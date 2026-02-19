@@ -10,6 +10,7 @@ on:
             - 'packages/**'
             - 'package.json'
             - 'package-lock.json'
+            - '.github/**'
     pull_request:
         branches:
             - master
@@ -19,6 +20,7 @@ on:
             - 'packages/**'
             - 'package.json'
             - 'package-lock.json'
+            - '.github/**'
 
 env:
     CI: true
