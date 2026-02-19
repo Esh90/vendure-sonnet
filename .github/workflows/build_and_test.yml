@@ -197,6 +197,13 @@ jobs:
                   node-version: ${{ matrix.node }}
             - name: Build
               run: npx lerna run build
+            - name: Wait for MariaDB
+              run: |
+                for i in {1..10}; do
+                  mysqladmin ping -h 127.0.0.1 -P ${{ job.services.mariadb.ports['3306'] }} -ppassword --silent && break
+                  echo "Waiting for MariaDB..."
+                  sleep 5
+                done
             - name: e2e tests
               env:
                   E2E_MARIADB_PORT: ${{ job.services.mariadb.ports['3306'] }}
@@ -244,6 +251,13 @@ jobs:
                   node-version: ${{ matrix.node }}
             - name: Build
               run: npx lerna run build
+            - name: Wait for MySQL
+              run: |
+                for i in {1..10}; do
+                  mysqladmin ping -h 127.0.0.1 -P ${{ job.services.mysql.ports['3306'] }} --silent && break
+                  echo "Waiting for MySQL..."
+                  sleep 5
+                done
             - name: e2e tests
               env:
                   E2E_MYSQL_PORT: ${{ job.services.mysql.ports['3306'] }}
@@ -292,6 +306,13 @@ jobs:
                   node-version: ${{ matrix.node }}
             - name: Build
               run: npx lerna run build
+            - name: Wait for Postgres
+              run: |
+                for i in {1..10}; do
+                  pg_isready -h 127.0.0.1 -p ${{ job.services.postgres.ports['5432'] }} && break
+                  echo "Waiting for Postgres..."
+                  sleep 5
+                done
             - name: e2e tests
               env:
                   E2E_POSTGRES_PORT: ${{ job.services.postgres.ports['5432'] }}
