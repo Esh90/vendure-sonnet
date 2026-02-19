@@ -10,7 +10,6 @@ on:
             - 'packages/**'
             - 'package.json'
             - 'package-lock.json'
-            - '.github/**'
     pull_request:
         branches:
             - master
@@ -20,7 +19,6 @@ on:
             - 'packages/**'
             - 'package.json'
             - 'package-lock.json'
-            - '.github/**'
 
 env:
     CI: true
@@ -61,9 +59,7 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
             - name: Build
-              run: |
-                npx lerna run build --scope @vendure/common --scope @vendure/core --include-dependencies
-                npx lerna run build
+              run: npx lerna run ci
             - name: Unit tests
               run: npm run test
     dashboard-changes:
@@ -99,9 +95,7 @@ jobs:
             - uses: actions/checkout@v4
             - uses: ./.github/actions/setup
             - name: Build
-              run: |
-                npx lerna run build --scope @vendure/common --scope @vendure/core --include-dependencies
-                npx lerna run build
+              run: npx lerna run ci
             - name: Cache Playwright browsers
               id: playwright-cache
               uses: actions/cache@v4
@@ -154,9 +148,7 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
             - name: Build
-              run: |
-                npx lerna run build --scope @vendure/common --scope @vendure/core --include-dependencies
-                npx lerna run build
+              run: npx lerna run ci
             - name: e2e tests
               env:
                   E2E_ELASTIC_PORT: ${{ job.services.elastic.ports['9200'] }}
@@ -204,16 +196,7 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
             - name: Build
-              run: |
-                npx lerna run build --scope @vendure/common --scope @vendure/core --include-dependencies
-                npx lerna run build
-            - name: Wait for MariaDB
-              run: |
-                for i in {1..10}; do
-                  mysqladmin ping -h 127.0.0.1 -P ${{ job.services.mariadb.ports['3306'] }} -ppassword --silent && break
-                  echo "Waiting for MariaDB..."
-                  sleep 5
-                done
+              run: npx lerna run ci
             - name: e2e tests
               env:
                   E2E_MARIADB_PORT: ${{ job.services.mariadb.ports['3306'] }}
@@ -260,16 +243,7 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
             - name: Build
-              run: |
-                npx lerna run build --scope @vendure/common --scope @vendure/core --include-dependencies
-                npx lerna run build
-            - name: Wait for MySQL
-              run: |
-                for i in {1..10}; do
-                  mysqladmin ping -h 127.0.0.1 -P ${{ job.services.mysql.ports['3306'] }} --silent && break
-                  echo "Waiting for MySQL..."
-                  sleep 5
-                done
+              run: npx lerna run ci
             - name: e2e tests
               env:
                   E2E_MYSQL_PORT: ${{ job.services.mysql.ports['3306'] }}
@@ -317,16 +291,7 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
             - name: Build
-              run: |
-                npx lerna run build --scope @vendure/common --scope @vendure/core --include-dependencies
-                npx lerna run build
-            - name: Wait for Postgres
-              run: |
-                for i in {1..10}; do
-                  pg_isready -h 127.0.0.1 -p ${{ job.services.postgres.ports['5432'] }} && break
-                  echo "Waiting for Postgres..."
-                  sleep 5
-                done
+              run: npx lerna run ci
             - name: e2e tests
               env:
                   E2E_POSTGRES_PORT: ${{ job.services.postgres.ports['5432'] }}
