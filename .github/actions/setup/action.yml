@@ -1,4 +1,5 @@
 name: 'Setup Vendure'
+# Triggering CI after package-lock restoration
 description: 'Setup Node with npm cache and install dependencies'
 inputs:
     node-version:
