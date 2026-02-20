@@ -10,6 +10,7 @@ on:
             - 'packages/**'
             - 'package.json'
             - 'package-lock.json'
+            - 'lerna.json'
             - '.github/**'
     pull_request:
         branches:
@@ -20,6 +21,7 @@ on:
             - 'packages/**'
             - 'package.json'
             - 'package-lock.json'
+            - 'lerna.json'
             - '.github/**'
 
 env:
