@@ -123,15 +123,15 @@ export class ProsemirrorService {
         const div = doc.createElement('div');
         div.innerHTML = text ?? '';
         return EditorState.create({
-            doc: DOMParser.fromSchema(this.mySchema).parse(div),
-            plugins: this.configurePlugins({ schema: this.mySchema, floatingMenu: false }),
+            doc: DOMParser.fromSchema(this.mySchema as any).parse(div),
+            plugins: this.configurePlugins({ schema: this.mySchema as any, floatingMenu: false }),
         });
     }
 
     private getTextFromState(state: EditorState): string {
         const doc = this.getDetachedDoc();
         const div = doc.createElement('div');
-        const fragment = DOMSerializer.fromSchema(this.mySchema).serializeFragment(state.doc.content);
+        const fragment = DOMSerializer.fromSchema(this.mySchema as any).serializeFragment(state.doc.content);
 
         div.appendChild(fragment);
 
@@ -140,8 +140,8 @@ export class ProsemirrorService {
 
     private configurePlugins(options: SetupOptions) {
         const plugins = [
-            buildInputRules(options.schema),
-            keymap(buildKeymap(options.schema, options.mapKeys)),
+            buildInputRules(options.schema as any),
+            keymap(buildKeymap(options.schema as any, options.mapKeys)),
             keymap(baseKeymap),
             dropCursor(),
             gapCursor(),
@@ -154,7 +154,7 @@ export class ProsemirrorService {
             customMenuPlugin({
                 floatingMenu: options.floatingMenu,
                 injector: this.injector,
-                schema: options.schema,
+                schema: options.schema as any,
             }),
         ];
         if (options.history !== false) {

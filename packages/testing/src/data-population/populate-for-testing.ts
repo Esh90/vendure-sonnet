@@ -2,7 +2,8 @@
 import { INestApplicationContext } from '@nestjs/common';
 import { LanguageCode } from '@vendure/common/lib/generated-types';
 import { ConfigService, isInspectableJobQueueStrategy, VendureConfig } from '@vendure/core';
-import { importProductsFromCsv, populateCollections, populateInitialData } from '@vendure/core/cli';
+// @ts-ignore
+const { importProductsFromCsv, populateCollections, populateInitialData } = require('@vendure/core/cli');
 
 import { TestServerOptions } from '../types';
 
