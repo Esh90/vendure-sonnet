@@ -127,7 +127,8 @@
         "packages/stellate-plugin",
         "packages/telemetry-plugin",
         "packages/testing",
-        "packages/ui-devkit"
+        "packages/ui-devkit",
+        "docs"
     ],
     "commitlint": {
         "extends": [
