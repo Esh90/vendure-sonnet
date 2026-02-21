@@ -5,7 +5,7 @@ import { ConfigService, isInspectableJobQueueStrategy, VendureConfig } from '@ve
 
 // @ts-ignore
 
-import { importProductsFromCsv, populateCollections, populateInitialData } from '@vendure/core/cli';
+import { importProductsFromCsv, populateCollections, populateInitialData } from '@vendure/core/dist/cli';
 
 import { TestServerOptions } from '../types';
 
