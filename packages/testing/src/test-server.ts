@@ -1,7 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { DefaultLogger, JobQueueService, Logger, VendureConfig } from '@vendure/core';
-import { preBootstrapConfig, configureSessionCookies } from '@vendure/core/dist/bootstrap';
+import { AppModule, DefaultLogger, JobQueueService, Logger, VendureConfig, preBootstrapConfig, configureSessionCookies } from '@vendure/core';
 
 import { populateForTesting } from './data-population/populate-for-testing';
 import { getInitializerFor } from './initializers/initializers';
@@ -109,10 +108,9 @@ export class TestServer {
     ): Promise<INestApplication> {
         const config = await preBootstrapConfig(userConfig);
         Logger.useLogger(config.logger);
-        const appModule = await import('@vendure/core/dist/app.module.js');
         try {
             DefaultLogger.hideNestBoostrapLogs();
-            const app = await NestFactory.create(appModule.AppModule, {
+            const app = await NestFactory.create(AppModule, {
                 cors: config.apiOptions.cors,
                 logger: new Logger(),
                 abortOnError: false,
@@ -123,8 +121,8 @@ export class TestServer {
             if (usingCookie) {
                 configureSessionCookies(app, config);
             }
-            const earlyMiddlewares = config.apiOptions.middleware.filter(mid => mid.beforeListen);
-            earlyMiddlewares.forEach(mid => {
+            const earlyMiddlewares = config.apiOptions.middleware.filter((mid: any) => mid.beforeListen);
+            earlyMiddlewares.forEach((mid: any) => {
                 app.use(mid.route, mid.handler);
             });
             await app.listen(config.apiOptions.port);

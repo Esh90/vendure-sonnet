@@ -3,6 +3,7 @@
     "compilerOptions": {
         "removeComments": false,
         "outDir": "../dist",
+        "rootDir": "../src",
         "rootDirs": ["../src"],
         "noEmit": false
     },

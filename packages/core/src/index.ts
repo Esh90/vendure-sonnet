@@ -7,6 +7,7 @@ export {
 } from '@vendure/common/lib/generated-types';
 export * from '@vendure/common/lib/shared-types';
 export * from './api/index';
+export * from './app.module';
 export * from './bootstrap';
 export * from './cache/index';
 export * from './common/index';
