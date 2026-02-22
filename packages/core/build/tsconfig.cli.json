@@ -2,7 +2,8 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "outDir": "../cli",
-    "rootDir": ".."
+    "rootDir": "..",
+    "noEmit": false
   },
   "files": [
     "../src/cli/index.ts",
