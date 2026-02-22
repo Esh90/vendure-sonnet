@@ -1,10 +1,11 @@
-import { ConfigArgValues } from '@vendure/core/common/configurable-operation';
-import { PaymentMetadata } from '@vendure/core/common/types/common-types';
+import { PaymentMetadata } from '@vendure/core';
 import { Environment, Transaction } from 'braintree';
 
-import { braintreePaymentMethodHandler } from './braintree.handler';
-
-export type PaymentMethodArgsHash = ConfigArgValues<(typeof braintreePaymentMethodHandler)['args']>;
+export type PaymentMethodArgsHash = {
+    merchantId: string;
+    publicKey: string;
+    privateKey: string;
+};
 
 // Note: we augment the @vendure/core module to add custom fields.
 declare module '@vendure/core' {
