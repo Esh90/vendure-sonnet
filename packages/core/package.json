@@ -41,6 +41,11 @@
             "require": "./dist/index.js",
             "types": "./dist/index.d.ts"
         },
+        "./*": {
+            "import": "./dist/*.js",
+            "require": "./dist/*.js",
+            "types": "./dist/*.d.ts"
+        },
         "./cli": {
             "import": "./cli/index.js",
             "require": "./cli/index.js",
@@ -55,8 +60,7 @@
             "import": "./cli/*.js",
             "require": "./cli/*.js",
             "types": "./cli/*.d.ts"
-        },
-        "./dist/*": "./dist/*"
+        }
     },
     "files": [
         "dist/**/*",
