@@ -6,6 +6,7 @@
   },
   "files": [
     "../src/cli/index.ts",
+    "../src/cli/populate.ts",
     "../typings.d.ts"
   ]
 }
