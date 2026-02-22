@@ -6,13 +6,13 @@ import { UuidIdStrategy } from '@vendure/core';
 // recursive evaluation of all imported files. This tests
 // the resilience of the id strategy implementation to the
 // order of file evaluation.
-import '@vendure/core/dist/index';
+import '@vendure/core';
 import { createTestEnvironment } from '@vendure/testing';
 import path from 'path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { initialData } from '../../../e2e-common/e2e-initial-data';
-import { testConfig, TEST_SETUP_TIMEOUT_MS } from '../../../e2e-common/test-config';
+import { TEST_SETUP_TIMEOUT_MS, testConfig } from '../../../e2e-common/test-config';
 
 import { GetProductListQuery, GetProductListQueryVariables } from './graphql/generated-e2e-admin-types';
 import { GET_PRODUCT_LIST } from './graphql/shared-definitions';
