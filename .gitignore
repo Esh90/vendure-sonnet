@@ -9,6 +9,9 @@
 .idea/**/tasks.xml
 .idea/dictionaries
 .env
+.gemini/
+error.txt.txt
+nul
 lerna-debug.log
 dist
 e2e/__data__/*
