@@ -14,7 +14,7 @@
     },
     "scripts": {
         "dev": "vite",
-        "check-types": "NODE_OPTIONS=\"--max-old-space-size=8192\" tsc --project tsconfig.check.json --noEmit",
+        "check-types": "tsc --project tsconfig.check.json --noEmit",
         "build:standalone": "vite build",
         "build:vite": "tsc --project tsconfig.vite.json",
         "build:plugin": "tsc --project tsconfig.plugin.json && node scripts/build-plugin.js",
