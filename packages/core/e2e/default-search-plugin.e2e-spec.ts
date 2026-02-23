@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { CurrencyCode, LanguageCode, LogicalOperator, SortOrder } from '@vendure/common/lib/generated-types';
+import {
+    CurrencyCode,
+    GlobalFlag,
+    LanguageCode,
+    LogicalOperator,
+    SortOrder,
+} from '@vendure/common/lib/generated-types';
 import { pick } from '@vendure/common/lib/pick';
 import {
     DefaultJobQueuePlugin,
@@ -1864,10 +1870,7 @@ describe('Default search plugin', () => {
             await adminClient.asSuperAdmin();
 
             // Create a second channel for testing stock isolation
-            const { createChannel } = await adminClient.query<
-                CreateChannelMutation,
-                CreateChannelMutationVariables
-            >(CREATE_CHANNEL, {
+            const { createChannel } = await adminClient.query(createChannelDocument, {
                 input: {
                     code: 'stock-test-channel',
                     token: STOCK_CHANNEL_TOKEN,
@@ -1878,13 +1881,14 @@ describe('Default search plugin', () => {
                     defaultShippingZoneId: 'T_1',
                 },
             });
-            stockTestChannelId = (createChannel as ChannelFragment).id;
+            const channelGuard: ErrorResultGuard<FragmentOf<typeof channelFragment>> = createErrorResultGuard(
+                input => !!input && !('errorCode' in input),
+            );
+            channelGuard.assertSuccess(createChannel);
+            stockTestChannelId = createChannel.id;
 
             // Create a product with a variant that has stock in the default channel
-            const { createProduct } = await adminClient.query<
-                CreateProductMutation,
-                CreateProductMutationVariables
-            >(CREATE_PRODUCT, {
+            const { createProduct } = await adminClient.query(createProductDocument, {
                 input: {
                     translations: [
                         {
@@ -1898,40 +1902,34 @@ describe('Default search plugin', () => {
             });
             testProductId = createProduct.id;
 
-            await adminClient.query<CreateProductVariantsMutation, CreateProductVariantsMutationVariables>(
-                CREATE_PRODUCT_VARIANTS,
-                {
-                    input: [
-                        {
-                            productId: testProductId,
-                            sku: 'STOCK-TEST-1',
-                            price: 1000,
-                            stockOnHand: 100,
-                            trackInventory: GlobalFlag.TRUE,
-                            translations: [{ languageCode: LanguageCode.en, name: 'Stock Test Variant' }],
-                        },
-                    ],
-                },
-            );
+            await adminClient.query(createProductVariantsDocument, {
+                input: [
+                    {
+                        productId: testProductId,
+                        sku: 'STOCK-TEST-1',
+                        price: 1000,
+                        stockOnHand: 100,
+                        trackInventory: GlobalFlag.TRUE,
+                        translations: [{ languageCode: LanguageCode.en, name: 'Stock Test Variant' }],
+                    },
+                ],
+            });
             await awaitRunningJobs(adminClient);
 
             // Assign the product to the second channel (no stock location there)
-            await adminClient.query<
-                AssignProductsToChannelMutation,
-                AssignProductsToChannelMutationVariables
-            >(ASSIGN_PRODUCT_TO_CHANNEL, {
+            await adminClient.query(assignProductToChannelDocument, {
                 input: { channelId: stockTestChannelId, productIds: [testProductId] },
             });
             await awaitRunningJobs(adminClient);
 
             // Reindex default channel first
             adminClient.setChannelToken(E2E_DEFAULT_CHANNEL_TOKEN);
-            await adminClient.query<ReindexMutation>(REINDEX);
+            await adminClient.query(reindexDocument);
             await awaitRunningJobs(adminClient);
 
             // Reindex the second channel
             adminClient.setChannelToken(STOCK_CHANNEL_TOKEN);
-            await adminClient.query<ReindexMutation>(REINDEX);
+            await adminClient.query(reindexDocument);
             await awaitRunningJobs(adminClient);
 
             // Reset admin token after reindexing second channel
@@ -1940,10 +1938,7 @@ describe('Default search plugin', () => {
 
         it('product is inStock in default channel', async () => {
             shopClient.setChannelToken(E2E_DEFAULT_CHANNEL_TOKEN);
-            const result = await shopClient.query<
-                SearchProductsShopQuery,
-                SearchProductsShopQueryVariablesExt
-            >(SEARCH_PRODUCTS_SHOP, {
+            const result = await shopClient.query(searchProductsShopDocument, {
                 input: {
                     term: 'Stock Test Product',
                     groupByProduct: true,
@@ -1955,10 +1950,7 @@ describe('Default search plugin', () => {
 
         it('product is NOT inStock in second channel (no stock location)', async () => {
             shopClient.setChannelToken(STOCK_CHANNEL_TOKEN);
-            const result = await shopClient.query<
-                SearchProductsShopQuery,
-                SearchProductsShopQueryVariablesExt
-            >(SEARCH_PRODUCTS_SHOP, {
+            const result = await shopClient.query(searchProductsShopDocument, {
                 input: {
                     term: 'Stock Test Product',
                     groupByProduct: true,
@@ -1970,10 +1962,7 @@ describe('Default search plugin', () => {
 
         it('product appears when filtering inStock: false in second channel', async () => {
             shopClient.setChannelToken(STOCK_CHANNEL_TOKEN);
-            const result = await shopClient.query<
-                SearchProductsShopQuery,
-                SearchProductsShopQueryVariablesExt
-            >(SEARCH_PRODUCTS_SHOP, {
+            const result = await shopClient.query(searchProductsShopDocument, {
                 input: {
                     term: 'Stock Test Product',
                     groupByProduct: true,
