@@ -73,6 +73,29 @@ class AdministratorEvent extends VendureEntityEvent<Administrator, Administrator
 
 
 </div>
+<GenerationInfo sourceFile="packages/core/src/event-bus/events/api-key-event.ts" sourceLine="18" packageName="@vendure/core" since="3.6.0" />
+
+This event is fired whenever a [ApiKey](/reference/typescript-api/entities/api-key#apikey) is added, updated or deleted.
+
+```ts title="Signature"
+class ApiKeyEvent extends VendureEntityEvent<ApiKey, ApiKeyInputTypes> {
+    constructor(ctx: RequestContext, entity: ApiKey, type: 'created' | 'updated' | 'deleted', input?: ApiKeyInputTypes)
+}
+```
+* Extends: [`VendureEntityEvent`](/reference/typescript-api/events/vendure-entity-event#vendureentityevent)`<`[`ApiKey`](/reference/typescript-api/entities/api-key#apikey)`, ApiKeyInputTypes>`
+
+
+
+<div className="members-wrapper">
+
+### constructor
+
+<MemberInfo kind="method" type={`(ctx: <a href='/reference/typescript-api/request/request-context#requestcontext'>RequestContext</a>, entity: <a href='/reference/typescript-api/entities/api-key#apikey'>ApiKey</a>, type: 'created' | 'updated' | 'deleted', input?: ApiKeyInputTypes) => ApiKeyEvent`}   />
+
+
+
+
+</div>
 <GenerationInfo sourceFile="packages/core/src/event-bus/events/asset-channel-event.ts" sourceLine="15" packageName="@vendure/core" />
 
 This event is fired whenever an [Asset](/reference/typescript-api/entities/asset#asset) is assigned or removed

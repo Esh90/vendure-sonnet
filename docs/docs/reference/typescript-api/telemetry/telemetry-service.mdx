@@ -22,12 +22,13 @@ Set the environment variable `VENDURE_DISABLE_TELEMETRY=true` to disable telemet
 Telemetry is automatically disabled in CI environments.
 
 ```ts title="Signature"
-class TelemetryService implements OnApplicationBootstrap {
+class TelemetryService implements OnApplicationBootstrap, OnApplicationShutdown {
     constructor(processContext: ProcessContext, installationIdCollector: InstallationIdCollector, systemInfoCollector: SystemInfoCollector, databaseCollector: DatabaseCollector, pluginCollector: PluginCollector, configCollector: ConfigCollector, deploymentCollector: DeploymentCollector)
     onApplicationBootstrap() => ;
+    onApplicationShutdown() => ;
 }
 ```
-* Implements: OnApplicationBootstrap
+* Implements: OnApplicationBootstrap, OnApplicationShutdown
 
 
 
@@ -39,6 +40,11 @@ class TelemetryService implements OnApplicationBootstrap {
 
 
 ### onApplicationBootstrap
+
+<MemberInfo kind="method" type={`() => `}   />
+
+
+### onApplicationShutdown
 
 <MemberInfo kind="method" type={`() => `}   />
 

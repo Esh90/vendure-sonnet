@@ -71,6 +71,40 @@ generated: true
 }`}
 </GraphQLDoc>
 
+<a name="apikey"></a>
+
+## apiKey
+
+<GraphQLDoc
+  type="query"
+  typeName="apiKey"
+  typeLinks={{
+    ApiKey: '/reference/graphql-api/admin/object-types#apikey',
+    ID: '/reference/graphql-api/admin/object-types#id',
+  }}
+>
+{`type Query {
+  apiKey(id: ID!): ApiKey
+}`}
+</GraphQLDoc>
+
+<a name="apikeys"></a>
+
+## apiKeys
+
+<GraphQLDoc
+  type="query"
+  typeName="apiKeys"
+  typeLinks={{
+    ApiKeyList: '/reference/graphql-api/admin/object-types#apikeylist',
+    ApiKeyListOptions: '/reference/graphql-api/admin/input-types#apikeylistoptions',
+  }}
+>
+{`type Query {
+  apiKeys(options: ApiKeyListOptions): ApiKeyList!
+}`}
+</GraphQLDoc>
+
 <a name="asset"></a>
 
 ## asset
