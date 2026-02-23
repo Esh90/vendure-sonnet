@@ -288,6 +288,17 @@ describe('Product related assets', () => {
         expect(updateProduct.assets.map(a => a.id)).toContain('T_3');
     });
 
+    it('Channel2 does not have asset A', async () => {
+        adminClient.setChannelToken(SECOND_CHANNEL_TOKEN);
+        const { product } = await adminClient.query<
+            Codegen.GetProductWithVariantsQuery,
+            Codegen.GetProductWithVariantsQueryVariables
+        >(GET_PRODUCT_WITH_VARIANTS, {
+            id: 'T_2',
+        });
+        expect(product!.assets.find(a => a.id === 'T_3')).toBeUndefined();
+    });
+
     it('Updating product with asset IDs not in channel does not crash', async () => {
         adminClient.setChannelToken(SECOND_CHANNEL_TOKEN);
         // T_3 is not assigned to channel2, so findByIdsInChannel returns empty.
@@ -302,17 +313,6 @@ describe('Product related assets', () => {
             },
         });
         expect(updateProduct.assets).toEqual([]);
-    });
-
-    it('Channel2 does not have asset A', async () => {
-        adminClient.setChannelToken(SECOND_CHANNEL_TOKEN);
-        const { product } = await adminClient.query<
-            Codegen.GetProductWithVariantsQuery,
-            Codegen.GetProductWithVariantsQueryVariables
-        >(GET_PRODUCT_WITH_VARIANTS, {
-            id: 'T_2',
-        });
-        expect(product!.assets.find(a => a.id === 'T_3')).toBeUndefined();
     });
 });
 
