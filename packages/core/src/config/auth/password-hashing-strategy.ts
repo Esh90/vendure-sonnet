@@ -4,7 +4,7 @@ import { InjectableStrategy } from '../../common/types/injectable-strategy';
  * @description
  * Defines how sensitive user credentials like passwords and API-Keys get hashed.
  *
- * :::info Config
+ * :::info[Config]
  *
  * Hashing for passwords when using the {@link NativeAuthenticationStrategy} can be
  * configured via the `authOptions.passwordHashingStrategy` property of

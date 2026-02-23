@@ -674,13 +674,13 @@ export function PageActionBarRight({
     /**
      * @description
      * ActionBarItem components that will be rendered in the action bar.
-     * Each item should have a unique `itemId` for extension targeting.
+     * Each item should have a unique itemId for extension targeting.
      */
     children?: React.ReactNode;
     /**
      * @description
      * Optional dropdown menu items. These are now extracted and rendered by PageActionBar.
-     * @deprecated Pass `dropdownMenuItems` directly to {@link PageActionBar} instead.
+     * @deprecated Pass dropdownMenuItems directly to PageActionBar instead.
      */
     dropdownMenuItems?: InlineDropdownItem[];
 }>) {
