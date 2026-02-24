@@ -2,8 +2,10 @@ import { LabeledData } from '@/vdb/components/labeled-data.js';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/vdb/components/ui/collapsible.js';
 import { api } from '@/vdb/graphql/api.js';
 import { ResultOf } from '@/vdb/graphql/graphql.js';
+import { useCustomFieldConfig } from '@/vdb/hooks/use-custom-field-config.js';
 import { useDynamicTranslations } from '@/vdb/hooks/use-dynamic-translations.js';
 import { useLocalFormat } from '@/vdb/hooks/use-local-format.js';
+import { useUserSettings } from '@/vdb/hooks/use-user-settings.js';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useMutation } from '@tanstack/react-query';
 import { ChevronDown } from 'lucide-react';
@@ -27,9 +29,42 @@ export function FulfillmentDetails({ order, fulfillment, onSuccess }: Readonly<F
     const { formatDate } = useLocalFormat();
     const { t } = useLingui();
     const { getTranslatedFulfillmentState } = useDynamicTranslations();
+    const customFieldConfig = useCustomFieldConfig('Fulfillment');
+    const {
+        settings: { displayLanguage },
+    } = useUserSettings();
 
     // Create a map of order lines by ID for quick lookup
     const orderLinesMap = new Map(order.lines.map(line => [line.id, line]));
+
+    const getCustomFieldLabel = (
+        fieldConfig: (typeof customFieldConfig)[number],
+    ): string => {
+        const label = fieldConfig.label;
+        if (typeof label === 'string') {
+            return label;
+        }
+        if (Array.isArray(label)) {
+            const translation = label.find(l => l.languageCode === displayLanguage);
+            if (translation) {
+                return translation.value;
+            }
+        }
+        return fieldConfig.name;
+    };
+
+    const formatCustomFieldValue = (value: unknown): string => {
+        if (value === null || value === undefined) {
+            return '-';
+        }
+        if (typeof value === 'boolean') {
+            return value ? t`Yes` : t`No`;
+        }
+        if (typeof value === 'object') {
+            return JSON.stringify(value);
+        }
+        return String(value);
+    };
 
     const transitionFulfillmentMutation = useMutation({
         mutationFn: api.mutate(transitionFulfillmentToStateDocument),
@@ -112,6 +147,20 @@ export function FulfillmentDetails({ order, fulfillment, onSuccess }: Readonly<F
                     <LabeledData label={<Trans>Tracking code</Trans>} value={fulfillment.trackingCode} />
                 )}
                 <LabeledData label={<Trans>Created</Trans>} value={formatDate(fulfillment.createdAt)} />
+                {customFieldConfig?.map(fieldConfig => {
+                    const customFields = fulfillment.customFields as Record<string, unknown> | null | undefined;
+                    const value = customFields?.[fieldConfig.name];
+                    if (value === null || value === undefined) {
+                        return null;
+                    }
+                    return (
+                        <LabeledData
+                            key={fieldConfig.name}
+                            label={getCustomFieldLabel(fieldConfig)}
+                            value={formatCustomFieldValue(value)}
+                        />
+                    );
+                })}
             </div>
 
             {fulfillment.lines.length > 0 && (
