@@ -97,7 +97,6 @@ export const fulfillmentFragment = graphql(`
             quantity
         }
         trackingCode
-        customFields
     }
 `);
 
