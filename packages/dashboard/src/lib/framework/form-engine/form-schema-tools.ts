@@ -366,6 +366,14 @@ export function getDefaultValueFromField(field: FieldInfo, defaultLanguageCode?:
                 return defaultLanguageCode || 'en';
             case 'Boolean':
                 return false;
+            case 'Int':
+            case 'Float':
+            case 'Money':
+            case 'DateTime':
+                // Nullable numeric/date fields should default to null, not 0.
+                // This allows forms to distinguish between "no value" (unlimited)
+                // and "zero value" (explicit zero).
+                return null;
             default:
                 // Object-typed fields (e.g. customFields without typeInfo) should default
                 // to {} to match the Zod schema which expects an object.
