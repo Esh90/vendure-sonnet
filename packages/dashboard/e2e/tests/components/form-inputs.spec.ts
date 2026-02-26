@@ -13,7 +13,7 @@ import { expect, test } from '@playwright/test';
 
 const TEST_PAGE = '/form-inputs-test';
 
-test.describe('Disabled form controls (#4424)', () => {
+test.describe('Form inputs — disabled state (#4424)', () => {
     test.beforeEach(async ({ page }) => {
         await page.goto(TEST_PAGE);
         await expect(page.getByText('Form Inputs Test')).toBeVisible();
