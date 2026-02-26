@@ -10,7 +10,7 @@ import { isReadonlyField } from '@/vdb/framework/form-engine/utils.js';
  * @docsCategory form-components
  * @docsPage TextInput
  */
-export const TextInput: DashboardFormComponent = ({ value, onChange, fieldDef }) => {
-    const readOnly = isReadonlyField(fieldDef);
+export const TextInput: DashboardFormComponent = ({ value, onChange, fieldDef, disabled }) => {
+    const readOnly = disabled || isReadonlyField(fieldDef);
     return <Input value={value ?? ''} onChange={e => onChange(e.target.value)} disabled={readOnly} />;
 };

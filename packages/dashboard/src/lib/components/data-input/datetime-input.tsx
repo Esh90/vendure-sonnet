@@ -39,8 +39,8 @@ export function useDayPickerLocale() {
  * @docsCategory form-components
  * @docsPage DateTimeInput
  */
-export function DateTimeInput({ value, onChange, fieldDef }: Readonly<DashboardFormComponentProps>) {
-    const readOnly = isReadonlyField(fieldDef);
+export function DateTimeInput({ value, onChange, fieldDef, disabled }: Readonly<DashboardFormComponentProps>) {
+    const readOnly = disabled || isReadonlyField(fieldDef);
     const locale = useDayPickerLocale();
     const date = value && value instanceof Date ? value.toISOString() : (value ?? '');
     const [isOpen, setIsOpen] = React.useState(false);
@@ -90,6 +90,7 @@ export function DateTimeInput({ value, onChange, fieldDef }: Readonly<DashboardF
                     {date ? (
                         <Button
                             variant="outline"
+                            disabled={readOnly}
                             className="rounded-l-none border-l-0"
                             onClick={e => {
                                 e.stopPropagation();
