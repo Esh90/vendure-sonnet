@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedFormInputsTestRouteImport } from './routes/_authenticated/form-inputs-test'
 import { Route as AuthenticatedZonesZonesRouteImport } from './routes/_authenticated/_zones/zones'
 import { Route as AuthenticatedTaxRatesTaxRatesRouteImport } from './routes/_authenticated/_tax-rates/tax-rates'
 import { Route as AuthenticatedTaxCategoriesTaxCategoriesRouteImport } from './routes/_authenticated/_tax-categories/tax-categories'
@@ -79,6 +80,12 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedFormInputsTestRoute =
+  AuthenticatedFormInputsTestRouteImport.update({
+    id: '/form-inputs-test',
+    path: '/form-inputs-test',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedZonesZonesRoute = AuthenticatedZonesZonesRouteImport.update({
   id: '/_zones/zones',
   path: '/zones',
@@ -395,8 +402,9 @@ const AuthenticatedProductsProductsProductIdOptionGroupsProductOptionGroupIdOpti
   )
 
 export interface FileRoutesByFullPath {
-  '/login': typeof LoginRoute
   '/': typeof AuthenticatedIndexRoute
+  '/login': typeof LoginRoute
+  '/form-inputs-test': typeof AuthenticatedFormInputsTestRoute
   '/administrators': typeof AuthenticatedAdministratorsAdministratorsRoute
   '/assets': typeof AuthenticatedAssetsAssetsRoute
   '/channels': typeof AuthenticatedChannelsChannelsRoute
@@ -452,6 +460,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/form-inputs-test': typeof AuthenticatedFormInputsTestRoute
   '/': typeof AuthenticatedIndexRoute
   '/administrators': typeof AuthenticatedAdministratorsAdministratorsRoute
   '/assets': typeof AuthenticatedAssetsAssetsRoute
@@ -510,6 +519,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/form-inputs-test': typeof AuthenticatedFormInputsTestRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/_administrators/administrators': typeof AuthenticatedAdministratorsAdministratorsRoute
   '/_authenticated/_assets/assets': typeof AuthenticatedAssetsAssetsRoute
@@ -567,8 +577,9 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/login'
     | '/'
+    | '/login'
+    | '/form-inputs-test'
     | '/administrators'
     | '/assets'
     | '/channels'
@@ -624,6 +635,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/form-inputs-test'
     | '/'
     | '/administrators'
     | '/assets'
@@ -681,6 +693,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/login'
+    | '/_authenticated/form-inputs-test'
     | '/_authenticated/'
     | '/_authenticated/_administrators/administrators'
     | '/_authenticated/_assets/assets'
@@ -753,7 +766,7 @@ declare module '@tanstack/react-router' {
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -762,6 +775,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/form-inputs-test': {
+      id: '/_authenticated/form-inputs-test'
+      path: '/form-inputs-test'
+      fullPath: '/form-inputs-test'
+      preLoaderRoute: typeof AuthenticatedFormInputsTestRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/_zones/zones': {
@@ -1132,6 +1152,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedFormInputsTestRoute: typeof AuthenticatedFormInputsTestRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAdministratorsAdministratorsRoute: typeof AuthenticatedAdministratorsAdministratorsRoute
   AuthenticatedAssetsAssetsRoute: typeof AuthenticatedAssetsAssetsRoute
@@ -1188,6 +1209,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedFormInputsTestRoute: AuthenticatedFormInputsTestRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAdministratorsAdministratorsRoute:
     AuthenticatedAdministratorsAdministratorsRoute,
