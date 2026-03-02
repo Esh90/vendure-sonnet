@@ -2,23 +2,28 @@
 title: "DefaultEntityAccessControlStrategy"
 generated: true
 ---
-<GenerationInfo sourceFile="packages/core/src/config/auth/default-entity-access-control-strategy.ts" sourceLine="34" packageName="@vendure/core" since="3.6.0" />
+<GenerationInfo sourceFile="packages/core/src/config/auth/default-entity-access-control-strategy.ts" sourceLine="39" packageName="@vendure/core" since="3.6.0" />
 
 The default EntityAccessControlStrategy which implements the standard
 Vendure permission evaluation logic. It checks the `@Allow()` decorator
 permissions against the current user's channel permissions.
 
-Custom strategies should extend this class and override `evaluateAccess()`
-to customize gate-level permissions, and/or implement `applyAccessControl()`
+Custom strategies should extend this class and override `canAccess()`
+to customize gate-level permissions, implement `prepareAccessControl()`
+for async pre-loading, and/or implement `applyAccessControl()`
 to add row-level filtering.
 
 *Example*
 
 ```ts
 class MyStrategy extends DefaultEntityAccessControlStrategy {
-    async evaluateAccess(ctx: RequestContext, permissions: Permission[]) {
+    async canAccess(ctx: RequestContext, permissions: Permission[]) {
         // Custom gate-level logic, falling back to default
-        return super.evaluateAccess(ctx, permissions);
+        return super.canAccess(ctx, permissions);
+    }
+
+    async prepareAccessControl(ctx: RequestContext) {
+        // Pre-load data for row-level filtering
     }
 
     applyAccessControl(qb, entityType, ctx) {
@@ -29,7 +34,7 @@ class MyStrategy extends DefaultEntityAccessControlStrategy {
 
 ```ts title="Signature"
 class DefaultEntityAccessControlStrategy implements EntityAccessControlStrategy {
-    evaluateAccess(ctx: RequestContext, permissions: Permission[]) => Promise<boolean>;
+    canAccess(ctx: RequestContext, permissions: Permission[]) => Promise<boolean>;
 }
 ```
 * Implements: [`EntityAccessControlStrategy`](/reference/typescript-api/auth/entity-access-control-strategy#entityaccesscontrolstrategy)
@@ -38,7 +43,7 @@ class DefaultEntityAccessControlStrategy implements EntityAccessControlStrategy 
 
 <div className="members-wrapper">
 
-### evaluateAccess
+### canAccess
 
 <MemberInfo kind="method" type={`(ctx: <a href='/reference/typescript-api/request/request-context#requestcontext'>RequestContext</a>, permissions: <a href='/reference/typescript-api/common/permission#permission'>Permission</a>[]) => Promise<boolean>`}   />
 

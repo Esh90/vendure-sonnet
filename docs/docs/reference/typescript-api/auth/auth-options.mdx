@@ -184,10 +184,11 @@ Allows you to customize the way verification tokens are generated.
 
 <MemberInfo kind="property" type={`<a href='/reference/typescript-api/auth/entity-access-control-strategy#entityaccesscontrolstrategy'>EntityAccessControlStrategy</a>`} default={`<a href='/reference/typescript-api/auth/default-entity-access-control-strategy#defaultentityaccesscontrolstrategy'>DefaultEntityAccessControlStrategy</a>`}  since="3.6.0"  />
 
-Allows you to define row-level access control for entity queries. When set,
-the strategy's `applyAccessControl()` method will be invoked for every entity
-query that goes through Vendure's data access layer, allowing you to restrict
-which entities are visible to the current user.
+Allows you to define access control for entity queries at three levels:
+
+- `canAccess()` — gate-level permission check (once per request)
+- `prepareAccessControl()` — async pre-loading for row-level filtering (once per request)
+- `applyAccessControl()` — synchronous row-level QB filtering (every entity query)
 
 
 </div>

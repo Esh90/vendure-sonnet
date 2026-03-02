@@ -2,15 +2,20 @@
 title: "EntityAccessControlStrategy"
 generated: true
 ---
-<GenerationInfo sourceFile="packages/core/src/config/auth/entity-access-control-strategy.ts" sourceLine="90" packageName="@vendure/core" since="3.6.0" />
+<GenerationInfo sourceFile="packages/core/src/config/auth/entity-access-control-strategy.ts" sourceLine="91" packageName="@vendure/core" since="3.6.0" />
 
-An EntityAccessControlStrategy provides two layers of access control:
+An EntityAccessControlStrategy provides three layers of access control:
 
-1. **Gate-level** (`evaluateAccess`): Determines whether a request should be
+1. **Gate-level** (`canAccess`): Determines whether a request should be
    allowed at all, replacing the default Vendure permission evaluation logic.
    This runs once per request in the AuthGuard.
 
-2. **Row-level** (`applyAccessControl`): Filters which entities a user can see
+2. **Pre-loading** (`prepareAccessControl`): Optional async phase that runs
+   once per request after `canAccess` passes. Use this to pre-load data
+   (e.g. seller IDs, category assignments) for use in the synchronous
+   `applyAccessControl()` method.
+
+3. **Row-level** (`applyAccessControl`): Filters which entities a user can see
    by modifying query builders. This runs for every entity query.
 
 The default implementation ([DefaultEntityAccessControlStrategy](/reference/typescript-api/auth/default-entity-access-control-strategy#defaultentityaccesscontrolstrategy)) preserves
@@ -29,12 +34,12 @@ they need.
 ```ts
 // Override gate-level permissions per channel (#2051 use case)
 class B2BAccessControlStrategy extends DefaultEntityAccessControlStrategy {
-    async evaluateAccess(ctx: RequestContext, permissions: Permission[]) {
+    async canAccess(ctx: RequestContext, permissions: Permission[]) {
         if (permissions.includes(Permission.Public)
             && ctx.channel.customFields.requireAuthentication) {
             return ctx.activeUserId != null;
         }
-        return super.evaluateAccess(ctx, permissions);
+        return super.canAccess(ctx, permissions);
     }
 }
 ```
@@ -51,16 +56,12 @@ class SellerScopedStrategy extends DefaultEntityAccessControlStrategy {
         this.connection = injector.get(TransactionalConnection);
     }
 
-    async evaluateAccess(ctx: RequestContext, permissions: Permission[]) {
-        const allowed = await super.evaluateAccess(ctx, permissions);
-        if (!allowed) return false;
-
+    async prepareAccessControl(ctx: RequestContext) {
         // Pre-load seller data (use rawConnection to avoid Proxy recursion)
         if (ctx.activeUserId && !ctx.userHasPermissions([Permission.SuperAdmin])) {
             const ids = await this.lookupSellerIds(ctx);
             this.sellerIds.set(ctx, ids);
         }
-        return true;
     }
 
     applyAccessControl(qb, entityType, ctx) {
@@ -85,7 +86,8 @@ of your VendureConfig.
 
 ```ts title="Signature"
 interface EntityAccessControlStrategy extends InjectableStrategy {
-    evaluateAccess(ctx: RequestContext, permissions: Permission[]): Promise<boolean>;
+    canAccess(ctx: RequestContext, permissions: Permission[]): Promise<boolean>;
+    prepareAccessControl?(ctx: RequestContext): Promise<void>;
     applyAccessControl?<T extends VendureEntity>(
         qb: SelectQueryBuilder<T>,
         entityType: new (...args: any[]) => T,
@@ -99,7 +101,7 @@ interface EntityAccessControlStrategy extends InjectableStrategy {
 
 <div className="members-wrapper">
 
-### evaluateAccess
+### canAccess
 
 <MemberInfo kind="method" type={`(ctx: <a href='/reference/typescript-api/request/request-context#requestcontext'>RequestContext</a>, permissions: <a href='/reference/typescript-api/common/permission#permission'>Permission</a>[]) => Promise<boolean>`}   />
 
@@ -107,12 +109,20 @@ Called once per request in the AuthGuard to determine whether the request
 should be allowed. This replaces the default Vendure permission evaluation
 logic, giving full control over gate-level access.
 
-This method can also be used to pre-load data (via `WeakMap<RequestContext>`)
-for use in the synchronous `applyAccessControl()` method.
-
 The [DefaultEntityAccessControlStrategy](/reference/typescript-api/auth/default-entity-access-control-strategy#defaultentityaccesscontrolstrategy) implements the standard
 Vendure permission logic. Custom strategies should extend it and call
-`super.evaluateAccess()` to preserve the default behavior.
+`super.canAccess()` to preserve the default behavior.
+### prepareAccessControl
+
+<MemberInfo kind="method" type={`(ctx: <a href='/reference/typescript-api/request/request-context#requestcontext'>RequestContext</a>) => Promise<void>`}   />
+
+Optional async phase that runs once per request in the AuthGuard, after
+`canAccess()` has passed. Use this to pre-load data needed by the
+synchronous `applyAccessControl()` method.
+
+For example, you can look up which seller IDs or category assignments
+the current user has, and stash the results in a `WeakMap<RequestContext>`
+for later use in `applyAccessControl()`.
 
 **Important:** Any database queries in this method should use
 `rawConnection.getRepository()` rather than the RequestContext-aware
@@ -131,7 +141,7 @@ and no Proxy is created on `getRepository()` — giving zero overhead for
 the default case.
 
 If your access control logic requires async lookups, perform them in
-`evaluateAccess()` and read the cached results here.
+`prepareAccessControl()` and read the cached results here.
 
 
 </div>
