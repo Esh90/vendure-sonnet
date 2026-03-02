@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { CurrencyCode, LanguageCode, LogicalOperator, SortOrder } from '@vendure/common/lib/generated-types';
+import {
+    CurrencyCode,
+    GlobalFlag,
+    LanguageCode,
+    LogicalOperator,
+    SortOrder,
+} from '@vendure/common/lib/generated-types';
 import { pick } from '@vendure/common/lib/pick';
 import {
     DefaultJobQueuePlugin,
@@ -1850,6 +1856,124 @@ describe('Default search plugin', () => {
                 expect((await search('foo + - *')).search.items).toBeDefined();
                 expect((await search('foo + - bar')).search.items).toBeDefined();
             });
+        });
+    });
+
+    // https://github.com/vendurehq/community-plugins/issues/1
+    describe('multi-channel productInStock cache', () => {
+        const STOCK_CHANNEL_TOKEN = 'stock-test-channel-token';
+        let stockTestChannelId: string;
+        let testProductId: string;
+
+        beforeAll(async () => {
+            adminClient.setChannelToken(E2E_DEFAULT_CHANNEL_TOKEN);
+            await adminClient.asSuperAdmin();
+
+            // Create a second channel for testing stock isolation
+            const { createChannel } = await adminClient.query(createChannelDocument, {
+                input: {
+                    code: 'stock-test-channel',
+                    token: STOCK_CHANNEL_TOKEN,
+                    defaultLanguageCode: LanguageCode.en,
+                    currencyCode: CurrencyCode.GBP,
+                    pricesIncludeTax: true,
+                    defaultTaxZoneId: 'T_2',
+                    defaultShippingZoneId: 'T_1',
+                },
+            });
+            const channelGuard: ErrorResultGuard<FragmentOf<typeof channelFragment>> = createErrorResultGuard(
+                input => !!input && !('errorCode' in input),
+            );
+            channelGuard.assertSuccess(createChannel);
+            stockTestChannelId = createChannel.id;
+
+            // Create a product with a variant that has stock in the default channel
+            const { createProduct } = await adminClient.query(createProductDocument, {
+                input: {
+                    translations: [
+                        {
+                            languageCode: LanguageCode.en,
+                            name: 'Stock Test Product',
+                            slug: 'stock-test-product',
+                            description: 'A product for testing multi-channel stock',
+                        },
+                    ],
+                },
+            });
+            testProductId = createProduct.id;
+
+            await adminClient.query(createProductVariantsDocument, {
+                input: [
+                    {
+                        productId: testProductId,
+                        sku: 'STOCK-TEST-1',
+                        price: 1000,
+                        stockOnHand: 100,
+                        trackInventory: GlobalFlag.TRUE,
+                        translations: [{ languageCode: LanguageCode.en, name: 'Stock Test Variant' }],
+                    },
+                ],
+            });
+            await awaitRunningJobs(adminClient);
+
+            // Assign the product to the second channel (no stock location there)
+            await adminClient.query(assignProductToChannelDocument, {
+                input: { channelId: stockTestChannelId, productIds: [testProductId] },
+            });
+            await awaitRunningJobs(adminClient);
+
+            // Reindex default channel first
+            adminClient.setChannelToken(E2E_DEFAULT_CHANNEL_TOKEN);
+            await adminClient.query(reindexDocument);
+            await awaitRunningJobs(adminClient);
+
+            // Reindex the second channel
+            adminClient.setChannelToken(STOCK_CHANNEL_TOKEN);
+            await adminClient.query(reindexDocument);
+            await awaitRunningJobs(adminClient);
+
+            // Reset admin token after reindexing second channel
+            adminClient.setChannelToken(E2E_DEFAULT_CHANNEL_TOKEN);
+        });
+
+        it('product is inStock in default channel', async () => {
+            shopClient.setChannelToken(E2E_DEFAULT_CHANNEL_TOKEN);
+            const result = await shopClient.query(searchProductsShopDocument, {
+                input: {
+                    term: 'Stock Test Product',
+                    groupByProduct: true,
+                    inStock: true,
+                },
+            });
+            expect(result.search.items.map(i => i.productName)).toContain('Stock Test Product');
+        });
+
+        it('product is NOT inStock in second channel (no stock location)', async () => {
+            shopClient.setChannelToken(STOCK_CHANNEL_TOKEN);
+            const result = await shopClient.query(searchProductsShopDocument, {
+                input: {
+                    term: 'Stock Test Product',
+                    groupByProduct: true,
+                    inStock: true,
+                },
+            });
+            expect(result.search.items.map(i => i.productName)).not.toContain('Stock Test Product');
+        });
+
+        it('product appears when filtering inStock: false in second channel', async () => {
+            shopClient.setChannelToken(STOCK_CHANNEL_TOKEN);
+            const result = await shopClient.query(searchProductsShopDocument, {
+                input: {
+                    term: 'Stock Test Product',
+                    groupByProduct: true,
+                    inStock: false,
+                },
+            });
+            expect(result.search.items.map(i => i.productName)).toContain('Stock Test Product');
+        });
+
+        afterAll(() => {
+            shopClient.setChannelToken(E2E_DEFAULT_CHANNEL_TOKEN);
         });
     });
 });

@@ -461,6 +461,28 @@ type Mutation {
 }`}
 </GraphQLDoc>
 
+<a name="createapikey"></a>
+
+## createApiKey
+
+<GraphQLDoc
+  type="mutation"
+  typeName="createApiKey"
+  typeLinks={{
+    CreateApiKeyResult: '/reference/graphql-api/admin/object-types#createapikeyresult',
+    CreateApiKeyInput: '/reference/graphql-api/admin/input-types#createapikeyinput',
+  }}
+>
+{`"""
+Generates a new API-Key and attaches it to an Administrator.
+Returns the generated API-Key.
+API-Keys cannot be viewed again after creation.
+"""
+type Mutation {
+  createApiKey(input: CreateApiKeyInput!): CreateApiKeyResult!
+}`}
+</GraphQLDoc>
+
 <a name="createassets"></a>
 
 ## createAssets
@@ -961,6 +983,24 @@ type Mutation {
 {`"""Delete multiple Administrators"""
 type Mutation {
   deleteAdministrators(ids: [ID!]!): [DeletionResponse!]!
+}`}
+</GraphQLDoc>
+
+<a name="deleteapikeys"></a>
+
+## deleteApiKeys
+
+<GraphQLDoc
+  type="mutation"
+  typeName="deleteApiKeys"
+  typeLinks={{
+    DeletionResponse: '/reference/graphql-api/admin/object-types#deletionresponse',
+    ID: '/reference/graphql-api/admin/object-types#id',
+  }}
+>
+{`"""Deletes API-Keys"""
+type Mutation {
+  deleteApiKeys(ids: [ID!]!): [DeletionResponse!]!
 }`}
 </GraphQLDoc>
 
@@ -2182,6 +2222,28 @@ type Mutation {
 }`}
 </GraphQLDoc>
 
+<a name="rotateapikey"></a>
+
+## rotateApiKey
+
+<GraphQLDoc
+  type="mutation"
+  typeName="rotateApiKey"
+  typeLinks={{
+    RotateApiKeyResult: '/reference/graphql-api/admin/object-types#rotateapikeyresult',
+    ID: '/reference/graphql-api/admin/object-types#id',
+  }}
+>
+{`"""
+Replaces the old with a new API-Key.
+This is a convenience method to invalidate an API-Key without
+deleting the underlying roles and permissions.
+"""
+type Mutation {
+  rotateApiKey(id: ID!): RotateApiKeyResult!
+}`}
+</GraphQLDoc>
+
 <a name="runpendingsearchindexupdates"></a>
 
 ## runPendingSearchIndexUpdates
@@ -2536,6 +2598,24 @@ type Mutation {
 {`"""Update an existing Administrator"""
 type Mutation {
   updateAdministrator(input: UpdateAdministratorInput!): Administrator!
+}`}
+</GraphQLDoc>
+
+<a name="updateapikey"></a>
+
+## updateApiKey
+
+<GraphQLDoc
+  type="mutation"
+  typeName="updateApiKey"
+  typeLinks={{
+    ApiKey: '/reference/graphql-api/admin/object-types#apikey',
+    UpdateApiKeyInput: '/reference/graphql-api/admin/input-types#updateapikeyinput',
+  }}
+>
+{`"""Updates an API-Key"""
+type Mutation {
+  updateApiKey(input: UpdateApiKeyInput!): ApiKey!
 }`}
 </GraphQLDoc>
 

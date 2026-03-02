@@ -2,7 +2,7 @@
 title: "Channel"
 generated: true
 ---
-<GenerationInfo sourceFile="packages/core/src/entity/channel/channel.entity.ts" sourceLine="37" packageName="@vendure/core" />
+<GenerationInfo sourceFile="packages/core/src/entity/channel/channel.entity.ts" sourceLine="38" packageName="@vendure/core" />
 
 A Channel represents a distinct sales channel and configures defaults for that
 channel.
@@ -76,6 +76,8 @@ class Channel extends VendureEntity {
     roles: Role[];
     @ManyToMany(type => StockLocation, stockLocation => stockLocation.channels, { onDelete: 'CASCADE' })
     stockLocations: StockLocation[];
+    @ManyToMany(type => ApiKey, apiKey => apiKey.channels, { onDelete: 'CASCADE' })
+    apiKeys: ApiKey[];
 }
 ```
 * Extends: [`VendureEntity`](/reference/typescript-api/entities/vendure-entity#vendureentity)
@@ -221,6 +223,11 @@ out of stock.
 ### stockLocations
 
 <MemberInfo kind="property" type={`<a href='/reference/typescript-api/entities/stock-location#stocklocation'>StockLocation</a>[]`}   />
+
+
+### apiKeys
+
+<MemberInfo kind="property" type={`<a href='/reference/typescript-api/entities/api-key#apikey'>ApiKey</a>[]`}   />
 
 
 

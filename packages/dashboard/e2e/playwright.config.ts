@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { VENDURE_PORT } from './constants.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const VITE_PORT = 5174;
+const VITE_PORT = Number(process.env.VITE_TEST_PORT) || 5174;
 
 export default defineConfig({
     testDir: './tests',
@@ -43,6 +43,7 @@ export default defineConfig({
         env: {
             VITE_ADMIN_API_PORT: String(VENDURE_PORT),
             VITE_ADMIN_API_HOST: 'http://localhost',
+            VENDURE_CONFIG_PATH: path.join(__dirname, 'fixtures/e2e-vendure-config.ts'),
         },
         timeout: 120_000,
     },
