@@ -2,7 +2,7 @@
 title: "AuthOptions"
 generated: true
 ---
-<GenerationInfo sourceFile="packages/core/src/config/vendure-config.ts" sourceLine="361" packageName="@vendure/core" />
+<GenerationInfo sourceFile="packages/core/src/config/vendure-config.ts" sourceLine="362" packageName="@vendure/core" />
 
 The AuthOptions define how authentication and authorization is managed.
 
@@ -27,6 +27,7 @@ interface AuthOptions {
     shopApiKeyStrategy?: ApiKeyStrategy;
     passwordValidationStrategy?: PasswordValidationStrategy;
     verificationTokenStrategy?: VerificationTokenStrategy;
+    entityAccessControlStrategy?: EntityAccessControlStrategy;
 }
 ```
 
@@ -179,6 +180,14 @@ policy, which you can do like this:
 <MemberInfo kind="property" type={`<a href='/reference/typescript-api/auth/verification-token-strategy#verificationtokenstrategy'>VerificationTokenStrategy</a>`} default={`<a href='/reference/typescript-api/auth/default-verification-token-strategy#defaultverificationtokenstrategy'>DefaultVerificationTokenStrategy</a>`}  since="3.2.0"  />
 
 Allows you to customize the way verification tokens are generated.
+### entityAccessControlStrategy
+
+<MemberInfo kind="property" type={`<a href='/reference/typescript-api/auth/entity-access-control-strategy#entityaccesscontrolstrategy'>EntityAccessControlStrategy</a>`} default={`<a href='/reference/typescript-api/auth/default-entity-access-control-strategy#defaultentityaccesscontrolstrategy'>DefaultEntityAccessControlStrategy</a>`}  since="3.6.0"  />
+
+Allows you to define row-level access control for entity queries. When set,
+the strategy's `applyAccessControl()` method will be invoked for every entity
+query that goes through Vendure's data access layer, allowing you to restrict
+which entities are visible to the current user.
 
 
 </div>
