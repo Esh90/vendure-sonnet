@@ -547,6 +547,7 @@ export interface AuthOptions {
      *
      * @default DefaultEntityAccessControlStrategy
      * @since 3.6.0
+     * @experimental
      */
     entityAccessControlStrategy?: EntityAccessControlStrategy;
 }

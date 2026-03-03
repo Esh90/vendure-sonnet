@@ -35,6 +35,7 @@ import { EntityAccessControlStrategy } from './entity-access-control-strategy';
  *
  * @docsCategory auth
  * @since 3.6.0
+ * @experimental
  */
 export class DefaultEntityAccessControlStrategy implements EntityAccessControlStrategy {
     /**

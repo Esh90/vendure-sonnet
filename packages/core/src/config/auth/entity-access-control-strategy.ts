@@ -96,6 +96,7 @@ import { VendureEntity } from '../../entity/base/base.entity';
  *
  * @docsCategory auth
  * @since 3.6.0
+ * @experimental
  */
 export interface EntityAccessControlStrategy extends InjectableStrategy {
     /**
