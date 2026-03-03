@@ -74,16 +74,24 @@ export interface BootstrapOptions {
     /**
      * @description
      * A function which is called before the app starts listening. This can be used to perform any final configuration of the Nest application.
-     * E.g., to set global filters, interceptors or pipes.
+     * E.g., to set up OpenAPI specification with Swagger.
      *
      * @example
      * ```ts
      * import { bootstrap } from '\@vendure/core';
      * import { config } from './vendure-config';
+     * import { SwaggerModule, DocumentBuilder } from '\@nestjs/swagger';
      *
      * bootstrap(config, {
      *  onBeforeAppListen: async (app) => {
-     *    app.useGlobalFilters(new MyExceptionFilter());
+     *    const config = new DocumentBuilder()
+     *      .setTitle('Cats example')
+     *      .setDescription('The cats API description')
+     *      .setVersion('1.0')
+     *      .addTag('cats')
+     *      .build();
+     *    const documentFactory = () => SwaggerModule.createDocument(app, config);
+     *    SwaggerModule.setup('api', app, documentFactory);
      *  }
      * });
      * ```
