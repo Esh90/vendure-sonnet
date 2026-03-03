@@ -122,6 +122,12 @@ export function useGeneratedForm<
         mode: 'onChange',
         defaultValues: processedDefaultValues,
         values,
+        // Preserve user edits when external values update (e.g., due to re-renders
+        // from filter validity state changes). Without this, the form's dirty state
+        // could be incorrectly reset when the component re-renders.
+        resetOptions: {
+            keepDirtyValues: true,
+        },
     });
     let submitHandler = (event: FormEvent): any => {
         event.preventDefault();
