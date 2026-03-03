@@ -44,7 +44,9 @@ function processRelationCustomFields(obj: Record<string, any>, fieldDefs: FieldI
                 const propertyAccessorKey = customField.name.replace(/Ids$/, '');
                 const relationValue = customFieldsObj[propertyAccessorKey];
 
-                if (Array.isArray(relationValue)) {
+                if (relationValue === null) {
+                    customFieldsObj[relationField] = null;
+                } else if (Array.isArray(relationValue)) {
                     customFieldsObj[relationField] = relationValue.map((v: { id: string }) => v.id);
                 }
                 delete customFieldsObj[propertyAccessorKey];

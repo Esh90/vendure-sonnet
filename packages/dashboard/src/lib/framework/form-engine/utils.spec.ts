@@ -106,13 +106,18 @@ describe('transformRelationFields', () => {
         expect(result.customFields).toEqual({ featuredProductsIds: [] });
     });
 
-    it('should handle undefined/null list relation by deleting field', () => {
+    it('should handle undefined list relation by not setting the field', () => {
         const undefinedResult = transformRelationFields(createFieldsWithListRelation(), { customFields: {} });
+
+        expect(undefinedResult.customFields).not.toHaveProperty('featuredProductsIds');
+    });
+
+    it('should set null explicitly when list relation is cleared', () => {
         const nullResult = transformRelationFields(createFieldsWithListRelation(), {
             customFields: { featuredProducts: null },
         });
 
-        expect(undefinedResult.customFields).not.toHaveProperty('featuredProductsIds');
+        expect(nullResult.customFields.featuredProductsIds).toBeNull();
         expect(nullResult.customFields).not.toHaveProperty('featuredProducts');
     });
 
