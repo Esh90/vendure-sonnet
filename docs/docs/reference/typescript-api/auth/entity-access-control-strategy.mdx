@@ -2,7 +2,7 @@
 title: "EntityAccessControlStrategy"
 generated: true
 ---
-<GenerationInfo sourceFile="packages/core/src/config/auth/entity-access-control-strategy.ts" sourceLine="100" packageName="@vendure/core" since="3.6.0" />
+<GenerationInfo sourceFile="packages/core/src/config/auth/entity-access-control-strategy.ts" sourceLine="108" packageName="@vendure/core" since="3.6.0" experimental="true" />
 
 An EntityAccessControlStrategy provides three layers of access control:
 
@@ -90,6 +90,13 @@ class SellerScopedStrategy extends DefaultEntityAccessControlStrategy {
 
 This is configured via the `authOptions.entityAccessControlStrategy` property
 of your VendureConfig.
+
+:::
+
+:::caution
+
+This API is currently in **developer preview** and is subject to change in
+future releases. Feedback welcome.
 
 :::
 
