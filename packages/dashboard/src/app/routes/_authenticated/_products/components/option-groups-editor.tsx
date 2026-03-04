@@ -68,7 +68,7 @@ export function SingleOptionGroupEditor({
 }: Readonly<SingleOptionGroupEditorProps>) {
     const { fields, append, remove } = useFieldArray({
         control,
-        name: [fieldArrayPath, 'values'].join('.'),
+        name: fieldArrayPath ? `${fieldArrayPath}.values` : 'values',
     });
 
     return (
@@ -77,7 +77,7 @@ export function SingleOptionGroupEditor({
                 <div>
                     <FormFieldWrapper
                         control={control}
-                        name={[fieldArrayPath, 'name'].join('.')}
+                        name={fieldArrayPath ? `${fieldArrayPath}.name` : 'name'}
                         label={<Trans>Option Group Name</Trans>}
                         render={({ field }) => <Input placeholder="e.g. Size" {...field} />}
                     />
@@ -86,7 +86,7 @@ export function SingleOptionGroupEditor({
                 <div>
                     <FormFieldWrapper
                         control={control}
-                        name="values"
+                        name={fieldArrayPath ? `${fieldArrayPath}.values` : 'values'}
                         label={<Trans>Option Values</Trans>}
                         render={({ field }) => (
                             <OptionValueInput

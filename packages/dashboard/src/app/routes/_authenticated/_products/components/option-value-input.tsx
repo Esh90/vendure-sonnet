@@ -1,8 +1,10 @@
 import { Badge } from '@/vdb/components/ui/badge.js';
 import { Button } from '@/vdb/components/ui/button.js';
 import { Input } from '@/vdb/components/ui/input.js';
+import { useLingui } from '@lingui/react/macro';
 import { X } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface OptionValue {
     value: string;
@@ -23,12 +25,17 @@ export function OptionValueInput({
     disabled = false,
 }: Readonly<OptionValueInputProps>) {
     const [newValue, setNewValue] = useState('');
+    const { t } = useLingui();
 
     const handleAddValue = () => {
-        if (newValue.trim() && !fields.some(f => f.value === newValue.trim())) {
-            onAdd({ value: newValue.trim(), id: Date.now().toString() });
-            setNewValue('');
+        const trimmed = newValue.trim();
+        if (!trimmed) return;
+        if (fields.some(f => f.value === trimmed)) {
+            toast.error(t`Duplicate value "${trimmed}" already exists`);
+            return;
         }
+        onAdd({ value: trimmed, id: Date.now().toString() });
+        setNewValue('');
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
