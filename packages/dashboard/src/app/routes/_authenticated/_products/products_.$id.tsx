@@ -187,7 +187,7 @@ function ProductDetailPage() {
                         </div>
                     </PageBlock>
                 )}
-                {entity && entity.variantList.totalItems === 0 && (
+                {entity && (
                     <PageBlock column="main" blockId="create-product-variants-dialog">
                         <CreateProductVariantsDialog
                             productId={entity.id}
@@ -195,6 +195,7 @@ function ProductDetailPage() {
                             existingOptionGroups={entity.optionGroups}
                             onSuccess={() => {
                                 refreshEntity();
+                                refreshRef.current?.();
                             }}
                         />
                     </PageBlock>
