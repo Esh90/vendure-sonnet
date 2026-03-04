@@ -30,7 +30,8 @@ export function OptionValueInput({
     const handleAddValue = () => {
         const trimmed = newValue.trim();
         if (!trimmed) return;
-        if (fields.some(f => f.value === trimmed)) {
+        const normalized = trimmed.toLowerCase().normalize();
+        if (fields.some(f => f.value.toLowerCase().normalize() === normalized)) {
             toast.error(t`Duplicate value "${trimmed}" already exists`);
             return;
         }
