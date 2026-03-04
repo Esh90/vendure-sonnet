@@ -187,25 +187,16 @@ function ProductDetailPage() {
                         </div>
                     </PageBlock>
                 )}
-                {entity && entity.variantList.totalItems === 0 && entity.optionGroups.length === 0 && (
+                {entity && entity.variantList.totalItems === 0 && (
                     <PageBlock column="main" blockId="create-product-variants-dialog">
                         <CreateProductVariantsDialog
                             productId={entity.id}
                             productName={entity.name}
+                            existingOptionGroups={entity.optionGroups}
                             onSuccess={() => {
                                 refreshEntity();
                             }}
                         />
-                    </PageBlock>
-                )}
-                {entity && entity.variantList.totalItems === 0 && entity.optionGroups.length > 0 && (
-                    <PageBlock column="main" blockId="manage-variants-link">
-                        <Button asChild variant="outline">
-                            <Link to="./variants">
-                                <PlusIcon className="mr-2 h-4 w-4" />
-                                <Trans>Manage variants</Trans>
-                            </Link>
-                        </Button>
                     </PageBlock>
                 )}
                 {entity?.optionGroups.length ? (

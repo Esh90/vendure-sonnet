@@ -1,3 +1,4 @@
+import { Alert, AlertDescription } from '@/vdb/components/ui/alert.js';
 import { Button } from '@/vdb/components/ui/button.js';
 import {
     Dialog,
@@ -15,21 +16,35 @@ import { normalizeString } from '@/vdb/lib/utils.js';
 import { useMutation } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
     addOptionGroupToProductDocument,
     createProductOptionGroupDocument,
     createProductVariantsDocument,
 } from '../products.graphql.js';
 import { CreateProductVariants, VariantConfiguration } from './create-product-variants.js';
+import { OptionGroupConfiguration } from './option-groups-editor.js';
+
+interface ExistingOptionGroup {
+    id: string;
+    code: string;
+    name: string;
+    options: Array<{
+        id: string;
+        code: string;
+        name: string;
+    }>;
+}
 
 export function CreateProductVariantsDialog({
     productId,
     productName,
+    existingOptionGroups = [],
     onSuccess,
 }: {
     productId: string;
     productName: string;
+    existingOptionGroups?: ExistingOptionGroup[];
     onSuccess?: () => void;
 }) {
     const { t } = useLingui();
@@ -49,14 +64,42 @@ export function CreateProductVariantsDialog({
         mutationFn: api.mutate(createProductVariantsDocument),
     });
 
+    // Map existing option groups to the format expected by the editor.
+    // Crucially, the values[].id here are real server option IDs.
+    const initialGroups: OptionGroupConfiguration['optionGroups'] = useMemo(
+        () =>
+            existingOptionGroups
+                .filter(g => g.name.trim() && g.options.length > 0)
+                .map(g => ({
+                    name: g.name,
+                    values: g.options.map(o => ({
+                        value: o.name,
+                        id: o.id,
+                    })),
+                })),
+        [existingOptionGroups],
+    );
+
+    // Set of existing option group names for quick lookup
+    const existingGroupNames = useMemo(
+        () => new Set(existingOptionGroups.filter(g => g.name.trim()).map(g => g.name)),
+        [existingOptionGroups],
+    );
+
     async function handleCreateVariants() {
         if (!variantData || !activeChannel?.defaultLanguageCode) return;
 
         try {
-            // 1. Create option groups and their options
-            const validOptionGroups = variantData.optionGroups.filter(g => g.name.trim() && g.values.length > 0);
+            const validOptionGroups = variantData.optionGroups.filter(
+                g => g.name.trim() && g.values.length > 0,
+            );
+
+            // Split into existing and new groups
+            const newOptionGroups = validOptionGroups.filter(g => !existingGroupNames.has(g.name));
+
+            // 1. Create only NEW option groups
             const createdOptionGroups = await Promise.all(
-                validOptionGroups.map(async optionGroup => {
+                newOptionGroups.map(async optionGroup => {
                     const result = await createOptionGroupMutation.mutateAsync({
                         input: {
                             code: normalizeString(optionGroup.name, '-'),
@@ -81,7 +124,7 @@ export function CreateProductVariantsDialog({
                 }),
             );
 
-            // 2. Add option groups to product
+            // 2. Add only NEW option groups to product
             await Promise.all(
                 createdOptionGroups.map(group =>
                     addOptionGroupToProductMutation.mutateAsync({
@@ -105,11 +148,22 @@ export function CreateProductVariantsDialog({
                         price: Number(variant.price),
                         stockOnHand: Number(variant.stock),
                         optionIds: variant.options.map(option => {
-                            const optionGroup = createdOptionGroups.find(g => g.name === option.name);
-                            if (!optionGroup) {
-                                throw new Error(`Could not find option group ${option.name}`);
+                            // For existing groups, the option.id is already the real server ID
+                            if (existingGroupNames.has(option.name)) {
+                                return option.id;
                             }
-                            const createdOption = optionGroup.options.find(o => o.name === option.value);
+                            // For new groups, look up the created option by name
+                            const optionGroup = createdOptionGroups.find(
+                                g => g.name === option.name,
+                            );
+                            if (!optionGroup) {
+                                throw new Error(
+                                    `Could not find option group ${option.name}`,
+                                );
+                            }
+                            const createdOption = optionGroup.options.find(
+                                o => o.name === option.value,
+                            );
                             if (!createdOption) {
                                 throw new Error(
                                     `Could not find option ${option.value} in group ${option.name}`,
@@ -140,7 +194,11 @@ export function CreateProductVariantsDialog({
         [],
     );
     const createCount = Object.values(variantData?.variants ?? {}).filter(v => v.enabled).length;
-    const hasInvalidOptionGroups = variantData?.optionGroups.some(g => !g.name || g.values.length === 0) ?? false;
+    const hasInvalidOptionGroups =
+        variantData?.optionGroups.some(g => !g.name || g.values.length === 0) ?? false;
+    const hasInvalidExistingGroups = existingOptionGroups.some(
+        g => !g.name.trim() || g.options.length === 0,
+    );
 
     return (
         <>
@@ -160,10 +218,22 @@ export function CreateProductVariantsDialog({
                             <Trans>Create variants for your product</Trans>
                         </DialogDescription>
                     </DialogHeader>
+                    {hasInvalidExistingGroups && (
+                        <Alert variant="destructive" className="mt-4">
+                            <AlertDescription>
+                                <Trans>
+                                    This product has invalid option groups (empty name or no
+                                    options). Please remove them from the Manage Variants page
+                                    before creating variants.
+                                </Trans>
+                            </AlertDescription>
+                        </Alert>
+                    )}
                     <div className="mt-4">
                         <CreateProductVariants
                             onChange={handleOnChange}
                             currencyCode={activeChannel?.defaultCurrencyCode}
+                            initialGroups={initialGroups}
                         />
                     </div>
                     <DialogFooter>
@@ -176,7 +246,8 @@ export function CreateProductVariantsDialog({
                                 addOptionGroupToProductMutation.isPending ||
                                 createProductVariantsMutation.isPending ||
                                 createCount === 0 ||
-                                hasInvalidOptionGroups
+                                hasInvalidOptionGroups ||
+                                hasInvalidExistingGroups
                             }
                         >
                             {createOptionGroupMutation.isPending ||
