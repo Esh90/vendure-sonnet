@@ -7,6 +7,7 @@ import { Button } from '@/vdb/components/ui/button.js';
 import { Form } from '@/vdb/components/ui/form.js';
 import { addCustomFields } from '@/vdb/framework/document-introspection/add-custom-fields.js';
 import { useGeneratedForm } from '@/vdb/framework/form-engine/use-generated-form.js';
+import { useCustomFieldConfig } from '@/vdb/hooks/use-custom-field-config.js';
 import {
     Page,
     PageActionBar,
@@ -69,6 +70,30 @@ function DraftOrderPage() {
         params: { id: params.id },
     });
 
+    const orderCustomFields = useCustomFieldConfig('Order');
+
+    const transformCustomFieldsForForm = (customFields: Record<string, any> | undefined) => {
+        if (!customFields) return {};
+        const result: Record<string, any> = {};
+        for (const [key, value] of Object.entries(customFields)) {
+            const fieldConfig = orderCustomFields.find(f => f.name === key);
+            if (fieldConfig?.type === 'relation') {
+                // Convert relation objects to IDs for the form
+                const idKey = fieldConfig.list ? `${key}Ids` : `${key}Id`;
+                if (value === null) {
+                    result[idKey] = null;
+                } else if (Array.isArray(value)) {
+                    result[idKey] = value.map((v: { id: string }) => v.id);
+                } else if (value?.id) {
+                    result[idKey] = value.id;
+                }
+            } else {
+                result[key] = value;
+            }
+        }
+        return result;
+    };
+
     const { form: orderCustomFieldsForm } = useGeneratedForm({
         document: setDraftOrderCustomFieldsDocument,
         varName: undefined,
@@ -78,7 +103,7 @@ function DraftOrderPage() {
                 orderId: entity.id,
                 input: {
                     id: entity.id,
-                    customFields: entity.customFields,
+                    customFields: transformCustomFieldsForForm(entity.customFields),
                 },
             };
         },
@@ -284,8 +309,16 @@ function DraftOrderPage() {
     }
 
     const onSaveCustomFields = (values: any) => {
+        const customFields = { ...values.input?.customFields };
+        // Strip relation object keys (e.g. 'relatedProduct') from the form values,
+        // keeping only the ID fields (e.g. 'relatedProductId') that the API expects.
+        for (const field of orderCustomFields) {
+            if (field.type === 'relation') {
+                delete customFields[field.name];
+            }
+        }
         setDraftOrderCustomFields({
-            input: { id: entity.id, customFields: values.input?.customFields },
+            input: { id: entity.id, customFields },
             orderId: entity.id,
         });
     };
