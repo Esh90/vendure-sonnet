@@ -115,7 +115,6 @@ import { OrderStateMachine } from '../helpers/order-state-machine/order-state-ma
 import { PaymentState } from '../helpers/payment-state-machine/payment-state';
 import { RefundState } from '../helpers/refund-state-machine/refund-state';
 import { RefundStateMachine } from '../helpers/refund-state-machine/refund-state-machine';
-import { RequestContextService } from '../helpers/request-context/request-context.service';
 import { ShippingCalculator } from '../helpers/shipping-calculator/shipping-calculator';
 import { TranslatorService } from '../helpers/translator/translator.service';
 import { isForeignKeyViolationError } from '../helpers/utils/db-errors';
@@ -166,7 +165,6 @@ export class OrderService {
         private requestCache: RequestContextCacheService,
         private translator: TranslatorService,
         private stockLevelService: StockLevelService,
-        private requestContextService: RequestContextService,
     ) {}
 
     /**
@@ -588,12 +586,8 @@ export class OrderService {
 
         const previousCurrencyCode = order.currencyCode;
 
-        const newCurrencyCtx = await this.requestContextService.create({
-            req: ctx.req,
-            apiType: ctx.apiType,
-            languageCode: ctx.languageCode,
-            currencyCode,
-        });
+        const newCurrencyCtx = ctx.copy();
+        (newCurrencyCtx as any)._currencyCode = currencyCode;
 
         order.currencyCode = currencyCode;
 
