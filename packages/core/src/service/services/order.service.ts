@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
     AddPaymentToOrderResult,
     ApplyCouponCodeResult,
+    CurrencyCode,
     PaymentInput,
     PaymentMethodQuote,
     RemoveOrderItemsResult,
@@ -114,6 +115,7 @@ import { OrderStateMachine } from '../helpers/order-state-machine/order-state-ma
 import { PaymentState } from '../helpers/payment-state-machine/payment-state';
 import { RefundState } from '../helpers/refund-state-machine/refund-state';
 import { RefundStateMachine } from '../helpers/refund-state-machine/refund-state-machine';
+import { RequestContextService } from '../helpers/request-context/request-context.service';
 import { ShippingCalculator } from '../helpers/shipping-calculator/shipping-calculator';
 import { TranslatorService } from '../helpers/translator/translator.service';
 import { isForeignKeyViolationError } from '../helpers/utils/db-errors';
@@ -164,6 +166,7 @@ export class OrderService {
         private requestCache: RequestContextCacheService,
         private translator: TranslatorService,
         private stockLevelService: StockLevelService,
+        private requestContextService: RequestContextService,
     ) {}
 
     /**
@@ -552,6 +555,60 @@ export class OrderService {
                 note,
             },
         });
+        return updatedOrder;
+    }
+
+    /**
+     * @description
+     * Updates the currency code of an Order. This will recalculate all prices
+     * in the new currency using `applyPriceAdjustments`.
+     *
+     * @since 3.3.0
+     */
+    async updateOrderCurrency(
+        ctx: RequestContext,
+        orderId: ID,
+        currencyCode: CurrencyCode,
+        relations?: RelationPaths<Order>,
+    ): Promise<ErrorResultUnion<UpdateOrderItemsResult, Order>> {
+        const order = await this.getOrderOrThrow(ctx, orderId);
+        const validationError = this.assertAddingItemsState(order);
+        if (validationError) {
+            return validationError;
+        }
+
+        if (order.currencyCode === currencyCode) {
+            return order;
+        }
+
+        const channel = await this.channelService.getChannelFromToken(ctx.channel.token);
+        if (!channel.availableCurrencyCodes.includes(currencyCode)) {
+            throw new UserInputError('error.currency-not-available', { currencyCode });
+        }
+
+        const previousCurrencyCode = order.currencyCode;
+
+        const newCurrencyCtx = await this.requestContextService.create({
+            req: ctx.req,
+            apiType: ctx.apiType,
+            languageCode: ctx.languageCode,
+            currencyCode,
+        });
+
+        order.currencyCode = currencyCode;
+
+        await this.historyService.createHistoryEntryForOrder({
+            ctx,
+            orderId: order.id,
+            type: HistoryEntryType.ORDER_CURRENCY_UPDATED,
+            data: {
+                previousCurrency: previousCurrencyCode,
+                newCurrency: currencyCode,
+            },
+        });
+
+        const updatedOrder = await this.applyPriceAdjustments(newCurrencyCtx, order, order.lines, relations);
+        await this.eventBus.publish(new OrderEvent(ctx, updatedOrder, 'updated'));
         return updatedOrder;
     }
 
