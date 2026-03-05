@@ -345,7 +345,7 @@ export function DataTable<TData>({
         >
             <div className="space-y-2 @container/table">
                 <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                         {onSearchTermChange && (
                             <Input
                                 placeholder={t`Filter...`}
