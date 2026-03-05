@@ -58,12 +58,10 @@ export function transformRelationFields<E extends Record<string, any>>(fields: F
             const propertyAccessorKey = customField.name.replace(/Ids$/, '');
             const relationValue = entity.customFields[propertyAccessorKey];
 
-            if (relationValue) {
-                const relationIdValue = relationValue.map((v: { id: string }) => v.id);
-                if (relationIdValue && relationIdValue.length > 0) {
-                    processedEntity.customFields[relationField] = relationIdValue;
-                }
+            if (Array.isArray(relationValue)) {
+                processedEntity.customFields[relationField] = relationValue.map((v: { id: string }) => v.id);
             }
+            delete processedEntity.customFields[propertyAccessorKey];
         } else {
             // For single fields, the accessor is the field name without the "Id" suffix
             const propertyAccessorKey = customField.name.replace(/Id$/, '');
@@ -119,6 +117,69 @@ export function removeEmptyIdFields<T extends Record<string, any>>(values: T, fi
     }
 
     recursiveRemove(result, fields);
+    return result;
+}
+
+/**
+ * Converts empty string values to null for nullable non-string fields before submission.
+ * This handles cases where user interaction (e.g. clearing a date picker) leaves
+ * empty strings that are invalid for non-string GraphQL types like DateTime or Enums.
+ */
+export function convertEmptyStringsToNull<T extends Record<string, any>>(values: T, fields: FieldInfo[]): T {
+    if (!values) {
+        return values;
+    }
+    const result = structuredClone(values);
+
+    function processFields(obj: any, fieldDefs: FieldInfo[]) {
+        for (const field of fieldDefs) {
+            if (field.nullable && obj[field.name] === '' && field.type !== 'String') {
+                obj[field.name] = null;
+            }
+            if (field.typeInfo && typeof obj[field.name] === 'object' && obj[field.name] !== null) {
+                if (Array.isArray(obj[field.name])) {
+                    for (const item of obj[field.name]) {
+                        processFields(item, field.typeInfo);
+                    }
+                } else {
+                    processFields(obj[field.name], field.typeInfo);
+                }
+            }
+        }
+    }
+
+    processFields(result, fields);
+    return result;
+}
+
+/**
+ * Strips null-valued nullable fields from the payload so they are omitted
+ * rather than sent as explicit nulls. In GraphQL, omitting a field lets the
+ * server apply its own default, whereas sending null means "set to NULL".
+ * This is only used for create mutations, to avoid sending explicit nulls for
+ * fields the user likely did not touch.
+ */
+export function stripNullNullableFields<T extends Record<string, any>>(values: T, fields: FieldInfo[]): T {
+    if (!values) return values;
+    const result = structuredClone(values);
+
+    function processFields(obj: any, fieldDefs: FieldInfo[]) {
+        for (const field of fieldDefs) {
+            if (field.nullable && obj[field.name] === null) {
+                delete obj[field.name];
+            } else if (field.typeInfo && typeof obj[field.name] === 'object' && obj[field.name] !== null) {
+                if (Array.isArray(obj[field.name])) {
+                    for (const item of obj[field.name]) {
+                        processFields(item, field.typeInfo);
+                    }
+                } else {
+                    processFields(obj[field.name], field.typeInfo);
+                }
+            }
+        }
+    }
+
+    processFields(result, fields);
     return result;
 }
 
@@ -336,6 +397,17 @@ export function isListField(input?: ConfigurableFieldDef): boolean {
  */
 export function isReadonlyField(input?: ConfigurableFieldDef): boolean {
     return input && isCustomFieldConfig(input) ? Boolean(input.readonly) : false;
+}
+
+/**
+ * Determines if a field should be disabled based on the `disabled` prop from
+ * react-hook-form's Controller and the field's own readonly configuration.
+ *
+ * This centralises the disabled check so that every input component handles
+ * both sources of disabled state consistently.
+ */
+export function isFieldDisabled(disabled?: boolean, fieldDef?: ConfigurableFieldDef): boolean {
+    return Boolean(disabled) || isReadonlyField(fieldDef);
 }
 
 /**

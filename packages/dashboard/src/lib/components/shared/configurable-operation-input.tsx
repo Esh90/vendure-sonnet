@@ -1,6 +1,7 @@
 import { ConfigurableOperationDefFragment } from '@/vdb/graphql/fragments.js';
 import { ConfigurableOperationInput as ConfigurableOperationInputType } from '@vendure/common/lib/generated-types';
 import { X } from 'lucide-react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '../ui/button.js';
 import { Card, CardContent, CardHeader } from '../ui/card.js';
@@ -16,6 +17,7 @@ export interface ConfigurableOperationInputProps {
     value: ConfigurableOperationInputType;
     onChange: (val: ConfigurableOperationInputType) => void;
     onRemove?: () => void;
+    onValidityChange?: (isValid: boolean) => void;
 }
 
 export function ConfigurableOperationInput({
@@ -26,12 +28,32 @@ export function ConfigurableOperationInput({
     value,
     onChange,
     onRemove,
+    onValidityChange,
 }: Readonly<ConfigurableOperationInputProps>) {
     const form = useForm({
         defaultValues: {
             ...value,
         },
     });
+
+    // Check validity of required fields and notify parent.
+    // List args are exempt from required validation (matching legacy Angular admin-ui behavior)
+    // because an empty array is considered a valid value for list types.
+    useEffect(() => {
+        if (!onValidityChange) return;
+
+        const isValid = operationDefinition.args.every(arg => {
+            if (!arg.required || arg.list) return true;
+            const argValue = value.arguments.find(a => a.name === arg.name)?.value;
+            // Args with a defaultValue are considered valid even when absent from
+            // stored data. This handles legacy collections created before an arg
+            // (e.g. combineWithAnd) was added to the filter definition.
+            if (argValue === undefined && arg.defaultValue != null) return true;
+            return argValue !== undefined && argValue !== '';
+        });
+
+        onValidityChange(isValid);
+    }, [value.arguments, operationDefinition.args, onValidityChange]);
 
     const handleInputChange = (name: string, inputValue: string) => {
         const argIndex = value.arguments.findIndex(arg => arg.name === name);
@@ -101,6 +123,11 @@ export function ConfigurableOperationInput({
                                                         <FormItem className="space-y-2">
                                                             <FormLabel className="text-sm font-medium text-foreground">
                                                                 {arg.label || arg.name}
+                                                                {arg.required && !arg.list && (
+                                                                    <span className="text-destructive ml-1">
+                                                                        *
+                                                                    </span>
+                                                                )}
                                                             </FormLabel>
                                                             <FormControl>
                                                                 <ConfigurableOperationArgInput
