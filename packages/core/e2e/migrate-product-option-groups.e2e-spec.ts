@@ -49,7 +49,7 @@ describe('migrateProductOptionGroupData()', () => {
         ].join(', ');
         await queryRunner.query(
             `INSERT INTO ${esc('channel')} (${cols})
-             VALUES ('second-channel', 'second-channel-token', 'en', 'USD', 0, 1, 0)`,
+             VALUES ('second-channel', 'second-channel-token', 'en', 'USD', FALSE, TRUE, 0)`,
         );
         const newChannels: Array<{ id: number }> = await queryRunner.query(
             `SELECT ${esc('id')} FROM ${esc('channel')} WHERE ${esc('code')} = 'second-channel'`,
