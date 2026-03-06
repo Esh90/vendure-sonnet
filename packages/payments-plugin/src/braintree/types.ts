@@ -97,6 +97,12 @@ export interface BraintreePluginOptions {
      *
      * @since 1.7.0
      */
-    merchantAccountIds?: BraintreeMerchantAccountIds;
     extractMetadata?: (transaction: Transaction) => PaymentMetadata;
+    /**
+     * @description
+     * An optional mapping of currency codes to Braintree Merchant Account IDs.
+     * When set, the corresponding Merchant Account ID will be used for transactions
+     * in the given currency.
+     */
+    merchantAccountIds?: BraintreeMerchantAccountIds;
 }

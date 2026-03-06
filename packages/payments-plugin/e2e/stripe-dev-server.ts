@@ -26,7 +26,6 @@ import {
 } from './graphql/generated-admin-types';
 import { AddItemToOrderMutation, AddItemToOrderMutationVariables } from './graphql/generated-shop-types';
 import { ADD_ITEM_TO_ORDER } from './graphql/shop-queries';
-import { StripeCheckoutTestPlugin } from './fixtures/stripe-checkout-test.plugin';
 import {
     CREATE_CUSTOM_STRIPE_PAYMENT_INTENT,
     CREATE_STRIPE_PAYMENT_INTENT,
