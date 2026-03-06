@@ -171,6 +171,80 @@ export type AlreadyRefundedError = ErrorResult & {
   refundId: Scalars['ID']['output'];
 };
 
+export type ApiKey = Node & {
+  __typename?: 'ApiKey';
+  createdAt: Scalars['DateTime']['output'];
+  customFields?: Maybe<Scalars['JSON']['output']>;
+  id: Scalars['ID']['output'];
+  /** Helps you identify unused keys */
+  lastUsedAt?: Maybe<Scalars['DateTime']['output']>;
+  /**
+   * ID by which we can look up the API-Key.
+   * Also helps you identify keys without leaking the underlying secret API-Key.
+   */
+  lookupId: Scalars['String']['output'];
+  /** A descriptive name so you can remind yourself where the API-Key gets used */
+  name: Scalars['String']['output'];
+  /**
+   * Usually the user who created the ApiKey but could also be used as the basis for
+   * restricting resolvers to `Permission.Owner` queries for customers for example.
+   */
+  owner: User;
+  translations: Array<ApiKeyTranslation>;
+  updatedAt: Scalars['DateTime']['output'];
+  /** This is the underlying User which determines the kind of permissions for this API-Key. */
+  user: User;
+};
+
+export type ApiKeyFilterParameter = {
+  _and?: InputMaybe<Array<ApiKeyFilterParameter>>;
+  _or?: InputMaybe<Array<ApiKeyFilterParameter>>;
+  createdAt?: InputMaybe<DateOperators>;
+  id?: InputMaybe<IdOperators>;
+  lastUsedAt?: InputMaybe<DateOperators>;
+  lookupId?: InputMaybe<StringOperators>;
+  name?: InputMaybe<StringOperators>;
+  updatedAt?: InputMaybe<DateOperators>;
+};
+
+export type ApiKeyList = PaginatedList & {
+  __typename?: 'ApiKeyList';
+  items: Array<ApiKey>;
+  totalItems: Scalars['Int']['output'];
+};
+
+export type ApiKeyListOptions = {
+  /** Allows the results to be filtered */
+  filter?: InputMaybe<ApiKeyFilterParameter>;
+  /** Specifies whether multiple top-level "filter" fields should be combined with a logical AND or OR operation. Defaults to AND. */
+  filterOperator?: InputMaybe<LogicalOperator>;
+  /** Skips the first n results, for use in pagination */
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  /** Specifies which properties to sort the results by */
+  sort?: InputMaybe<ApiKeySortParameter>;
+  /** Takes n results, for use in pagination */
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ApiKeySortParameter = {
+  createdAt?: InputMaybe<SortOrder>;
+  id?: InputMaybe<SortOrder>;
+  lastUsedAt?: InputMaybe<SortOrder>;
+  lookupId?: InputMaybe<SortOrder>;
+  name?: InputMaybe<SortOrder>;
+  updatedAt?: InputMaybe<SortOrder>;
+};
+
+export type ApiKeyTranslation = Node & {
+  __typename?: 'ApiKeyTranslation';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  languageCode: LanguageCode;
+  /** A descriptive name so you can remind yourself where the API-Key gets used */
+  name: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
 export type ApplyCouponCodeResult = CouponCodeExpiredError | CouponCodeInvalidError | CouponCodeLimitError | Order;
 
 export type Asset = Node & {
@@ -181,11 +255,13 @@ export type Asset = Node & {
   focalPoint?: Maybe<Coordinate>;
   height: Scalars['Int']['output'];
   id: Scalars['ID']['output'];
+  languageCode: LanguageCode;
   mimeType: Scalars['String']['output'];
   name: Scalars['String']['output'];
   preview: Scalars['String']['output'];
   source: Scalars['String']['output'];
   tags: Array<Tag>;
+  translations: Array<AssetTranslation>;
   type: AssetType;
   updatedAt: Scalars['DateTime']['output'];
   width: Scalars['Int']['output'];
@@ -198,6 +274,7 @@ export type AssetFilterParameter = {
   fileSize?: InputMaybe<NumberOperators>;
   height?: InputMaybe<NumberOperators>;
   id?: InputMaybe<IdOperators>;
+  languageCode?: InputMaybe<StringOperators>;
   mimeType?: InputMaybe<StringOperators>;
   name?: InputMaybe<StringOperators>;
   preview?: InputMaybe<StringOperators>;
@@ -241,6 +318,22 @@ export type AssetSortParameter = {
   width?: InputMaybe<SortOrder>;
 };
 
+export type AssetTranslation = {
+  __typename?: 'AssetTranslation';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  languageCode: LanguageCode;
+  name: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type AssetTranslationInput = {
+  customFields?: InputMaybe<Scalars['JSON']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  languageCode: LanguageCode;
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
 export enum AssetType {
   BINARY = 'BINARY',
   IMAGE = 'IMAGE',
@@ -265,6 +358,11 @@ export type AssignFacetsToChannelInput = {
 export type AssignPaymentMethodsToChannelInput = {
   channelId: Scalars['ID']['input'];
   paymentMethodIds: Array<Scalars['ID']['input']>;
+};
+
+export type AssignProductOptionGroupsToChannelInput = {
+  channelId: Scalars['ID']['input'];
+  productOptionGroupIds: Array<Scalars['ID']['input']>;
 };
 
 export type AssignProductVariantsToChannelInput = {
@@ -485,6 +583,7 @@ export type Collection = Node & {
   parent?: Maybe<Collection>;
   parentId: Scalars['ID']['output'];
   position: Scalars['Int']['output'];
+  productVariantCount: Scalars['Int']['output'];
   productVariants: ProductVariantList;
   slug: Scalars['String']['output'];
   translations: Array<CollectionTranslation>;
@@ -515,6 +614,7 @@ export type CollectionFilterParameter = {
   name?: InputMaybe<StringOperators>;
   parentId?: InputMaybe<IdOperators>;
   position?: InputMaybe<NumberOperators>;
+  productVariantCount?: InputMaybe<NumberOperators>;
   slug?: InputMaybe<StringOperators>;
   updatedAt?: InputMaybe<DateOperators>;
 };
@@ -556,6 +656,7 @@ export type CollectionSortParameter = {
   name?: InputMaybe<SortOrder>;
   parentId?: InputMaybe<SortOrder>;
   position?: InputMaybe<SortOrder>;
+  productVariantCount?: InputMaybe<SortOrder>;
   slug?: InputMaybe<SortOrder>;
   updatedAt?: InputMaybe<SortOrder>;
 };
@@ -752,10 +853,40 @@ export type CreateAdministratorInput = {
   roleIds: Array<Scalars['ID']['input']>;
 };
 
+/**
+ * There is no User ID because you can only create API-Keys for yourself,
+ * which gets determined by the User who does the request.
+ */
+export type CreateApiKeyInput = {
+  customFields?: InputMaybe<Scalars['JSON']['input']>;
+  /**
+   * Which roles to attach to this ApiKey.
+   * You may only grant roles which you, yourself have.
+   */
+  roleIds: Array<Scalars['ID']['input']>;
+  translations: Array<CreateApiKeyTranslationInput>;
+};
+
+export type CreateApiKeyResult = {
+  __typename?: 'CreateApiKeyResult';
+  /** The generated API-Key. API-Keys cannot be viewed again after creation! */
+  apiKey: Scalars['String']['output'];
+  /** ID of the created ApiKey-Entity */
+  entityId: Scalars['ID']['output'];
+};
+
+export type CreateApiKeyTranslationInput = {
+  customFields?: InputMaybe<Scalars['JSON']['input']>;
+  languageCode: LanguageCode;
+  /** A descriptive name so you can remind yourself where the API-Key gets used */
+  name: Scalars['String']['input'];
+};
+
 export type CreateAssetInput = {
   customFields?: InputMaybe<Scalars['JSON']['input']>;
   file: Scalars['Upload']['input'];
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
+  translations?: InputMaybe<Array<AssetTranslationInput>>;
 };
 
 export type CreateAssetResult = Asset | MimeTypeError;
@@ -877,7 +1008,7 @@ export type CreateProductInput = {
 export type CreateProductOptionGroupInput = {
   code: Scalars['String']['input'];
   customFields?: InputMaybe<Scalars['JSON']['input']>;
-  options: Array<CreateGroupOptionInput>;
+  options?: InputMaybe<Array<CreateGroupOptionInput>>;
   translations: Array<ProductOptionGroupTranslationInput>;
 };
 
@@ -1358,6 +1489,7 @@ export type CustomFields = {
   __typename?: 'CustomFields';
   Address: Array<CustomFieldConfig>;
   Administrator: Array<CustomFieldConfig>;
+  ApiKey: Array<CustomFieldConfig>;
   Asset: Array<CustomFieldConfig>;
   Channel: Array<CustomFieldConfig>;
   Collection: Array<CustomFieldConfig>;
@@ -1701,6 +1833,7 @@ export enum ErrorCode {
   PAYMENT_METHOD_MISSING_ERROR = 'PAYMENT_METHOD_MISSING_ERROR',
   PAYMENT_ORDER_MISMATCH_ERROR = 'PAYMENT_ORDER_MISMATCH_ERROR',
   PAYMENT_STATE_TRANSITION_ERROR = 'PAYMENT_STATE_TRANSITION_ERROR',
+  PRODUCT_OPTION_GROUP_IN_USE_ERROR = 'PRODUCT_OPTION_GROUP_IN_USE_ERROR',
   PRODUCT_OPTION_IN_USE_ERROR = 'PRODUCT_OPTION_IN_USE_ERROR',
   QUANTITY_TOO_GREAT_ERROR = 'QUANTITY_TOO_GREAT_ERROR',
   REFUND_AMOUNT_ERROR = 'REFUND_AMOUNT_ERROR',
@@ -2056,6 +2189,7 @@ export enum HistoryEntryType {
   ORDER_CANCELLATION = 'ORDER_CANCELLATION',
   ORDER_COUPON_APPLIED = 'ORDER_COUPON_APPLIED',
   ORDER_COUPON_REMOVED = 'ORDER_COUPON_REMOVED',
+  ORDER_CURRENCY_UPDATED = 'ORDER_CURRENCY_UPDATED',
   ORDER_CUSTOMER_UPDATED = 'ORDER_CUSTOMER_UPDATED',
   ORDER_FULFILLMENT = 'ORDER_FULFILLMENT',
   ORDER_FULFILLMENT_TRANSITION = 'ORDER_FULFILLMENT_TRANSITION',
@@ -2779,6 +2913,8 @@ export type Mutation = {
   assignFacetsToChannel: Array<Facet>;
   /** Assigns PaymentMethods to the specified Channel */
   assignPaymentMethodsToChannel: Array<PaymentMethod>;
+  /** Assigns ProductOptionGroups to the specified Channel */
+  assignProductOptionGroupsToChannel: Array<ProductOptionGroup>;
   /** Assigns ProductVariants to the specified Channel */
   assignProductVariantsToChannel: Array<ProductVariant>;
   /** Assigns all ProductVariants of Product to the specified Channel */
@@ -2798,6 +2934,12 @@ export type Mutation = {
   cancelPayment: CancelPaymentResult;
   /** Create a new Administrator */
   createAdministrator: Administrator;
+  /**
+   * Generates a new API-Key and attaches it to an Administrator.
+   * Returns the generated API-Key.
+   * API-Keys cannot be viewed again after creation.
+   */
+  createApiKey: CreateApiKeyResult;
   /** Create a new Asset */
   createAssets: Array<CreateAssetResult>;
   /** Create a new Channel */
@@ -2852,6 +2994,8 @@ export type Mutation = {
   deleteAdministrator: DeletionResponse;
   /** Delete multiple Administrators */
   deleteAdministrators: Array<DeletionResponse>;
+  /** Deletes API-Keys */
+  deleteApiKeys: Array<DeletionResponse>;
   /** Delete an Asset */
   deleteAsset: DeletionResponse;
   /** Delete multiple Assets */
@@ -2896,6 +3040,10 @@ export type Mutation = {
   deleteProduct: DeletionResponse;
   /** Delete a ProductOption */
   deleteProductOption: DeletionResponse;
+  /** Delete a ProductOptionGroup */
+  deleteProductOptionGroup: DeletionResponse;
+  /** Delete multiple ProductOptionGroups */
+  deleteProductOptionGroups: Array<DeletionResponse>;
   /** Delete a ProductVariant */
   deleteProductVariant: DeletionResponse;
   /** Delete multiple ProductVariants */
@@ -2979,6 +3127,8 @@ export type Mutation = {
   removeOptionGroupFromProduct: RemoveOptionGroupFromProductResult;
   /** Removes PaymentMethods from the specified Channel */
   removePaymentMethodsFromChannel: Array<PaymentMethod>;
+  /** Removes ProductOptionGroups from the specified Channel */
+  removeProductOptionGroupsFromChannel: Array<RemoveProductOptionGroupFromChannelResult>;
   /** Removes ProductVariants from the specified Channel */
   removeProductVariantsFromChannel: Array<ProductVariant>;
   /** Removes all ProductVariants of Product from the specified Channel */
@@ -2991,6 +3141,12 @@ export type Mutation = {
   removeShippingMethodsFromChannel: Array<ShippingMethod>;
   /** Removes StockLocations from the specified Channel */
   removeStockLocationsFromChannel: Array<StockLocation>;
+  /**
+   * Replaces the old with a new API-Key.
+   * This is a convenience method to invalidate an API-Key without
+   * deleting the underlying roles and permissions.
+   */
+  rotateApiKey: RotateApiKeyResult;
   runPendingSearchIndexUpdates: Success;
   runScheduledTask: Success;
   setCustomerForDraftOrder: SetCustomerForDraftOrderResult;
@@ -3022,6 +3178,8 @@ export type Mutation = {
   updateActiveAdministrator: Administrator;
   /** Update an existing Administrator */
   updateAdministrator: Administrator;
+  /** Updates an API-Key */
+  updateApiKey: ApiKey;
   /** Update an existing Asset */
   updateAsset: Asset;
   /** Update an existing Channel */
@@ -3157,6 +3315,11 @@ export type MutationAssignPaymentMethodsToChannelArgs = {
 };
 
 
+export type MutationAssignProductOptionGroupsToChannelArgs = {
+  input: AssignProductOptionGroupsToChannelInput;
+};
+
+
 export type MutationAssignProductVariantsToChannelArgs = {
   input: AssignProductVariantsToChannelInput;
 };
@@ -3211,6 +3374,11 @@ export type MutationCancelPaymentArgs = {
 
 export type MutationCreateAdministratorArgs = {
   input: CreateAdministratorInput;
+};
+
+
+export type MutationCreateApiKeyArgs = {
+  input: CreateApiKeyInput;
 };
 
 
@@ -3351,6 +3519,11 @@ export type MutationDeleteAdministratorsArgs = {
 };
 
 
+export type MutationDeleteApiKeysArgs = {
+  ids: Array<Scalars['ID']['input']>;
+};
+
+
 export type MutationDeleteAssetArgs = {
   input: DeleteAssetInput;
 };
@@ -3468,6 +3641,18 @@ export type MutationDeleteProductArgs = {
 
 export type MutationDeleteProductOptionArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteProductOptionGroupArgs = {
+  force?: InputMaybe<Scalars['Boolean']['input']>;
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteProductOptionGroupsArgs = {
+  force?: InputMaybe<Scalars['Boolean']['input']>;
+  ids: Array<Scalars['ID']['input']>;
 };
 
 
@@ -3659,6 +3844,11 @@ export type MutationRemovePaymentMethodsFromChannelArgs = {
 };
 
 
+export type MutationRemoveProductOptionGroupsFromChannelArgs = {
+  input: RemoveProductOptionGroupsFromChannelInput;
+};
+
+
 export type MutationRemoveProductVariantsFromChannelArgs = {
   input: RemoveProductVariantsFromChannelInput;
 };
@@ -3687,6 +3877,11 @@ export type MutationRemoveShippingMethodsFromChannelArgs = {
 
 export type MutationRemoveStockLocationsFromChannelArgs = {
   input: RemoveStockLocationsFromChannelInput;
+};
+
+
+export type MutationRotateApiKeyArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -3791,6 +3986,11 @@ export type MutationUpdateActiveAdministratorArgs = {
 
 export type MutationUpdateAdministratorArgs = {
   input: UpdateAdministratorInput;
+};
+
+
+export type MutationUpdateApiKeyArgs = {
+  input: UpdateApiKeyInput;
 };
 
 
@@ -4493,6 +4693,8 @@ export enum Permission {
   Authenticated = 'Authenticated',
   /** Grants permission to create Administrator */
   CreateAdministrator = 'CreateAdministrator',
+  /** Grants permission to create ApiKey */
+  CreateApiKey = 'CreateApiKey',
   /** Grants permission to create Asset */
   CreateAsset = 'CreateAsset',
   /** Grants permission to create Products, Facets, Assets, Collections */
@@ -4537,6 +4739,8 @@ export enum Permission {
   CreateZone = 'CreateZone',
   /** Grants permission to delete Administrator */
   DeleteAdministrator = 'DeleteAdministrator',
+  /** Grants permission to delete ApiKey */
+  DeleteApiKey = 'DeleteApiKey',
   /** Grants permission to delete Asset */
   DeleteAsset = 'DeleteAsset',
   /** Grants permission to delete Products, Facets, Assets, Collections */
@@ -4585,6 +4789,8 @@ export enum Permission {
   Public = 'Public',
   /** Grants permission to read Administrator */
   ReadAdministrator = 'ReadAdministrator',
+  /** Grants permission to read ApiKey */
+  ReadApiKey = 'ReadApiKey',
   /** Grants permission to read Asset */
   ReadAsset = 'ReadAsset',
   /** Grants permission to read Products, Facets, Assets, Collections */
@@ -4631,6 +4837,8 @@ export enum Permission {
   SuperAdmin = 'SuperAdmin',
   /** Grants permission to update Administrator */
   UpdateAdministrator = 'UpdateAdministrator',
+  /** Grants permission to update ApiKey */
+  UpdateApiKey = 'UpdateApiKey',
   /** Grants permission to update Asset */
   UpdateAsset = 'UpdateAsset',
   /** Grants permission to update Products, Facets, Assets, Collections */
@@ -4797,6 +5005,53 @@ export type ProductOptionGroup = Node & {
   options: Array<ProductOption>;
   translations: Array<ProductOptionGroupTranslation>;
   updatedAt: Scalars['DateTime']['output'];
+};
+
+export type ProductOptionGroupFilterParameter = {
+  _and?: InputMaybe<Array<ProductOptionGroupFilterParameter>>;
+  _or?: InputMaybe<Array<ProductOptionGroupFilterParameter>>;
+  code?: InputMaybe<StringOperators>;
+  createdAt?: InputMaybe<DateOperators>;
+  id?: InputMaybe<IdOperators>;
+  languageCode?: InputMaybe<StringOperators>;
+  name?: InputMaybe<StringOperators>;
+  updatedAt?: InputMaybe<DateOperators>;
+};
+
+export type ProductOptionGroupInUseError = ErrorResult & {
+  __typename?: 'ProductOptionGroupInUseError';
+  errorCode: ErrorCode;
+  message: Scalars['String']['output'];
+  optionGroupCode: Scalars['String']['output'];
+  productCount: Scalars['Int']['output'];
+  variantCount: Scalars['Int']['output'];
+};
+
+export type ProductOptionGroupList = PaginatedList & {
+  __typename?: 'ProductOptionGroupList';
+  items: Array<ProductOptionGroup>;
+  totalItems: Scalars['Int']['output'];
+};
+
+export type ProductOptionGroupListOptions = {
+  /** Allows the results to be filtered */
+  filter?: InputMaybe<ProductOptionGroupFilterParameter>;
+  /** Specifies whether multiple top-level "filter" fields should be combined with a logical AND or OR operation. Defaults to AND. */
+  filterOperator?: InputMaybe<LogicalOperator>;
+  /** Skips the first n results, for use in pagination */
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  /** Specifies which properties to sort the results by */
+  sort?: InputMaybe<ProductOptionGroupSortParameter>;
+  /** Takes n results, for use in pagination */
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ProductOptionGroupSortParameter = {
+  code?: InputMaybe<SortOrder>;
+  createdAt?: InputMaybe<SortOrder>;
+  id?: InputMaybe<SortOrder>;
+  name?: InputMaybe<SortOrder>;
+  updatedAt?: InputMaybe<SortOrder>;
 };
 
 export type ProductOptionGroupTranslation = {
@@ -5181,6 +5436,8 @@ export type Query = {
   activeChannel: Channel;
   administrator?: Maybe<Administrator>;
   administrators: AdministratorList;
+  apiKey?: Maybe<ApiKey>;
+  apiKeys: ApiKeyList;
   /** Get a single Asset by id */
   asset?: Maybe<Asset>;
   /** Get a list of Assets */
@@ -5232,7 +5489,7 @@ export type Query = {
   product?: Maybe<Product>;
   productOption?: Maybe<ProductOption>;
   productOptionGroup?: Maybe<ProductOptionGroup>;
-  productOptionGroups: Array<ProductOptionGroup>;
+  productOptionGroups: ProductOptionGroupList;
   productOptions: ProductOptionList;
   /** Get a ProductVariant by id */
   productVariant?: Maybe<ProductVariant>;
@@ -5280,6 +5537,16 @@ export type QueryAdministratorArgs = {
 
 export type QueryAdministratorsArgs = {
   options?: InputMaybe<AdministratorListOptions>;
+};
+
+
+export type QueryApiKeyArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryApiKeysArgs = {
+  options?: InputMaybe<ApiKeyListOptions>;
 };
 
 
@@ -5447,7 +5714,7 @@ export type QueryProductOptionGroupArgs = {
 
 
 export type QueryProductOptionGroupsArgs = {
-  filterTerm?: InputMaybe<Scalars['String']['input']>;
+  options?: InputMaybe<ProductOptionGroupListOptions>;
 };
 
 
@@ -5748,6 +6015,14 @@ export type RemovePaymentMethodsFromChannelInput = {
   paymentMethodIds: Array<Scalars['ID']['input']>;
 };
 
+export type RemoveProductOptionGroupFromChannelResult = ProductOptionGroup | ProductOptionGroupInUseError;
+
+export type RemoveProductOptionGroupsFromChannelInput = {
+  channelId: Scalars['ID']['input'];
+  force?: InputMaybe<Scalars['Boolean']['input']>;
+  productOptionGroupIds: Array<Scalars['ID']['input']>;
+};
+
 export type RemoveProductVariantsFromChannelInput = {
   channelId: Scalars['ID']['input'];
   productVariantIds: Array<Scalars['ID']['input']>;
@@ -5832,6 +6107,12 @@ export type RoleSortParameter = {
   updatedAt?: InputMaybe<SortOrder>;
 };
 
+export type RotateApiKeyResult = {
+  __typename?: 'RotateApiKeyResult';
+  /** The generated API-Key. API-Keys cannot be viewed again after creation! */
+  apiKey: Scalars['String']['output'];
+};
+
 export type Sale = Node & StockMovement & {
   __typename?: 'Sale';
   createdAt: Scalars['DateTime']['output'];
@@ -5858,7 +6139,9 @@ export type ScheduledTask = {
 
 export type SearchInput = {
   collectionId?: InputMaybe<Scalars['ID']['input']>;
+  collectionIds?: InputMaybe<Array<Scalars['ID']['input']>>;
   collectionSlug?: InputMaybe<Scalars['String']['input']>;
+  collectionSlugs?: InputMaybe<Array<Scalars['String']['input']>>;
   facetValueFilters?: InputMaybe<Array<FacetValueFilterInput>>;
   /** @deprecated Use `facetValueFilters` instead */
   facetValueIds?: InputMaybe<Array<Scalars['ID']['input']>>;
@@ -6610,12 +6893,33 @@ export type UpdateAdministratorInput = {
   roleIds?: InputMaybe<Array<Scalars['ID']['input']>>;
 };
 
+export type UpdateApiKeyInput = {
+  customFields?: InputMaybe<Scalars['JSON']['input']>;
+  /** ID of the ApiKey */
+  id: Scalars['ID']['input'];
+  /**
+   * Which roles to attach to this ApiKey.
+   * You may only grant roles which you, yourself have.
+   */
+  roleIds?: InputMaybe<Array<Scalars['ID']['input']>>;
+  translations?: InputMaybe<Array<UpdateApiKeyTranslationInput>>;
+};
+
+export type UpdateApiKeyTranslationInput = {
+  customFields?: InputMaybe<Scalars['JSON']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  languageCode: LanguageCode;
+  /** A descriptive name so you can remind yourself where the API-Key gets used */
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type UpdateAssetInput = {
   customFields?: InputMaybe<Scalars['JSON']['input']>;
   focalPoint?: InputMaybe<CoordinateInput>;
   id: Scalars['ID']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
+  translations?: InputMaybe<Array<AssetTranslationInput>>;
 };
 
 export type UpdateChannelInput = {

@@ -1,3 +1,5 @@
+export * from './api-key-strategy/api-key-strategy';
+export * from './api-key-strategy/random-bytes-api-key-strategy';
 export * from './asset-import-strategy/asset-import-strategy';
 export * from './asset-naming-strategy/asset-naming-strategy';
 export * from './asset-naming-strategy/default-asset-naming-strategy';
@@ -5,8 +7,10 @@ export * from './asset-preview-strategy/asset-preview-strategy';
 export * from './asset-storage-strategy/asset-storage-strategy';
 export * from './auth/authentication-strategy';
 export * from './auth/bcrypt-password-hashing-strategy';
+export * from './auth/default-entity-access-control-strategy';
 export * from './auth/default-password-validation-strategy';
 export * from './auth/default-verification-token-strategy';
+export * from './auth/entity-access-control-strategy';
 export * from './auth/native-authentication-strategy';
 export * from './auth/password-hashing-strategy';
 export * from './auth/password-validation-strategy';

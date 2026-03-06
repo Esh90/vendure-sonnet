@@ -1,4 +1,6 @@
 import { DataTable, FacetedFilter } from '@/vdb/components/data-table/data-table.js';
+import { Alert, AlertDescription, AlertTitle } from '@/vdb/components/ui/alert.js';
+import { Trans } from '@lingui/react/macro';
 import { getObjectPathToPaginatedList } from '@/vdb/framework/document-introspection/get-document-structure.js';
 import { useListQueryFields } from '@/vdb/framework/document-introspection/hooks.js';
 import { api } from '@/vdb/graphql/api.js';
@@ -16,6 +18,7 @@ import { ColumnDef, Row, TableOptions, VisibilityState } from '@tanstack/table-c
 import React from 'react';
 import { getColumnVisibility, getStandardizedDefaultColumnOrder } from '../data-table/data-table-utils.js';
 import { useGeneratedColumns } from '../data-table/use-generated-columns.js';
+import { PaginatedListContext } from './paginated-list-context.js';
 
 // Type that identifies a paginated list structure (has items array and totalItems)
 type IsPaginatedList<T> = T extends { items: any[]; totalItems: number } ? true : false;
@@ -95,6 +98,11 @@ export type ColumnDefWithMetaDependencies<T extends TypedDocumentNode<any, any>>
     meta?: {
         /**
          * @description
+         * If true, the column will not be displayed in the table.
+         */
+        disabled?: boolean;
+        /**
+         * @description
          * Columns that rely on _other_ columns in order to correctly render,
          * can declare those other columns as dependencies in order to ensure that
          * those columns are always fetched, even when those columns are not explicitly
@@ -109,7 +117,7 @@ export type CustomizeColumnConfig<T extends TypedDocumentNode<any, any>> = {
 };
 
 export type FacetedFilterConfig<T extends TypedDocumentNode<any, any>> = {
-    [Key in AllItemFieldKeys<T>]?: FacetedFilter;
+    [Key in AllItemFieldKeys<T> | (string & {})]?: FacetedFilter;
 };
 
 export type ListQueryFields<T extends TypedDocumentNode<any, any>> = {
@@ -151,38 +159,6 @@ export type ListQueryOptionsShape = {
 export type AdditionalColumns<T extends TypedDocumentNode<any, any>> = {
     [key: string]: ColumnDefWithMetaDependencies<PaginatedListItemFields<T>>;
 };
-
-export interface PaginatedListContext {
-    refetchPaginatedList: () => void;
-}
-
-export const PaginatedListContext = React.createContext<PaginatedListContext | undefined>(undefined);
-
-/**
- * @description
- * Returns the context for the paginated list data table. Must be used within a PaginatedListDataTable.
- *
- * @example
- * ```ts
- * const { refetchPaginatedList } = usePaginatedList();
- *
- * const mutation = useMutation({
- *     mutationFn: api.mutate(updateFacetValueDocument),
- *     onSuccess: () => {
- *         refetchPaginatedList();
- *     },
- * });
- * ```
- * @docsCategory hooks
- * @since 3.4.0
- */
-export function usePaginatedList() {
-    const context = React.useContext(PaginatedListContext);
-    if (!context) {
-        throw new Error('usePaginatedList must be used within a PaginatedListDataTable');
-    }
-    return context;
-}
 
 export interface RowAction<T> {
     label: React.ReactNode;
@@ -234,6 +210,21 @@ export interface PaginatedListDataTableProps<
      * the list needs to be refreshed.
      */
     registerRefresher?: PaginatedListRefresherRegisterFn;
+    /**
+     * @description
+     * Callback when items are reordered via drag and drop.
+     * When provided, enables drag-and-drop functionality.
+     */
+    onReorder?: (
+        oldIndex: number,
+        newIndex: number,
+        item: PaginatedListItemFields<T>,
+    ) => void | Promise<void>;
+    /**
+     * @description
+     * When true, drag and drop will be disabled. This will only have an effect if the onReorder prop is also set
+     */
+    disableDragAndDrop?: boolean;
 }
 
 export const PaginatedListDataTableKey = 'PaginatedListDataTable';
@@ -378,6 +369,8 @@ export function PaginatedListDataTable<
     setTableOptions,
     transformData,
     registerRefresher,
+    onReorder,
+    disableDragAndDrop = false,
 }: Readonly<PaginatedListDataTableProps<T, U, V, AC>>) {
     const [searchTerm, setSearchTerm] = React.useState<string>('');
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -450,7 +443,7 @@ export function PaginatedListDataTable<
     ];
     const queryKey = transformQueryKey ? transformQueryKey(defaultQueryKey) : defaultQueryKey;
 
-    const { data, isFetching } = useQuery({
+    const { data, isFetching, error } = useQuery({
         queryFn: () => {
             const searchFilter = onSearchTermChange ? onSearchTermChange(debouncedSearchTerm) : {};
             const mergedFilter = { ...filter, ...searchFilter };
@@ -478,6 +471,14 @@ export function PaginatedListDataTable<
         typeof transformData === 'function' ? transformData(listData?.items ?? []) : (listData?.items ?? []);
     return (
         <PaginatedListContext.Provider value={{ refetchPaginatedList }}>
+            {error && (
+                <Alert variant="destructive" className="mb-4">
+                    <AlertTitle><Trans>Error</Trans></AlertTitle>
+                    <AlertDescription>
+                        {error instanceof Error ? error.message : <Trans>An unknown error occurred</Trans>}
+                    </AlertDescription>
+                </Alert>
+            )}
             <DataTable
                 columns={columns}
                 data={transformedData}
@@ -498,6 +499,8 @@ export function PaginatedListDataTable<
                 bulkActions={bulkActions}
                 setTableOptions={setTableOptions}
                 onRefresh={refetchPaginatedList}
+                onReorder={onReorder}
+                disableDragAndDrop={disableDragAndDrop}
             />
         </PaginatedListContext.Provider>
     );

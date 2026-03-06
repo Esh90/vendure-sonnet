@@ -13,7 +13,7 @@ import { useUserSettings } from '@/vdb/hooks/use-user-settings.js';
 import { Trans } from '@lingui/react/macro';
 import { JsonEditor } from 'json-edit-react';
 import { EllipsisVertical } from 'lucide-react';
-import { useMemo } from 'react';
+import { Fragment, useMemo } from 'react';
 import { orderDetailDocument, orderLineFragment } from '../orders.graphql.js';
 import { MoneyGrossNet } from './money-gross-net.js';
 import { OrderTableTotals } from './order-table-totals.js';
@@ -124,6 +124,27 @@ function createCustomizeColumns(currencyCode: string) {
                 <Money currencyCode={currencyCode} value={row.original.discountedLinePriceWithTax} />
             ),
         },
+        discounts: {
+            header: () => <Trans>Discounts</Trans>,
+            cell: ({ row }: { row: any }) => {
+                const discounts = row.original.discounts;
+                if (!discounts?.length) return null;
+                return (
+                    <div className="grid grid-cols-[auto_1fr] items-start gap-x-2 gap-y-1">
+                        {discounts.map((discount: any, index: number) => (
+                            <Fragment key={index}>
+                                <span>{discount.description}</span>
+                                <MoneyGrossNet
+                                    priceWithTax={discount.amountWithTax}
+                                    price={discount.amount}
+                                    currencyCode={currencyCode}
+                                />
+                            </Fragment>
+                        ))}
+                    </div>
+                );
+            },
+        },
     };
 }
 
@@ -147,7 +168,10 @@ export function OrderTable({ order, pageId }: Readonly<OrderTableProps>) {
     ];
     const currencyCode = order.currencyCode;
 
-    const fields = getFieldsFromDocumentNode(addCustomFields(orderDetailDocument), ['order', 'lines']);
+    const fields = getFieldsFromDocumentNode(
+        addCustomFields(orderDetailDocument, { includeNestedFragments: ['OrderLine'] }),
+        ['order', 'lines'],
+    );
 
     const customizeColumns = useMemo(() => createCustomizeColumns(currencyCode), [currencyCode]);
 
@@ -172,6 +196,7 @@ export function OrderTable({ order, pageId }: Readonly<OrderTableProps>) {
                 columns={columns as any}
                 data={data as any}
                 totalItems={data.length}
+                itemsPerPage={data.length}
                 disableViewOptions={false}
                 defaultColumnVisibility={columnVisibility}
                 onColumnVisibilityChange={(_, columnVisibility) => {

@@ -18,6 +18,8 @@ export type ProductVariantInfo = {
     priceWithTax?: number;
 };
 
+type SurchargeInput = NonNullable<ModifyOrderInput['surcharges']>[number];
+
 export interface UseModifyOrderReturn {
     modifyOrderInput: ModifyOrderInput;
     addedVariants: Map<string, ProductVariantInfo>;
@@ -33,6 +35,9 @@ export interface UseModifyOrderReturn {
     removeCouponCode: (params: { couponCode: string }) => void;
     updateShippingAddress: (address: AddressFragment) => void;
     updateBillingAddress: (address: AddressFragment) => void;
+    addSurcharge: (surcharge: SurchargeInput) => void;
+    setNote: (note: string) => void;
+    setRecalculateShipping: (recalculate: boolean) => void;
     hasModifications: boolean;
 }
 
@@ -81,7 +86,7 @@ export function useModifyOrder(order: Order | null | undefined): UseModifyOrderR
                         const newQuantity = existingAdjustment.quantity + 1;
 
                         // If back to original quantity, remove from adjustments
-                        if (newQuantity === existingLine.quantity) {
+                        if (newQuantity === Number(existingLine.quantity)) {
                             return {
                                 ...prev,
                                 adjustOrderLines: (prev.adjustOrderLines ?? []).filter(
@@ -144,7 +149,9 @@ export function useModifyOrder(order: Order | null | undefined): UseModifyOrderR
                 setModifyOrderInput(prev => ({
                     ...prev,
                     addItems: (prev.addItems ?? []).map(item =>
-                        item.productVariantId === productVariantId ? { ...item, quantity } : item,
+                        item.productVariantId === productVariantId
+                            ? { ...item, quantity, customFields }
+                            : item,
                     ),
                 }));
             } else {
@@ -284,6 +291,33 @@ export function useModifyOrder(order: Order | null | undefined): UseModifyOrderR
         }));
     }, []);
 
+    // Add surcharge
+    const addSurcharge = useCallback((surcharge: SurchargeInput) => {
+        setModifyOrderInput(prev => ({
+            ...prev,
+            surcharges: [...(prev.surcharges ?? []), surcharge],
+        }));
+    }, []);
+
+    // Set note
+    const setNote = useCallback((note: string) => {
+        setModifyOrderInput(prev => ({
+            ...prev,
+            note: note || '',
+        }));
+    }, []);
+
+    // Set recalculate shipping
+    const setRecalculateShipping = useCallback((recalculate: boolean) => {
+        setModifyOrderInput(prev => ({
+            ...prev,
+            options: {
+                ...prev.options,
+                recalculateShipping: recalculate,
+            },
+        }));
+    }, []);
+
     // Check if there are modifications
     const hasModifications = useMemo(() => {
         return (
@@ -291,6 +325,7 @@ export function useModifyOrder(order: Order | null | undefined): UseModifyOrderR
             (modifyOrderInput.adjustOrderLines?.length ?? 0) > 0 ||
             (modifyOrderInput.couponCodes?.length ?? 0) > 0 ||
             (modifyOrderInput.shippingMethodIds?.length ?? 0) > 0 ||
+            (modifyOrderInput.surcharges?.length ?? 0) > 0 ||
             !!modifyOrderInput.updateShippingAddress ||
             !!modifyOrderInput.updateBillingAddress
         );
@@ -307,6 +342,9 @@ export function useModifyOrder(order: Order | null | undefined): UseModifyOrderR
         removeCouponCode,
         updateShippingAddress,
         updateBillingAddress,
+        addSurcharge,
+        setNote,
+        setRecalculateShipping,
         hasModifications,
     };
 }

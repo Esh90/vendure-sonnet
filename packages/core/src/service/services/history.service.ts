@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UpdateCustomerInput as UpdateCustomerShopInput } from '@vendure/common/lib/generated-shop-types';
 import {
+    CurrencyCode,
     HistoryEntryListOptions,
     HistoryEntryType,
     OrderLineInput,
@@ -115,6 +116,10 @@ export interface OrderHistoryEntryData {
         newCustomerId: ID;
         newCustomerName: ID;
         note?: string;
+    };
+    [HistoryEntryType.ORDER_CURRENCY_UPDATED]: {
+        previousCurrency: CurrencyCode;
+        newCurrency: CurrencyCode;
     };
 }
 
@@ -240,7 +245,7 @@ export interface UpdateCustomerHistoryEntryArgs<T extends keyof CustomerHistoryE
  * ```
  * :::info
  * It is also possible to define a UI component to display custom history entry types. See the
- * [Custom History Timeline Components guide](/guides/extending-the-admin-ui/custom-timeline-components/).
+ * [Custom History Timeline Components guide](/extending-the-admin-ui/custom-timeline-components/).
  * :::
  *
  * @docsCategory services

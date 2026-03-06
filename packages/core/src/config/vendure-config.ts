@@ -12,11 +12,13 @@ import { JobBufferStorageStrategy } from '../job-queue/job-buffer/job-buffer-sto
 import { ScheduledTask } from '../scheduler/scheduled-task';
 import { SchedulerStrategy } from '../scheduler/scheduler-strategy';
 
+import { ApiKeyStrategy } from './api-key-strategy/api-key-strategy';
 import { AssetImportStrategy } from './asset-import-strategy/asset-import-strategy';
 import { AssetNamingStrategy } from './asset-naming-strategy/asset-naming-strategy';
 import { AssetPreviewStrategy } from './asset-preview-strategy/asset-preview-strategy';
 import { AssetStorageStrategy } from './asset-storage-strategy/asset-storage-strategy';
 import { AuthenticationStrategy } from './auth/authentication-strategy';
+import { EntityAccessControlStrategy } from './auth/entity-access-control-strategy';
 import { PasswordHashingStrategy } from './auth/password-hashing-strategy';
 import { PasswordValidationStrategy } from './auth/password-validation-strategy';
 import { VerificationTokenStrategy } from './auth/verification-token-strategy';
@@ -376,6 +378,9 @@ export interface AuthOptions {
      *   should automatically send the session cookie with each request.
      * * 'bearer': Upon login, the token is returned in the response and should be then stored by the
      *   client app. Each request should include the header `Authorization: Bearer <token>`.
+     * * 'api-key': The mutation `createApiKey` will return a generated API-Key once, which should then be
+     *   stored by the User. Each request should include the API-Key inside the header defined by `apiKeyHeaderKey`
+     * ('vendure-api-key' by default).
      *
      * Note that if the bearer method is used, Vendure will automatically expose the configured
      * `authTokenHeaderKey` in the server's CORS configuration (adding `Access-Control-Expose-Headers: vendure-auth-token`
@@ -383,9 +388,12 @@ export interface AuthOptions {
      *
      * From v1.2.0 it is possible to specify both methods as a tuple: `['cookie', 'bearer']`.
      *
+     * From v3.6.0 it is possible to include 'api-key' as additional method in the method-tuple to allow for long-lived
+     * API-Key based authorization.
+     *
      * @default 'cookie'
      */
-    tokenMethod?: 'cookie' | 'bearer' | ReadonlyArray<'cookie' | 'bearer'>;
+    tokenMethod?: 'cookie' | 'bearer' | ReadonlyArray<'cookie' | 'bearer' | 'api-key'>;
     /**
      * @description
      * Options related to the handling of cookies when using the 'cookie' tokenMethod.
@@ -398,6 +406,13 @@ export interface AuthOptions {
      * @default 'vendure-auth-token'
      */
     authTokenHeaderKey?: string;
+    /**
+     * @description
+     * Defines which header will be used to read the API-Key when using the 'api-key' token method.
+     *
+     * @default 'vendure-api-key'
+     */
+    apiKeyHeaderKey?: string;
     /**
      * @description
      * Session duration, i.e. the time which must elapse from the last authenticated request
@@ -484,6 +499,16 @@ export interface AuthOptions {
      */
     passwordHashingStrategy?: PasswordHashingStrategy;
     /**
+     * Defines how authorization via API-Keys is managed for the Admin API.
+     * @since 3.6.0
+     */
+    adminApiKeyStrategy?: ApiKeyStrategy;
+    /**
+     * Defines how authorization via API-Keys is managed for the Shop API.
+     * @since 3.6.0
+     */
+    shopApiKeyStrategy?: ApiKeyStrategy;
+    /**
      * @description
      * Allows you to set a custom policy for passwords when using the {@link NativeAuthenticationStrategy}.
      * By default, it uses the {@link DefaultPasswordValidationStrategy}, which will impose a minimum length
@@ -512,6 +537,21 @@ export interface AuthOptions {
      * @since 3.2.0
      */
     verificationTokenStrategy?: VerificationTokenStrategy;
+    /**
+     * @description
+     * Allows you to define access control for entity queries at three levels:
+     *
+     * - `canAccess()` — gate-level permission check (once per request)
+     * - `prepareAccessControl()` — async pre-loading for row-level filtering (once per request)
+     * - `applyAccessControl()` — synchronous row-level QB filtering (every entity query)
+     *
+     * **Developer preview:** this API is subject to change in future releases.
+     *
+     * @default DefaultEntityAccessControlStrategy
+     * @since 3.6.0
+     * @experimental
+     */
+    entityAccessControlStrategy?: EntityAccessControlStrategy;
 }
 
 /**
@@ -1165,7 +1205,7 @@ export interface SystemOptions {
 /**
  * @description
  * All possible configuration options are defined by the
- * [`VendureConfig`](https://github.com/vendure-ecommerce/vendure/blob/master/packages/core/src/config/vendure-config.ts) interface.
+ * [`VendureConfig`](https://github.com/vendurehq/vendure/blob/master/packages/core/src/config/vendure-config.ts) interface.
  *
  * @docsCategory configuration
  * */
@@ -1337,9 +1377,9 @@ type DeepPartialSimple<T> = {
     [P in keyof T]?:
         | null
         | (T[P] extends Array<infer U>
-              ? Array<DeepPartialSimple<U>>
+              ? U[]
               : T[P] extends ReadonlyArray<infer X>
-                ? ReadonlyArray<DeepPartialSimple<X>>
+                ? readonly X[]
                 : T[P] extends Type<any>
                   ? T[P]
                   : DeepPartialSimple<T[P]>);

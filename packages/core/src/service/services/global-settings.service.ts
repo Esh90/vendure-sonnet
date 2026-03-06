@@ -42,7 +42,7 @@ export class GlobalSettingsService {
                 throw new Error('No global settings');
             }
             if (1 < result.length) {
-                // Strange edge case, see https://github.com/vendure-ecommerce/vendure/issues/987
+                // Strange edge case, see https://github.com/vendurehq/vendure/issues/987
                 const toDelete = result.slice(1);
                 await this.connection.rawConnection.getRepository(GlobalSettings).remove(toDelete);
             }
@@ -76,9 +76,10 @@ export class GlobalSettingsService {
 
     async updateSettings(ctx: RequestContext, input: UpdateGlobalSettingsInput): Promise<GlobalSettings> {
         const settings = await this.getSettings(ctx);
-        await this.eventBus.publish(new GlobalSettingsEvent(ctx, settings, input));
         patchEntity(settings, input);
+        await this.eventBus.publish(new GlobalSettingsEvent(ctx, settings, input));
+        await this.connection.getRepository(ctx, GlobalSettings).save(settings);
         await this.customFieldRelationService.updateRelations(ctx, GlobalSettings, input, settings);
-        return this.connection.getRepository(ctx, GlobalSettings).save(settings);
+        return settings;
     }
 }

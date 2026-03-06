@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
     AddPaymentToOrderResult,
     ApplyCouponCodeResult,
+    CurrencyCode,
     PaymentInput,
     PaymentMethodQuote,
     RemoveOrderItemsResult,
@@ -12,7 +13,6 @@ import {
     AddFulfillmentToOrderResult,
     AddManualPaymentToOrderResult,
     AddNoteToOrderInput,
-    AdjustmentType,
     CancelOrderInput,
     CancelOrderResult,
     CancelPaymentResult,
@@ -335,7 +335,7 @@ export class OrderService {
         );
         return this.listQueryBuilder
             .build(Order, options, {
-                relations: relations ?? ['lines', 'customer', 'channels', 'shippingLines'],
+                relations: effectiveRelations,
                 channelId: ctx.channelId,
                 ctx,
             })
@@ -553,6 +553,56 @@ export class OrderService {
                 note,
             },
         });
+        return updatedOrder;
+    }
+
+    /**
+     * @description
+     * Updates the currency code of an Order. This will recalculate all prices
+     * in the new currency using `applyPriceAdjustments`.
+     *
+     * @since 3.3.0
+     */
+    async updateOrderCurrency(
+        ctx: RequestContext,
+        orderId: ID,
+        currencyCode: CurrencyCode,
+        relations?: RelationPaths<Order>,
+    ): Promise<ErrorResultUnion<UpdateOrderItemsResult, Order>> {
+        const order = await this.getOrderOrThrow(ctx, orderId);
+        const validationError = this.assertAddingItemsState(order);
+        if (validationError) {
+            return validationError;
+        }
+
+        if (order.currencyCode === currencyCode) {
+            return order;
+        }
+
+        const channel = await this.channelService.getChannelFromToken(ctx.channel.token);
+        if (!channel.availableCurrencyCodes.includes(currencyCode)) {
+            throw new UserInputError('error.currency-not-available', { currencyCode });
+        }
+
+        const previousCurrencyCode = order.currencyCode;
+
+        const newCurrencyCtx = ctx.copy();
+        (newCurrencyCtx as any)._currencyCode = currencyCode;
+
+        order.currencyCode = currencyCode;
+
+        await this.historyService.createHistoryEntryForOrder({
+            ctx,
+            orderId: order.id,
+            type: HistoryEntryType.ORDER_CURRENCY_UPDATED,
+            data: {
+                previousCurrency: previousCurrencyCode,
+                newCurrency: currencyCode,
+            },
+        });
+
+        const updatedOrder = await this.applyPriceAdjustments(newCurrencyCtx, order, order.lines, relations);
+        await this.eventBus.publish(new OrderEvent(ctx, updatedOrder, 'updated'));
         return updatedOrder;
     }
 
@@ -1028,14 +1078,6 @@ export class OrderService {
     async removeCouponCode(ctx: RequestContext, orderId: ID, couponCode: string) {
         const order = await this.getOrderOrThrow(ctx, orderId);
         if (order.couponCodes.includes(couponCode)) {
-            // When removing a couponCode which has triggered an Order-level discount
-            // we need to make sure we persist the changes to the adjustments array of
-            // any affected OrderLines.
-            const affectedOrderLines = order.lines.filter(
-                line =>
-                    line.adjustments.filter(a => a.type === AdjustmentType.DISTRIBUTED_ORDER_PROMOTION)
-                        .length,
-            );
             order.couponCodes = order.couponCodes.filter(cc => cc !== couponCode);
             await this.historyService.createHistoryEntryForOrder({
                 ctx,
@@ -1044,9 +1086,7 @@ export class OrderService {
                 data: { couponCode },
             });
             await this.eventBus.publish(new CouponCodeEvent(ctx, couponCode, orderId, 'removed'));
-            const result = await this.applyPriceAdjustments(ctx, order);
-            await this.connection.getRepository(ctx, OrderLine).save(affectedOrderLines);
-            return result;
+            return this.applyPriceAdjustments(ctx, order);
         } else {
             return order;
         }
@@ -1091,8 +1131,8 @@ export class OrderService {
         // Since a changed ShippingAddress could alter the activeTaxZone,
         // we will remove any cached activeTaxZone, so it can be re-calculated
         // as needed.
-        this.requestCache.set(ctx, CacheKey.ActiveTaxZone, undefined);
-        this.requestCache.set(ctx, CacheKey.ActiveTaxZone_PPA, undefined);
+        this.requestCache.set(ctx, CacheKey.ActiveTaxZone(ctx.channelId), undefined);
+        this.requestCache.set(ctx, CacheKey.ActiveTaxZone_PPA(ctx.channelId), undefined);
         return this.applyPriceAdjustments(ctx, order, order.lines);
     }
 
@@ -1115,8 +1155,8 @@ export class OrderService {
         // Since a changed BillingAddress could alter the activeTaxZone,
         // we will remove any cached activeTaxZone, so it can be re-calculated
         // as needed.
-        this.requestCache.set(ctx, CacheKey.ActiveTaxZone, undefined);
-        this.requestCache.set(ctx, CacheKey.ActiveTaxZone_PPA, undefined);
+        this.requestCache.set(ctx, CacheKey.ActiveTaxZone(ctx.channelId), undefined);
+        this.requestCache.set(ctx, CacheKey.ActiveTaxZone_PPA(ctx.channelId), undefined);
         return this.applyPriceAdjustments(ctx, order, order.lines);
     }
 
@@ -1139,8 +1179,8 @@ export class OrderService {
         // Since a changed ShippingAddress could alter the activeTaxZone,
         // we will remove any cached activeTaxZone, so it can be re-calculated
         // as needed.
-        this.requestCache.set(ctx, CacheKey.ActiveTaxZone, undefined);
-        this.requestCache.set(ctx, CacheKey.ActiveTaxZone_PPA, undefined);
+        this.requestCache.set(ctx, CacheKey.ActiveTaxZone(ctx.channelId), undefined);
+        this.requestCache.set(ctx, CacheKey.ActiveTaxZone_PPA(ctx.channelId), undefined);
         return this.applyPriceAdjustments(ctx, order, order.lines);
     }
 
@@ -1163,8 +1203,8 @@ export class OrderService {
         // Since a changed BillingAddress could alter the activeTaxZone,
         // we will remove any cached activeTaxZone, so it can be re-calculated
         // as needed.
-        this.requestCache.set(ctx, CacheKey.ActiveTaxZone, undefined);
-        this.requestCache.set(ctx, CacheKey.ActiveTaxZone_PPA, undefined);
+        this.requestCache.set(ctx, CacheKey.ActiveTaxZone(ctx.channelId), undefined);
+        this.requestCache.set(ctx, CacheKey.ActiveTaxZone_PPA(ctx.channelId), undefined);
         return this.applyPriceAdjustments(ctx, order, order.lines);
     }
 
@@ -1854,7 +1894,7 @@ export class OrderService {
                       .getRepository(ctx, Order)
                       .findOneOrFail({ where: { id: orderOrId }, relations: ['lines', 'shippingLines'] });
         // If there is a Session referencing the Order to be deleted, we must first remove that
-        // reference in order to avoid a foreign key error. See https://github.com/vendure-ecommerce/vendure/issues/1454
+        // reference in order to avoid a foreign key error. See https://github.com/vendurehq/vendure/issues/1454
         const sessions = await this.connection
             .getRepository(ctx, Session)
             .find({ where: { activeOrderId: orderToDelete.id } });
@@ -1883,7 +1923,7 @@ export class OrderService {
     ): Promise<Order | undefined> {
         if (guestOrder && guestOrder.customer) {
             // In this case the "guest order" is actually an order of an existing Customer,
-            // so we do not want to merge at all. See https://github.com/vendure-ecommerce/vendure/issues/263
+            // so we do not want to merge at all. See https://github.com/vendurehq/vendure/issues/263
             return existingOrder;
         }
         const mergeResult = this.orderMerger.merge(ctx, guestOrder, existingOrder);
@@ -2130,9 +2170,9 @@ export class OrderService {
                     reload: false,
                 },
             );
+        await this.promotionService.runPromotionSideEffects(ctx, order, activePromotionsPre);
         await this.connection.getRepository(ctx, OrderLine).save(updatedOrder.lines, { reload: false });
         await this.connection.getRepository(ctx, ShippingLine).save(order.shippingLines, { reload: false });
-        await this.promotionService.runPromotionSideEffects(ctx, order, activePromotionsPre);
 
         return assertFound(this.findOne(ctx, order.id, relations));
     }

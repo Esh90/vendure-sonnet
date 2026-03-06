@@ -10,6 +10,7 @@ import {
 } from '@/vdb/components/ui/form.js';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/vdb/components/ui/tabs.js';
 import { CustomFormComponent } from '@/vdb/framework/form-engine/custom-form-component.js';
+import { ConfigurableFieldDef } from '@/vdb/framework/form-engine/form-engine-types.js';
 import { useCustomFieldConfig } from '@/vdb/hooks/use-custom-field-config.js';
 import { useUserSettings } from '@/vdb/hooks/use-user-settings.js';
 import { customFieldConfigFragment } from '@/vdb/providers/server-config.js';
@@ -20,15 +21,16 @@ import { Control } from 'react-hook-form';
 import { FormControlAdapter } from '../../framework/form-engine/form-control-adapter.js';
 import { TranslatableFormField } from './translatable-form-field.js';
 
-type CustomFieldConfig = ResultOf<typeof customFieldConfigFragment>;
+type CustomFieldConfig = Omit<ResultOf<typeof customFieldConfigFragment>, '__typename'>;
 
 interface CustomFieldsFormProps {
     entityType: string;
     control: Control<any, any>;
     formPathPrefix?: string;
+    disabled?: boolean;
 }
 
-export function CustomFieldsForm({ entityType, control, formPathPrefix }: Readonly<CustomFieldsFormProps>) {
+export function CustomFieldsForm({ entityType, control, formPathPrefix, disabled }: Readonly<CustomFieldsFormProps>) {
     const { t } = useLingui();
     const customFields = useCustomFieldConfig(entityType);
 
@@ -72,7 +74,7 @@ export function CustomFieldsForm({ entityType, control, formPathPrefix }: Readon
     const shouldShowTabs = useMemo(() => {
         if (!customFields) return false;
         const hasTabbedFields = customFields.some(field => field.ui?.tab);
-        return hasTabbedFields || groupedFields.length > 1;
+        return hasTabbedFields && groupedFields.length > 1;
     }, [customFields, groupedFields.length]);
 
     if (!shouldShowTabs) {
@@ -85,6 +87,7 @@ export function CustomFieldsForm({ entityType, control, formPathPrefix }: Readon
                         fieldDef={fieldDef}
                         control={control}
                         fieldName={getFieldName(fieldDef)}
+                        disabled={disabled}
                     />
                 ))}
             </div>
@@ -94,7 +97,7 @@ export function CustomFieldsForm({ entityType, control, formPathPrefix }: Readon
     // Tabbed view
     return (
         <Tabs defaultValue={groupedFields[0]?.tabName} className="w-full">
-            <TabsList>
+            <TabsList className="h-auto w-full flex-wrap justify-start">
                 {groupedFields.map(group => (
                     <TabsTrigger key={group.tabName} value={group.tabName}>
                         {group.tabName === 'general' ? t`General` : group.tabName}
@@ -110,6 +113,7 @@ export function CustomFieldsForm({ entityType, control, formPathPrefix }: Readon
                                 fieldDef={fieldDef}
                                 control={control}
                                 fieldName={getFieldName(fieldDef)}
+                                disabled={disabled}
                             />
                         ))}
                     </div>
@@ -120,24 +124,30 @@ export function CustomFieldsForm({ entityType, control, formPathPrefix }: Readon
 }
 
 interface CustomFieldItemProps {
-    fieldDef: CustomFieldConfig;
-    control: Control<any, any>;
+    fieldDef: ConfigurableFieldDef;
+    control: Control<any>;
     fieldName: string;
+    disabled?: boolean;
 }
 
-function CustomFieldItem({ fieldDef, control, fieldName }: Readonly<CustomFieldItemProps>) {
+function CustomFieldItem({ fieldDef, control, fieldName, disabled }: Readonly<CustomFieldItemProps>) {
     const {
         settings: { displayLanguage },
     } = useUserSettings();
 
-    const getTranslation = (input: Array<{ languageCode: string; value: string }> | null | undefined) => {
+    const getTranslation = (
+        input: string | Array<{ languageCode: string; value: string }> | null | undefined,
+    ) => {
+        if (typeof input === 'string') {
+            return input;
+        }
         return input?.find(t => t.languageCode === displayLanguage)?.value;
     };
     const hasCustomFormComponent = fieldDef.ui?.component;
     const isLocaleField = fieldDef.type === 'localeString' || fieldDef.type === 'localeText';
     const shouldBeFullWidth = fieldDef.ui?.fullWidth === true;
     const containerClassName = shouldBeFullWidth ? 'col-span-2' : '';
-    const isReadonly = fieldDef.readonly ?? false;
+    const isReadonly = (fieldDef as CustomFieldConfig).readonly ?? false;
 
     // For locale fields, always use TranslatableFormField regardless of custom components
     if (isLocaleField) {
@@ -146,6 +156,7 @@ function CustomFieldItem({ fieldDef, control, fieldName }: Readonly<CustomFieldI
                 <TranslatableFormField
                     control={control}
                     name={fieldName}
+                    disabled={disabled}
                     render={({ field, ...props }) => (
                         <FormItem>
                             <FormLabel>{getTranslation(fieldDef.label) ?? field.name}</FormLabel>
@@ -176,6 +187,7 @@ function CustomFieldItem({ fieldDef, control, fieldName }: Readonly<CustomFieldI
                 <FormField
                     control={control}
                     name={fieldName}
+                    disabled={disabled}
                     render={fieldProps => (
                         <CustomFieldFormItem
                             fieldDef={fieldDef}
@@ -201,6 +213,7 @@ function CustomFieldItem({ fieldDef, control, fieldName }: Readonly<CustomFieldI
                     <FormField
                         control={control}
                         name={fieldName}
+                        disabled={disabled}
                         render={({ field }) => (
                             <FormItem>
                                 <FormLabel>{getTranslation(fieldDef.label) ?? fieldDef.name}</FormLabel>
@@ -212,7 +225,6 @@ function CustomFieldItem({ fieldDef, control, fieldName }: Readonly<CustomFieldI
                                             <StructFormInput {...inputField} fieldDef={fieldDef} />
                                         )}
                                         defaultValue={{}} // Empty struct object as default
-                                        isFullWidth={true} // Structs should always be full-width
                                     />
                                 </FormControl>
                                 <FormDescription>{getTranslation(fieldDef.description)}</FormDescription>
@@ -230,6 +242,7 @@ function CustomFieldItem({ fieldDef, control, fieldName }: Readonly<CustomFieldI
                 <FormField
                     control={control}
                     name={fieldName}
+                    disabled={disabled}
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>{getTranslation(fieldDef.label) ?? fieldDef.name}</FormLabel>
@@ -251,6 +264,7 @@ function CustomFieldItem({ fieldDef, control, fieldName }: Readonly<CustomFieldI
             <FormField
                 control={control}
                 name={fieldName}
+                disabled={disabled}
                 render={({ field }) => (
                     <CustomFieldFormItem
                         fieldDef={fieldDef}
@@ -266,9 +280,9 @@ function CustomFieldItem({ fieldDef, control, fieldName }: Readonly<CustomFieldI
 }
 
 interface CustomFieldFormItemProps {
-    fieldDef: CustomFieldConfig;
+    fieldDef: ConfigurableFieldDef;
     getTranslation: (
-        input: Array<{ languageCode: string; value: string }> | null | undefined,
+        input: string | Array<{ languageCode: string; value: string }> | null | undefined,
     ) => string | undefined;
     fieldName: string;
     children: React.ReactNode;

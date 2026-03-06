@@ -9,7 +9,7 @@ import { useQuery } from '@tanstack/react-query';
 import { RefreshCw } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { DashboardBaseWidget } from '../base-widget.js';
-import { useWidgetFilters } from '../widget-filters-context.js';
+import { useWidgetFilters } from '@/vdb/hooks/use-widget-filters.js';
 import { MetricsChart } from './chart.js';
 import { orderChartDataQuery } from './metrics-widget.graphql.js';
 
@@ -25,6 +25,17 @@ export function MetricsWidget() {
     const { activeChannel } = useChannel();
     const { dateRange } = useWidgetFilters();
     const [dataType, setDataType] = useState<DATA_TYPES>(DATA_TYPES.OrderTotal);
+
+    const dataTypeLabel = useMemo(() => {
+        switch (dataType) {
+            case DATA_TYPES.OrderCount:
+                return t`Order Count`;
+            case DATA_TYPES.OrderTotal:
+                return t`Order Total`;
+            case DATA_TYPES.AverageOrderValue:
+                return t`Average Order Value`;
+        }
+    }, [dataType, t]);
 
     const { data, refetch, isRefetching } = useQuery({
         queryKey: ['dashboard-order-metrics', dataType, dateRange],
@@ -89,6 +100,7 @@ export function MetricsWidget() {
                         return formatCurrency(value, activeChannel?.defaultCurrencyCode ?? 'USD', 0);
                     }}
                     chartData={chartData.values}
+                    dataLabel={dataTypeLabel}
                 />
             )}
         </DashboardBaseWidget>

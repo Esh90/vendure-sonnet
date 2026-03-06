@@ -97,6 +97,7 @@ export const fulfillmentFragment = graphql(`
             quantity
         }
         trackingCode
+        customFields
     }
 `);
 
@@ -734,6 +735,47 @@ export const settleRefundDocument = graphql(
                     transactionId
                     method
                     metadata
+                }
+                ...ErrorResult
+            }
+        }
+    `,
+    [errorResultFragment],
+);
+
+export const refundOrderDocument = graphql(
+    `
+        mutation RefundOrder($input: RefundOrderInput!) {
+            refundOrder(input: $input) {
+                __typename
+                ... on Refund {
+                    id
+                    state
+                    total
+                    reason
+                    transactionId
+                    method
+                    metadata
+                    lines {
+                        orderLineId
+                        quantity
+                    }
+                }
+                ...ErrorResult
+            }
+        }
+    `,
+    [errorResultFragment],
+);
+
+export const cancelOrderDocument = graphql(
+    `
+        mutation CancelOrder($input: CancelOrderInput!) {
+            cancelOrder(input: $input) {
+                __typename
+                ... on Order {
+                    id
+                    state
                 }
                 ...ErrorResult
             }

@@ -38,6 +38,11 @@ export const productDetailFragment = graphql(
             assets {
                 ...Asset
             }
+            channels {
+                id
+                code
+                token
+            }
             translations {
                 id
                 languageCode
@@ -49,6 +54,11 @@ export const productDetailFragment = graphql(
                 id
                 code
                 name
+                options {
+                    id
+                    code
+                    name
+                }
             }
             facetValues {
                 id
@@ -60,6 +70,7 @@ export const productDetailFragment = graphql(
                     code
                 }
             }
+            customFields
         }
     `,
     [assetFragment],
@@ -284,9 +295,10 @@ export const deleteProductVariantDocument = graphql(`
 `);
 
 export const removeOptionGroupFromProductDocument = graphql(`
-    mutation RemoveOptionGroupFromProduct($productId: ID!, $optionGroupId: ID!) {
-        removeOptionGroupFromProduct(productId: $productId, optionGroupId: $optionGroupId) {
+    mutation RemoveOptionGroupFromProduct($productId: ID!, $optionGroupId: ID!, $force: Boolean) {
+        removeOptionGroupFromProduct(productId: $productId, optionGroupId: $optionGroupId, force: $force) {
             ... on Product {
+                __typename
                 id
                 optionGroups {
                     id
@@ -294,7 +306,8 @@ export const removeOptionGroupFromProductDocument = graphql(`
                     name
                 }
             }
-            ... on ErrorResult {
+            ... on ProductOptionInUseError {
+                __typename
                 errorCode
                 message
             }

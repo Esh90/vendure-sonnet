@@ -19,6 +19,7 @@ docs/static/intro.js*
 docs/static/intro.css*
 docs/public
 docs/data/build.json
+docs/dist/
 yarn-error.log
 e2e-common/ports.json
 
@@ -389,3 +390,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 __admin-ui/
+
+# Vendure telemetry installation ID
+.vendure/

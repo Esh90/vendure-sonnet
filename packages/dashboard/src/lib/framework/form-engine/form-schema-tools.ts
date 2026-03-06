@@ -309,7 +309,10 @@ export function createFormSchemaFromFields(
                 customFieldConfigs && customFieldConfigs.length > 0
                     ? processCustomFieldsSchema(customFieldConfigs, isTranslationContext)
                     : {};
-            schemaConfig[field.name] = z.object(customFieldsSchema).optional();
+            // Use .passthrough() to preserve custom field values that aren't in the schema
+            // This is essential for nested entities (e.g., ProductVariantPrice) whose custom
+            // field configs aren't passed to the parent form schema builder
+            schemaConfig[field.name] = z.object(customFieldsSchema).passthrough().optional();
         } else if (field.typeInfo) {
             const isNestedTranslationContext = field.name === 'translations' || isTranslationContext;
             let nestedType: ZodType = createFormSchemaFromFields(
@@ -353,6 +356,27 @@ export function getDefaultValueFromField(field: FieldInfo, defaultLanguageCode?:
     if (field.list) {
         return [];
     }
+    if (field.nullable) {
+        switch (field.type) {
+            case 'String':
+                return '';
+            case 'ID':
+                return '';
+            case 'LanguageCode':
+                return defaultLanguageCode || 'en';
+            case 'Boolean':
+                return false;
+            default:
+                // Object-typed fields (e.g. customFields without typeInfo) should default
+                // to {} to match the Zod schema which expects an object.
+                // JSON scalar is used for customFields when the field structure isn't
+                // known from introspection — it still represents an object at runtime.
+                if (!field.isScalar || field.type === 'JSON') {
+                    return {};
+                }
+                return null;
+        }
+    }
     switch (field.type) {
         case 'String':
         case 'DateTime':
@@ -369,9 +393,8 @@ export function getDefaultValueFromField(field: FieldInfo, defaultLanguageCode?:
             return defaultLanguageCode || 'en';
         case 'JSON':
             return {};
-        default: {
+        default:
             return '';
-        }
     }
 }
 

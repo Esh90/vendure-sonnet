@@ -44,6 +44,7 @@ export function FulfillOrderDialog({ order, onSuccess }: Readonly<FulfillOrderDi
     const [fulfillmentQuantities, setFulfillmentQuantities] = useState<{
         [lineId: string]: FulfillmentQuantity;
     }>({});
+    const [handlerArgsValid, setHandlerArgsValid] = useState(true);
 
     // Get fulfillment handlers
     const { data: fulfillmentHandlersData } = useQuery({
@@ -161,7 +162,7 @@ export function FulfillOrderDialog({ order, onSuccess }: Readonly<FulfillOrderDi
             ({ fulfillCount, max }) => fulfillCount <= max && fulfillCount >= 0,
         );
         const formIsValid = form.formState.isValid;
-        return formIsValid && totalCount > 0 && fulfillmentQuantityIsValid;
+        return formIsValid && totalCount > 0 && fulfillmentQuantityIsValid && handlerArgsValid;
     };
 
     const handleSubmit = async (data: FormData) => {
@@ -195,6 +196,7 @@ export function FulfillOrderDialog({ order, onSuccess }: Readonly<FulfillOrderDi
     const handleCancel = () => {
         form.reset();
         setFulfillmentQuantities({});
+        setHandlerArgsValid(true);
         setOpen(false);
     };
 
@@ -218,8 +220,8 @@ export function FulfillOrderDialog({ order, onSuccess }: Readonly<FulfillOrderDi
             >
                 <Trans>Fulfill order</Trans>
             </Button>
-            <Dialog open={open}>
-                <DialogContent className="sm:max-w-[600px]">
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-hidden flex flex-col">
                     <DialogHeader>
                         <DialogTitle>
                             <Trans>Fulfill order</Trans>
@@ -234,9 +236,9 @@ export function FulfillOrderDialog({ order, onSuccess }: Readonly<FulfillOrderDi
                                 e.stopPropagation();
                                 form.handleSubmit(handleSubmit)(e);
                             }}
-                            className="space-y-4"
+                            className="space-y-4 flex-1 overflow-hidden flex flex-col"
                         >
-                            <div className="space-y-4">
+                            <div className="space-y-4 flex-1 overflow-y-auto">
                                 <div className="font-medium">
                                     <Trans>Order lines</Trans>
                                 </div>
@@ -290,10 +292,13 @@ export function FulfillOrderDialog({ order, onSuccess }: Readonly<FulfillOrderDi
                                     render={({ field }) => (
                                         <ConfigurableOperationInput
                                             operationDefinition={selectedHandler}
-                                            value={field.value}
+                                            value={
+                                                field.value ?? { code: selectedHandler.code, arguments: [] }
+                                            }
                                             onChange={field.onChange}
                                             readonly={false}
                                             removable={false}
+                                            onValidityChange={setHandlerArgsValid}
                                         />
                                     )}
                                 />

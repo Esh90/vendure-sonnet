@@ -7,6 +7,7 @@ import { Fulfillment, Order, Payment } from './order-types.js';
 import { ProductVariantInfo } from './use-modify-order.js';
 
 type ModifyOrderInput = VariablesOf<typeof modifyOrderDocument>['input'];
+type WithCustomFields<T> = T & { customFields?: Record<string, any> };
 
 /**
  * Calculates the outstanding payment amount for an order
@@ -99,14 +100,20 @@ export function computePendingOrder(
     input: ModifyOrderInput,
     addedVariants: Map<string, ProductVariantInfo>,
     eligibleShippingMethods?: Array<{ id: string; name: string; priceWithTax: number }>,
+    orderLineCustomFieldNames?: string[],
 ): Order {
     // Adjust lines
     const lines = order.lines.map(line => {
         const adjust = input.adjustOrderLines?.find(l => l.orderLineId === line.id);
-        return adjust
-            ? { ...line, quantity: adjust.quantity, customFields: (adjust as any).customFields }
-            : line;
+        const adjustCf = (adjust as WithCustomFields<typeof adjust>)?.customFields;
+        const lineCf = (line as WithCustomFields<typeof line>).customFields;
+        return adjust ? { ...line, quantity: adjust.quantity, customFields: adjustCf ?? lineCf } : line;
     });
+
+    const customFieldsTemplate =
+        orderLineCustomFieldNames && orderLineCustomFieldNames.length > 0
+            ? Object.fromEntries(orderLineCustomFieldNames.map(k => [k, null]))
+            : undefined;
 
     // Add new items (as AddedLine)
     const addedLines = input.addItems
@@ -126,6 +133,8 @@ export function computePendingOrder(
                       quantity: item.quantity,
                       linePrice: (variantInfo.price ?? 0) * item.quantity,
                       linePriceWithTax: (variantInfo.priceWithTax ?? 0) * item.quantity,
+                      customFields:
+                          (item as WithCustomFields<typeof item>).customFields ?? customFieldsTemplate,
                   } as unknown as Order['lines'][number])
                 : null;
         })
@@ -156,4 +165,55 @@ export function computePendingOrder(
                   .filter(x => x !== undefined)
             : order.shippingLines,
     };
+}
+
+/**
+ * Gets the total quantity already refunded for an order line across all payments.
+ */
+export function getRefundedQuantity(order: Order, lineId: string): number {
+    return (
+        order.payments
+            ?.reduce((all, payment) => [...all, ...payment.refunds], [] as Payment['refunds'])
+            .filter(refund => refund.state !== 'Failed')
+            .reduce(
+                (all, refund) => [...all, ...refund.lines],
+                [] as Array<{ orderLineId: string; quantity: number }>,
+            )
+            .filter(refundLine => refundLine.orderLineId === lineId)
+            .reduce((sum, refundLine) => sum + refundLine.quantity, 0) ?? 0
+    );
+}
+
+/**
+ * Checks if an order line can still be refunded (has unrefunded quantity).
+ */
+export function lineCanBeRefunded(order: Order, line: Order['lines'][number]): boolean {
+    const refundedCount = getRefundedQuantity(order, line.id);
+    return refundedCount < line.orderPlacedQuantity;
+}
+
+/**
+ * Gets the maximum refundable quantity for an order line.
+ */
+export function getMaxRefundableQuantity(order: Order, line: Order['lines'][number]): number {
+    const refundedCount = getRefundedQuantity(order, line.id);
+    return Math.max(0, line.orderPlacedQuantity - refundedCount);
+}
+
+/**
+ * Checks if an order has any settled payments that can be refunded.
+ */
+export function orderHasSettledPayments(order: Order): boolean {
+    return !!order.payments?.some(p => p.state === 'Settled');
+}
+
+/**
+ * Determines if the refund button should be shown for an order.
+ * Shows refund for orders with settled payments that are not in initial states.
+ */
+export function canRefundOrder(order: Order): boolean {
+    if (!order || order.type === 'Aggregate') return false;
+    const hasSettled = orderHasSettledPayments(order);
+    const notInInitialState = order.state !== 'PaymentAuthorized' && order.active !== true;
+    return hasSettled && notInInitialState;
 }

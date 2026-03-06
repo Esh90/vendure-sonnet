@@ -3,27 +3,28 @@ import { RichTextInput } from '@/vdb/components/data-input/rich-text-input.js';
 import { EntityAssets } from '@/vdb/components/shared/entity-assets.js';
 import { ErrorPage } from '@/vdb/components/shared/error-page.js';
 import { FormFieldWrapper } from '@/vdb/components/shared/form-field-wrapper.js';
-import { PermissionGuard } from '@/vdb/components/shared/permission-guard.js';
 import { TranslatableFormFieldWrapper } from '@/vdb/components/shared/translatable-form-field.js';
 import { Button } from '@/vdb/components/ui/button.js';
 import { FormControl, FormDescription, FormItem, FormLabel, FormMessage } from '@/vdb/components/ui/form.js';
 import { Input } from '@/vdb/components/ui/input.js';
 import { Switch } from '@/vdb/components/ui/switch.js';
 import { NEW_ENTITY_PATH } from '@/vdb/constants.js';
-import {
-    CustomFieldsPageBlock,
+import {    CustomFieldsPageBlock,
     DetailFormGrid,
     Page,
     PageActionBar,
-    PageActionBarRight,
     PageBlock,
     PageLayout,
     PageTitle,
 } from '@/vdb/framework/layout-engine/page-layout.js';
+import { ActionBarItem } from '@/vdb/framework/layout-engine/action-bar-item-wrapper.js';
 import { detailPageRouteLoader } from '@/vdb/framework/page/detail-page-route-loader.js';
 import { useDetailPage } from '@/vdb/framework/page/use-detail-page.js';
+import { useJobQueuePolling } from '@/vdb/hooks/use-job-queue-polling.js';
 import { Trans, useLingui } from '@lingui/react/macro';
+import { useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import {
     collectionDetailDocument,
@@ -54,6 +55,12 @@ function CollectionDetailPage() {
     const navigate = useNavigate();
     const creatingNewEntity = params.id === NEW_ENTITY_PATH;
     const { t } = useLingui();
+    const queryClient = useQueryClient();
+
+    const { isPolling: pendingFilterApplication, startPolling } = useJobQueuePolling(
+        'apply-collection-filters',
+        () => queryClient.invalidateQueries({ queryKey: ['PaginatedListDataTable'] }),
+    );
 
     const { form, submitHandler, entity, isPending, resetForm } = useDetailPage({
         pageId,
@@ -79,6 +86,7 @@ function CollectionDetailPage() {
                     name: translation.name,
                     slug: translation.slug,
                     description: translation.description,
+                    customFields: (translation as any).customFields,
                 })),
                 filters: entity.filters.map(f => ({
                     code: f.code,
@@ -90,12 +98,20 @@ function CollectionDetailPage() {
         },
         params: { id: params.id },
         onSuccess: async data => {
+            const filtersWereDirty =
+                form.getFieldState('inheritFilters').isDirty || form.getFieldState('filters').isDirty;
             toast(
                 creatingNewEntity ? t`Successfully created collection` : t`Successfully updated collection`,
             );
             resetForm();
+            if (filtersWereDirty) {
+                startPolling();
+            }
             if (creatingNewEntity) {
-                await navigate({ to: `../$id`, params: { id: data.id } });
+                await navigate({
+                    to: `../$id`,
+                    params: { id: data.id },
+                });
             }
         },
         onError: err => {
@@ -106,25 +122,32 @@ function CollectionDetailPage() {
     });
 
     const shouldPreviewContents =
-        form.getFieldState('inheritFilters').isDirty || form.getFieldState('filters').isDirty;
+        form.getFieldState('inheritFilters').isDirty ||
+        form.getFieldState('filters').isDirty ||
+        pendingFilterApplication;
 
     const currentFiltersValue = form.watch('filters');
     const currentInheritFiltersValue = form.watch('inheritFilters');
+
+    const [filtersArgsValid, setFiltersArgsValid] = useState(true);
 
     return (
         <Page pageId={pageId} form={form} submitHandler={submitHandler} entity={entity}>
             <PageTitle>{creatingNewEntity ? <Trans>New collection</Trans> : (entity?.name ?? '')}</PageTitle>
             <PageActionBar>
-                <PageActionBarRight>
-                    <PermissionGuard requires={['UpdateCollection', 'UpdateCatalog']}>
-                        <Button
-                            type="submit"
-                            disabled={!form.formState.isDirty || !form.formState.isValid || isPending}
-                        >
-                            {creatingNewEntity ? <Trans>Create</Trans> : <Trans>Update</Trans>}
-                        </Button>
-                    </PermissionGuard>
-                </PageActionBarRight>
+                <ActionBarItem itemId="save-button" requiresPermission={['UpdateCollection', 'UpdateCatalog']}>
+                    <Button
+                        type="submit"
+                        disabled={
+                            !form.formState.isDirty ||
+                            !form.formState.isValid ||
+                            isPending ||
+                            !filtersArgsValid
+                        }
+                    >
+                        {creatingNewEntity ? <Trans>Create</Trans> : <Trans>Update</Trans>}
+                    </Button>
+                </ActionBarItem>
             </PageActionBar>
             <PageLayout>
                 <PageBlock column="side" blockId="privacy">
@@ -188,7 +211,11 @@ function CollectionDetailPage() {
                         control={form.control}
                         name="filters"
                         render={({ field }) => (
-                            <CollectionFiltersSelector value={field.value ?? []} onChange={field.onChange} />
+                            <CollectionFiltersSelector
+                                value={field.value ?? []}
+                                onChange={field.onChange}
+                                onValidityChange={setFiltersArgsValid}
+                            />
                         )}
                     />
                 </PageBlock>
@@ -220,7 +247,7 @@ function CollectionDetailPage() {
                     </FormItem>
                 </PageBlock>
                 <PageBlock column="main" blockId="contents" title={<Trans>Contents</Trans>}>
-                    {shouldPreviewContents || creatingNewEntity ? (
+                    {pendingFilterApplication || shouldPreviewContents || creatingNewEntity ? (
                         <CollectionContentsPreviewTable
                             parentId={entity?.parent?.id}
                             filters={currentFiltersValue ?? []}

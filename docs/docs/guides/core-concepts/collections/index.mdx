@@ -1,9 +1,8 @@
 ---
 title: 'Collections'
+metaTitle: "Organizing Products with Collections in Vendure"
+metaDescription: "Collections group product variants for navigation, promotions, and storefront display. Covers built-in filters and filter inheritance."
 ---
-
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
 
 [`Collections`](/reference/typescript-api/entities/collection/) are used to categorize and organize your catalog. A collection
 contains multiple product variants, and a product variant can belong to multiple collections. Collections can be nested to
@@ -31,7 +30,7 @@ includes a number of collection filters:
 
 ![Collection filters](./collection-filters.webp)
 
-It is also possible to create your own custom collection filters, which can be used to implement more complex logic. See the section on [creating a collection filter](#creating-a-collection-filter) for more details.
+Collections often work hand-in-hand with [facets and filters](/core-concepts/facets-filters/) to provide structured navigation in your storefront.
 
 ### Filter inheritance
 
@@ -53,10 +52,14 @@ In order to create a child collection which contains product variants _not_ cont
 in the child collection.
 :::
 
-### Creating a collection filter
+For details on creating custom collection filters, see the [Developer Guide](/developer-guide/strategies-configurable-operations/).
+
+## Code Examples
+
+### Custom CollectionFilter
 
 You can create your own custom collection filters with the [`CollectionFilter`](/reference/typescript-api/configuration/collection-filter/) class. This class
-is a [configurable operation](/guides/developer-guide/strategies-configurable-operations/#configurable-operations) where the specific
+is a [configurable operation](/developer-guide/strategies-configurable-operations/#configurable-operations) where the specific
 filtering logic is implemented in the `apply()` method passed to its constructor.
 
 The `apply()` method receives an instance of the [TypeORM SelectQueryBuilder](https://typeorm.io/select-query-builder) which should have filtering logic
@@ -112,8 +115,7 @@ export const config: VendureConfig = {
     catalogOptions: {
         collectionFilters: [
             ...defaultCollectionFilters,
-            // highlight-next-line
-            skuCollectionFilter
+            skuCollectionFilter // [!code highlight]
         ],
     },
 };
@@ -121,5 +123,5 @@ export const config: VendureConfig = {
 
 :::info
 To see some more advanced collection filter examples, you can look at the source code of the
-[default collection filters](https://github.com/vendure-ecommerce/vendure/blob/master/packages/core/src/config/catalog/default-collection-filters.ts).
+[default collection filters](https://github.com/vendurehq/vendure/blob/master/packages/core/src/config/catalog/default-collection-filters.ts).
 :::

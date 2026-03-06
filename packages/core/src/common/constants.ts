@@ -1,4 +1,5 @@
 import { LanguageCode } from '@vendure/common/lib/generated-types';
+import { ID } from '@vendure/common/lib/shared-types';
 
 import { CrudPermissionDefinition, PermissionDefinition, PermissionMetadata } from './permission-definition';
 
@@ -51,6 +52,7 @@ export const DEFAULT_PERMISSIONS: PermissionDefinition[] = [
             `Grants permission to ${operation} PaymentMethods, ShippingMethods, TaxCategories, TaxRates, Zones, Countries, System & GlobalSettings`,
     ),
     new CrudPermissionDefinition('Administrator'),
+    new CrudPermissionDefinition('ApiKey'),
     new CrudPermissionDefinition('Asset'),
     new CrudPermissionDefinition('Channel'),
     new CrudPermissionDefinition('Collection'),
@@ -80,6 +82,7 @@ export function getAllPermissionsMetadata(customPermissions: PermissionDefinitio
 export const CacheKey = {
     GlobalSettings: 'GlobalSettings',
     AllZones: 'AllZones',
-    ActiveTaxZone: 'ActiveTaxZone',
-    ActiveTaxZone_PPA: 'ActiveTaxZone_PPA',
+    ActiveTaxZone: (channelId: ID) => `ActiveTaxZone:${channelId}`,
+    ActiveTaxZone_PPA: (channelId: ID) => `ActiveTaxZone_PPA:${channelId}`,
+    CollectionVariantCounts: 'CollectionService.getProductVariantCounts',
 };

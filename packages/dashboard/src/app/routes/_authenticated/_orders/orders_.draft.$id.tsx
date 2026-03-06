@@ -2,7 +2,6 @@ import { ConfirmationDialog } from '@/vdb/components/shared/confirmation-dialog.
 import { CustomFieldsForm } from '@/vdb/components/shared/custom-fields-form.js';
 import { CustomerSelector } from '@/vdb/components/shared/customer-selector.js';
 import { ErrorPage } from '@/vdb/components/shared/error-page.js';
-import { PermissionGuard } from '@/vdb/components/shared/permission-guard.js';
 import { Button } from '@/vdb/components/ui/button.js';
 import { Form } from '@/vdb/components/ui/form.js';
 import { addCustomFields } from '@/vdb/framework/document-introspection/add-custom-fields.js';
@@ -10,11 +9,11 @@ import { useGeneratedForm } from '@/vdb/framework/form-engine/use-generated-form
 import {
     Page,
     PageActionBar,
-    PageActionBarRight,
     PageBlock,
     PageLayout,
     PageTitle,
 } from '@/vdb/framework/layout-engine/page-layout.js';
+import { ActionBarItem } from '@/vdb/framework/layout-engine/action-bar-item-wrapper.js';
 import { useDetailPage } from '@/vdb/framework/page/use-detail-page.js';
 import { api } from '@/vdb/graphql/api.js';
 import { Trans, useLingui } from '@lingui/react/macro';
@@ -24,6 +23,7 @@ import { ResultOf } from 'gql.tada';
 import { User } from 'lucide-react';
 import { toast } from 'sonner';
 import { CustomerAddressSelector } from './components/customer-address-selector.js';
+import { DraftOrderStatus } from './components/draft-order-status.js';
 import { EditOrderTable } from './components/edit-order-table.js';
 import { OrderAddress } from './components/order-address.js';
 import {
@@ -58,7 +58,9 @@ function DraftOrderPage() {
     const navigate = useNavigate();
 
     const { entity, refreshEntity, form } = useDetailPage({
-        queryDocument: addCustomFields(orderDetailDocument),
+        queryDocument: addCustomFields(orderDetailDocument, {
+            includeNestedFragments: ['OrderLine', 'Fulfillment'],
+        }),
         setValuesForUpdate: entity => {
             return {
                 id: entity.id,
@@ -289,43 +291,56 @@ function DraftOrderPage() {
         });
     };
 
+    const hasCustomer = !!entity.customer;
+    const hasLines = entity.lines.length > 0;
+    const hasShippingMethod = entity.shippingLines.length > 0;
+    const isDraftState = entity.state === 'Draft';
+
+    const isCompleteDraftDisabled = !hasCustomer || !hasLines || !hasShippingMethod || !isDraftState;
+
     return (
-        <Page pageId="draft-order-detail" form={form}>
+        <Page pageId="draft-order-detail" form={form} entity={entity}>
             <PageTitle>
                 <Trans>Draft order</Trans>: {entity?.code ?? ''}
             </PageTitle>
             <PageActionBar>
-                <PageActionBarRight>
-                    <PermissionGuard requires={['DeleteOrder']}>
-                        <ConfirmationDialog
-                            title={t`Delete draft order`}
-                            description={t`Are you sure you want to delete this draft order?`}
-                            onConfirm={() => {
-                                deleteDraftOrder({ orderId: entity.id });
-                            }}
-                        >
-                            <Button variant="destructive" type="button">
-                                <Trans>Delete draft</Trans>
-                            </Button>
-                        </ConfirmationDialog>
-                    </PermissionGuard>
-                    <PermissionGuard requires={['UpdateOrder']}>
-                        <Button
-                            type="button"
-                            disabled={
-                                !entity.customer ||
-                                entity.lines.length === 0 ||
-                                entity.shippingLines.length === 0 ||
-                                entity.state !== 'Draft'
-                            }
-                            onClick={() => completeDraftOrder({ id: entity.id, state: 'ArrangingPayment' })}
-                        >
-                            <Trans>Complete draft</Trans>
+                <ActionBarItem itemId="delete-button" requiresPermission={['DeleteOrder']}>
+                    <ConfirmationDialog
+                        title={t`Delete draft order`}
+                        description={t`Are you sure you want to delete this draft order?`}
+                        onConfirm={() => {
+                            deleteDraftOrder({ orderId: entity.id });
+                        }}
+                    >
+                        <Button variant="destructive" type="button">
+                            <Trans>Delete draft</Trans>
                         </Button>
-                    </PermissionGuard>
-                </PageActionBarRight>
+                    </ConfirmationDialog>
+                </ActionBarItem>
+                <ActionBarItem itemId="complete-draft-button" requiresPermission={['UpdateOrder']}>
+                    <Button
+                        type="button"
+                        disabled={isCompleteDraftDisabled}
+                        onClick={() => completeDraftOrder({ id: entity.id, state: 'ArrangingPayment' })}
+                    >
+                        <Trans>Complete draft</Trans>
+                    </Button>
+                </ActionBarItem>
             </PageActionBar>
+
             <PageLayout>
+                <PageBlock
+                    column="side"
+                    blockId="draft-order-status"
+                    title={<Trans>Draft order status</Trans>}
+                >
+                    <DraftOrderStatus
+                        hasCustomer={hasCustomer}
+                        hasLines={hasLines}
+                        hasShippingMethod={hasShippingMethod}
+                        isDraftState={isDraftState}
+                    />
+                </PageBlock>
                 <PageBlock column="main" blockId="order-table">
                     <EditOrderTable
                         order={entity}

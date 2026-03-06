@@ -1,25 +1,27 @@
 import { MoneyInput } from '@/vdb/components/data-input/money-input.js';
 import { NumberInput } from '@/vdb/components/data-input/number-input.js';
 import { AssignedFacetValues } from '@/vdb/components/shared/assigned-facet-values.js';
+import { CustomFieldsForm } from '@/vdb/components/shared/custom-fields-form.js';
 import { DetailPageButton } from '@/vdb/components/shared/detail-page-button.js';
 import { EntityAssets } from '@/vdb/components/shared/entity-assets.js';
 import { ErrorPage } from '@/vdb/components/shared/error-page.js';
 import { FormFieldWrapper } from '@/vdb/components/shared/form-field-wrapper.js';
-import { PermissionGuard } from '@/vdb/components/shared/permission-guard.js';
 import { TaxCategorySelector } from '@/vdb/components/shared/tax-category-selector.js';
 import { TranslatableFormFieldWrapper } from '@/vdb/components/shared/translatable-form-field.js';
 import { Button } from '@/vdb/components/ui/button.js';
 import { FormControl, FormDescription, FormItem, FormLabel, FormMessage } from '@/vdb/components/ui/form.js';
 import { Input } from '@/vdb/components/ui/input.js';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/vdb/components/ui/select.js';
+import { Separator } from '@/vdb/components/ui/separator.js';
 import { Switch } from '@/vdb/components/ui/switch.js';
 import { NEW_ENTITY_PATH } from '@/vdb/constants.js';
+import { addCustomFields } from '@/vdb/framework/document-introspection/add-custom-fields.js';
+import { ActionBarItem } from '@/vdb/framework/layout-engine/action-bar-item-wrapper.js';
 import {
     CustomFieldsPageBlock,
     DetailFormGrid,
     Page,
     PageActionBar,
-    PageActionBarRight,
     PageBlock,
     PageLayout,
     PageTitle,
@@ -34,6 +36,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { VariablesOf } from 'gql.tada';
 import { Trash } from 'lucide-react';
 import { toast } from 'sonner';
+
 import { AddCurrencyDropdown } from './components/add-currency-dropdown.js';
 import { AddStockLocationDropdown } from './components/add-stock-location-dropdown.js';
 import { VariantPriceDetail } from './components/variant-price-detail.js';
@@ -50,11 +53,14 @@ export const Route = createFileRoute('/_authenticated/_product-variants/product-
     component: ProductVariantDetailPage,
     loader: detailPageRouteLoader({
         pageId,
-        queryDocument: productVariantDetailDocument,
+        queryDocument: () =>
+            addCustomFields(productVariantDetailDocument, {
+                includeNestedFragments: ['ProductVariantPrice'],
+            }),
         breadcrumb(_isNew, entity, location) {
             if ((location.search as any).from === 'product') {
                 return [
-                    { path: '/product', label: <Trans>Products</Trans> },
+                    { path: '/products', label: <Trans>Products</Trans> },
                     { path: `/products/${entity?.product.id}`, label: entity?.product.name ?? '' },
                     entity?.name,
                 ];
@@ -81,7 +87,9 @@ function ProductVariantDetailPage() {
 
     const { form, submitHandler, entity, isPending, resetForm } = useDetailPage({
         pageId,
-        queryDocument: productVariantDetailDocument,
+        queryDocument: addCustomFields(productVariantDetailDocument, {
+            includeNestedFragments: ['ProductVariantPrice'],
+        }),
         createDocument: createProductVariantDocument,
         updateDocument: updateProductVariantDocument,
         setValuesForUpdate: entity => {
@@ -97,6 +105,7 @@ function ProductVariantDetailPage() {
                 prices: entity.prices,
                 trackInventory: entity.trackInventory,
                 outOfStockThreshold: entity.outOfStockThreshold,
+                useGlobalOutOfStockThreshold: entity.useGlobalOutOfStockThreshold,
                 stockLevels: entity.stockLevels.map(stockLevel => ({
                     stockOnHand: stockLevel.stockOnHand,
                     stockLocationId: stockLevel.stockLocation.id,
@@ -168,6 +177,7 @@ function ProductVariantDetailPage() {
                 currencyCode,
                 price: 0,
                 delete: false,
+                customFields: {},
             } as PriceInput;
             form.setValue('prices', [...currentPrices, newPrice], {
                 shouldDirty: true,
@@ -207,16 +217,14 @@ function ProductVariantDetailPage() {
                 {creatingNewEntity ? <Trans>New product variant</Trans> : (entity?.name ?? '')}
             </PageTitle>
             <PageActionBar>
-                <PageActionBarRight>
-                    <PermissionGuard requires={['UpdateProduct', 'UpdateCatalog']}>
-                        <Button
-                            type="submit"
-                            disabled={!form.formState.isDirty || !form.formState.isValid || isPending}
-                        >
-                            {creatingNewEntity ? <Trans>Create</Trans> : <Trans>Update</Trans>}
-                        </Button>
-                    </PermissionGuard>
-                </PageActionBarRight>
+                <ActionBarItem itemId="save-button" requiresPermission={['UpdateProduct', 'UpdateCatalog']}>
+                    <Button
+                        type="submit"
+                        disabled={!form.formState.isDirty || !form.formState.isValid || isPending}
+                    >
+                        {creatingNewEntity ? <Trans>Create</Trans> : <Trans>Update</Trans>}
+                    </Button>
+                </ActionBarItem>
             </PageActionBar>
             <PageLayout>
                 <PageBlock column="side" blockId="enabled">
@@ -273,37 +281,46 @@ function ProductVariantDetailPage() {
                             </div>
                         );
                         return (
-                            <DetailFormGrid key={price.currencyCode}>
-                                <div className="flex gap-1 items-end">
-                                    <FormFieldWrapper
-                                        control={form.control}
-                                        name={`prices.${actualIndex}.price`}
-                                        label={priceLabel}
-                                        render={({ field }) => (
-                                            <MoneyInput {...field} currency={price.currencyCode} />
+                            <div key={price.currencyCode} className="space-y-6">
+                                {displayIndex > 0 && <Separator className="my-4" />}
+                                <DetailFormGrid key={price.currencyCode}>
+                                    <div className="flex gap-1 items-end">
+                                        <FormFieldWrapper
+                                            control={form.control}
+                                            name={`prices.${actualIndex}.price`}
+                                            label={priceLabel}
+                                            render={({ field }) => (
+                                                <MoneyInput {...field} currency={price.currencyCode} />
+                                            )}
+                                        />
+                                        {activePrices.length > 1 && (
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => handleRemoveCurrency(actualIndex)}
+                                                className="h-6 w-6 p-0 mb-2 hover:text-destructive hover:bg-destructive-100"
+                                            >
+                                                <Trash className="size-4" />
+                                            </Button>
                                         )}
+                                    </div>
+                                    <VariantPriceDetail
+                                        priceIncludesTax={activeChannel?.pricesIncludeTax ?? false}
+                                        price={price.price}
+                                        currencyCode={
+                                            price.currencyCode ?? activeChannel?.defaultCurrencyCode ?? ''
+                                        }
+                                        taxCategoryId={taxCategoryId}
                                     />
-                                    {activePrices.length > 1 && (
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => handleRemoveCurrency(actualIndex)}
-                                            className="h-6 w-6 p-0 mb-2 hover:text-destructive hover:bg-destructive-100"
-                                        >
-                                            <Trash className="size-4" />
-                                        </Button>
-                                    )}
-                                </div>
-                                <VariantPriceDetail
-                                    priceIncludesTax={activeChannel?.pricesIncludeTax ?? false}
-                                    price={price.price}
-                                    currencyCode={
-                                        price.currencyCode ?? activeChannel?.defaultCurrencyCode ?? ''
-                                    }
-                                    taxCategoryId={taxCategoryId}
+                                </DetailFormGrid>
+                                {/* Custom fields for ProductVariantPrice */}
+                                <CustomFieldsForm
+                                    entityType="ProductVariantPrice"
+                                    control={form.control}
+                                    formPathPrefix={`prices.${actualIndex}`}
                                 />
-                            </DetailFormGrid>
+                            </div>
                         );
                     })}
                     {unusedCurrencies.length ? (

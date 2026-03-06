@@ -21,13 +21,13 @@ import { PubSubOptions } from './options';
  * Note: To use this strategy, you need to manually install the `@google-cloud/pubsub` package:
  *
  * ```shell
- * npm install @google-cloud/pubsub@^2.8.0
+ * npm install @google-cloud/pubsub@^4.11.0
  * ```
  *
  * @docsCategory core plugins/JobQueuePlugin
  */
 export class PubSubJobQueueStrategy extends InjectableJobQueueStrategy implements JobQueueStrategy {
-    private concurrency: number;
+    private concurrency: number | ((queueName: string) => number);
     private queueNamePubSubPair: Map<string, [string, string]>;
     private pubSubClient: PubSub;
     private topics = new Map<string, Topic>();
@@ -41,6 +41,13 @@ export class PubSubJobQueueStrategy extends InjectableJobQueueStrategy implement
         this.queueNamePubSubPair = options.queueNamePubSubPair ?? new Map();
 
         super.init(injector);
+    }
+
+    private getConcurrency(queueName: string): number {
+        if (typeof this.concurrency === 'function') {
+            return this.concurrency(queueName);
+        }
+        return this.concurrency;
     }
 
     destroy() {
@@ -162,7 +169,7 @@ export class PubSubJobQueueStrategy extends InjectableJobQueueStrategy implement
         const [topicName, subscriptionName] = pair;
         subscription = this.topic(queueName).subscription(subscriptionName, {
             flowControl: {
-                maxMessages: this.concurrency,
+                maxMessages: this.getConcurrency(queueName),
             },
         });
         this.subscriptions.set(queueName, subscription);

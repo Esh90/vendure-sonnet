@@ -7,7 +7,16 @@ import { useChannel } from '../../hooks/use-channel.js';
 import { useServerConfig } from '../../hooks/use-server-config.js';
 import { getOperationVariablesFields } from '../document-introspection/get-document-structure.js';
 import { createFormSchemaFromFields, getDefaultValuesFromFields } from './form-schema-tools.js';
-import { removeEmptyIdFields, transformRelationFields } from './utils.js';
+import {
+    convertEmptyStringsToNull,
+    removeEmptyIdFields,
+    stripNullNullableFields,
+    transformRelationFields,
+} from './utils.js';
+
+export type WithLooseCustomFields<T> = T extends { customFields?: any }
+    ? Omit<T, 'customFields'> & { customFields?: T['customFields'] | unknown }
+    : T;
 
 /**
  * @description
@@ -40,7 +49,9 @@ export interface GeneratedFormOptions<
     customFieldConfig?: any[]; // Add custom field config for validation
     setValues: (
         entity: NonNullable<E>,
-    ) => VarName extends keyof VariablesOf<T> ? VariablesOf<T>[VarName] : VariablesOf<T>;
+    ) => WithLooseCustomFields<
+        VarName extends keyof VariablesOf<T> ? VariablesOf<T>[VarName] : VariablesOf<T>
+    >;
     onSubmit?: (
         values: VarName extends keyof VariablesOf<T> ? VariablesOf<T>[VarName] : VariablesOf<T>,
     ) => void;
@@ -92,9 +103,13 @@ export function useGeneratedForm<
     const defaultValues = getDefaultValuesFromFields(updateFields, activeChannel?.defaultLanguageCode);
     const processedEntity = ensureTranslationsForAllLanguages(entity, availableLanguages, defaultValues);
 
+    // Also ensure defaultValues has translations for all languages (for creation case)
+    const processedDefaultValues =
+        ensureTranslationsForAllLanguages(defaultValues, availableLanguages, defaultValues) ?? defaultValues;
+
     const values = processedEntity
         ? transformRelationFields(updateFields, setValues(processedEntity))
-        : defaultValues;
+        : processedDefaultValues;
 
     const form = useForm({
         resolver: async (values, context, options) => {
@@ -105,7 +120,7 @@ export function useGeneratedForm<
             return result;
         },
         mode: 'onChange',
-        defaultValues,
+        defaultValues: processedDefaultValues,
         values,
     });
     let submitHandler = (event: FormEvent): any => {
@@ -125,7 +140,14 @@ export function useGeneratedForm<
             }
 
             const onSubmitWrapper = (values: any) => {
-                onSubmit(removeEmptyIdFields(values, updateFields));
+                let processed = convertEmptyStringsToNull(
+                    removeEmptyIdFields(values, updateFields),
+                    updateFields,
+                );
+                if (!entity) {
+                    processed = stripNullNullableFields(processed, updateFields);
+                }
+                onSubmit(processed);
             };
             form.handleSubmit(onSubmitWrapper)(event);
         };
