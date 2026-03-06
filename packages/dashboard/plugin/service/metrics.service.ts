@@ -48,7 +48,7 @@ export class MetricsService {
                 JSON.stringify({
                     startDate: calculatedStartDate,
                     endDate: calculatedEndDate,
-                    types: types.toSorted(),
+                    types: [...types].sort(),
                     channel: ctx.channel.token,
                 }),
             )

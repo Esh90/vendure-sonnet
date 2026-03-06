@@ -241,7 +241,7 @@ export function PageLayout({ children, className }: Readonly<PageLayoutProps>) {
             );
 
             // sort the blocks to make sure we have the correct order
-            const arrangedExtensionBlocks = matchingExtensionBlocks.toSorted((a, b) => {
+            const arrangedExtensionBlocks = [...matchingExtensionBlocks].sort((a, b) => {
                 const orderPriority = { before: 1, replace: 2, after: 3 };
                 return orderPriority[a.location.position.order] - orderPriority[b.location.position.order];
             });

@@ -114,7 +114,7 @@ export function DateTimeInput({ value, onChange, fieldDef, disabled }: Readonly<
                     <div className="flex flex-col sm:flex-row sm:h-[300px] divide-y sm:divide-y-0 sm:divide-x">
                         <ScrollArea className="w-64 sm:w-auto">
                             <div className="flex sm:flex-col p-2">
-                                {hours.toReversed().map(hour => (
+                                {[...hours].reverse().map(hour => (
                                     <Button
                                         key={hour}
                                         size="icon"
