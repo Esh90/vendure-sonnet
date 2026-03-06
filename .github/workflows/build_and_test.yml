@@ -112,6 +112,19 @@ jobs:
             - name: Dashboard e2e tests
               run: npm run e2e:pw
               working-directory: packages/dashboard
+    sonarqube:
+        name: SonarQube
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+            - name: SonarQube Scan
+              uses: SonarSource/sonarqube-scan-action@v6
+              env:
+                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     e2e-sqljs:
         name: e2e (sqljs)
         runs-on: ubuntu-latest
