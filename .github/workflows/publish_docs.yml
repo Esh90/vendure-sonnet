@@ -69,7 +69,7 @@ jobs:
           repositories: vendure-io
 
       - name: Trigger docs update in vendure-io
-        uses: peter-evans/repository-dispatch@v3
+        uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0 # v3
         with:
           token: ${{ steps.vendure-io-token.outputs.token }}
           repository: vendurehq/vendure-io
