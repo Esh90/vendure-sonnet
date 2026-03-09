@@ -15,6 +15,11 @@ export const productOptionGroupDetailDocument = graphql(`
                 languageCode
                 name
             }
+            channels {
+                id
+                code
+                token
+            }
             customFields
         }
     }

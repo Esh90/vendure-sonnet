@@ -5,6 +5,7 @@ import { TranslatableFormFieldWrapper } from '@/vdb/components/shared/translatab
 import { Button } from '@/vdb/components/ui/button.js';
 import { Input } from '@/vdb/components/ui/input.js';
 import { NEW_ENTITY_PATH } from '@/vdb/constants.js';
+import { useChannel } from '@/vdb/hooks/use-channel.js';
 import {
     CustomFieldsPageBlock,
     DetailFormGrid,
@@ -20,6 +21,7 @@ import { useDetailPage } from '@/vdb/framework/page/use-detail-page.js';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
+import { OptionGroupChannels } from '../_products/components/option-group-channels.js';
 import { ProductOptionsTable } from '../_products/components/product-options-table.js';
 import { SharedOptionGroupWarning } from '../_products/components/shared-option-group-warning.js';
 import {
@@ -50,6 +52,7 @@ function OptionGroupDetailPage() {
     const navigate = useNavigate();
     const creatingNewEntity = params.id === NEW_ENTITY_PATH;
     const { t } = useLingui();
+    const { channels } = useChannel();
 
     const { form, submitHandler, entity, isPending, resetForm } = useDetailPage({
         pageId,
@@ -160,6 +163,15 @@ function OptionGroupDetailPage() {
                                 `/option-groups/${entity.id}/options/${optionId}`
                             }
                             newOptionHref={`/option-groups/${entity.id}/options/new`}
+                        />
+                    </PageBlock>
+                )}
+                {channels.length > 1 && entity && (
+                    <PageBlock column="side" blockId="channels" title={<Trans>Channels</Trans>}>
+                        <OptionGroupChannels
+                            channels={entity.channels}
+                            entityId={entity.id}
+                            canUpdate={!creatingNewEntity}
                         />
                     </PageBlock>
                 )}

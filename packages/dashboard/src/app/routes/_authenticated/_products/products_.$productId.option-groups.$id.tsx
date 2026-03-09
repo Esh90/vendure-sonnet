@@ -5,6 +5,7 @@ import { TranslatableFormFieldWrapper } from '@/vdb/components/shared/translatab
 import { Button } from '@/vdb/components/ui/button.js';
 import { Input } from '@/vdb/components/ui/input.js';
 import { NEW_ENTITY_PATH } from '@/vdb/constants.js';
+import { useChannel } from '@/vdb/hooks/use-channel.js';
 import { extendDetailFormQuery } from '@/vdb/framework/document-extension/extend-detail-form-query.js';
 import { addCustomFields } from '@/vdb/framework/document-introspection/add-custom-fields.js';
 import {    CustomFieldsPageBlock,
@@ -21,6 +22,7 @@ import { api } from '@/vdb/graphql/api.js';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { createFileRoute, ParsedLocation, useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
+import { OptionGroupChannels } from './components/option-group-channels.js';
 import { ProductOptionsTable } from './components/product-options-table.js';
 import { SharedOptionGroupWarning } from './components/shared-option-group-warning.js';
 import {
@@ -72,6 +74,7 @@ function ProductOptionGroupDetailPage() {
     const navigate = useNavigate();
     const creatingNewEntity = params.id === NEW_ENTITY_PATH;
     const { t } = useLingui();
+    const { channels } = useChannel();
 
     const { form, submitHandler, entity, isPending, resetForm } = useDetailPage({
         pageId,
@@ -166,6 +169,15 @@ function ProductOptionGroupDetailPage() {
                 {entity && (
                     <PageBlock column="main" blockId="product-options" title={<Trans>Product Options</Trans>}>
                         <ProductOptionsTable productOptionGroupId={entity?.id} />
+                    </PageBlock>
+                )}
+                {channels.length > 1 && entity && (
+                    <PageBlock column="side" blockId="channels" title={<Trans>Channels</Trans>}>
+                        <OptionGroupChannels
+                            channels={entity.channels}
+                            entityId={entity.id}
+                            canUpdate={!creatingNewEntity}
+                        />
                     </PageBlock>
                 )}
             </PageLayout>

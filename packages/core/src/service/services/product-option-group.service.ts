@@ -21,6 +21,7 @@ import { ListQueryOptions } from '../../common/types/common-types';
 import { Translated } from '../../common/types/locale-types';
 import { assertFound, idsAreEqual } from '../../common/utils';
 import { TransactionalConnection } from '../../connection/transactional-connection';
+import { Channel } from '../../entity/channel/channel.entity';
 import { ProductOptionGroupTranslation } from '../../entity/product-option-group/product-option-group-translation.entity';
 import { ProductOptionGroup } from '../../entity/product-option-group/product-option-group.entity';
 import { ProductOption } from '../../entity/product-option/product-option.entity';
@@ -112,6 +113,18 @@ export class ProductOptionGroupService {
             .orderBy('optionGroup.id', 'ASC')
             .getMany()
             .then(groups => groups.map(group => this.translator.translate(group, ctx, ['options'])));
+    }
+
+    /**
+     * @description
+     * Returns all Channels to which the ProductOptionGroup is assigned.
+     */
+    async getOptionGroupChannels(ctx: RequestContext, optionGroupId: ID): Promise<Channel[]> {
+        const optionGroup = await this.connection.getEntityOrThrow(ctx, ProductOptionGroup, optionGroupId, {
+            relations: ['channels'],
+            channelId: ctx.channelId,
+        });
+        return optionGroup.channels;
     }
 
     /**

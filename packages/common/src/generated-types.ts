@@ -4996,6 +4996,7 @@ export type ProductOptionFilterParameter = {
 
 export type ProductOptionGroup = Node & {
   __typename?: 'ProductOptionGroup';
+  channels: Array<Channel>;
   code: Scalars['String']['output'];
   createdAt: Scalars['DateTime']['output'];
   customFields?: Maybe<Scalars['JSON']['output']>;
