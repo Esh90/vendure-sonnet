@@ -296,8 +296,8 @@ export class Order extends VendureEntity implements ChannelAware, HasCustomField
     get taxSummary(): OrderTaxSummary[] {
         this.throwIfLinesNotJoined('taxSummary');
         this.throwIfSurchargesNotJoined('taxSummary');
-        const { orderTaxSummaryCalculationStrategy } = getConfig().taxOptions;
-        return orderTaxSummaryCalculationStrategy.calculateTaxSummary(this);
+        const { orderTaxCalculationStrategy } = getConfig().taxOptions;
+        return orderTaxCalculationStrategy.calculateTaxSummary(this);
     }
 
     private throwIfLinesNotJoined(propertyName: keyof Order) {

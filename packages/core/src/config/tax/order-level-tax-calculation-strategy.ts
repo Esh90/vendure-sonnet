@@ -3,10 +3,7 @@ import { OrderTaxSummary, TaxLine } from '@vendure/common/lib/generated-types';
 import { taxPayableOn } from '../../common/tax-utils';
 import { Order } from '../../entity/order/order.entity';
 
-import {
-    OrderTaxSummaryCalculationStrategy,
-    OrderTotalsResult,
-} from './order-tax-summary-calculation-strategy';
+import { OrderTaxCalculationStrategy, OrderTotalsResult } from './order-tax-calculation-strategy';
 
 interface TaxGroup {
     rate: number;
@@ -16,9 +13,9 @@ interface TaxGroup {
 
 /**
  * @description
- * An {@link OrderTaxSummaryCalculationStrategy} that groups net subtotals by tax rate
+ * An {@link OrderTaxCalculationStrategy} that groups net subtotals by tax rate
  * and rounds once per group. This eliminates per-line rounding accumulation errors
- * present in the {@link DefaultOrderTaxSummaryCalculationStrategy}.
+ * present in the {@link DefaultOrderTaxCalculationStrategy}.
  *
  * This approach is required by certain jurisdictions and ERP systems that expect
  * tax to be calculated on the subtotal per tax rate rather than per line.
@@ -29,20 +26,20 @@ interface TaxGroup {
  *
  * @example
  * ```ts
- * import { OrderLevelTaxSummaryCalculationStrategy, VendureConfig } from '\@vendure/core';
+ * import { OrderLevelTaxCalculationStrategy, VendureConfig } from '\@vendure/core';
  *
  * export const config: VendureConfig = {
  *   taxOptions: {
- *     orderTaxSummaryCalculationStrategy: new OrderLevelTaxSummaryCalculationStrategy(),
+ *     orderTaxCalculationStrategy: new OrderLevelTaxCalculationStrategy(),
  *   },
  * };
  * ```
  *
  * @docsCategory tax
- * @docsPage OrderTaxSummaryCalculationStrategy
+ * @docsPage OrderTaxCalculationStrategy
  * @since 3.6.0
  */
-export class OrderLevelTaxSummaryCalculationStrategy implements OrderTaxSummaryCalculationStrategy {
+export class OrderLevelTaxCalculationStrategy implements OrderTaxCalculationStrategy {
     calculateOrderTotals(order: Order): OrderTotalsResult {
         const { subTotal, subTotalGroups, shipping, shippingGroups } = this.groupOrder(order);
 

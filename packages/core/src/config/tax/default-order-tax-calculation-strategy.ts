@@ -5,22 +5,19 @@ import { OrderLine } from '../../entity/order-line/order-line.entity';
 import { Order } from '../../entity/order/order.entity';
 import { Surcharge } from '../../entity/surcharge/surcharge.entity';
 
-import {
-    OrderTaxSummaryCalculationStrategy,
-    OrderTotalsResult,
-} from './order-tax-summary-calculation-strategy';
+import { OrderTaxCalculationStrategy, OrderTotalsResult } from './order-tax-calculation-strategy';
 
 /**
  * @description
- * The default {@link OrderTaxSummaryCalculationStrategy}. Tax is rounded at the
+ * The default {@link OrderTaxCalculationStrategy}. Tax is rounded at the
  * individual line level and then summed. This matches the standard Vendure behaviour
  * prior to the introduction of this strategy.
  *
  * @docsCategory tax
- * @docsPage OrderTaxSummaryCalculationStrategy
+ * @docsPage OrderTaxCalculationStrategy
  * @since 3.6.0
  */
-export class DefaultOrderTaxSummaryCalculationStrategy implements OrderTaxSummaryCalculationStrategy {
+export class DefaultOrderTaxCalculationStrategy implements OrderTaxCalculationStrategy {
     calculateOrderTotals(order: Order): OrderTotalsResult {
         let subTotal = 0;
         let subTotalWithTax = 0;

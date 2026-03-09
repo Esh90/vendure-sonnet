@@ -5,16 +5,16 @@ import { Surcharge } from '../../entity/surcharge/surcharge.entity';
 import { createOrder, createRequestContext, taxCategoryStandard } from '../../testing/order-test-utils';
 import { ensureConfigLoaded } from '../config-helpers';
 
-import { DefaultOrderTaxSummaryCalculationStrategy } from './default-order-tax-summary-calculation-strategy';
-import { OrderLevelTaxSummaryCalculationStrategy } from './order-level-tax-summary-calculation-strategy';
+import { DefaultOrderTaxCalculationStrategy } from './default-order-tax-calculation-strategy';
+import { OrderLevelTaxCalculationStrategy } from './order-level-tax-calculation-strategy';
 
-describe('OrderTaxSummaryCalculationStrategy', () => {
+describe('OrderTaxCalculationStrategy', () => {
     beforeAll(async () => {
         await ensureConfigLoaded();
     });
 
-    describe('DefaultOrderTaxSummaryCalculationStrategy', () => {
-        const strategy = new DefaultOrderTaxSummaryCalculationStrategy();
+    describe('DefaultOrderTaxCalculationStrategy', () => {
+        const strategy = new DefaultOrderTaxCalculationStrategy();
 
         it('sums per-line totals for a single tax rate', () => {
             const ctx = createRequestContext({ pricesIncludeTax: false });
@@ -115,8 +115,8 @@ describe('OrderTaxSummaryCalculationStrategy', () => {
         });
     });
 
-    describe('OrderLevelTaxSummaryCalculationStrategy', () => {
-        const strategy = new OrderLevelTaxSummaryCalculationStrategy();
+    describe('OrderLevelTaxCalculationStrategy', () => {
+        const strategy = new OrderLevelTaxCalculationStrategy();
 
         it('rounds tax on grouped net subtotal rather than per line', () => {
             const ctx = createRequestContext({ pricesIncludeTax: false });
@@ -130,7 +130,7 @@ describe('OrderTaxSummaryCalculationStrategy', () => {
             order.lines[0].taxLines = [{ taxRate: 21, description: 'VAT' }];
             order.lines[1].taxLines = [{ taxRate: 21, description: 'VAT' }];
 
-            const defaultStrategy = new DefaultOrderTaxSummaryCalculationStrategy();
+            const defaultStrategy = new DefaultOrderTaxCalculationStrategy();
             const defaultTotals = defaultStrategy.calculateOrderTotals(order);
             const defaultTaxSummary = defaultStrategy.calculateTaxSummary(order);
             const orderLevelTotals = strategy.calculateOrderTotals(order);
@@ -293,7 +293,7 @@ describe('OrderTaxSummaryCalculationStrategy', () => {
                 }),
             ];
 
-            const defaultStrategy = new DefaultOrderTaxSummaryCalculationStrategy();
+            const defaultStrategy = new DefaultOrderTaxCalculationStrategy();
             const defaultTotals = defaultStrategy.calculateOrderTotals(order);
             const orderLevelTotals = strategy.calculateOrderTotals(order);
 

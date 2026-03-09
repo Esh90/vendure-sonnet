@@ -5,10 +5,10 @@ import { Order } from '../../entity/order/order.entity';
 
 /**
  * @description
- * The result of an {@link OrderTaxSummaryCalculationStrategy}'s `calculateOrderTotals` method.
+ * The result of an {@link OrderTaxCalculationStrategy}'s `calculateOrderTotals` method.
  *
  * @docsCategory tax
- * @docsPage OrderTaxSummaryCalculationStrategy
+ * @docsPage OrderTaxCalculationStrategy
  * @since 3.6.0
  */
 export interface OrderTotalsResult {
@@ -22,26 +22,26 @@ export interface OrderTotalsResult {
  * @description
  * Defines how order-level tax totals and the tax summary are calculated.
  *
- * The default implementation ({@link DefaultOrderTaxSummaryCalculationStrategy}) rounds
+ * The default implementation ({@link DefaultOrderTaxCalculationStrategy}) rounds
  * tax at the individual line level and then sums. This is the standard Vendure behaviour.
  *
- * An alternative implementation ({@link OrderLevelTaxSummaryCalculationStrategy}) groups
+ * An alternative implementation ({@link OrderLevelTaxCalculationStrategy}) groups
  * net subtotals by tax rate and rounds once per group, which eliminates per-line rounding
  * accumulation errors. This approach is required by certain jurisdictions and ERP systems.
  *
  * :::info
  *
- * This is configured via the `taxOptions.orderTaxSummaryCalculationStrategy` property of
+ * This is configured via the `taxOptions.orderTaxCalculationStrategy` property of
  * your VendureConfig.
  *
  * :::
  *
  * @docsCategory tax
- * @docsPage OrderTaxSummaryCalculationStrategy
+ * @docsPage OrderTaxCalculationStrategy
  * @docsWeight 0
  * @since 3.6.0
  */
-export interface OrderTaxSummaryCalculationStrategy extends InjectableStrategy {
+export interface OrderTaxCalculationStrategy extends InjectableStrategy {
     /**
      * @description
      * Calculates the order totals (subTotal, subTotalWithTax, shipping, shippingWithTax)

@@ -65,7 +65,7 @@ import { CacheStrategy } from './system/cache-strategy';
 import { ErrorHandlerStrategy } from './system/error-handler-strategy';
 import { HealthCheckStrategy } from './system/health-check-strategy';
 import { InstrumentationStrategy } from './system/instrumentation-strategy';
-import { OrderTaxSummaryCalculationStrategy } from './tax/order-tax-summary-calculation-strategy';
+import { OrderTaxCalculationStrategy } from './tax/order-tax-calculation-strategy';
 import { TaxLineCalculationStrategy } from './tax/tax-line-calculation-strategy';
 import { TaxZoneStrategy } from './tax/tax-zone-strategy';
 
@@ -971,14 +971,14 @@ export interface TaxOptions {
      * Defines how order-level tax totals and the tax summary are calculated.
      *
      * The default strategy rounds tax at the individual line level and then sums
-     * (per-line rounding). The {@link OrderLevelTaxSummaryCalculationStrategy} alternative
+     * (per-line rounding). The {@link OrderLevelTaxCalculationStrategy} alternative
      * groups net subtotals by tax rate and rounds once per group (per-total rounding),
      * which is required by certain jurisdictions and ERP systems.
      *
-     * @default DefaultOrderTaxSummaryCalculationStrategy
+     * @default DefaultOrderTaxCalculationStrategy
      * @since 3.6.0
      */
-    orderTaxSummaryCalculationStrategy?: OrderTaxSummaryCalculationStrategy;
+    orderTaxCalculationStrategy?: OrderTaxCalculationStrategy;
 }
 
 /**

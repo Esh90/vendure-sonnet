@@ -10,10 +10,10 @@ import { ensureConfigLoaded } from '../../../config/config-helpers';
 import { ConfigService } from '../../../config/config.service';
 import { MockConfigService } from '../../../config/config.service.mock';
 import { PromotionCondition } from '../../../config/promotion/promotion-condition';
-import { DefaultOrderTaxSummaryCalculationStrategy } from '../../../config/tax/default-order-tax-summary-calculation-strategy';
+import { DefaultOrderTaxCalculationStrategy } from '../../../config/tax/default-order-tax-calculation-strategy';
 import { DefaultTaxLineCalculationStrategy } from '../../../config/tax/default-tax-line-calculation-strategy';
 import { DefaultTaxZoneStrategy } from '../../../config/tax/default-tax-zone-strategy';
-import { OrderLevelTaxSummaryCalculationStrategy } from '../../../config/tax/order-level-tax-summary-calculation-strategy';
+import { OrderLevelTaxCalculationStrategy } from '../../../config/tax/order-level-tax-calculation-strategy';
 import {
     CalculateTaxLinesArgs,
     TaxLineCalculationStrategy,
@@ -52,7 +52,7 @@ describe('OrderCalculator', () => {
         mockConfigService.taxOptions = {
             taxZoneStrategy: new DefaultTaxZoneStrategy(),
             taxLineCalculationStrategy: new DefaultTaxLineCalculationStrategy(),
-            orderTaxSummaryCalculationStrategy: new DefaultOrderTaxSummaryCalculationStrategy(),
+            orderTaxCalculationStrategy: new DefaultOrderTaxCalculationStrategy(),
         };
     });
 
@@ -1540,7 +1540,7 @@ describe('OrderCalculator with custom TaxLineCalculationStrategy', () => {
         mockConfigService.taxOptions = {
             taxZoneStrategy: new DefaultTaxZoneStrategy(),
             taxLineCalculationStrategy: new CustomTaxLineCalculationStrategy(),
-            orderTaxSummaryCalculationStrategy: new DefaultOrderTaxSummaryCalculationStrategy(),
+            orderTaxCalculationStrategy: new DefaultOrderTaxCalculationStrategy(),
         };
     });
 
@@ -1654,7 +1654,7 @@ describe('OrderCalculator with custom TaxLineCalculationStrategy', () => {
     });
 });
 
-describe('OrderCalculator with OrderLevelTaxSummaryCalculationStrategy', () => {
+describe('OrderCalculator with OrderLevelTaxCalculationStrategy', () => {
     let orderCalculator: OrderCalculator;
 
     beforeAll(async () => {
@@ -1664,14 +1664,14 @@ describe('OrderCalculator with OrderLevelTaxSummaryCalculationStrategy', () => {
         mockConfigService.taxOptions = {
             taxZoneStrategy: new DefaultTaxZoneStrategy(),
             taxLineCalculationStrategy: new DefaultTaxLineCalculationStrategy(),
-            orderTaxSummaryCalculationStrategy: new OrderLevelTaxSummaryCalculationStrategy(),
+            orderTaxCalculationStrategy: new OrderLevelTaxCalculationStrategy(),
         };
     });
 
     // Note: taxCategoryStandard uses a 20% rate, which means these inputs (102, 215)
-    // produce the same result for both OrderLevelTaxSummaryCalculationStrategy and
-    // DefaultOrderTaxSummaryCalculationStrategy. This test serves as a regression/integration
-    // smoke-check. See order-tax-summary-calculation-strategy.spec.ts for tests with a 21%
+    // produce the same result for both OrderLevelTaxCalculationStrategy and
+    // DefaultOrderTaxCalculationStrategy. This test serves as a regression/integration
+    // smoke-check. See order-tax-calculation-strategy.spec.ts for tests with a 21%
     // rate that demonstrate the actual rounding difference between strategies.
     it('calculates order-level totals using grouped rounding', async () => {
         const ctx = createRequestContext({ pricesIncludeTax: false });

@@ -363,8 +363,8 @@ export class OrderCalculator {
      * totals.
      */
     public calculateOrderTotals(order: Order) {
-        const { orderTaxSummaryCalculationStrategy } = this.configService.taxOptions;
-        const result = orderTaxSummaryCalculationStrategy.calculateOrderTotals(order);
+        const { orderTaxCalculationStrategy } = this.configService.taxOptions;
+        const result = orderTaxCalculationStrategy.calculateOrderTotals(order);
         order.subTotal = result.subTotal;
         order.subTotalWithTax = result.subTotalWithTax;
         order.shipping = result.shipping;
