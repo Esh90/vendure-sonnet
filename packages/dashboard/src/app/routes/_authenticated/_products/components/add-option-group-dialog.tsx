@@ -10,6 +10,7 @@ import {
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -61,6 +62,7 @@ export function AddOptionGroupDialog({
     });
 
     const handleAssignExisting = async (optionGroupId: string) => {
+        if (addOptionGroupToProductMutation.isPending) return;
         try {
             await addOptionGroupToProductMutation.mutateAsync({
                 productId,
@@ -76,11 +78,10 @@ export function AddOptionGroupDialog({
         }
     };
 
-    const handleCreateNew = async () => {
-        const formValue = form.getValues();
-        if (!formValue.name || formValue.values.length === 0) return;
-
+    const handleCreateNew = form.handleSubmit(async formValue => {
         try {
+            // TODO: use the active language code from the UI language context
+            // instead of hardcoding 'en'
             const createResult = await createOptionGroupMutation.mutateAsync({
                 input: {
                     code: formValue.name.toLowerCase().replace(/\s+/g, '-'),
@@ -118,7 +119,7 @@ export function AddOptionGroupDialog({
                 description: error instanceof Error ? error.message : t`Unknown error`,
             });
         }
-    };
+    });
 
     return (
         <Dialog
@@ -137,11 +138,14 @@ export function AddOptionGroupDialog({
                     <Trans>Add option group</Trans>
                 </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl" aria-description={'Add option group'}>
+            <DialogContent className="max-w-2xl">
                 <DialogHeader>
                     <DialogTitle>
                         <Trans>Add option group to product</Trans>
                     </DialogTitle>
+                    <DialogDescription>
+                        <Trans>Assign an existing option group or create a new one</Trans>
+                    </DialogDescription>
                 </DialogHeader>
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
                     <TabsList className="grid w-full grid-cols-2">
@@ -201,6 +205,7 @@ function OptionGroupSearch({
 }>) {
     const [searchTerm, setSearchTerm] = useState('');
     const debouncedSearchTerm = useDebounce(searchTerm, 300);
+    const { t } = useLingui();
 
     const { data, isLoading } = useQuery({
         queryKey: ['option-groups-search', debouncedSearchTerm],
@@ -208,7 +213,7 @@ function OptionGroupSearch({
             api.query(optionGroupListDocument, {
                 options: {
                     take: 20,
-                    sort: { name: 'ASC' as any },
+                    sort: { name: 'ASC' },
                     filter: debouncedSearchTerm
                         ? { name: { contains: debouncedSearchTerm } }
                         : undefined,
@@ -222,7 +227,7 @@ function OptionGroupSearch({
     return (
         <Command shouldFilter={false} className="border rounded-md">
             <CommandInput
-                placeholder="Search option groups..."
+                placeholder={t`Search option groups...`}
                 onValueChange={setSearchTerm}
                 className="h-10"
             />
