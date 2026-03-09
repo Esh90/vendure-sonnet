@@ -29,6 +29,7 @@ import { Route as AuthenticatedProductsProductsRouteImport } from './routes/_aut
 import { Route as AuthenticatedProductVariantsProductVariantsRouteImport } from './routes/_authenticated/_product-variants/product-variants'
 import { Route as AuthenticatedPaymentMethodsPaymentMethodsRouteImport } from './routes/_authenticated/_payment-methods/payment-methods'
 import { Route as AuthenticatedOrdersOrdersRouteImport } from './routes/_authenticated/_orders/orders'
+import { Route as AuthenticatedOptionGroupsOptionGroupsRouteImport } from './routes/_authenticated/_option-groups/option-groups'
 import { Route as AuthenticatedGlobalSettingsGlobalSettingsRouteImport } from './routes/_authenticated/_global-settings/global-settings'
 import { Route as AuthenticatedFacetsFacetsRouteImport } from './routes/_authenticated/_facets/facets'
 import { Route as AuthenticatedCustomersCustomersRouteImport } from './routes/_authenticated/_customers/customers'
@@ -50,6 +51,7 @@ import { Route as AuthenticatedProductsProductsIdRouteImport } from './routes/_a
 import { Route as AuthenticatedProductVariantsProductVariantsIdRouteImport } from './routes/_authenticated/_product-variants/product-variants_.$id'
 import { Route as AuthenticatedPaymentMethodsPaymentMethodsIdRouteImport } from './routes/_authenticated/_payment-methods/payment-methods_.$id'
 import { Route as AuthenticatedOrdersOrdersIdRouteImport } from './routes/_authenticated/_orders/orders_.$id'
+import { Route as AuthenticatedOptionGroupsOptionGroupsIdRouteImport } from './routes/_authenticated/_option-groups/option-groups_.$id'
 import { Route as AuthenticatedFacetsFacetsIdRouteImport } from './routes/_authenticated/_facets/facets_.$id'
 import { Route as AuthenticatedCustomersCustomersIdRouteImport } from './routes/_authenticated/_customers/customers_.$id'
 import { Route as AuthenticatedCustomerGroupsCustomerGroupsIdRouteImport } from './routes/_authenticated/_customer-groups/customer-groups_.$id'
@@ -63,6 +65,7 @@ import { Route as AuthenticatedOrdersOrdersDraftIdRouteImport } from './routes/_
 import { Route as AuthenticatedOrdersOrdersIdModifyRouteImport } from './routes/_authenticated/_orders/orders_.$id_.modify'
 import { Route as AuthenticatedProductsProductsProductIdOptionGroupsIdRouteImport } from './routes/_authenticated/_products/products_.$productId.option-groups.$id'
 import { Route as AuthenticatedOrdersOrdersAggregateOrderIdSellerOrdersSellerOrderIdRouteImport } from './routes/_authenticated/_orders/orders_.$aggregateOrderId_.seller-orders.$sellerOrderId'
+import { Route as AuthenticatedOptionGroupsOptionGroupsGroupIdOptionsIdRouteImport } from './routes/_authenticated/_option-groups/option-groups_.$groupId.options_.$id'
 import { Route as AuthenticatedFacetsFacetsFacetIdValuesIdRouteImport } from './routes/_authenticated/_facets/facets_.$facetId.values_.$id'
 import { Route as AuthenticatedProductsProductsProductIdOptionGroupsProductOptionGroupIdOptionsIdRouteImport } from './routes/_authenticated/_products/products_.$productId.option-groups.$productOptionGroupId.options_.$id'
 
@@ -178,6 +181,12 @@ const AuthenticatedOrdersOrdersRoute =
   AuthenticatedOrdersOrdersRouteImport.update({
     id: '/_orders/orders',
     path: '/orders',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedOptionGroupsOptionGroupsRoute =
+  AuthenticatedOptionGroupsOptionGroupsRouteImport.update({
+    id: '/_option-groups/option-groups',
+    path: '/option-groups',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedGlobalSettingsGlobalSettingsRoute =
@@ -306,6 +315,12 @@ const AuthenticatedOrdersOrdersIdRoute =
     path: '/orders/$id',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedOptionGroupsOptionGroupsIdRoute =
+  AuthenticatedOptionGroupsOptionGroupsIdRouteImport.update({
+    id: '/_option-groups/option-groups_/$id',
+    path: '/option-groups/$id',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedFacetsFacetsIdRoute =
   AuthenticatedFacetsFacetsIdRouteImport.update({
     id: '/_facets/facets_/$id',
@@ -386,6 +401,12 @@ const AuthenticatedOrdersOrdersAggregateOrderIdSellerOrdersSellerOrderIdRoute =
       getParentRoute: () => AuthenticatedRoute,
     } as any,
   )
+const AuthenticatedOptionGroupsOptionGroupsGroupIdOptionsIdRoute =
+  AuthenticatedOptionGroupsOptionGroupsGroupIdOptionsIdRouteImport.update({
+    id: '/_option-groups/option-groups_/$groupId/options_/$id',
+    path: '/option-groups/$groupId/options/$id',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedFacetsFacetsFacetIdValuesIdRoute =
   AuthenticatedFacetsFacetsFacetIdValuesIdRouteImport.update({
     id: '/_facets/facets_/$facetId/values_/$id',
@@ -413,6 +434,7 @@ export interface FileRoutesByFullPath {
   '/customers': typeof AuthenticatedCustomersCustomersRoute
   '/facets': typeof AuthenticatedFacetsFacetsRoute
   '/global-settings': typeof AuthenticatedGlobalSettingsGlobalSettingsRoute
+  '/option-groups': typeof AuthenticatedOptionGroupsOptionGroupsRoute
   '/orders': typeof AuthenticatedOrdersOrdersRoute
   '/payment-methods': typeof AuthenticatedPaymentMethodsPaymentMethodsRoute
   '/product-variants': typeof AuthenticatedProductVariantsProductVariantsRoute
@@ -438,6 +460,7 @@ export interface FileRoutesByFullPath {
   '/customer-groups/$id': typeof AuthenticatedCustomerGroupsCustomerGroupsIdRoute
   '/customers/$id': typeof AuthenticatedCustomersCustomersIdRoute
   '/facets/$id': typeof AuthenticatedFacetsFacetsIdRoute
+  '/option-groups/$id': typeof AuthenticatedOptionGroupsOptionGroupsIdRoute
   '/orders/$id': typeof AuthenticatedOrdersOrdersIdRoute
   '/payment-methods/$id': typeof AuthenticatedPaymentMethodsPaymentMethodsIdRoute
   '/product-variants/$id': typeof AuthenticatedProductVariantsProductVariantsIdRoute
@@ -454,6 +477,7 @@ export interface FileRoutesByFullPath {
   '/orders/draft/$id': typeof AuthenticatedOrdersOrdersDraftIdRoute
   '/products/$id/variants': typeof AuthenticatedProductsProductsIdVariantsRoute
   '/facets/$facetId/values/$id': typeof AuthenticatedFacetsFacetsFacetIdValuesIdRoute
+  '/option-groups/$groupId/options/$id': typeof AuthenticatedOptionGroupsOptionGroupsGroupIdOptionsIdRoute
   '/orders/$aggregateOrderId/seller-orders/$sellerOrderId': typeof AuthenticatedOrdersOrdersAggregateOrderIdSellerOrdersSellerOrderIdRoute
   '/products/$productId/option-groups/$id': typeof AuthenticatedProductsProductsProductIdOptionGroupsIdRoute
   '/products/$productId/option-groups/$productOptionGroupId/options/$id': typeof AuthenticatedProductsProductsProductIdOptionGroupsProductOptionGroupIdOptionsIdRoute
@@ -470,6 +494,7 @@ export interface FileRoutesByTo {
   '/customers': typeof AuthenticatedCustomersCustomersRoute
   '/facets': typeof AuthenticatedFacetsFacetsRoute
   '/global-settings': typeof AuthenticatedGlobalSettingsGlobalSettingsRoute
+  '/option-groups': typeof AuthenticatedOptionGroupsOptionGroupsRoute
   '/orders': typeof AuthenticatedOrdersOrdersRoute
   '/payment-methods': typeof AuthenticatedPaymentMethodsPaymentMethodsRoute
   '/product-variants': typeof AuthenticatedProductVariantsProductVariantsRoute
@@ -495,6 +520,7 @@ export interface FileRoutesByTo {
   '/customer-groups/$id': typeof AuthenticatedCustomerGroupsCustomerGroupsIdRoute
   '/customers/$id': typeof AuthenticatedCustomersCustomersIdRoute
   '/facets/$id': typeof AuthenticatedFacetsFacetsIdRoute
+  '/option-groups/$id': typeof AuthenticatedOptionGroupsOptionGroupsIdRoute
   '/orders/$id': typeof AuthenticatedOrdersOrdersIdRoute
   '/payment-methods/$id': typeof AuthenticatedPaymentMethodsPaymentMethodsIdRoute
   '/product-variants/$id': typeof AuthenticatedProductVariantsProductVariantsIdRoute
@@ -511,6 +537,7 @@ export interface FileRoutesByTo {
   '/orders/draft/$id': typeof AuthenticatedOrdersOrdersDraftIdRoute
   '/products/$id/variants': typeof AuthenticatedProductsProductsIdVariantsRoute
   '/facets/$facetId/values/$id': typeof AuthenticatedFacetsFacetsFacetIdValuesIdRoute
+  '/option-groups/$groupId/options/$id': typeof AuthenticatedOptionGroupsOptionGroupsGroupIdOptionsIdRoute
   '/orders/$aggregateOrderId/seller-orders/$sellerOrderId': typeof AuthenticatedOrdersOrdersAggregateOrderIdSellerOrdersSellerOrderIdRoute
   '/products/$productId/option-groups/$id': typeof AuthenticatedProductsProductsProductIdOptionGroupsIdRoute
   '/products/$productId/option-groups/$productOptionGroupId/options/$id': typeof AuthenticatedProductsProductsProductIdOptionGroupsProductOptionGroupIdOptionsIdRoute
@@ -529,6 +556,7 @@ export interface FileRoutesById {
   '/_authenticated/_customers/customers': typeof AuthenticatedCustomersCustomersRoute
   '/_authenticated/_facets/facets': typeof AuthenticatedFacetsFacetsRoute
   '/_authenticated/_global-settings/global-settings': typeof AuthenticatedGlobalSettingsGlobalSettingsRoute
+  '/_authenticated/_option-groups/option-groups': typeof AuthenticatedOptionGroupsOptionGroupsRoute
   '/_authenticated/_orders/orders': typeof AuthenticatedOrdersOrdersRoute
   '/_authenticated/_payment-methods/payment-methods': typeof AuthenticatedPaymentMethodsPaymentMethodsRoute
   '/_authenticated/_product-variants/product-variants': typeof AuthenticatedProductVariantsProductVariantsRoute
@@ -554,6 +582,7 @@ export interface FileRoutesById {
   '/_authenticated/_customer-groups/customer-groups_/$id': typeof AuthenticatedCustomerGroupsCustomerGroupsIdRoute
   '/_authenticated/_customers/customers_/$id': typeof AuthenticatedCustomersCustomersIdRoute
   '/_authenticated/_facets/facets_/$id': typeof AuthenticatedFacetsFacetsIdRoute
+  '/_authenticated/_option-groups/option-groups_/$id': typeof AuthenticatedOptionGroupsOptionGroupsIdRoute
   '/_authenticated/_orders/orders_/$id': typeof AuthenticatedOrdersOrdersIdRoute
   '/_authenticated/_payment-methods/payment-methods_/$id': typeof AuthenticatedPaymentMethodsPaymentMethodsIdRoute
   '/_authenticated/_product-variants/product-variants_/$id': typeof AuthenticatedProductVariantsProductVariantsIdRoute
@@ -570,6 +599,7 @@ export interface FileRoutesById {
   '/_authenticated/_orders/orders_/draft/$id': typeof AuthenticatedOrdersOrdersDraftIdRoute
   '/_authenticated/_products/products_/$id_/variants': typeof AuthenticatedProductsProductsIdVariantsRoute
   '/_authenticated/_facets/facets_/$facetId/values_/$id': typeof AuthenticatedFacetsFacetsFacetIdValuesIdRoute
+  '/_authenticated/_option-groups/option-groups_/$groupId/options_/$id': typeof AuthenticatedOptionGroupsOptionGroupsGroupIdOptionsIdRoute
   '/_authenticated/_orders/orders_/$aggregateOrderId_/seller-orders/$sellerOrderId': typeof AuthenticatedOrdersOrdersAggregateOrderIdSellerOrdersSellerOrderIdRoute
   '/_authenticated/_products/products_/$productId/option-groups/$id': typeof AuthenticatedProductsProductsProductIdOptionGroupsIdRoute
   '/_authenticated/_products/products_/$productId/option-groups/$productOptionGroupId/options_/$id': typeof AuthenticatedProductsProductsProductIdOptionGroupsProductOptionGroupIdOptionsIdRoute
@@ -588,6 +618,7 @@ export interface FileRouteTypes {
     | '/customers'
     | '/facets'
     | '/global-settings'
+    | '/option-groups'
     | '/orders'
     | '/payment-methods'
     | '/product-variants'
@@ -613,6 +644,7 @@ export interface FileRouteTypes {
     | '/customer-groups/$id'
     | '/customers/$id'
     | '/facets/$id'
+    | '/option-groups/$id'
     | '/orders/$id'
     | '/payment-methods/$id'
     | '/product-variants/$id'
@@ -629,6 +661,7 @@ export interface FileRouteTypes {
     | '/orders/draft/$id'
     | '/products/$id/variants'
     | '/facets/$facetId/values/$id'
+    | '/option-groups/$groupId/options/$id'
     | '/orders/$aggregateOrderId/seller-orders/$sellerOrderId'
     | '/products/$productId/option-groups/$id'
     | '/products/$productId/option-groups/$productOptionGroupId/options/$id'
@@ -645,6 +678,7 @@ export interface FileRouteTypes {
     | '/customers'
     | '/facets'
     | '/global-settings'
+    | '/option-groups'
     | '/orders'
     | '/payment-methods'
     | '/product-variants'
@@ -670,6 +704,7 @@ export interface FileRouteTypes {
     | '/customer-groups/$id'
     | '/customers/$id'
     | '/facets/$id'
+    | '/option-groups/$id'
     | '/orders/$id'
     | '/payment-methods/$id'
     | '/product-variants/$id'
@@ -686,6 +721,7 @@ export interface FileRouteTypes {
     | '/orders/draft/$id'
     | '/products/$id/variants'
     | '/facets/$facetId/values/$id'
+    | '/option-groups/$groupId/options/$id'
     | '/orders/$aggregateOrderId/seller-orders/$sellerOrderId'
     | '/products/$productId/option-groups/$id'
     | '/products/$productId/option-groups/$productOptionGroupId/options/$id'
@@ -703,6 +739,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_customers/customers'
     | '/_authenticated/_facets/facets'
     | '/_authenticated/_global-settings/global-settings'
+    | '/_authenticated/_option-groups/option-groups'
     | '/_authenticated/_orders/orders'
     | '/_authenticated/_payment-methods/payment-methods'
     | '/_authenticated/_product-variants/product-variants'
@@ -728,6 +765,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_customer-groups/customer-groups_/$id'
     | '/_authenticated/_customers/customers_/$id'
     | '/_authenticated/_facets/facets_/$id'
+    | '/_authenticated/_option-groups/option-groups_/$id'
     | '/_authenticated/_orders/orders_/$id'
     | '/_authenticated/_payment-methods/payment-methods_/$id'
     | '/_authenticated/_product-variants/product-variants_/$id'
@@ -744,6 +782,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_orders/orders_/draft/$id'
     | '/_authenticated/_products/products_/$id_/variants'
     | '/_authenticated/_facets/facets_/$facetId/values_/$id'
+    | '/_authenticated/_option-groups/option-groups_/$groupId/options_/$id'
     | '/_authenticated/_orders/orders_/$aggregateOrderId_/seller-orders/$sellerOrderId'
     | '/_authenticated/_products/products_/$productId/option-groups/$id'
     | '/_authenticated/_products/products_/$productId/option-groups/$productOptionGroupId/options_/$id'
@@ -896,6 +935,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrdersOrdersRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/_option-groups/option-groups': {
+      id: '/_authenticated/_option-groups/option-groups'
+      path: '/option-groups'
+      fullPath: '/option-groups'
+      preLoaderRoute: typeof AuthenticatedOptionGroupsOptionGroupsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/_global-settings/global-settings': {
       id: '/_authenticated/_global-settings/global-settings'
       path: '/global-settings'
@@ -1043,6 +1089,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrdersOrdersIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/_option-groups/option-groups_/$id': {
+      id: '/_authenticated/_option-groups/option-groups_/$id'
+      path: '/option-groups/$id'
+      fullPath: '/option-groups/$id'
+      preLoaderRoute: typeof AuthenticatedOptionGroupsOptionGroupsIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/_facets/facets_/$id': {
       id: '/_authenticated/_facets/facets_/$id'
       path: '/facets/$id'
@@ -1134,6 +1187,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOrdersOrdersAggregateOrderIdSellerOrdersSellerOrderIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/_option-groups/option-groups_/$groupId/options_/$id': {
+      id: '/_authenticated/_option-groups/option-groups_/$groupId/options_/$id'
+      path: '/option-groups/$groupId/options/$id'
+      fullPath: '/option-groups/$groupId/options/$id'
+      preLoaderRoute: typeof AuthenticatedOptionGroupsOptionGroupsGroupIdOptionsIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/_facets/facets_/$facetId/values_/$id': {
       id: '/_authenticated/_facets/facets_/$facetId/values_/$id'
       path: '/facets/$facetId/values/$id'
@@ -1162,6 +1222,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCustomersCustomersRoute: typeof AuthenticatedCustomersCustomersRoute
   AuthenticatedFacetsFacetsRoute: typeof AuthenticatedFacetsFacetsRoute
   AuthenticatedGlobalSettingsGlobalSettingsRoute: typeof AuthenticatedGlobalSettingsGlobalSettingsRoute
+  AuthenticatedOptionGroupsOptionGroupsRoute: typeof AuthenticatedOptionGroupsOptionGroupsRoute
   AuthenticatedOrdersOrdersRoute: typeof AuthenticatedOrdersOrdersRoute
   AuthenticatedPaymentMethodsPaymentMethodsRoute: typeof AuthenticatedPaymentMethodsPaymentMethodsRoute
   AuthenticatedProductVariantsProductVariantsRoute: typeof AuthenticatedProductVariantsProductVariantsRoute
@@ -1187,6 +1248,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCustomerGroupsCustomerGroupsIdRoute: typeof AuthenticatedCustomerGroupsCustomerGroupsIdRoute
   AuthenticatedCustomersCustomersIdRoute: typeof AuthenticatedCustomersCustomersIdRoute
   AuthenticatedFacetsFacetsIdRoute: typeof AuthenticatedFacetsFacetsIdRoute
+  AuthenticatedOptionGroupsOptionGroupsIdRoute: typeof AuthenticatedOptionGroupsOptionGroupsIdRoute
   AuthenticatedOrdersOrdersIdRoute: typeof AuthenticatedOrdersOrdersIdRoute
   AuthenticatedPaymentMethodsPaymentMethodsIdRoute: typeof AuthenticatedPaymentMethodsPaymentMethodsIdRoute
   AuthenticatedProductVariantsProductVariantsIdRoute: typeof AuthenticatedProductVariantsProductVariantsIdRoute
@@ -1203,6 +1265,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedOrdersOrdersDraftIdRoute: typeof AuthenticatedOrdersOrdersDraftIdRoute
   AuthenticatedProductsProductsIdVariantsRoute: typeof AuthenticatedProductsProductsIdVariantsRoute
   AuthenticatedFacetsFacetsFacetIdValuesIdRoute: typeof AuthenticatedFacetsFacetsFacetIdValuesIdRoute
+  AuthenticatedOptionGroupsOptionGroupsGroupIdOptionsIdRoute: typeof AuthenticatedOptionGroupsOptionGroupsGroupIdOptionsIdRoute
   AuthenticatedOrdersOrdersAggregateOrderIdSellerOrdersSellerOrderIdRoute: typeof AuthenticatedOrdersOrdersAggregateOrderIdSellerOrdersSellerOrderIdRoute
   AuthenticatedProductsProductsProductIdOptionGroupsIdRoute: typeof AuthenticatedProductsProductsProductIdOptionGroupsIdRoute
   AuthenticatedProductsProductsProductIdOptionGroupsProductOptionGroupIdOptionsIdRoute: typeof AuthenticatedProductsProductsProductIdOptionGroupsProductOptionGroupIdOptionsIdRoute
@@ -1223,6 +1286,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedFacetsFacetsRoute: AuthenticatedFacetsFacetsRoute,
   AuthenticatedGlobalSettingsGlobalSettingsRoute:
     AuthenticatedGlobalSettingsGlobalSettingsRoute,
+  AuthenticatedOptionGroupsOptionGroupsRoute:
+    AuthenticatedOptionGroupsOptionGroupsRoute,
   AuthenticatedOrdersOrdersRoute: AuthenticatedOrdersOrdersRoute,
   AuthenticatedPaymentMethodsPaymentMethodsRoute:
     AuthenticatedPaymentMethodsPaymentMethodsRoute,
@@ -1260,6 +1325,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCustomersCustomersIdRoute:
     AuthenticatedCustomersCustomersIdRoute,
   AuthenticatedFacetsFacetsIdRoute: AuthenticatedFacetsFacetsIdRoute,
+  AuthenticatedOptionGroupsOptionGroupsIdRoute:
+    AuthenticatedOptionGroupsOptionGroupsIdRoute,
   AuthenticatedOrdersOrdersIdRoute: AuthenticatedOrdersOrdersIdRoute,
   AuthenticatedPaymentMethodsPaymentMethodsIdRoute:
     AuthenticatedPaymentMethodsPaymentMethodsIdRoute,
@@ -1285,6 +1352,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
     AuthenticatedProductsProductsIdVariantsRoute,
   AuthenticatedFacetsFacetsFacetIdValuesIdRoute:
     AuthenticatedFacetsFacetsFacetIdValuesIdRoute,
+  AuthenticatedOptionGroupsOptionGroupsGroupIdOptionsIdRoute:
+    AuthenticatedOptionGroupsOptionGroupsGroupIdOptionsIdRoute,
   AuthenticatedOrdersOrdersAggregateOrderIdSellerOrdersSellerOrderIdRoute:
     AuthenticatedOrdersOrdersAggregateOrderIdSellerOrdersSellerOrderIdRoute,
   AuthenticatedProductsProductsProductIdOptionGroupsIdRoute:
