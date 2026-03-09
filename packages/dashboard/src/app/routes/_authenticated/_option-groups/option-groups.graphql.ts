@@ -25,6 +25,21 @@ export const deleteOptionGroupsDocument = graphql(`
     }
 `);
 
+export const productsByOptionGroupDocument = graphql(`
+    query ProductsByOptionGroup($options: ProductListOptions) {
+        products(options: $options) {
+            items {
+                id
+                createdAt
+                updatedAt
+                name
+                slug
+            }
+            totalItems
+        }
+    }
+`);
+
 export const assignOptionGroupsToChannelDocument = graphql(`
     mutation AssignOptionGroupsToChannel($input: AssignProductOptionGroupsToChannelInput!) {
         assignProductOptionGroupsToChannel(input: $input) {

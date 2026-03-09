@@ -26,7 +26,6 @@ import { AssignedChannels } from '@/vdb/components/shared/assigned-channels.js';
 import { api } from '@/vdb/graphql/api.js';
 import { OptionGroupProductsBlock } from './components/option-group-products-block.js';
 import { ProductOptionsTable } from '../_products/components/product-options-table.js';
-import { SharedOptionGroupWarning } from '../_products/components/shared-option-group-warning.js';
 import {
     assignOptionGroupsToChannelDocument,
     removeOptionGroupsFromChannelDocument,
@@ -163,11 +162,6 @@ function OptionGroupDetailPage() {
                 </ActionBarItem>
             </PageActionBar>
             <PageLayout>
-                {entity && entity.productCount > 1 && (
-                    <PageBlock column="main" blockId="shared-warning">
-                        <SharedOptionGroupWarning productCount={entity.productCount} />
-                    </PageBlock>
-                )}
                 <PageBlock column="main" blockId="main-form">
                     <DetailFormGrid>
                         <TranslatableFormFieldWrapper
@@ -215,10 +209,7 @@ function OptionGroupDetailPage() {
                 )}
                 {entity && (
                     <PageBlock column="side" blockId="products" title={<Trans>Products</Trans>}>
-                        <OptionGroupProductsBlock
-                            optionGroupId={entity.id}
-                            productCount={entity.productCount}
-                        />
+                        <OptionGroupProductsBlock optionGroupId={entity.id} />
                     </PageBlock>
                 )}
                 {channels.length > 1 && entity && (

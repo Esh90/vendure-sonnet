@@ -26,6 +26,7 @@ import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { PlusIcon } from 'lucide-react';
 import { useRef } from 'react';
 import { toast } from 'sonner';
+import { AddOptionGroupDialog } from './components/add-option-group-dialog.js';
 import { CreateProductVariantsDialog } from './components/create-product-variants-dialog.js';
 import { ProductOptionGroupBadge } from './components/product-option-group-badge.js';
 import { ProductVariantsTable } from './components/product-variants-table.js';
@@ -196,15 +197,27 @@ function ProductDetailPage() {
                         />
                     </PageBlock>
                 )}
-                {entity?.optionGroups.length ? (
+                {entity && (
                     <PageBlock column="side" blockId="option-groups" title={<Trans>Product Options</Trans>}>
-                        <div className="flex flex-wrap gap-1.5">
-                            {entity.optionGroups.map(g => (
-                                <ProductOptionGroupBadge key={g.id} id={g.id} name={g.name} productId={entity.id} />
-                            ))}
-                        </div>
+                        {entity.optionGroups.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 mb-3">
+                                {entity.optionGroups.map(g => (
+                                    <ProductOptionGroupBadge
+                                        key={g.id}
+                                        id={g.id}
+                                        name={g.name}
+                                        productId={entity.id}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                        <AddOptionGroupDialog
+                            productId={entity.id}
+                            existingGroupIds={entity.optionGroups.map(g => g.id)}
+                            onSuccess={() => refreshEntity()}
+                        />
                     </PageBlock>
-                ) : null}
+                )}
                 <PageBlock column="side" blockId="facet-values" title={<Trans>Facet Values</Trans>}>
                     <FormFieldWrapper
                         control={form.control}
