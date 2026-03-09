@@ -200,7 +200,7 @@ function ProductDetailPage() {
                     <PageBlock column="side" blockId="option-groups" title={<Trans>Product Options</Trans>}>
                         <div className="flex flex-wrap gap-1.5">
                             {entity.optionGroups.map(g => (
-                                <ProductOptionGroupBadge key={g.id} id={g.id} name={g.name} />
+                                <ProductOptionGroupBadge key={g.id} id={g.id} name={g.name} productId={entity.id} />
                             ))}
                         </div>
                     </PageBlock>
@@ -233,7 +233,7 @@ function ProductDetailPage() {
                                 priceFactor,
                             })}
                             additionalAssignFields={priceFactorField}
-                            queryKeyScope={['DetailPage', 'ProductDetail']}
+                            queryKeyScope={['DetailPage', 'product']}
                         />
                     </PageBlock>
                 )}

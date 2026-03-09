@@ -1,5 +1,4 @@
 import { SlugInput } from '@/vdb/components/data-input/index.js';
-import { PageBreadcrumb } from '@/vdb/components/layout/generated-breadcrumbs.js';
 import { ErrorPage } from '@/vdb/components/shared/error-page.js';
 import { FormFieldWrapper } from '@/vdb/components/shared/form-field-wrapper.js';
 import { TranslatableFormFieldWrapper } from '@/vdb/components/shared/translatable-form-field.js';
@@ -16,14 +15,18 @@ import {
     PageTitle,
 } from '@/vdb/framework/layout-engine/page-layout.js';
 import { ActionBarItem } from '@/vdb/framework/layout-engine/action-bar-item-wrapper.js';
-import { detailPageRouteLoader } from '@/vdb/framework/page/detail-page-route-loader.js';
-import { useDetailPage } from '@/vdb/framework/page/use-detail-page.js';
+import { extendDetailFormQuery } from '@/vdb/framework/document-extension/extend-detail-form-query.js';
+import { addCustomFields } from '@/vdb/framework/document-introspection/add-custom-fields.js';
+import { getDetailQueryOptions, useDetailPage } from '@/vdb/framework/page/use-detail-page.js';
+import { api } from '@/vdb/graphql/api.js';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, ParsedLocation, useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 import {
     createProductOptionDocument,
+    productIdNameDocument,
     productOptionDetailDocument,
+    productOptionGroupIdNameDocument,
     updateProductOptionDocument,
 } from '../_products/product-option-groups.graphql.js';
 
@@ -33,25 +36,67 @@ export const Route = createFileRoute(
     '/_authenticated/_option-groups/option-groups_/$groupId/options_/$id',
 )({
     component: OptionGroupOptionDetailPage,
-    loader: detailPageRouteLoader({
-        pageId,
-        queryDocument: productOptionDetailDocument,
-        breadcrumb(isNew, entity) {
-            const groupName = entity?.group?.name ?? 'Option Group';
-            const breadcrumb: PageBreadcrumb[] = [
+    loader: async ({ context, params, location }: { context: any; params: any; location: ParsedLocation }) => {
+        if (!params.id) {
+            throw new Error('ID param is required');
+        }
+        const isNew = params.id === NEW_ENTITY_PATH;
+        const { extendedQuery: extendedQueryDocument } = extendDetailFormQuery(
+            addCustomFields(productOptionDetailDocument),
+            pageId,
+        );
+        const result = isNew
+            ? null
+            : await context.queryClient.ensureQueryData(
+                  getDetailQueryOptions(extendedQueryDocument, { id: params.id }),
+              );
+
+        if (!isNew && !result?.productOption) {
+            throw new Error(`ProductOption with the ID ${params.id} was not found`);
+        }
+
+        let optionGroupName: string | undefined;
+        if (isNew) {
+            const optionGroupResult = await context.queryClient.fetchQuery({
+                queryKey: [pageId, 'optionGroupIdName', params.groupId],
+                queryFn: () => api.query(productOptionGroupIdNameDocument, { id: params.groupId }),
+            });
+            optionGroupName = optionGroupResult.productOptionGroup?.name;
+        } else {
+            optionGroupName = result.productOption.group.name;
+        }
+
+        const search = location.search as Record<string, string>;
+        const groupId = isNew ? params.groupId : result.productOption.group.id;
+
+        if (search.from === 'product' && search.productId) {
+            const productResult = await context.queryClient.fetchQuery({
+                queryKey: [pageId, 'productIdName', search.productId],
+                queryFn: () => api.query(productIdNameDocument, { id: search.productId }),
+            });
+            return {
+                breadcrumb: [
+                    { path: '/products', label: <Trans>Products</Trans> },
+                    { path: `/products/${search.productId}`, label: productResult.product.name },
+                    { path: `/products/${search.productId}`, label: <Trans>Option Groups</Trans> },
+                    { path: `/option-groups/${groupId}`, label: optionGroupName },
+                    isNew ? <Trans>New option</Trans> : result?.productOption?.name,
+                ],
+            };
+        }
+
+        return {
+            breadcrumb: [
                 { path: '/option-groups', label: <Trans>Option Groups</Trans> },
-            ];
-            if (isNew) {
-                breadcrumb.push(<Trans>New option</Trans>);
-            } else if (entity) {
-                breadcrumb.push(
-                    { path: `/option-groups/${entity.group.id}`, label: groupName },
-                    entity.name,
-                );
-            }
-            return breadcrumb;
-        },
-    }),
+                ...(isNew
+                    ? [<Trans>New option</Trans>]
+                    : [
+                          { path: `/option-groups/${groupId}`, label: optionGroupName },
+                          result?.productOption?.name,
+                      ]),
+            ],
+        };
+    },
     errorComponent: ({ error }) => <ErrorPage message={error.message} />,
 });
 

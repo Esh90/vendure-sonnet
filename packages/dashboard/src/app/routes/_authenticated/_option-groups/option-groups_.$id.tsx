@@ -16,10 +16,11 @@ import {
     PageTitle,
 } from '@/vdb/framework/layout-engine/page-layout.js';
 import { ActionBarItem } from '@/vdb/framework/layout-engine/action-bar-item-wrapper.js';
-import { detailPageRouteLoader } from '@/vdb/framework/page/detail-page-route-loader.js';
-import { useDetailPage } from '@/vdb/framework/page/use-detail-page.js';
+import { extendDetailFormQuery } from '@/vdb/framework/document-extension/extend-detail-form-query.js';
+import { addCustomFields } from '@/vdb/framework/document-introspection/add-custom-fields.js';
+import { getDetailQueryOptions, useDetailPage } from '@/vdb/framework/page/use-detail-page.js';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, ParsedLocation, useLocation, useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 import { AssignedChannels } from '@/vdb/components/shared/assigned-channels.js';
 import { api } from '@/vdb/graphql/api.js';
@@ -32,6 +33,7 @@ import {
 } from './option-groups.graphql.js';
 import {
     createProductOptionGroupDocument,
+    productIdNameDocument,
     productOptionGroupDetailDocument,
     updateProductOptionGroupDocument,
 } from '../_products/product-option-groups.graphql.js';
@@ -40,22 +42,56 @@ const pageId = 'option-group-detail';
 
 export const Route = createFileRoute('/_authenticated/_option-groups/option-groups_/$id')({
     component: OptionGroupDetailPage,
-    loader: detailPageRouteLoader({
-        pageId,
-        queryDocument: productOptionGroupDetailDocument,
-        breadcrumb(isNew, entity) {
-            return [
+    loader: async ({ context, params, location }: { context: any; params: any; location: ParsedLocation }) => {
+        if (!params.id) {
+            throw new Error('ID param is required');
+        }
+        const isNew = params.id === NEW_ENTITY_PATH;
+        const { extendedQuery: extendedQueryDocument } = extendDetailFormQuery(
+            addCustomFields(productOptionGroupDetailDocument),
+            pageId,
+        );
+        const result = isNew
+            ? null
+            : await context.queryClient.ensureQueryData(
+                  getDetailQueryOptions(extendedQueryDocument, { id: params.id }),
+              );
+
+        if (!isNew && !result.productOptionGroup) {
+            throw new Error(`ProductOptionGroup with the ID ${params.id} was not found`);
+        }
+
+        const search = location.search as Record<string, string>;
+        if (search.from === 'product' && search.productId) {
+            const productResult = await context.queryClient.fetchQuery({
+                queryKey: [pageId, 'productIdName', search.productId],
+                queryFn: () => api.query(productIdNameDocument, { id: search.productId }),
+            });
+            return {
+                breadcrumb: [
+                    { path: '/products', label: <Trans>Products</Trans> },
+                    { path: `/products/${search.productId}`, label: productResult.product.name },
+                    { path: `/products/${search.productId}`, label: <Trans>Option Groups</Trans> },
+                    isNew ? <Trans>New option group</Trans> : result?.productOptionGroup?.name,
+                ],
+            };
+        }
+
+        return {
+            breadcrumb: [
                 { path: '/option-groups', label: <Trans>Option Groups</Trans> },
-                isNew ? <Trans>New option group</Trans> : entity?.name,
-            ];
-        },
-    }),
+                isNew ? <Trans>New option group</Trans> : result?.productOptionGroup?.name,
+            ],
+        };
+    },
     errorComponent: ({ error }) => <ErrorPage message={error.message} />,
 });
 
 function OptionGroupDetailPage() {
     const params = Route.useParams();
     const navigate = useNavigate();
+    const location = useLocation();
+    const search = location.search as Record<string, string>;
     const creatingNewEntity = params.id === NEW_ENTITY_PATH;
     const { t } = useLingui();
     const { channels } = useChannel();
@@ -127,7 +163,11 @@ function OptionGroupDetailPage() {
                 </ActionBarItem>
             </PageActionBar>
             <PageLayout>
-                {entity && <SharedOptionGroupWarning productCount={entity.productCount} />}
+                {entity && entity.productCount > 1 && (
+                    <PageBlock column="main" blockId="shared-warning">
+                        <SharedOptionGroupWarning productCount={entity.productCount} />
+                    </PageBlock>
+                )}
                 <PageBlock column="main" blockId="main-form">
                     <DetailFormGrid>
                         <TranslatableFormFieldWrapper
@@ -169,14 +209,17 @@ function OptionGroupDetailPage() {
                                 `/option-groups/${entity.id}/options/${optionId}`
                             }
                             newOptionHref={`/option-groups/${entity.id}/options/new`}
+                            linkSearch={search.from === 'product' ? search : undefined}
                         />
                     </PageBlock>
                 )}
                 {entity && (
-                    <OptionGroupProductsBlock
-                        optionGroupId={entity.id}
-                        productCount={entity.productCount}
-                    />
+                    <PageBlock column="side" blockId="products" title={<Trans>Products</Trans>}>
+                        <OptionGroupProductsBlock
+                            optionGroupId={entity.id}
+                            productCount={entity.productCount}
+                        />
+                    </PageBlock>
                 )}
                 {channels.length > 1 && entity && (
                     <PageBlock column="side" blockId="channels" title={<Trans>Channels</Trans>}>
@@ -195,7 +238,7 @@ function OptionGroupDetailPage() {
                                 productOptionGroupIds: [eid],
                                 channelId,
                             })}
-                            queryKeyScope={['DetailPage', 'ProductOptionGroupDetail']}
+                            queryKeyScope={['DetailPage', 'productOptionGroup']}
                         />
                     </PageBlock>
                 )}

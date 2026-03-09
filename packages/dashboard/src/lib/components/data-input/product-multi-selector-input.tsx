@@ -162,9 +162,11 @@ function ProductList({
     );
 }
 
+const EMPTY_IDS: string[] = [];
+
 export function ProductMultiSelectorDialog({
     mode,
-    initialSelectionIds = [],
+    initialSelectionIds = EMPTY_IDS,
     onSelectionChange,
     open,
     onOpenChange,

@@ -44,7 +44,8 @@ export function AssignToProductsDialog({
             );
         }
 
-        queryClient.invalidateQueries({ queryKey: ['DetailPage', 'ProductOptionGroupDetail'] });
+        queryClient.invalidateQueries({ queryKey: ['DetailPage', 'productOptionGroup'] });
+        queryClient.invalidateQueries({ queryKey: ['optionGroupProducts', optionGroupId] });
     };
 
     return (

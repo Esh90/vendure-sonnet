@@ -29,6 +29,7 @@ export interface ProductOptionsTableProps {
     registerRefresher?: (refresher: () => void) => void;
     getOptionHref?: (optionId: string) => string;
     newOptionHref?: string;
+    linkSearch?: Record<string, string>;
 }
 
 export function ProductOptionsTable({
@@ -36,6 +37,7 @@ export function ProductOptionsTable({
     registerRefresher,
     getOptionHref,
     newOptionHref,
+    linkSearch,
 }: Readonly<ProductOptionsTableProps>) {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [page, setPage] = useState(1);
@@ -104,6 +106,7 @@ export function ProductOptionsTable({
                                         ? getOptionHref(row.original.id)
                                         : `options/${row.original.id}`
                                 }
+                                search={linkSearch}
                             />
                         ),
                     },
@@ -111,7 +114,7 @@ export function ProductOptionsTable({
             />
             <div className="mt-4">
                 <Button asChild variant="outline">
-                    <Link to={newOptionHref ?? './options/new'}>
+                    <Link to={newOptionHref ?? './options/new'} search={linkSearch}>
                         <PlusIcon />
                         <Trans>Add product option</Trans>
                     </Link>

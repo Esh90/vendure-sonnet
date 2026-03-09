@@ -1,5 +1,4 @@
 import { Button } from '@/vdb/components/ui/button.js';
-import { PageBlock } from '@/vdb/framework/layout-engine/page-layout.js';
 import { Plural, Trans } from '@lingui/react/macro';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -15,7 +14,7 @@ export function OptionGroupProductsBlock({
     const [assignDialogOpen, setAssignDialogOpen] = useState(false);
 
     return (
-        <PageBlock column="side" blockId="products" title={<Trans>Products</Trans>}>
+        <>
             <p className="text-sm text-muted-foreground mb-3">
                 <Plural
                     value={productCount}
@@ -38,6 +37,6 @@ export function OptionGroupProductsBlock({
                 open={assignDialogOpen}
                 onOpenChange={setAssignDialogOpen}
             />
-        </PageBlock>
+        </>
     );
 }
