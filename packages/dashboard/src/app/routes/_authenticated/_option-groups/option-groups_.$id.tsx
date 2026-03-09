@@ -18,11 +18,14 @@ import {
 import { ActionBarItem } from '@/vdb/framework/layout-engine/action-bar-item-wrapper.js';
 import { detailPageRouteLoader } from '@/vdb/framework/page/detail-page-route-loader.js';
 import { useDetailPage } from '@/vdb/framework/page/use-detail-page.js';
-import { Trans, useLingui } from '@lingui/react/macro';
+import { Plural, Trans, useLingui } from '@lingui/react/macro';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { Plus } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { AssignedChannels } from '@/vdb/components/shared/assigned-channels.js';
 import { api } from '@/vdb/graphql/api.js';
+import { AssignToProductsDialog } from './components/assign-to-products-dialog.js';
 import { ProductOptionsTable } from '../_products/components/product-options-table.js';
 import { SharedOptionGroupWarning } from '../_products/components/shared-option-group-warning.js';
 import {
@@ -58,6 +61,7 @@ function OptionGroupDetailPage() {
     const creatingNewEntity = params.id === NEW_ENTITY_PATH;
     const { t } = useLingui();
     const { channels } = useChannel();
+    const [assignDialogOpen, setAssignDialogOpen] = useState(false);
 
     const { form, submitHandler, entity, isPending, resetForm } = useDetailPage({
         pageId,
@@ -168,6 +172,32 @@ function OptionGroupDetailPage() {
                                 `/option-groups/${entity.id}/options/${optionId}`
                             }
                             newOptionHref={`/option-groups/${entity.id}/options/new`}
+                        />
+                    </PageBlock>
+                )}
+                {entity && (
+                    <PageBlock column="side" blockId="products" title={<Trans>Products</Trans>}>
+                        <p className="text-sm text-muted-foreground mb-3">
+                            <Plural
+                                value={entity.productCount}
+                                _0="Not assigned to any products"
+                                one="Assigned to # product"
+                                other="Assigned to # products"
+                            />
+                        </p>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setAssignDialogOpen(true)}
+                        >
+                            <Plus className="h-4 w-4 mr-1" />
+                            <Trans>Assign to products</Trans>
+                        </Button>
+                        <AssignToProductsDialog
+                            optionGroupId={entity.id}
+                            open={assignDialogOpen}
+                            onOpenChange={setAssignDialogOpen}
                         />
                     </PageBlock>
                 )}

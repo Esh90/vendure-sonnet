@@ -162,7 +162,7 @@ function ProductList({
     );
 }
 
-function ProductMultiSelectorDialog({
+export function ProductMultiSelectorDialog({
     mode,
     initialSelectionIds = [],
     onSelectionChange,
