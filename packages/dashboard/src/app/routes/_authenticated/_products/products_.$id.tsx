@@ -38,6 +38,7 @@ import {
 } from './products.graphql.js';
 import { api } from '@/vdb/graphql/api.js';
 import { AssignedChannels } from '@/vdb/components/shared/assigned-channels.js';
+import { usePriceFactor } from '@/vdb/components/shared/assign-to-channel-dialog.js';
 import { useChannel } from '@/vdb/hooks/use-channel.js';
 
 const pageId = 'product-detail';
@@ -64,6 +65,7 @@ function ProductDetailPage() {
     const { t } = useLingui();
     const refreshRef = useRef<() => void>(() => {});
     const { channels } = useChannel();
+    const { priceFactor, priceFactorField } = usePriceFactor();
 
     const { form, submitHandler, entity, isPending, refreshEntity, resetForm } = useDetailPage({
         pageId,
@@ -217,9 +219,21 @@ function ProductDetailPage() {
                         <AssignedChannels
                             channels={entity.channels}
                             entityId={entity.id}
+                            entityType="product"
                             canUpdate={!creatingNewEntity}
                             assignMutationFn={api.mutate(assignProductsToChannelDocument)}
                             removeMutationFn={api.mutate(removeProductsFromChannelDocument)}
+                            buildRemoveInput={(eid, channelId) => ({
+                                productIds: [eid],
+                                channelId,
+                            })}
+                            buildAssignInput={(eid, channelId) => ({
+                                productIds: [eid],
+                                channelId,
+                                priceFactor,
+                            })}
+                            additionalAssignFields={priceFactorField}
+                            queryKeyScope={['DetailPage', 'ProductDetail']}
                         />
                     </PageBlock>
                 )}

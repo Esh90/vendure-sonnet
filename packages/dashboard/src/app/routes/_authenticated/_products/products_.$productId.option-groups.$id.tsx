@@ -22,9 +22,13 @@ import { api } from '@/vdb/graphql/api.js';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { createFileRoute, ParsedLocation, useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
-import { OptionGroupChannels } from './components/option-group-channels.js';
+import { AssignedChannels } from '@/vdb/components/shared/assigned-channels.js';
 import { ProductOptionsTable } from './components/product-options-table.js';
 import { SharedOptionGroupWarning } from './components/shared-option-group-warning.js';
+import {
+    assignOptionGroupsToChannelDocument,
+    removeOptionGroupsFromChannelDocument,
+} from '../_option-groups/option-groups.graphql.js';
 import {
     createProductOptionGroupDocument,
     productIdNameDocument,
@@ -173,10 +177,22 @@ function ProductOptionGroupDetailPage() {
                 )}
                 {channels.length > 1 && entity && (
                     <PageBlock column="side" blockId="channels" title={<Trans>Channels</Trans>}>
-                        <OptionGroupChannels
+                        <AssignedChannels
                             channels={entity.channels}
                             entityId={entity.id}
+                            entityType="option group"
                             canUpdate={!creatingNewEntity}
+                            assignMutationFn={api.mutate(assignOptionGroupsToChannelDocument)}
+                            removeMutationFn={api.mutate(removeOptionGroupsFromChannelDocument)}
+                            buildRemoveInput={(eid, channelId) => ({
+                                productOptionGroupIds: [eid],
+                                channelId,
+                            })}
+                            buildAssignInput={(eid, channelId) => ({
+                                productOptionGroupIds: [eid],
+                                channelId,
+                            })}
+                            queryKeyScope={['DetailPage', 'ProductOptionGroupDetail']}
                         />
                     </PageBlock>
                 )}
