@@ -223,6 +223,12 @@ function OptionGroupSearch({
     });
 
     const items = data?.productOptionGroups?.items ?? [];
+    const sortedItems = [...items].sort((a, b) => {
+        const aAssigned = existingGroupIds.includes(a.id);
+        const bAssigned = existingGroupIds.includes(b.id);
+        if (aAssigned !== bAssigned) return aAssigned ? -1 : 1;
+        return 0;
+    });
 
     return (
         <Command shouldFilter={false} className="border rounded-md">
@@ -235,7 +241,7 @@ function OptionGroupSearch({
                 <CommandEmpty>
                     {isLoading ? <Trans>Loading...</Trans> : <Trans>No option groups found</Trans>}
                 </CommandEmpty>
-                {items.map(group => {
+                {sortedItems.map(group => {
                     const isAlreadyAssigned = existingGroupIds.includes(group.id);
                     return (
                         <CommandItem
