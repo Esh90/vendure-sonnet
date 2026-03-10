@@ -41,6 +41,13 @@ export function registerDefaults() {
                         requiresPermission: ['ReadProduct', 'ReadCatalog'],
                     },
                     {
+                        id: 'option-groups',
+                        title: /* i18n*/ 'Option Groups',
+                        url: '/option-groups',
+                        order: 250,
+                        requiresPermission: ['ReadProduct', 'ReadCatalog'],
+                    },
+                    {
                         id: 'facets',
                         title: /* i18n*/ 'Facets',
                         url: '/facets',
@@ -130,13 +137,6 @@ export function registerDefaults() {
                         title: /* i18n*/ 'Job Queue',
                         url: '/job-queue',
                         order: 100,
-                        requiresPermission: ['ReadSystem'],
-                    },
-                    {
-                        id: 'healthchecks',
-                        title: /* i18n*/ 'Healthchecks',
-                        url: '/healthchecks',
-                        order: 200,
                         requiresPermission: ['ReadSystem'],
                     },
                     {
