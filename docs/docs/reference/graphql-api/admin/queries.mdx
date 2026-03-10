@@ -814,12 +814,12 @@ type Query {
   type="query"
   typeName="productOptionGroups"
   typeLinks={{
-    ProductOptionGroup: '/reference/graphql-api/admin/object-types#productoptiongroup',
-    String: '/reference/graphql-api/admin/object-types#string',
+    ProductOptionGroupList: '/reference/graphql-api/admin/object-types#productoptiongrouplist',
+    ProductOptionGroupListOptions: '/reference/graphql-api/admin/input-types#productoptiongrouplistoptions',
   }}
 >
 {`type Query {
-  productOptionGroups(filterTerm: String): [ProductOptionGroup!]!
+  productOptionGroups(options: ProductOptionGroupListOptions): ProductOptionGroupList!
 }`}
 </GraphQLDoc>
 
@@ -1094,6 +1094,23 @@ type Query {
 >
 {`type Query {
   sellers(options: SellerListOptions): SellerList!
+}`}
+</GraphQLDoc>
+
+<a name="settingsstorefielddefinitions"></a>
+
+## settingsStoreFieldDefinitions
+
+<GraphQLDoc
+  type="query"
+  typeName="settingsStoreFieldDefinitions"
+  typeLinks={{
+    SettingsStoreFieldDefinition: '/reference/graphql-api/admin/object-types#settingsstorefielddefinition',
+  }}
+>
+{`"""Returns all registered settings store field definitions with their current values"""
+type Query {
+  settingsStoreFieldDefinitions: [SettingsStoreFieldDefinition!]!
 }`}
 </GraphQLDoc>
 
