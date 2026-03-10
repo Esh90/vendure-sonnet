@@ -470,12 +470,14 @@ function ManageProductVariants() {
                         </Table>
                     </div>
 
-                    <AddProductVariantDialog
-                        productId={id}
-                        onSuccess={() => {
-                            refetch();
-                        }}
-                    />
+                    {productData.product.optionGroups.length > 0 && (
+                        <AddProductVariantDialog
+                            productId={id}
+                            onSuccess={() => {
+                                refetch();
+                            }}
+                        />
+                    )}
                 </PageBlock>
             </PageLayout>
             <AlertDialog open={!!forceRemoveGroupId} onOpenChange={(open) => { if (!open) setForceRemoveGroupId(null); }}>
