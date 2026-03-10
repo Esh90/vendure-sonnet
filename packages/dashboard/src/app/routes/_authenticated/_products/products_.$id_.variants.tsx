@@ -259,10 +259,8 @@ function ManageProductVariants() {
         });
     };
 
-    const deleteVariant = async (variant: Variant) => {
-        if (confirm(t`Are you sure you want to delete this variant?`)) {
-            await deleteVariantMutation.mutateAsync({ id: variant.id });
-        }
+    const deleteVariant = async (variantId: string) => {
+        await deleteVariantMutation.mutateAsync({ id: variantId });
     };
 
     const getOption = (variant: Variant, groupId: string) => {
@@ -452,13 +450,19 @@ function ManageProductVariants() {
                                             );
                                         })}
                                         <TableCell>
-                                            <Button
-                                                size="sm"
-                                                variant="ghost"
-                                                onClick={() => deleteVariant(variant)}
+                                            <ConfirmationDialog
+                                                title={t`Delete variant`}
+                                                description={t`Are you sure you want to delete this variant?`}
+                                                onConfirm={() => deleteVariant(variant.id)}
                                             >
-                                                <Trash2 className="h-4 w-4 text-destructive" />
-                                            </Button>
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    disabled={deleteVariantMutation.isPending}
+                                                >
+                                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                                </Button>
+                                            </ConfirmationDialog>
                                         </TableCell>
                                     </TableRow>
                                 ))}
