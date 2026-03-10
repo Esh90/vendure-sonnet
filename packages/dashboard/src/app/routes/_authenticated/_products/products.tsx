@@ -1,3 +1,4 @@
+import { FacetValueFacetedFilter } from '@/vdb/components/data-table/data-table-facet-value-faceted-filter.js';
 import { DetailPageButton } from '@/vdb/components/shared/detail-page-button.js';
 import { PermissionGuard } from '@/vdb/components/shared/permission-guard.js';
 import { RichTextDescriptionCell } from '@/vdb/components/shared/table-cell/order-table-cell-components.js';
@@ -62,6 +63,21 @@ function ProductListPage() {
                       }
                     : {};
             }}
+            additionalColumns={{
+                facetValueId: {
+                    header: '',
+                    cell: () => null,
+                    enableSorting: false,
+                    enableHiding: false,
+                    enableColumnFilter: false,
+                },
+            }}
+            facetedFilters={{
+                facetValueId: {
+                    title: t`Facet values`,
+                    component: FacetValueFacetedFilter,
+                },
+            }}
             transformVariables={variables => {
                 return {
                     options: {
@@ -70,6 +86,7 @@ function ProductListPage() {
                     },
                 };
             }}
+            defaultSort={[{ id: 'updatedAt', desc: true }]}
             defaultVisibility={{
                 name: true,
                 featuredAsset: true,

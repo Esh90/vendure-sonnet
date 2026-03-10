@@ -259,7 +259,7 @@ export interface ListPageProps<
      *
      * @example
      * ```tsx
-     * defaultSort={[{ id: 'orderPlacedAt', desc: true }]}
+     * defaultSort={[{ id: 'updatedAt', desc: true }]}
      * ```
      */
     defaultSort?: SortingState;
@@ -515,8 +515,8 @@ export function ListPage<
     const tableSettings = pageId ? settings.tableSettings?.[pageId] : undefined;
 
     const pagination = {
-        page: routeSearch.page ? parseInt(routeSearch.page) : 1,
-        itemsPerPage: routeSearch.perPage ? parseInt(routeSearch.perPage) : (tableSettings?.pageSize ?? 10),
+        page: routeSearch.page ? Number.parseInt(routeSearch.page) : 1,
+        itemsPerPage: routeSearch.perPage ? Number.parseInt(routeSearch.perPage) : (tableSettings?.pageSize ?? 10),
     };
 
     const columnVisibility = pageId
