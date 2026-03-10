@@ -121,7 +121,7 @@ function OptionGroupDetailPage() {
         },
         params: { id: params.id },
         onSuccess: async data => {
-            toast(
+            toast.success(
                 creatingNewEntity
                     ? t`Successfully created option group`
                     : t`Successfully updated option group`,
@@ -132,7 +132,7 @@ function OptionGroupDetailPage() {
             }
         },
         onError: err => {
-            toast(
+            toast.error(
                 creatingNewEntity
                     ? t`Failed to create option group`
                     : t`Failed to update option group`,
