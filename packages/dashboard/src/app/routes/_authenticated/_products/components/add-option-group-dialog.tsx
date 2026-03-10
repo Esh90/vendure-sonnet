@@ -133,8 +133,8 @@ export function AddOptionGroupDialog({
             }}
         >
             <DialogTrigger asChild>
-                <Button variant="outline">
-                    <Plus className="mr-2 h-4 w-4" />
+                <Button variant="outline" size="sm" type="button" className="w-full gap-2">
+                    <Plus className="h-4 w-4" />
                     <Trans>Add option group</Trans>
                 </Button>
             </DialogTrigger>
