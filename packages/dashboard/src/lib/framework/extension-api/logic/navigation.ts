@@ -1,19 +1,30 @@
-import { addNavMenuItem, addNavMenuSection, NavMenuItem } from '../../nav-menu/nav-menu-extensions.js';
+import {
+    addNavMenuItem,
+    addNavMenuSection,
+    NavMenuConfig,
+    NavMenuItem,
+} from '../../nav-menu/nav-menu-extensions.js';
 import { registerRoute } from '../../page/page-api.js';
 import { DashboardNavSectionDefinition, DashboardRouteDefinition } from '../types/navigation.js';
 
 export function registerNavigationExtensions(
-    navSections?: DashboardNavSectionDefinition[],
+    navSections?: DashboardNavSectionDefinition[] | ((config: NavMenuConfig) => NavMenuConfig),
     routes?: DashboardRouteDefinition[],
-) {
+): ((config: NavMenuConfig) => NavMenuConfig) | undefined {
+    let navMenuModifier: ((config: NavMenuConfig) => NavMenuConfig) | undefined;
+
     if (navSections) {
-        for (const section of navSections) {
-            addNavMenuSection({
-                ...section,
-                placement: section.placement ?? 'top',
-                order: section.order ?? 999,
-                items: [],
-            });
+        if (typeof navSections === 'function') {
+            navMenuModifier = navSections;
+        } else {
+            for (const section of navSections) {
+                addNavMenuSection({
+                    ...section,
+                    placement: section.placement ?? 'top',
+                    order: section.order ?? 999,
+                    items: [],
+                });
+            }
         }
     }
 
@@ -38,4 +49,6 @@ export function registerNavigationExtensions(
             }
         }
     }
+
+    return navMenuModifier;
 }
