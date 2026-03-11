@@ -4,6 +4,7 @@ import {
     DashboardHistoryEntryComponent,
     DashboardLoginExtensions,
     DashboardPageBlockDefinition,
+    DashboardToolbarItemDefinition,
     DashboardWidgetDefinition,
 } from '@/vdb/framework/extension-api/types/index.js';
 import { DashboardFormComponent } from '@/vdb/framework/form-engine/form-engine-types.js';
@@ -30,4 +31,5 @@ export interface GlobalRegistryContents {
     loginExtensions: DashboardLoginExtensions;
     historyEntries: Map<string, DashboardHistoryEntryComponent['component']>;
     navMenuModifiers: Array<(config: NavMenuConfig) => NavMenuConfig>;
+    dashboardToolbarItemRegistry: Map<string, DashboardToolbarItemDefinition>;
 }

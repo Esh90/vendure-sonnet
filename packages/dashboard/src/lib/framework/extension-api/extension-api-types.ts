@@ -12,6 +12,7 @@ import {
     DashboardNavSectionDefinition,
     DashboardPageBlockDefinition,
     DashboardRouteDefinition,
+    DashboardToolbarItemDefinition,
     DashboardWidgetDefinition,
 } from './types/index.js';
 
@@ -118,4 +119,13 @@ export interface DashboardExtension {
      * in the Order or Customer history lists.
      */
     historyEntries?: DashboardHistoryEntryComponent[];
+    /**
+     * @description
+     * Allows you to define custom toolbar items in the app shell header bar.
+     * Toolbar items appear alongside the breadcrumbs, dev mode indicator,
+     * and alerts icon.
+     *
+     * @since 3.5.3
+     */
+    toolbarItems?: DashboardToolbarItemDefinition[];
 }
