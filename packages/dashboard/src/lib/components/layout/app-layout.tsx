@@ -11,7 +11,7 @@ import {
 import { getToolbarItemRegistry } from '@/vdb/framework/toolbar/toolbar-extensions.js';
 import { useUserSettings } from '@/vdb/hooks/use-user-settings.js';
 import { Outlet } from '@tanstack/react-router';
-import { useMemo } from 'react';
+import React from 'react';
 import { Alerts } from '../shared/alerts.js';
 import { DevModeToolbarItemWrapper } from './toolbar-item-wrapper.js';
 
@@ -78,27 +78,21 @@ function mergeToolbarItems(
 
 function ToolbarItems() {
     const { settings } = useUserSettings();
-    const extensionItems = useMemo(() => Array.from(getToolbarItemRegistry().values()), []);
+    const extensionItems = Array.from(getToolbarItemRegistry().values());
 
-    const builtinItems: BuiltInToolbarItem[] = useMemo(
-        () => [
-            {
-                id: 'dev-mode-indicator',
-                component: DevModeIndicator,
-                shouldRender: settings.devMode,
-            },
-            {
-                id: 'alerts',
-                component: Alerts,
-            },
-        ],
-        [settings.devMode],
-    );
+    const builtinItems: BuiltInToolbarItem[] = [
+        {
+            id: 'dev-mode-indicator',
+            component: DevModeIndicator,
+            shouldRender: settings.devMode,
+        },
+        {
+            id: 'alerts',
+            component: Alerts,
+        },
+    ];
 
-    const mergedItems = useMemo(
-        () => mergeToolbarItems(builtinItems, extensionItems),
-        [builtinItems, extensionItems],
-    );
+    const mergedItems = mergeToolbarItems(builtinItems, extensionItems);
 
     return (
         <>
@@ -108,14 +102,15 @@ function ToolbarItems() {
                     if (item.shouldRender === false) {
                         return null;
                     }
+                    const content = <item.component />;
                     if (settings.devMode) {
                         return (
                             <DevModeToolbarItemWrapper key={item.id} itemId={item.id}>
-                                <item.component />
+                                {content}
                             </DevModeToolbarItemWrapper>
                         );
                     }
-                    return <item.component key={item.id} />;
+                    return <React.Fragment key={item.id}>{content}</React.Fragment>;
                 }
 
                 const { item } = merged;
@@ -131,11 +126,7 @@ function ToolbarItems() {
                         </DevModeToolbarItemWrapper>
                     );
                 }
-                return (
-                    <PermissionGuard key={item.id} requires={item.requiresPermission ?? []}>
-                        <item.component />
-                    </PermissionGuard>
-                );
+                return <React.Fragment key={item.id}>{content}</React.Fragment>;
             })}
         </>
     );
