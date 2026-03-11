@@ -51,7 +51,7 @@ function mergeToolbarItems(
             replace: 2,
             after: 3,
         };
-        const sortedExtensions = matchingExtensions.toSorted(
+        const sortedExtensions = [...matchingExtensions].sort(
             (a, b) => orderPriority[a.position!.order] - orderPriority[b.position!.order],
         );
 
