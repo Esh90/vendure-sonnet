@@ -233,6 +233,7 @@ describe('OrderCalculator', () => {
             mockConfigService.taxOptions = {
                 taxZoneStrategy: new DefaultTaxZoneStrategy(),
                 taxLineCalculationStrategy: new DefaultTaxLineCalculationStrategy(),
+                orderTaxCalculationStrategy: new DefaultOrderTaxCalculationStrategy(),
             };
 
             const ctx = createRequestContext({ pricesIncludeTax: false });
