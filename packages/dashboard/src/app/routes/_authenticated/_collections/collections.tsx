@@ -67,7 +67,32 @@ function CollectionListPage() {
     const [nextPageToFetch, setNextPageToFetch] = useState<Record<string, number>>({});
 
     useEffect(() => {
-        queryClient.invalidateQueries({ queryKey: ['childCollections'] });
+        // Hydrate accumulatedChildren from the query cache so that previously
+        // expanded folders show cached data immediately while refetching.
+        const cachedQueries = queryClient.getQueriesData<
+            ResultOf<typeof collectionListDocument>
+        >({ queryKey: ['childCollections'] });
+        const hydrated: Record<string, { items: Collection[]; totalItems: number }> = {};
+        for (const [queryKey, data] of cachedQueries) {
+            if (!data) continue;
+            const collectionId = queryKey[1] as string;
+            if (!collectionId) continue;
+            const page = queryKey[3] as number;
+            if (page === 0) {
+                hydrated[collectionId] = {
+                    items: data.collections.items,
+                    totalItems: data.collections.totalItems,
+                };
+            } else if (hydrated[collectionId]) {
+                hydrated[collectionId] = {
+                    items: [...hydrated[collectionId].items, ...data.collections.items],
+                    totalItems: data.collections.totalItems,
+                };
+            }
+        }
+        if (Object.keys(hydrated).length > 0) {
+            setAccumulatedChildren(hydrated);
+        }
     }, []);
 
     useQueries({
