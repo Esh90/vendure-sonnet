@@ -52,8 +52,8 @@ export function DevModeToolbarItemWrapper({
     };
 
     return (
+        // eslint-disable-next-line jsx-a11y/no-static-element-interactions
         <div
-            role="presentation"
             className={cn(
                 'ring-1 ring-transparent rounded transition-all delay-50 relative',
                 isHovered || isPopoverOpen ? 'ring-dev-mode ring-offset-1 ring-offset-background' : '',
