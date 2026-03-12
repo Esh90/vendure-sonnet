@@ -113,6 +113,8 @@ describe('transformRelationFields', () => {
     });
 
     it('should pass null through when list relation is explicitly cleared', () => {
+        // Simulates clearing a relation: the form engine receives null from onChange,
+        // which the static types don't model
         const nullResult = transformRelationFields(createFieldsWithListRelation(), {
             customFields: { featuredProducts: null } as any,
         });
@@ -122,6 +124,8 @@ describe('transformRelationFields', () => {
     });
 
     it('should pass null through when single relation is explicitly cleared', () => {
+        // Simulates clearing a relation: the form engine receives null from onChange,
+        // which the static types don't model
         const result = transformRelationFields(createFieldsWithSingleRelation(), {
             customFields: { featuredProduct: null } as any,
         });
