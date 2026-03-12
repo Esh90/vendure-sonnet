@@ -69,9 +69,14 @@ function CollectionListPage() {
     useEffect(() => {
         // Hydrate accumulatedChildren from the query cache so that previously
         // expanded folders show cached data immediately while refetching.
-        const cachedQueries = queryClient.getQueriesData<
-            ResultOf<typeof collectionListDocument>
-        >({ queryKey: ['childCollections'] });
+        const cachedQueries = queryClient
+            .getQueriesData<ResultOf<typeof collectionListDocument>>({ queryKey: ['childCollections'] })
+            .sort((a, b) => {
+                // Sort by page number to ensure page 0 is processed first
+                const pageA = (a[0][3] as number) ?? 0;
+                const pageB = (b[0][3] as number) ?? 0;
+                return pageA - pageB;
+            });
         const hydrated: Record<string, { items: Collection[]; totalItems: number }> = {};
         for (const [queryKey, data] of cachedQueries) {
             if (!data) continue;
