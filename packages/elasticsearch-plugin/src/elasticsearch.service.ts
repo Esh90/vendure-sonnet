@@ -275,6 +275,9 @@ export class ElasticsearchService implements OnModuleInit, OnModuleDestroy {
                 total: {
                     cardinality: {
                         field: groupBySKU ? 'sku.keyword' : 'productId',
+                        ...(searchConfig.cardinalityPrecisionThreshold > 0 && {
+                            precision_threshold: searchConfig.cardinalityPrecisionThreshold,
+                        }),
                     },
                 },
             };
@@ -397,6 +400,9 @@ export class ElasticsearchService implements OnModuleInit, OnModuleDestroy {
                 total: {
                     cardinality: {
                         field: 'productId',
+                        ...(this.options.searchConfig.cardinalityPrecisionThreshold > 0 && {
+                            precision_threshold: this.options.searchConfig.cardinalityPrecisionThreshold,
+                        }),
                     },
                 },
             };
@@ -407,6 +413,9 @@ export class ElasticsearchService implements OnModuleInit, OnModuleDestroy {
                 total: {
                     cardinality: {
                         field: 'sku.keyword',
+                        ...(this.options.searchConfig.cardinalityPrecisionThreshold > 0 && {
+                            precision_threshold: this.options.searchConfig.cardinalityPrecisionThreshold,
+                        }),
                     },
                 },
             };

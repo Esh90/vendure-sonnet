@@ -429,6 +429,28 @@ export interface SearchConfig {
      * 10000
      */
     totalItemsMaxSize?: number | boolean;
+    /**
+     * @description
+     * The precision threshold for the
+     * [cardinality aggregation](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-metrics-cardinality-aggregation.html)
+     * used to count unique products or SKUs when `groupByProduct` or `groupBySKU` is `true`.
+     *
+     * Elasticsearch's cardinality aggregation uses the HyperLogLog++ algorithm which trades
+     * accuracy for memory. The default Elasticsearch `precision_threshold` is `3000`, meaning
+     * counts become approximate for datasets with more than ~3,000 unique values. This can
+     * cause issues such as inflated `totalItems` and empty last pages in paginated results.
+     *
+     * Setting a higher value improves accuracy at the cost of slightly more memory per
+     * aggregation (~8 bytes per unique value up to the threshold). For example, a value of
+     * `40000` uses ~320KB per aggregation and provides exact counts for up to 40,000 unique
+     * products.
+     *
+     * Set to `0` to use the Elasticsearch default of `3000`.
+     *
+     * @default 0
+     * @since 3.5.6
+     */
+    cardinalityPrecisionThreshold?: number;
 
     // prettier-ignore
     /**
@@ -729,6 +751,7 @@ export const defaultOptions: ElasticsearchRuntimeOptions = {
         facetValueMaxSize: 50,
         collectionMaxSize: 50,
         totalItemsMaxSize: 10000,
+        cardinalityPrecisionThreshold: 0,
         multiMatchType: 'best_fields',
         boostFields: {
             productName: 5,
