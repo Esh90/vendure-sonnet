@@ -1136,6 +1136,13 @@ const config = {
 
 The [onDelete](https://typeorm.io/docs/relations/relations/) behavior for the relation. Defaults to `RESTRICT`.
 
+:::note
+
+Setting `onDelete` to `CASCADE` will cause related entities to be deleted when the owning entity is deleted.
+This can have unintended consequences especially if the related entity is a core Vendure entity.
+For example, if you have a relation to `ProductVariant` and you set `onDelete: 'CASCADE'`, then deleting the owning entity will cause the related `ProductVariant` to be deleted.
+Use with caution.
+
 ```ts title="src/vendure-config.ts"
 import { Product } from '\@vendure/core';
 import { ProductReview } from './entities/product-review.entity';
