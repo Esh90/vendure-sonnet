@@ -20,6 +20,8 @@ import { CustomFieldConfig, CustomFields } from '../config/custom-field/custom-f
 import { Logger } from '../config/logger/vendure-logger';
 import { VendureConfig } from '../config/vendure-config';
 
+import { coreEntitiesMap } from './entities';
+
 /**
  * The maximum length of the "length" argument of a MySQL varchar column.
  */
@@ -44,6 +46,18 @@ function registerCustomFieldsForEntity(
             const registerColumn = () => {
                 if (customField.type === 'relation') {
                     const { cascade, onDelete, onUpdate, eager } = customField;
+                    const relatedEntityName = customField.entity.name;
+
+                    if (onDelete === 'CASCADE' && relatedEntityName in coreEntitiesMap) {
+                        Logger.warn(
+                            [
+                                `WARNING: You have set "onDelete: 'CASCADE'" on a custom field relation to the "${relatedEntityName}" entity. `,
+                                `This is not recommended as it may cause unexpected data loss. The "${relatedEntityName}" entity is a core Vendure entity,` +
+                                    `and cascading deletes from a custom entity to a core entity may have unintended consequences. `,
+                                `Please reconsider whether you really want to use "CASCADE" in this case.`,
+                            ].join('\n'),
+                        );
+                    }
                     if (customField.list) {
                         ManyToMany(type => customField.entity, customField.inverseSide, {
                             cascade,
