@@ -51,10 +51,9 @@ function registerCustomFieldsForEntity(
                     if (onDelete === 'CASCADE' && relatedEntityName in coreEntitiesMap) {
                         Logger.warn(
                             [
-                                `WARNING: You have set "onDelete: 'CASCADE'" on a custom field relation to the "${relatedEntityName}" entity. `,
-                                `This is not recommended as it may cause unexpected data loss. The "${relatedEntityName}" entity is a core Vendure entity,` +
-                                    `and cascading deletes from a custom entity to a core entity may have unintended consequences. `,
-                                `Please reconsider whether you really want to use "CASCADE" in this case.`,
+                                `WARNING: You have set "onDelete: 'CASCADE'" on a custom field relation to the "${relatedEntityName}" entity.`,
+                                `With this FK behavior, deleting a "${relatedEntityName}" row can delete owning rows that reference it.`,
+                                `Please verify this is intended, especially when targeting core Vendure entities.`,
                             ].join('\n'),
                         );
                     }
