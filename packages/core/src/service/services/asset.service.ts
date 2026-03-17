@@ -303,7 +303,7 @@ export class AssetService {
             errorPromise,
         ]);
         if (isGraphQlErrorResult(result)) {
-            return result;
+            return result as any;
         }
         await this.customFieldRelationService.updateRelations(ctx, Asset, input, result);
         if (input.tags) {
@@ -312,7 +312,7 @@ export class AssetService {
             await this.connection.getRepository(ctx, Asset).save(result);
         }
         await this.eventBus.publish(new AssetEvent(ctx, result, 'created', input));
-        return result;
+        return result as any;
     }
 
     /**
@@ -442,6 +442,8 @@ export class AssetService {
     /**
      * @description
      * Create an Asset from a file stream, for example to create an Asset during data import.
+     *
+     * @internal
      */
     async createFromFileStream(stream: ReadStream, ctx?: RequestContext): Promise<CreateAssetResult>;
     async createFromFileStream(
@@ -468,7 +470,7 @@ export class AssetService {
                     : maybeCtx instanceof RequestContext
                       ? maybeCtx
                       : RequestContext.empty();
-            return this.createAssetInternal(ctx, stream, filename, mimetype);
+            return this.createAssetInternal(ctx, stream, filename, mimetype) as any;
         } else {
             throw new InternalServerError('error.path-should-be-a-string-got-buffer');
         }

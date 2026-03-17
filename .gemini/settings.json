@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "fetch": {
+      "command": "https://raw.githubusercontent.com/modelcontextprotocol/servers/main/src/fetch/index.ts",
+      "args": []
+    },
+    "sqlite": {
+      "command": "https://raw.githubusercontent.com/modelcontextprotocol/servers/main/src/sqlite/index.ts",
+      "args": []
+    },
+    "elasticsearch": {
+      "command": "https://raw.githubusercontent.com/modelcontextprotocol/servers/main/src/elasticsearch/index.ts",
+      "args": []
+    },
+    "puppeteer": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-puppeteer"
+      ]
+    },
+    "docker": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-docker"
+      ]
+    }
+  }
+}
