@@ -57,10 +57,10 @@ export function ImageDialog({ editor, isOpen, onClose }: Readonly<ImageDialogPro
         };
 
         // Only add width/height if they are valid numbers
-        if (width && !isNaN(Number(width))) {
+        if (width && !Number.isNaN(Number(width))) {
             attrs.width = Number(width);
         }
-        if (height && !isNaN(Number(height))) {
+        if (height && !Number.isNaN(Number(height))) {
             attrs.height = Number(height);
         }
 
@@ -106,7 +106,7 @@ export function ImageDialog({ editor, isOpen, onClose }: Readonly<ImageDialogPro
                             {isEditing ? <Trans>Edit image</Trans> : <Trans>Insert image</Trans>}
                         </DialogTitle>
                         <DialogDescription className="sr-only">
-                            {isEditing ? <Trans>Edit the selected image properties</Trans> : <Trans>Insert a new image by URL or from assets</Trans>}
+                            {isEditing ? <Trans>Edit the selected image properties</Trans> : <Trans>Insert a new image with source, title, and dimensions</Trans>}
                         </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">

@@ -189,7 +189,7 @@ export function PaymentDetails({ payment, currencyCode, onSuccess }: Readonly<Pa
                 <Collapsible className="mt-2 border-t pt-2">
                     <CollapsibleTrigger className="flex items-center justify-between w-full text-sm hover:underline text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md p-1 -m-1">
                         <Trans>Payment metadata</Trans>
-                        <ChevronDown className="h-4 w-4 transition-transform duration-200 data-open:rotate-180" />
+                        <ChevronDown className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-180" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2">
                         <JsonEditor
@@ -206,7 +206,7 @@ export function PaymentDetails({ payment, currencyCode, onSuccess }: Readonly<Pa
                     <Collapsible className="mt-2 border-t pt-2">
                         <CollapsibleTrigger className="flex items-center justify-between w-full text-sm hover:underline text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md p-1 -m-1">
                             <Trans>Refunds ({payment.refunds.length})</Trans>
-                            <ChevronDown className="h-4 w-4 transition-transform duration-200 data-open:rotate-180" />
+                            <ChevronDown className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-180" />
                         </CollapsibleTrigger>
                         <CollapsibleContent className="mt-2 space-y-3">
                             {payment.refunds.map(refund => (

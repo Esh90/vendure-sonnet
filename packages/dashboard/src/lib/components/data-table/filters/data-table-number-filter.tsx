@@ -42,9 +42,9 @@ export function DataTableNumberFilter({
                 setError('Please enter both min and max values');
                 return;
             }
-            const minNum = parseFloat(minValue);
-            const maxNum = parseFloat(maxValue);
-            if (isNaN(minNum) || isNaN(maxNum)) {
+            const minNum = Number.parseFloat(minValue);
+            const maxNum = Number.parseFloat(maxValue);
+            if (Number.isNaN(minNum) || Number.isNaN(maxNum)) {
                 setError('Please enter valid numbers');
                 return;
             }
@@ -59,8 +59,8 @@ export function DataTableNumberFilter({
                 onChange({});
                 return;
             }
-            const numValue = parseFloat(value);
-            if (isNaN(numValue)) {
+            const numValue = Number.parseFloat(value);
+            if (Number.isNaN(numValue)) {
                 setError('Please enter a valid number');
                 return;
             }
@@ -76,7 +76,7 @@ export function DataTableNumberFilter({
                     ref={() => {}}
                     onBlur={() => {}}
                     name="amount"
-                    value={parseFloat(value) || 0}
+                    value={Number.parseFloat(value) || 0}
                     onChange={newValue => onChange(newValue.toString())}
                     currency={activeChannel?.defaultCurrencyCode ?? 'USD'}
                 />
@@ -95,7 +95,7 @@ export function DataTableNumberFilter({
     return (
         <div className="flex flex-col gap-2">
             <div className="flex flex-col md:flex-row gap-2">
-                <Select value={operator} onValueChange={value => { if (value != null) setOperator(value); }}>
+                <Select value={operator} onValueChange={value => setOperator(value)}>
                     <SelectTrigger>
                         <SelectValue placeholder="Select operator" />
                     </SelectTrigger>

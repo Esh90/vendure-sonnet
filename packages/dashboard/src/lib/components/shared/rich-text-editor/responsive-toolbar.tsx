@@ -55,7 +55,7 @@ export function ResponsiveToolbar({ editor, disabled }: Readonly<ResponsiveToolb
             if (value === 'paragraph') {
                 editor.chain().focus().setParagraph().run();
             } else {
-                const level = parseInt(value.replace('h', '')) as 1 | 2 | 3 | 4 | 5 | 6;
+                const level = Number.parseInt(value.replace('h', '')) as 1 | 2 | 3 | 4 | 5 | 6;
                 editor.chain().focus().toggleHeading({ level }).run();
             }
         },
@@ -384,7 +384,7 @@ export function ResponsiveToolbar({ editor, disabled }: Readonly<ResponsiveToolb
 
     return (
         <div ref={toolbarRef} className="flex items-center gap-1 p-2 border-b bg-muted/30">
-            <Select value={getCurrentHeading()} onValueChange={(value) => { if (value != null) handleHeadingChange(value) }} disabled={disabled}>
+            <Select value={getCurrentHeading()} onValueChange={handleHeadingChange} disabled={disabled}>
                 <SelectTrigger className="h-8 w-[130px]">
                     <SelectValue />
                 </SelectTrigger>
@@ -403,13 +403,7 @@ export function ResponsiveToolbar({ editor, disabled }: Readonly<ResponsiveToolb
 
             {overflowElements.length > 0 && (
                 <DropdownMenu>
-                    <DropdownMenuTrigger render={<Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 px-2"
-                            disabled={disabled}
-                        />}>
+                    <DropdownMenuTrigger render={<Button type="button" variant="ghost" size="sm" className="h-8 px-2" disabled={disabled} />}>
                             <MoreHorizontalIcon className="h-4 w-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">

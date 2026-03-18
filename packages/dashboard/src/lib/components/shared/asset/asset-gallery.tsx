@@ -348,7 +348,7 @@ export function AssetGallery({
                                 </Button>
                             )}
                         </div>
-                        <Select value={assetType} onValueChange={(value) => { if (value != null) setAssetType(value) }}>
+                        <Select value={assetType} onValueChange={setAssetType}>
                             <SelectTrigger className="w-full md:w-[180px]">
                                 <SelectValue placeholder="Asset type" />
                             </SelectTrigger>
@@ -493,12 +493,10 @@ export function AssetGallery({
                         <span className="text-sm text-muted-foreground">Items per page</span>
                         <Select
                             value={pageSize.toString()}
-                            onValueChange={(value) => {
-                                if (value != null) {
-                                    const newPageSize = parseInt(value, 10);
-                                    onPageSizeChange(newPageSize);
-                                    setPage(1); // Reset to first page when changing page size
-                                }
+                            onValueChange={value => {
+                                const newPageSize = Number.parseInt(value, 10);
+                                onPageSizeChange(newPageSize);
+                                setPage(1); // Reset to first page when changing page size
                             }}
                         >
                             <SelectTrigger className="h-8 w-[70px]">
