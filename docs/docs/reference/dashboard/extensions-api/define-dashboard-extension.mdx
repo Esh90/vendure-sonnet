@@ -39,7 +39,7 @@ Parameters
 
 <MemberInfo kind="parameter" type={`<a href='/reference/dashboard/extensions-api/define-dashboard-extension#dashboardextension'>DashboardExtension</a>`} />
 
-<GenerationInfo sourceFile="packages/dashboard/src/lib/framework/extension-api/extension-api-types.ts" sourceLine="34" packageName="@vendure/dashboard" since="3.3.0" />
+<GenerationInfo sourceFile="packages/dashboard/src/lib/framework/extension-api/extension-api-types.ts" sourceLine="35" packageName="@vendure/dashboard" since="3.3.0" />
 
 This is the main interface for defining _all_ extensions to the dashboard.
 
@@ -66,7 +66,7 @@ interface DashboardExtension {
     detailForms?: DashboardDetailFormExtensionDefinition[];
     login?: DashboardLoginExtensions;
     historyEntries?: DashboardHistoryEntryComponent[];
-    customFormLabels?: Record<string, string | React.ReactNode>;
+    detailFormLabels?: DashboardDetailFormLabelsExtensionDefinition;
 }
 ```
 
@@ -129,22 +129,12 @@ Allows you to customize the login page with custom components.
 
 Allows a custom component to be used to render a history entry item
 in the Order or Customer history lists.
-### customFormLabels
+### detailFormLabels
 
-<MemberInfo kind="property" type={`Record<string, string | React.ReactNode>`}  since="3.6.0"  />
+<MemberInfo kind="property" type={`<a href='/reference/dashboard/extensions-api/detail-form-labels#dashboarddetailformlabelsextensiondefinition'>DashboardDetailFormLabelsExtensionDefinition</a>`}  since="3.6.0"  />
 
 Allows you to provide custom labels for form fields on DetailPages.
 The key is the field name of the form field, and the value is the label to be displayed for that form field.
-
-*Example*
-
-```ts
-customFormLabels: {
-  'orderId': 'Order ID',
-  'camelCaseTitle': 'Custom Camel Case Title',
-  'description': <Trans>Custom Translatable Description</Trans>,
-}
-```
 
 
 </div>

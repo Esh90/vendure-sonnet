@@ -1,0 +1,22 @@
+---
+title: "GetDetailFormLabel"
+generated: true
+---
+<GenerationInfo sourceFile="packages/dashboard/src/lib/framework/extension-api/label-component-extensions.tsx" sourceLine="44" packageName="@vendure/dashboard" since="3.6.0" />
+
+Retrieves a custom form label for a specific field on a specific page.
+Falls back to looking for global labels (without pageId) if page-scoped label is not found.
+
+```ts title="Signature"
+function getDetailFormLabel(pageId: string, fieldName: string): string | React.ReactNode | undefined
+```
+Parameters
+
+### pageId
+
+<MemberInfo kind="parameter" type={`string`} />
+
+### fieldName
+
+<MemberInfo kind="parameter" type={`string`} />
+

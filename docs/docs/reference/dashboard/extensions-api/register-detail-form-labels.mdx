@@ -1,0 +1,30 @@
+---
+title: "RegisterDetailFormLabels"
+generated: true
+---
+<GenerationInfo sourceFile="packages/dashboard/src/lib/framework/extension-api/logic/custom-labels.ts" sourceLine="26" packageName="@vendure/dashboard" since="3.6.0" />
+
+Registers custom form labels for a specific detail page. Labels are stored with a composite key
+combining the pageId and field name to allow different labels for the same field across different pages.
+
+*Example*
+
+```ts
+registerDetailFormLabels({
+  pageId: 'product-detail',
+  labels: [
+    { field: 'name', component: 'Product Name' },
+    { field: 'sku', component: <Trans>SKU Code</Trans> }
+  ]
+})
+```
+
+```ts title="Signature"
+function registerDetailFormLabels(customFormLabels?: DashboardExtension['detailFormLabels']): void
+```
+Parameters
+
+### customFormLabels
+
+<MemberInfo kind="parameter" type={`<a href='/reference/dashboard/extensions-api/define-dashboard-extension#dashboardextension'>DashboardExtension</a>['detailFormLabels']`} />
+
