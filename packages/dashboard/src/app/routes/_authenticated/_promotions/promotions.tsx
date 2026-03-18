@@ -79,11 +79,9 @@ function PromotionListPage() {
             ]}
         >
             <ActionBarItem itemId="create-button" requiresPermission={['CreatePromotion']}>
-                <Button asChild>
-                    <Link to="./new">
-                        <PlusIcon className="mr-2 h-4 w-4" />
-                        <Trans>New Promotion</Trans>
-                    </Link>
+                <Button render={<Link to="./new" />}>
+                    <PlusIcon className="mr-2 h-4 w-4" />
+                    <Trans>New Promotion</Trans>
                 </Button>
             </ActionBarItem>
         </ListPage>

@@ -85,11 +85,13 @@ export function LocationWrapper({ children, identifier }: Readonly<LocationWrapp
                     className={`absolute top-1 right-1 transition-all delay-50 z-10 ${isHovered || isPopoverOpen ? 'visible' : 'invisible'}`}
                 >
                     <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-                        <PopoverTrigger asChild>
-                            <DevModeButton
-                                className={isPageWrapper ? '-top-8 -end-1 border-2' : '-top-4 -end-4'}
-                            />
-                        </PopoverTrigger>
+                        <PopoverTrigger
+                            render={
+                                <DevModeButton
+                                    className={isPageWrapper ? '-top-8 -end-1 border-2' : '-top-4 -end-4'}
+                                />
+                            }
+                        />
                         <PopoverContent className="w-48 p-3">
                             <div className="space-y-2">
                                 <div className="space-y-1">

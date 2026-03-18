@@ -122,6 +122,9 @@ export function useGeneratedForm<
         mode: 'onChange',
         defaultValues: processedDefaultValues,
         values,
+        resetOptions: {
+            keepDirtyValues: true,
+        },
     });
     let submitHandler = (event: FormEvent): any => {
         event.preventDefault();

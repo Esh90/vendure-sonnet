@@ -52,7 +52,7 @@ export function TestShippingMethods() {
     return (
         <div className="space-y-6 overflow-y-auto max-h-[calc(100vh-200px)] px-4">
             <Accordion
-                type="multiple"
+                multiple
                 value={expandedAccordions}
                 onValueChange={setExpandedAccordions}
                 className="w-full"

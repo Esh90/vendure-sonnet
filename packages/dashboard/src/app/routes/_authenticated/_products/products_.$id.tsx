@@ -177,11 +177,9 @@ function ProductDetailPage() {
                             fromProductDetailPage={true}
                         />
                         <div className="mt-4 flex gap-2">
-                            <Button asChild variant="outline">
-                                <Link to="./variants">
-                                    <PlusIcon className="mr-2 h-4 w-4" />
-                                    <Trans>Manage variants</Trans>
-                                </Link>
+                            <Button render={<Link to="./variants" />} variant="outline">
+                                <PlusIcon className="mr-2 h-4 w-4" />
+                                <Trans>Manage variants</Trans>
                             </Button>
                         </div>
                     </PageBlock>

@@ -28,7 +28,7 @@ export function DataTableBooleanFilter({
 
     return (
         <div className="flex flex-col md:flex-row gap-2">
-            <Select value={operator} onValueChange={value => setOperator(value)}>
+            <Select value={operator} onValueChange={value => { if (value != null) setOperator(value); }}>
                 <SelectTrigger>
                     <SelectValue placeholder="Select operator" />
                 </SelectTrigger>
@@ -41,7 +41,7 @@ export function DataTableBooleanFilter({
                 </SelectContent>
             </Select>
             {operator !== 'isNull' && (
-                <Select value={value.toString()} onValueChange={v => setValue(v === 'true')}>
+                <Select value={value.toString()} onValueChange={v => { if (v != null) setValue(v === 'true'); }}>
                     <SelectTrigger>
                         <SelectValue placeholder="Select value" />
                     </SelectTrigger>

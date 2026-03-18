@@ -92,11 +92,9 @@ function CustomerListPage() {
             ]}
         >
             <ActionBarItem itemId="create-button" requiresPermission={['CreateCustomer']}>
-                <Button asChild>
-                    <Link to="./new">
-                        <PlusIcon />
-                        <Trans>New Customer</Trans>
-                    </Link>
+                <Button render={<Link to="./new" />}>
+                    <PlusIcon />
+                    <Trans>New Customer</Trans>
                 </Button>
             </ActionBarItem>
         </ListPage>

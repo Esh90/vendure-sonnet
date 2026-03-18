@@ -21,10 +21,8 @@ export const CustomerCell: DataTableCellComponent<CustomerCellData> = ({ row }) 
         return null;
     }
     return (
-        <Button asChild variant="ghost">
-            <Link to={`/customers/${value.id}`}>
+        <Button render={<Link to={`/customers/${value.id}`} />} variant="ghost">
                 {value.firstName} {value.lastName}
-            </Link>
         </Button>
     );
 };

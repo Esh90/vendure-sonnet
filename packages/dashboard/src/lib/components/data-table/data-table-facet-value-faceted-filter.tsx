@@ -135,8 +135,7 @@ export function FacetValueFacetedFilter<TData, TValue>({
 
     return (
         <Popover>
-            <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 border-dashed">
+            <PopoverTrigger render={<Button variant="outline" size="sm" className="h-8 border-dashed" />}>
                     <FilterIcon />
                     {title}
                     {selectedIds.size > 0 && (
@@ -164,7 +163,6 @@ export function FacetValueFacetedFilter<TData, TValue>({
                             </div>
                         </>
                     )}
-                </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[400px] p-0" align="start">
                 <Command shouldFilter={false}>

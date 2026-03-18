@@ -66,11 +66,9 @@ function ChannelListPage() {
             ]}
         >
             <ActionBarItem itemId="create-button" requiresPermission={['CreateChannel']}>
-                <Button asChild>
-                    <Link to="./new">
-                        <PlusIcon className="mr-2 h-4 w-4" />
-                        <Trans>New Channel</Trans>
-                    </Link>
+                <Button render={<Link to="./new" />}>
+                    <PlusIcon className="mr-2 h-4 w-4" />
+                    <Trans>New Channel</Trans>
                 </Button>
             </ActionBarItem>
         </ListPage>

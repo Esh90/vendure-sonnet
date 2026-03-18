@@ -50,11 +50,9 @@ function StockLocationListPage() {
             ]}
         >
             <ActionBarItem itemId="create-button" requiresPermission={['CreateStockLocation']}>
-                <Button asChild>
-                    <Link to="./new">
-                        <PlusIcon className="mr-2 h-4 w-4" />
-                        <Trans>New Stock Location</Trans>
-                    </Link>
+                <Button render={<Link to="./new" />}>
+                    <PlusIcon className="mr-2 h-4 w-4" />
+                    <Trans>New Stock Location</Trans>
                 </Button>
             </ActionBarItem>
         </ListPage>

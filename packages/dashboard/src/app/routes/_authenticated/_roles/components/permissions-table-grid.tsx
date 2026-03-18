@@ -74,9 +74,7 @@ export function PermissionsTableGrid({
                                             </span>
                                             <TooltipProvider>
                                                 <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <InfoIcon className="h-3 w-3 text-muted-foreground" />
-                                                    </TooltipTrigger>
+                                                    <TooltipTrigger render={<InfoIcon className="h-3 w-3 text-muted-foreground" />} />
                                                     <TooltipContent side="right" className="max-w-[250px]">
                                                         <p className="text-xs">
                                                             {i18n.t(section.description)}
@@ -105,24 +103,22 @@ export function PermissionsTableGrid({
                                     >
                                         <TooltipProvider>
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <div className="flex flex-col items-center space-y-1.5">
-                                                        <Switch
-                                                            id={`${section.id}-${permission.name}`}
-                                                            checked={value.includes(permission.name)}
-                                                            onCheckedChange={checked =>
-                                                                setPermission(permission.name, checked)
-                                                            }
-                                                            disabled={readonly}
-                                                            className="scale-90"
-                                                        />
-                                                        <label
-                                                            htmlFor={`${section.id}-${permission.name}`}
-                                                            className="text-xs text-center cursor-pointer leading-tight"
-                                                        >
-                                                            {getPermissionLabel(permission, section.label)}
-                                                        </label>
-                                                    </div>
+                                                <TooltipTrigger render={<div className="flex flex-col items-center space-y-1.5" />}>
+                                                    <Switch
+                                                        id={`${section.id}-${permission.name}`}
+                                                        checked={value.includes(permission.name)}
+                                                        onCheckedChange={checked =>
+                                                            setPermission(permission.name, checked)
+                                                        }
+                                                        disabled={readonly}
+                                                        className="scale-90"
+                                                    />
+                                                    <label
+                                                        htmlFor={`${section.id}-${permission.name}`}
+                                                        className="text-xs text-center cursor-pointer leading-tight"
+                                                    >
+                                                        {getPermissionLabel(permission, section.label)}
+                                                    </label>
                                                 </TooltipTrigger>
                                                 <TooltipContent side="top" className="max-w-[250px]">
                                                     <div className="text-xs">
@@ -161,9 +157,7 @@ export function PermissionsTableGrid({
                                 <span className="font-semibold text-sm">{i18n.t(section.label)}</span>
                                 <TooltipProvider>
                                     <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <InfoIcon className="h-3 w-3 text-muted-foreground" />
-                                        </TooltipTrigger>
+                                        <TooltipTrigger render={<InfoIcon className="h-3 w-3 text-muted-foreground" />} />
                                         <TooltipContent side="right" className="max-w-[250px]">
                                             <p className="text-xs">{i18n.t(section.description)}</p>
                                         </TooltipContent>
@@ -196,13 +190,11 @@ export function PermissionsTableGrid({
                                     <div className="flex-1 min-w-0">
                                         <TooltipProvider>
                                             <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <label
+                                                <TooltipTrigger render={<label
                                                         htmlFor={`mobile-${section.id}-${permission.name}`}
                                                         className="text-xs cursor-pointer block truncate"
-                                                    >
-                                                        {getPermissionLabel(permission, section.label)}
-                                                    </label>
+                                                    />}>
+                                                    {getPermissionLabel(permission, section.label)}
                                                 </TooltipTrigger>
                                                 <TooltipContent side="top" className="max-w-[250px]">
                                                     <div className="text-xs">

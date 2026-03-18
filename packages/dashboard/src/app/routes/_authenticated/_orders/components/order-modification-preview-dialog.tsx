@@ -345,10 +345,8 @@ export function OrderModificationPreviewDialog({
                     )}
                 </div>
                 <DialogFooter>
-                    <DialogClose asChild>
-                        <Button type="button" variant="secondary" onClick={() => onResolve()}>
-                            <Trans>Cancel</Trans>
-                        </Button>
+                    <DialogClose render={<Button type="button" variant="secondary" onClick={() => onResolve()} />}>
+                        <Trans>Cancel</Trans>
                     </DialogClose>
                     <Button
                         type="button"

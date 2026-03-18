@@ -41,11 +41,9 @@ function SellerListPage() {
             ]}
         >
             <ActionBarItem itemId="create-button" requiresPermission={['CreateSeller']}>
-                <Button asChild>
-                    <Link to="./new">
-                        <PlusIcon className="mr-2 h-4 w-4" />
-                        <Trans>New Seller</Trans>
-                    </Link>
+                <Button render={<Link to="./new" />}>
+                    <PlusIcon className="mr-2 h-4 w-4" />
+                    <Trans>New Seller</Trans>
                 </Button>
             </ActionBarItem>
         </ListPage>

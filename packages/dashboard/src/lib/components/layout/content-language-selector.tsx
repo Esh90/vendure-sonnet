@@ -26,9 +26,11 @@ export function ContentLanguageSelector({ value, onChange, className }: ContentL
     return (
         <Select
             value={currentValue}
-            onValueChange={value => {
-                onChange?.(value);
-                setContentLanguage(value);
+            onValueChange={(value) => {
+                if (value != null) {
+                    onChange?.(value);
+                    setContentLanguage(value);
+                }
             }}
         >
             <SelectTrigger className={cn('w-[200px]', className)}>

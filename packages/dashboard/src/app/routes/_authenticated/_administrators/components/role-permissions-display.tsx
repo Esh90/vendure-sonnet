@@ -107,10 +107,8 @@ export function RolePermissionsDisplay({ value = [] }: Readonly<RolePermissionsD
                                                         />
                                                         <TooltipProvider>
                                                             <Tooltip>
-                                                                <TooltipTrigger asChild>
-                                                                    <label className="text-sm cursor-default">
-                                                                        {i18n.t(permission.name)}
-                                                                    </label>
+                                                                <TooltipTrigger render={<label className="text-sm cursor-default" />}>
+                                                                    {i18n.t(permission.name)}
                                                                 </TooltipTrigger>
                                                                 <TooltipContent>
                                                                     <p>{i18n.t(permission.description)}</p>

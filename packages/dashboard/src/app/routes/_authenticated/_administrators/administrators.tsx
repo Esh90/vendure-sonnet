@@ -89,11 +89,9 @@ function AdministratorListPage() {
             ]}
         >
             <ActionBarItem itemId="create-button" requiresPermission={['CreateAdministrator']}>
-                <Button asChild>
-                    <Link to="./new">
-                        <PlusIcon />
-                        New Administrator
-                    </Link>
+                <Button render={<Link to="./new" />}>
+                    <PlusIcon />
+                    New Administrator
                 </Button>
             </ActionBarItem>
         </ListPage>

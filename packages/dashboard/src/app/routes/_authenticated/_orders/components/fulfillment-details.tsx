@@ -132,7 +132,7 @@ export function FulfillmentDetails({ order, fulfillment, onSuccess }: Readonly<F
                                 Fulfilled items (
                                 {fulfillment.lines.reduce((acc, line) => acc + line.quantity, 0)})
                             </Trans>
-                            <ChevronDown className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-180" />
+                            <ChevronDown className="h-4 w-4 transition-transform duration-200 data-open:rotate-180" />
                         </CollapsibleTrigger>
                         <CollapsibleContent className="mt-2 space-y-1">
                             {fulfillment.lines.map(line => {

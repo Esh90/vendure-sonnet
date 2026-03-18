@@ -215,7 +215,7 @@ export const RefundOrderDialog = forwardRef<RefundOrderDialogRef, RefundOrderDia
                             <Label className="text-base font-medium">
                                 <Trans>Reason</Trans>
                             </Label>
-                            <Select value={refund.selectedReason} onValueChange={refund.setSelectedReason}>
+                            <Select value={refund.selectedReason} onValueChange={(value) => { if (value != null) refund.setSelectedReason(value) }}>
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder={t`Select a reason...`} />
                                 </SelectTrigger>

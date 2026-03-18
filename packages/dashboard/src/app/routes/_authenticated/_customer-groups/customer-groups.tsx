@@ -57,11 +57,9 @@ function CustomerGroupListPage() {
             ]}
         >
             <ActionBarItem itemId="create-button" requiresPermission={['CreateCustomerGroup']}>
-                <Button asChild>
-                    <Link to="./new">
-                        <PlusIcon className="mr-2 h-4 w-4" />
-                        <Trans>New Customer Group</Trans>
-                    </Link>
+                <Button render={<Link to="./new" />}>
+                    <PlusIcon className="mr-2 h-4 w-4" />
+                    <Trans>New Customer Group</Trans>
                 </Button>
             </ActionBarItem>
         </ListPage>

@@ -102,13 +102,11 @@ export function DataTableBulkActionItem({
     if (confirmationText) {
         return (
             <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-                <AlertDialogTrigger asChild>
-                    <DropdownMenuItem onClick={handleClick} disabled={!userHasPermission || disabled}>
+                <AlertDialogTrigger nativeButton={false} render={<DropdownMenuItem closeOnClick={false} onClick={handleClick} disabled={!userHasPermission || disabled} />}>
                         {Icon && <Icon className={cn('mr-1 h-4 w-4', className)} />}
                         <span className={cn('text-sm', className)}>
                             <Trans>{label}</Trans>
                         </span>
-                    </DropdownMenuItem>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                     <AlertDialogHeader>

@@ -11,7 +11,7 @@ import { JsonEditor } from 'json-edit-react';
 
 type PayloadDialogProps = {
     payload: any;
-    trigger: React.ReactNode;
+    trigger: React.ReactElement;
     title?: string | React.ReactNode;
     description?: string | React.ReactNode;
     onOpenChange?: (open: boolean) => void;
@@ -26,7 +26,7 @@ export function PayloadDialog({
 }: Readonly<PayloadDialogProps>) {
     return (
         <Dialog onOpenChange={open => onOpenChange?.(open)}>
-            <DialogTrigger asChild>{trigger}</DialogTrigger>
+            <DialogTrigger render={trigger} />
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>

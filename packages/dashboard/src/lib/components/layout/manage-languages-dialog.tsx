@@ -352,7 +352,7 @@ export function ManageLanguagesDialog({ open, onClose }: ManageLanguagesDialogPr
                                         </Label>
                                         <Select
                                             value={channelDefaultLanguage}
-                                            onValueChange={setChannelDefaultLanguage}
+                                            onValueChange={(value) => { if (value != null) setChannelDefaultLanguage(value) }}
                                             disabled={!canUpdateChannel}
                                         >
                                             <SelectTrigger className="w-[200px]">

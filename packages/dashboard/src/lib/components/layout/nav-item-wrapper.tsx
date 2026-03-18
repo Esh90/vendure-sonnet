@@ -78,9 +78,7 @@ export function NavItemWrapper({
                     )}
                 >
                     <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
-                        <PopoverTrigger asChild>
-                            <DevModeButton className={`h-5 w-5 top-0 end-0`} />
-                        </PopoverTrigger>
+                        <PopoverTrigger render={<DevModeButton className={`h-5 w-5 top-0 end-0`} />} />
                         <PopoverContent className="w-48 p-3">
                             <div className="space-y-2">
                                 <div className="space-y-1">

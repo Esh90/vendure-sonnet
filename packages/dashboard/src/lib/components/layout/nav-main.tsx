@@ -53,15 +53,10 @@ function CollapsedSectionMenu({
 }>) {
     const { i18n } = useLingui();
     return (
-        <HoverCard openDelay={HOVER_OPEN_DELAY} closeDelay={HOVER_CLOSE_DELAY}>
-            <HoverCardTrigger asChild>
-                {/* No tooltip prop — the HoverCard replaces it in collapsed mode */}
-                <SidebarMenuButton
-                    isActive={item.items?.some(subItem => isPathActive(subItem.url))}
-                >
+        <HoverCard>
+            <HoverCardTrigger delay={HOVER_OPEN_DELAY} render={<SidebarMenuButton isActive={item.items?.some(subItem => isPathActive(subItem.url))} />}>
                     {item.icon && <item.icon />}
                     <span>{i18n.t(item.title)}</span>
-                </SidebarMenuButton>
             </HoverCardTrigger>
             <HoverCardContent
                 side="right"
@@ -252,13 +247,11 @@ export function NavMain({ items }: Readonly<{ items: Array<NavMenuSection | NavM
                     <SidebarMenuItem>
                         <SidebarMenuButton
                             tooltip={i18n.t(item.title)}
-                            asChild
+                            render={<Link to={item.url} />}
                             isActive={isPathActive(item.url)}
                         >
-                            <Link to={item.url}>
                                 {item.icon && <item.icon />}
                                 <span>{i18n.t(item.title)}</span>
-                            </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </NavItemWrapper>
@@ -278,18 +271,15 @@ export function NavMain({ items }: Readonly<{ items: Array<NavMenuSection | NavM
         return (
             <NavItemWrapper key={item.id} locationId={item.id} order={item.order} offset={true}>
                 <Collapsible
-                    asChild
                     open={isOpen}
                     onOpenChange={open => onToggle(item.id, open)}
                     className="group/collapsible"
                 >
                     <SidebarMenuItem>
-                        <CollapsibleTrigger asChild>
-                            <SidebarMenuButton tooltip={i18n.t(item.title)}>
+                        <CollapsibleTrigger render={<SidebarMenuButton tooltip={i18n.t(item.title)} />}>
                                 {item.icon && <item.icon />}
                                 <span>{i18n.t(item.title)}</span>
-                                <ChevronRight className="ms-auto transition-transform duration-200 rtl:rotate-180 group-data-[state=open]/collapsible:rotate-90" />
-                            </SidebarMenuButton>
+                                <ChevronRight className="ms-auto transition-transform duration-200 rtl:rotate-180 group-data-open/collapsible:rotate-90" />
                         </CollapsibleTrigger>
                         <CollapsibleContent>
                             <SidebarMenuSub>
@@ -302,12 +292,10 @@ export function NavMain({ items }: Readonly<{ items: Array<NavMenuSection | NavM
                                     >
                                         <SidebarMenuSubItem>
                                             <SidebarMenuSubButton
-                                                asChild
+                                                render={<Link to={subItem.url} />}
                                                 isActive={isPathActive(subItem.url)}
                                             >
-                                                <Link to={subItem.url}>
                                                     <span>{i18n.t(subItem.title)}</span>
-                                                </Link>
                                             </SidebarMenuSubButton>
                                         </SidebarMenuSubItem>
                                     </NavItemWrapper>
@@ -319,6 +307,8 @@ export function NavMain({ items }: Readonly<{ items: Array<NavMenuSection | NavM
             </NavItemWrapper>
         );
     };
+
+
 
     return (
         <>

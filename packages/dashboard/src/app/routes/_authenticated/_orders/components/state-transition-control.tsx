@@ -67,15 +67,13 @@ export function StateTransitionControl({
             </div>
             {actions.length > 0 && (
                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
+                    <DropdownMenuTrigger render={<Button
                             variant="outline"
                             size="sm"
                             disabled={isLoading}
                             className={cn('rounded-l-none border-l-0 shadow-none', 'bg-background')}
-                        >
-                            <EllipsisVertical className="h-4 w-4" />
-                        </Button>
+                        />}>
+                        <EllipsisVertical className="h-4 w-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         {actions.map((action, index) => {

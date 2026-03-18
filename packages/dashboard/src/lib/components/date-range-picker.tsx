@@ -144,14 +144,12 @@ export function DateRangePicker({ className, dateRange, onDateRangeChange }: Dat
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-                <Button
+            <PopoverTrigger render={<Button
                     variant="outline"
                     className={cn('w-[280px] justify-start text-left font-normal', className)}
-                >
+                />}>
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {formatDateRange()}
-                </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
                 <div className="flex">

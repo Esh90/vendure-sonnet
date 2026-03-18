@@ -73,8 +73,7 @@ export function DataTableFacetedFilter<TData, TValue>({
 
     return (
         <Popover>
-            <PopoverTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 border-dashed">
+            <PopoverTrigger render={<Button variant="outline" size="sm" className="h-8 border-dashed" />}>
                     {Icon && <Icon />}
                     {!Icon && <FilterIcon />}
                     {title}
@@ -105,7 +104,6 @@ export function DataTableFacetedFilter<TData, TValue>({
                             </div>
                         </>
                     )}
-                </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[200px] p-0" align="start">
                 <Command>

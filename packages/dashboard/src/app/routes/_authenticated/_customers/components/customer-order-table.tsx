@@ -64,8 +64,8 @@ export function CustomerOrderTable({ customerId }: Readonly<CustomerOrderTablePr
                         const value = cell.getValue() as string;
                         const id = row.original.id;
                         return (
-                            <Button asChild variant="ghost">
-                                <Link to={`/orders/${id}`}>{value}</Link>
+                            <Button render={<Link to={`/orders/${id}`} />} variant="ghost">
+                                {value}
                             </Button>
                         );
                     },

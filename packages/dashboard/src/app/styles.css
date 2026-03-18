@@ -8,6 +8,13 @@ html[dir="rtl"] * {
 
 @custom-variant dark (&:is(.dark *));
 
+/* Required by @vendure-io/ui: Map data-horizontal/data-vertical Tailwind variants
+   to Base UI's data-orientation attribute values. Base UI sets
+   data-orientation="horizontal" while @vendure-io/ui CSS uses data-horizontal:
+   selectors. Per design-tokens docs, consumers must define these custom variants. */
+@custom-variant data-horizontal (&[data-orientation="horizontal"]);
+@custom-variant data-vertical (&[data-orientation="vertical"]);
+
 /* @source rules from extensions will be added here by the dashboardTailwindSourcePlugin */
 
 /*
@@ -73,6 +80,16 @@ html[dir="rtl"] * {
 
     body {
         @apply bg-background text-foreground;
+    }
+
+    #app {
+        isolation: isolate;
+    }
+
+    /* Restore h-svh on sidebar-gap to prevent sidebar fixed container
+       from intercepting pointer events in the main content area */
+    [data-slot="sidebar-gap"] {
+        height: 100svh;
     }
 }
 

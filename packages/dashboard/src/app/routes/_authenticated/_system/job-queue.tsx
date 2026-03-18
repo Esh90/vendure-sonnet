@@ -179,10 +179,8 @@ function JobQueuePage() {
                                         <DropdownMenu
                                             onOpenChange={open => (isActionMenuOpenRef.current = open)}
                                         >
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                                    <MoreVertical className="h-4 w-4" />
-                                                </Button>
+                                            <DropdownMenuTrigger render={<Button variant="ghost" size="sm" className="h-6 w-6 p-0" />}>
+                                                <MoreVertical className="h-4 w-4" />
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuItem
@@ -239,14 +237,12 @@ function JobQueuePage() {
         >
             <ActionBarItem itemId="auto-refresh-button">
                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm" className="gap-2">
-                            <RefreshCw className="h-4 w-4" />
-                            <span>
-                                <Trans>Auto refresh: {currentInterval?.label}</Trans>
-                            </span>
-                            <ChevronDown className="h-4 w-4" />
-                        </Button>
+                    <DropdownMenuTrigger render={<Button variant="outline" size="sm" className="gap-2" />}>
+                        <RefreshCw className="h-4 w-4" />
+                        <span>
+                            <Trans>Auto refresh: {currentInterval?.label}</Trans>
+                        </span>
+                        <ChevronDown className="h-4 w-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         {REFRESH_INTERVALS.map(interval => (

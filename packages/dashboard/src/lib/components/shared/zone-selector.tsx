@@ -45,9 +45,11 @@ export function ZoneSelector({ value, onChange }: Readonly<ZoneSelectorProps>) {
     }
 
     return (
-        <Select value={value} onValueChange={value => value && onChange(value)}>
+        <Select value={value ?? ''} onValueChange={value => value && onChange(value)}>
             <SelectTrigger>
-                <SelectValue placeholder={<Trans>Select a zone</Trans>} />
+                <SelectValue placeholder={<Trans>Select a zone</Trans>}>
+                    {(val: string) => data?.zones.items.find(z => z.id === val)?.name}
+                </SelectValue>
             </SelectTrigger>
             <SelectContent>
                 {data && (

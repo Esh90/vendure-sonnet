@@ -106,7 +106,7 @@ export function useTransitionOrderToState(orderId: string | undefined) {
                     <DialogDescription>
                         <Trans>Select the next state for the order</Trans>
                     </DialogDescription>
-                    <Select value={selectedState} onValueChange={setSelectedState}>
+                    <Select value={selectedState} onValueChange={(value) => { if (value != null) setSelectedState(value) }}>
                         <SelectTrigger>
                             <SelectValue placeholder="Select a state" />
                         </SelectTrigger>

@@ -36,8 +36,8 @@ export function ReviewSelectWithCreate(props: DashboardFormComponentProps) {
         <div>
             <ReviewMultiSelect {...props}></ReviewMultiSelect>
             <Dialog>
-                <DialogTrigger asChild>
-                    <Button variant="outline">Create new</Button>
+                <DialogTrigger render={<Button variant="outline" />}>
+                    Create new
                 </DialogTrigger>
 
                 <DialogContent>

@@ -210,7 +210,7 @@ export function useGeneratedColumns<T extends TypedDocumentNode<any, any>>({
                         className="mx-1"
                         checked={table.getIsAllRowsSelected()}
                         onCheckedChange={checked =>
-                            table.toggleAllRowsSelected(checked === 'indeterminate' ? undefined : checked)
+                            table.toggleAllRowsSelected(checked)
                         }
                     />
                 ),
@@ -221,7 +221,7 @@ export function useGeneratedColumns<T extends TypedDocumentNode<any, any>>({
                         <Checkbox
                             className="mx-1"
                             checked={row.getIsSelected()}
-                            onCheckedChange={row.getToggleSelectedHandler()}
+                            onCheckedChange={(checked) => row.toggleSelected(!!checked)}
                         />
                     );
                 },
@@ -248,10 +248,8 @@ function getRowActions(
         cell: ({ row, table }) => {
             return (
                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
+                    <DropdownMenuTrigger render={<Button variant="ghost" size="icon" />}>
                             <EllipsisIcon />
-                        </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         {rowActions?.map((action, index) => (
@@ -374,13 +372,11 @@ function DeleteMutationRowAction({
     });
     return (
         <AlertDialog>
-            <AlertDialogTrigger asChild>
-                <DropdownMenuItem onSelect={e => e.preventDefault()}>
+            <AlertDialogTrigger nativeButton={false} render={<DropdownMenuItem closeOnClick={false} />}>
                     <div className="flex items-center gap-2 text-destructive">
                         <TrashIcon className="w-4 h-4 text-destructive" />
                         <Trans>Delete</Trans>
                     </div>
-                </DropdownMenuItem>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>

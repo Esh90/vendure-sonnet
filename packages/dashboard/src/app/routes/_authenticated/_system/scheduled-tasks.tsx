@@ -192,10 +192,8 @@ function ScheduledTasksPage() {
             cell: ({ row }) => {
                 return (
                     <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                                <EllipsisIcon />
-                            </Button>
+                        <DropdownMenuTrigger render={<Button variant="ghost" size="icon" />}>
+                            <EllipsisIcon />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                             {row.original.enabled && (

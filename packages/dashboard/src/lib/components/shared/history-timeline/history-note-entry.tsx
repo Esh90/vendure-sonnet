@@ -32,10 +32,8 @@ export function HistoryNoteEntry(props: HistoryNoteEntryProps) {
                             {entry.isPublic ? 'Public' : 'Private'}
                         </Badge>
                         <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                            <DropdownMenuTrigger render={<Button variant="ghost" size="sm" className="h-6 w-6 p-0" />}>
                                     <MoreVerticalIcon className="h-3 w-3" />
-                                </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem

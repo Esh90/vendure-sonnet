@@ -1,5 +1,5 @@
 import { RwPermissionDefinition } from '@vendure/core';
-import { join } from 'node:path';
+import { join } from 'path';
 
 export const DEFAULT_APP_PATH = join(__dirname, 'dist');
 export const loggerCtx = 'DashboardPlugin';

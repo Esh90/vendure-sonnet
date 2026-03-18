@@ -49,11 +49,9 @@ function ZoneListPage() {
             ]}
         >
             <ActionBarItem itemId="create-button" requiresPermission={['CreateZone']}>
-                <Button asChild>
-                    <Link to="./new">
-                        <PlusIcon />
-                        <Trans>New Zone</Trans>
-                    </Link>
+                <Button render={<Link to="./new" />}>
+                    <PlusIcon />
+                    <Trans>New Zone</Trans>
                 </Button>
             </ActionBarItem>
         </ListPage>

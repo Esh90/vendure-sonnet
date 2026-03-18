@@ -92,7 +92,7 @@ export function SelectWithOptions({
     };
 
     return (
-        <Select value={currentValue ?? undefined} onValueChange={handleValueChange} disabled={readOnly}>
+        <Select value={currentValue} onValueChange={handleValueChange} disabled={readOnly}>
             <SelectTrigger className="mb-0">
                 <SelectValue placeholder={placeholder || <Trans>Select an option</Trans>} />
             </SelectTrigger>

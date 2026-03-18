@@ -464,11 +464,9 @@ export interface ListPageProps<
  *             }}
  *         >
  *             <PageActionBarRight>
- *                 <Button asChild>
- *                     <Link to="./new">
- *                         <PlusIcon className="mr-2 h-4 w-4" />
- *                         New article
- *                     </Link>
+ *                 <Button render={<Link to="./new" />}>
+ *                     <PlusIcon className="mr-2 h-4 w-4" />
+ *                     New article
  *                 </Button>
  *             </PageActionBarRight>
  *         </ListPage>
@@ -515,8 +513,8 @@ export function ListPage<
     const tableSettings = pageId ? settings.tableSettings?.[pageId] : undefined;
 
     const pagination = {
-        page: routeSearch.page ? Number.parseInt(routeSearch.page) : 1,
-        itemsPerPage: routeSearch.perPage ? Number.parseInt(routeSearch.perPage) : (tableSettings?.pageSize ?? 10),
+        page: routeSearch.page ? parseInt(routeSearch.page) : 1,
+        itemsPerPage: routeSearch.perPage ? parseInt(routeSearch.perPage) : (tableSettings?.pageSize ?? 10),
     };
 
     const columnVisibility = pageId

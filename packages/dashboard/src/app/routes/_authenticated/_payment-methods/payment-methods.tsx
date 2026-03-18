@@ -73,11 +73,9 @@ function PaymentMethodListPage() {
             ]}
         >
             <ActionBarItem itemId="create-button" requiresPermission={['CreatePaymentMethod']}>
-                <Button asChild>
-                    <Link to="./new">
-                        <PlusIcon className="mr-2 h-4 w-4" />
-                        <Trans>New Payment Method</Trans>
-                    </Link>
+                <Button render={<Link to="./new" />}>
+                    <PlusIcon className="mr-2 h-4 w-4" />
+                    <Trans>New Payment Method</Trans>
                 </Button>
             </ActionBarItem>
         </ListPage>

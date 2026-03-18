@@ -54,11 +54,9 @@ function TaxCategoryListPage() {
             ]}
         >
             <ActionBarItem itemId="create-button" requiresPermission={['CreateTaxCategory']}>
-                <Button asChild>
-                    <Link to="./new">
-                        <PlusIcon />
-                        <Trans>New Tax Category</Trans>
-                    </Link>
+                <Button render={<Link to="./new" />}>
+                    <PlusIcon />
+                    <Trans>New Tax Category</Trans>
                 </Button>
             </ActionBarItem>
         </ListPage>

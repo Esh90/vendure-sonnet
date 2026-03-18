@@ -65,10 +65,8 @@ function createCustomizeColumns(currencyCode: string) {
         fulfillmentLines: {
             cell: ({ row }: { row: any }) => (
                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                            <EllipsisVertical />
-                        </Button>
+                    <DropdownMenuTrigger render={<Button variant="ghost" size="icon" />}>
+                        <EllipsisVertical />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <JsonEditor data={row.original.fulfillmentLines} viewOnly rootFontSize={12} />
