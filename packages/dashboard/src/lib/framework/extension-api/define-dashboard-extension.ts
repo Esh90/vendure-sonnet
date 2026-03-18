@@ -3,9 +3,9 @@ import { globalRegistry } from '../registry/global-registry.js';
 import { DashboardExtension } from './extension-api-types.js';
 import {
     registerAlertExtensions,
-    registerCustomFormLabels,
     registerDataTableExtensions,
     registerDetailFormExtensions,
+    registerDetailFormLabels,
     registerFormComponentExtensions,
     registerHistoryEntryComponents,
     registerLayoutExtensions,
@@ -90,7 +90,7 @@ export function defineDashboardExtension(extension: DashboardExtension) {
         registerHistoryEntryComponents(extension.historyEntries);
 
         // Register custom form labels
-        registerCustomFormLabels(extension.customFormLabels);
+        registerDetailFormLabels(extension.detailFormLabels);
 
         // Execute extension source change callbacks
         const callbacks = globalRegistry.get('extensionSourceChangeCallbacks');

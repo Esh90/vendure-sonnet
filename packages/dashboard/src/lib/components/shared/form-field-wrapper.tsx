@@ -1,4 +1,3 @@
-import { getCustomFormLabel } from '@/vdb/framework/extension-api/logic/index.js';
 import { OverriddenFormComponent } from '@/vdb/framework/form-engine/overridden-form-component.js';
 import { LocationWrapper } from '@/vdb/framework/layout-engine/location-wrapper.js';
 import { FieldPath, FieldValues } from 'react-hook-form';
@@ -41,10 +40,10 @@ export type FormFieldWrapperProps<
 /**
  * @description
  * This is a wrapper that can be used in all forms to wrap the actual form control, and provide a label, description and error message.
- * 
+ *
  * Use this instead of the default Shadcn FormField (etc.) components, as it also supports
  * overridden form components.
- * 
+ *
  * @example
  * ```tsx
  * <PageBlock column="main" blockId="main-form">
@@ -64,7 +63,7 @@ export type FormFieldWrapperProps<
  *     </DetailFormGrid>
  * </PageBlock>
  * ```
- * 
+ *
  * If you are dealing with translatable fields, use the {@link TranslatableFormFieldWrapper} component instead.
  *
  * @docsCategory form-components
@@ -83,7 +82,6 @@ export function FormFieldWrapper<
     description,
     renderFormControl = true,
 }: FormFieldWrapperProps<TFieldValues, TName>) {
-    const customLabel = getCustomFormLabel(name) ?? label;
     return (
         <LocationWrapper identifier={name}>
             <FormField
@@ -91,7 +89,7 @@ export function FormFieldWrapper<
                 name={name}
                 render={renderArgs => (
                     <FormItem>
-                        {customLabel && <FormLabel>{customLabel}</FormLabel>}
+                        {label && <FormLabel>{label}</FormLabel>}
                         {renderFormControl ? (
                             <FormControl>
                                 <OverriddenFormComponent field={renderArgs.field} fieldName={name}>

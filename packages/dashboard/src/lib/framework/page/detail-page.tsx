@@ -8,13 +8,14 @@ import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { Trans } from '@lingui/react/macro';
 import { AnyRoute, useNavigate } from '@tanstack/react-router';
 import { ResultOf, VariablesOf } from 'gql.tada';
-import { toast } from 'sonner';
 import { ControllerRenderProps, FieldPath, FieldValues } from 'react-hook-form';
+import { toast } from 'sonner';
 import {
     FieldInfo,
     getEntityName,
     getOperationVariablesFields,
 } from '../document-introspection/get-document-structure.js';
+import { getDetailFormLabel } from '../extension-api/label-component-extensions.js';
 import {
     CustomFieldsPageBlock,
     DetailFormGrid,
@@ -112,12 +113,7 @@ function FieldInputRenderer<
     TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({ fieldInfo, field }: DetailPageFieldProps<TFieldValues, TName>) {
     const type = graphqlTypeMap[fieldInfo.type] ?? 'string';
-    return (
-        <DefaultInputForType
-            {...field}
-            fieldDef={{ type, name: fieldInfo.name } as any}
-        />
-    );
+    return <DefaultInputForType {...field} fieldDef={{ type, name: fieldInfo.name } as any} />;
 }
 
 /**
@@ -200,12 +196,14 @@ export function DetailPage<
                                 if (fieldInfo.name === 'id' && fieldInfo.type === 'ID') {
                                     return null;
                                 }
+                                const customLabel =
+                                    getDetailFormLabel(pageId, fieldInfo.name) ?? fieldInfo.name;
                                 return (
                                     <FormFieldWrapper
                                         key={fieldInfo.name}
                                         control={form.control}
                                         name={fieldInfo.name as never}
-                                        label={fieldInfo.name}
+                                        label={customLabel}
                                         render={({ field }) => (
                                             <FieldInputRenderer fieldInfo={fieldInfo} field={field} />
                                         )}
