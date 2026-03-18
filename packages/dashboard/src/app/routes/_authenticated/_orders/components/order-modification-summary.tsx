@@ -255,7 +255,7 @@ export function OrderModificationSummary({
                     disabled={hasNoModifications}
                     checked={modifyOrderInput.options?.recalculateShipping ?? true}
                     onCheckedChange={checked =>
-                        onRecalculateShippingChange?.(checked)
+                        onRecalculateShippingChange?.(checked === 'indeterminate' ? true : checked)
                     }
                 />
                 <label htmlFor="recalculate-shipping" className="text-sm cursor-pointer">

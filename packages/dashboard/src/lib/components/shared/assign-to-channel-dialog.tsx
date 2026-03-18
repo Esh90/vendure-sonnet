@@ -102,7 +102,7 @@ export function AssignToChannelDialog({
                         <label className="text-sm font-medium">
                             <Trans>Channel</Trans>
                         </label>
-                        <Select value={selectedChannelId} onValueChange={(value) => { if (value != null) setSelectedChannelId(value) }}>
+                        <Select value={selectedChannelId} onValueChange={setSelectedChannelId}>
                             <SelectTrigger>
                                 <SelectValue placeholder={t`Select a channel`} />
                             </SelectTrigger>
@@ -147,7 +147,7 @@ export function usePriceFactor() {
                 max="99999"
                 step="0.01"
                 value={priceFactor}
-                onChange={e => setPriceFactor(parseFloat(e.target.value) || 1)}
+                onChange={e => setPriceFactor(Number.parseFloat(e.target.value) || 1)}
             />
         </div>
     );
