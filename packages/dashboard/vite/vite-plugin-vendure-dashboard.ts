@@ -305,7 +305,7 @@ export function getNormalizedVendureConfigPath(vendureConfigPath: string | URL):
     return fixWindowsPath(stringPath);
 }
 
-function fixWindowsPath(filePath: string): string {
+export function fixWindowsPath(filePath: string): string {
     // Fix Windows paths that might start with a leading slash
     if (process.platform === 'win32') {
         // Remove leading slash before drive letter on Windows
