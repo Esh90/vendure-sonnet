@@ -75,17 +75,16 @@ export function FormFieldWrapper<
     TFieldValues extends FieldValues = FieldValues,
     TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
-    control,
-    name,
-    render,
     label,
     description,
     renderFormControl = true,
+    ...controllerProps
 }: FormFieldWrapperProps<TFieldValues, TName>) {
+    const { name, render, ...rest } = controllerProps;
     return (
         <LocationWrapper identifier={name}>
             <FormField
-                control={control}
+                {...rest}
                 name={name}
                 render={renderArgs => (
                     <FormItem>
