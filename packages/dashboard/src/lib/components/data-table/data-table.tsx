@@ -425,7 +425,7 @@ export function DataTable<TData>({
                     </div>
                 ) : null}
 
-                <div className="rounded-md border my-2 relative shadow-sm">
+                <div className="rounded-md border my-2 relative shadow-sm bg-card">
                     <DndContext
                         sensors={sensors}
                         collisionDetection={closestCenter}
