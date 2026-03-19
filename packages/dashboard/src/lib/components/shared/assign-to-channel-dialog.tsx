@@ -102,7 +102,7 @@ export function AssignToChannelDialog({
                         <label className="text-sm font-medium">
                             <Trans>Channel</Trans>
                         </label>
-                        <Select value={selectedChannelId} onValueChange={setSelectedChannelId}>
+                        <Select value={selectedChannelId} onValueChange={value => value != null && setSelectedChannelId(value)}>
                             <SelectTrigger>
                                 <SelectValue placeholder={t`Select a channel`} />
                             </SelectTrigger>
