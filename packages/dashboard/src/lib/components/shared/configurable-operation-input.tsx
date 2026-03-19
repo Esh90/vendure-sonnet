@@ -5,7 +5,9 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '../ui/button.js';
 import { Card, CardContent, CardHeader } from '../ui/card.js';
-import { Form, FormControl, FormField, FormItem, FormLabel } from '../ui/form.js';
+import { Form } from '../ui/form.js';
+import { Field, FieldLabel } from '../ui/field.js';
+import { Controller } from 'react-hook-form';
 import { ConfigurableOperationArgInput } from './configurable-operation-arg-input.js';
 
 export interface ConfigurableOperationInputProps {
@@ -116,30 +118,28 @@ export function ConfigurableOperationInput({
                                             const argValue =
                                                 value.arguments.find(a => a.name === arg.name)?.value || '';
                                             return (
-                                                <FormField
+                                                <Controller
                                                     key={arg.name}
                                                     name={`args.${arg.name}`}
                                                     render={() => (
-                                                        <FormItem className="space-y-2">
-                                                            <FormLabel className="text-sm font-medium text-foreground">
+                                                        <Field className="space-y-2">
+                                                            <FieldLabel className="text-sm font-medium text-foreground">
                                                                 {arg.label || arg.name}
                                                                 {arg.required && !arg.list && (
                                                                     <span className="text-destructive ml-1">
                                                                         *
                                                                     </span>
                                                                 )}
-                                                            </FormLabel>
-                                                            <FormControl>
-                                                                <ConfigurableOperationArgInput
-                                                                    definition={arg}
-                                                                    value={argValue}
-                                                                    onChange={value =>
-                                                                        handleInputChange(arg.name, value)
-                                                                    }
-                                                                    readOnly={readonly}
-                                                                />
-                                                            </FormControl>
-                                                        </FormItem>
+                                                            </FieldLabel>
+                                                            <ConfigurableOperationArgInput
+                                                                definition={arg}
+                                                                value={argValue}
+                                                                onChange={value =>
+                                                                    handleInputChange(arg.name, value)
+                                                                }
+                                                                readOnly={readonly}
+                                                            />
+                                                        </Field>
                                                     )}
                                                 />
                                             );

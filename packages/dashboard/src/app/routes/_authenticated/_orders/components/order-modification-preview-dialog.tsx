@@ -12,7 +12,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/vdb/components/ui/dialog.js';
-import { FormControl, FormField } from '@/vdb/components/ui/form.js';
+import { Controller } from 'react-hook-form';
 import { Textarea } from '@/vdb/components/ui/textarea.js';
 import { addCustomFields } from '@/vdb/framework/document-introspection/add-custom-fields.js';
 import { api } from '@/vdb/graphql/api.js';
@@ -239,24 +239,22 @@ export function OrderModificationPreviewDialog({
                                                                         )}
                                                                     </div>
                                                                     <div className="w-full">
-                                                                        <FormField
+                                                                        <Controller
                                                                             name={`payments.${payment.id}`}
                                                                             control={refundForm.control}
                                                                             render={({ field }) => (
-                                                                                <FormControl>
-                                                                                    <MoneyInput
-                                                                                        {...field}
-                                                                                        value={
-                                                                                            field.value || 0
-                                                                                        }
-                                                                                        onChange={
-                                                                                            field.onChange
-                                                                                        }
-                                                                                        currency={
-                                                                                            orderSnapshot.currencyCode
-                                                                                        }
-                                                                                    />
-                                                                                </FormControl>
+                                                                                <MoneyInput
+                                                                                    {...field}
+                                                                                    value={
+                                                                                        field.value || 0
+                                                                                    }
+                                                                                    onChange={
+                                                                                        field.onChange
+                                                                                    }
+                                                                                    currency={
+                                                                                        orderSnapshot.currencyCode
+                                                                                    }
+                                                                                />
                                                                             )}
                                                                         />
                                                                     </div>

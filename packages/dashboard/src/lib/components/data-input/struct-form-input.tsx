@@ -1,12 +1,6 @@
 import { Button } from '@/vdb/components/ui/button.js';
-import {
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from '@/vdb/components/ui/form.js';
+import { Field, FieldDescription, FieldError, FieldLabel } from '@/vdb/components/ui/field.js';
+import { Controller } from 'react-hook-form';
 import { Input } from '@/vdb/components/ui/input.js';
 import { Switch } from '@/vdb/components/ui/switch.js';
 import { getInputComponent } from '@/vdb/framework/extension-api/input-component-extensions.js';
@@ -124,35 +118,33 @@ export function StructFormInput({ fieldDef, disabled, ...field }: Readonly<Dashb
                         </div>
                     )}
                     {fieldDef?.fields.map(structField => (
-                        <FormField
+                        <Controller
                             key={structField.name}
                             control={control}
                             name={`${field.name}.${structField.name}`}
-                            render={({ field: structInputField }) => (
-                                <FormItem>
+                            render={({ field: structInputField, fieldState }) => (
+                                <Field data-invalid={fieldState.invalid || undefined}>
                                     <div className="flex items-baseline gap-4">
                                         <div className="flex-1">
-                                            <FormLabel>
+                                            <FieldLabel>
                                                 {getTranslation(structField.label) ?? structField.name}
-                                            </FormLabel>
+                                            </FieldLabel>
                                             {getTranslation(structField.description) && (
-                                                <FormDescription>
+                                                <FieldDescription>
                                                     {getTranslation(structField.description)}
-                                                </FormDescription>
+                                                </FieldDescription>
                                             )}
                                         </div>
                                         <div className="flex-[2]">
-                                            <FormControl>
-                                                {renderStructFieldInput(
-                                                    structField,
-                                                    structInputField,
-                                                    isReadonly,
-                                                )}
-                                            </FormControl>
-                                            <FormMessage />
+                                            {renderStructFieldInput(
+                                                structField,
+                                                structInputField,
+                                                isReadonly,
+                                            )}
+                                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                         </div>
                                     </div>
-                                </FormItem>
+                                </Field>
                             )}
                         />
                     ))}
