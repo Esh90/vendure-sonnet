@@ -22,7 +22,8 @@ import { useMutation } from '@tanstack/react-query';
 import { ResultOf, VariablesOf } from 'gql.tada';
 import { CheckIcon } from 'lucide-react';
 import { useEffect, useRef } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
+import { Form } from '@/vdb/components/ui/form.js';
 import { modifyOrderDocument, orderDetailDocument } from '../orders.graphql.js';
 import { OrderTable } from './order-table.js';
 
@@ -176,7 +177,7 @@ export function OrderModificationPreviewDialog({
                                             </Trans>
                                         </AlertDescription>
                                     </Alert>
-                                    <FormProvider {...refundForm}>
+                                    <Form {...refundForm}>
                                         <form className="space-y-4 mt-4">
                                             {/* Payment Cards */}
                                             <div className="space-y-3">
@@ -308,7 +309,7 @@ export function OrderModificationPreviewDialog({
                                                 </div>
                                             </div>
                                         </form>
-                                    </FormProvider>
+                                    </Form>
                                 </>
                             )}
                             <div className="w-full flex justify-end">

@@ -13,7 +13,8 @@ import { Trans, useLingui } from '@lingui/react/macro';
 import { useMutation } from '@tanstack/react-query';
 import { Save } from 'lucide-react';
 import { useMemo } from 'react';
-import { FormProvider, useForm, useWatch } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
+import { Form } from '@/vdb/components/ui/form.js';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { createProductVariantsDocument } from '../products.graphql.js';
@@ -171,7 +172,7 @@ export function GenerateVariantsPanel({
     }
 
     return (
-        <FormProvider {...form}>
+        <Form {...form}>
             <div className="space-y-4">
                 <Table>
                     <TableHeader>
@@ -295,6 +296,6 @@ export function GenerateVariantsPanel({
                     </Button>
                 </div>
             </div>
-        </FormProvider>
+        </Form>
     );
 }
