@@ -42,6 +42,14 @@ jobs:
             - name: Install Vercel CLI
               run: npm i -g vercel@latest
 
+            - name: Link Vercel project
+              run: vercel link --yes --scope vendure --project=admin-dashboard --token=${{ secrets.VERCEL_TOKEN }}
+
+            - name: Pull Vercel environment variables
+              run: |
+                  vercel env pull --environment=${{ github.ref_name == 'master' && github.event_name == 'push' && 'production' || 'preview' }} --yes --scope vendure --token=${{ secrets.VERCEL_TOKEN }}
+                  cp .env.local packages/dashboard/.env.local
+
             - name: Build common and core packages
               run: npm run build:core-common
 
