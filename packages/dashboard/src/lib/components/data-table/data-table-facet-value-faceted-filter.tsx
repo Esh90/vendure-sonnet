@@ -135,7 +135,7 @@ export function FacetValueFacetedFilter<TData, TValue>({
 
     return (
         <Popover>
-            <PopoverTrigger render={<Button variant="outline" size="sm" className="h-8 border-dashed" />}>
+            <PopoverTrigger render={<Button variant="outline" size="sm" className="h-8" />}>
                     <FilterIcon />
                     {title}
                     {selectedIds.size > 0 && (
