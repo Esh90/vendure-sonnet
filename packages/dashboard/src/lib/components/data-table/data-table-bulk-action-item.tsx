@@ -31,6 +31,7 @@ export interface DataTableBulkActionItemProps {
     className?: string;
     requiresPermission?: string[];
     disabled?: boolean;
+    closeOnClick?: boolean;
 }
 
 /**
@@ -72,6 +73,7 @@ export function DataTableBulkActionItem({
     onClick,
     requiresPermission,
     disabled,
+    closeOnClick,
 }: Readonly<DataTableBulkActionItemProps>) {
     const [isOpen, setIsOpen] = useState(false);
     const { hasPermissions } = usePermissions();
@@ -129,7 +131,7 @@ export function DataTableBulkActionItem({
     }
 
     return (
-        <DropdownMenuItem onClick={handleClick}>
+        <DropdownMenuItem closeOnClick={closeOnClick} onClick={handleClick}>
             {Icon && <Icon className={cn('mr-1 h-4 w-4', className)} />}
             <span className={cn('text-sm', className)}>
                 <Trans>{label}</Trans>
