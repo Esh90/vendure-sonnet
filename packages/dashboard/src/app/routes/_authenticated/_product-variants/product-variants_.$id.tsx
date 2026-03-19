@@ -338,6 +338,11 @@ function ProductVariantDetailPage() {
                             label={<Trans>Stock levels</Trans>}
                             render={({ field }) => (
                                 <Select
+                                    items={{
+                                        INHERIT: t`Inherit from global settings`,
+                                        TRUE: t`Track`,
+                                        FALSE: t`Do not track`,
+                                    }}
                                     onValueChange={val => {
                                         if (val) {
                                             field.onChange(val);

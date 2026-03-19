@@ -384,7 +384,12 @@ export function ResponsiveToolbar({ editor, disabled }: Readonly<ResponsiveToolb
 
     return (
         <div ref={toolbarRef} className="flex items-center gap-1 p-2 border-b bg-muted/30">
-            <Select value={getCurrentHeading()} onValueChange={value => value != null && handleHeadingChange(value)} disabled={disabled}>
+            <Select
+                items={headingOptions}
+                value={getCurrentHeading()}
+                onValueChange={value => value != null && handleHeadingChange(value)}
+                disabled={disabled}
+            >
                 <SelectTrigger className="h-8 w-[130px]">
                     <SelectValue />
                 </SelectTrigger>

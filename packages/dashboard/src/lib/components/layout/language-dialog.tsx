@@ -57,7 +57,11 @@ export function LanguageDialog() {
                     <Label>
                         <Trans>Display language</Trans>
                     </Label>
-                    <Select defaultValue={settings.displayLanguage} onValueChange={(value) => { if (value != null) handleLanguageChange(value) }}>
+                    <Select
+                        items={Object.fromEntries(sortedLanguages.map(({ code, label }) => [code, <><span className="uppercase text-muted-foreground">{code}</span> <span>{label}</span></>]))}
+                        defaultValue={settings.displayLanguage}
+                        onValueChange={(value) => { if (value != null) handleLanguageChange(value) }}
+                    >
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select a language" />
                         </SelectTrigger>
@@ -75,7 +79,11 @@ export function LanguageDialog() {
                     <Label>
                         <Trans>Locale</Trans>
                     </Label>
-                    <Select defaultValue={settings.displayLocale} onValueChange={(value) => { if (value != null) setDisplayLocale(value) }}>
+                    <Select
+                        items={Object.fromEntries(sortedLocales.map(({ code, label }) => [code, <><span className="uppercase text-muted-foreground">{code}</span> <span>{label}</span></>]))}
+                        defaultValue={settings.displayLocale}
+                        onValueChange={(value) => { if (value != null) setDisplayLocale(value) }}
+                    >
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select a locale" />
                         </SelectTrigger>
@@ -95,7 +103,11 @@ export function LanguageDialog() {
                     <Trans>Sample Formatting</Trans>:{' '}
                     <span className="text-muted-foreground">{humanReadableLanguageAndLocale}</span>
                 </span>
-                <Select defaultValue={selectedCurrency} onValueChange={(value) => { if (value != null) setSelectedCurrency(value) }}>
+                <Select
+                    items={Object.fromEntries(availableCurrencyCodes.map(c => [c, formatCurrencyName(c)]))}
+                    defaultValue={selectedCurrency}
+                    onValueChange={(value) => { if (value != null) setSelectedCurrency(value) }}
+                >
                     <SelectTrigger>
                         <SelectValue placeholder="Select a currency" />
                     </SelectTrigger>

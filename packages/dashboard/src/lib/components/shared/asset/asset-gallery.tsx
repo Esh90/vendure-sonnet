@@ -348,7 +348,16 @@ export function AssetGallery({
                                 </Button>
                             )}
                         </div>
-                        <Select value={assetType} onValueChange={value => value != null && setAssetType(value)}>
+                        <Select
+                            items={{
+                                [AssetType.ALL]: 'All types',
+                                [AssetType.IMAGE]: 'Images',
+                                [AssetType.VIDEO]: 'Video',
+                                [AssetType.BINARY]: 'Binary',
+                            }}
+                            value={assetType}
+                            onValueChange={value => value != null && setAssetType(value)}
+                        >
                             <SelectTrigger className="w-full md:w-[180px]">
                                 <SelectValue placeholder="Asset type" />
                             </SelectTrigger>
