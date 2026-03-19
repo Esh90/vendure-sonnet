@@ -356,7 +356,7 @@ export function DataTable<TData>({
                                 placeholder={t`Filter...`}
                                 value={searchTerm}
                                 onChange={event => handleSearchChange(event.target.value)}
-                                className="w-64"
+                                className="h-8 w-64"
                             />
                         )}
                         <Suspense>

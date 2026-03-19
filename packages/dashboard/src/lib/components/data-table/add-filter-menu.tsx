@@ -28,7 +28,7 @@ export function AddFilterMenu({ columns }: Readonly<AddFilterMenuProps>) {
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DropdownMenu>
                 <Tooltip>
-                    <TooltipTrigger render={<DropdownMenuTrigger render={<Button variant="outline" size="icon" />} />}>
+                    <TooltipTrigger render={<DropdownMenuTrigger render={<Button variant="outline" size="icon-sm" />} />}>
                                 <FilterIcon />
                     </TooltipTrigger>
                     <TooltipContent>

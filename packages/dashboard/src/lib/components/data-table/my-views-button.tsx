@@ -28,7 +28,7 @@ export const MyViewsButton: React.FC = () => {
                 <Tooltip>
                     <TooltipTrigger render={<Button
                             variant={activeView ? 'default' : 'outline'}
-                            size="icon"
+                            size="icon-sm"
                             onClick={() => setSheetOpen(true)}
                         />}>
                             <Bookmark />
