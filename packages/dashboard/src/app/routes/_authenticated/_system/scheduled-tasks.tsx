@@ -1,3 +1,4 @@
+import { CopyableText } from '@/vdb/components/shared/copyable-text.js';
 import { DataTable } from '@/vdb/components/data-table/data-table.js';
 import { Badge } from '@/vdb/components/ui/badge.js';
 import { Button } from '@/vdb/components/ui/button.js';
@@ -105,6 +106,7 @@ function ScheduledTasksPage() {
     const columns = [
         columnHelper.accessor('id', {
             header: t`ID`,
+            cell: ({ getValue }) => <CopyableText value={getValue()}><span className="font-mono">{getValue()}</span></CopyableText>,
         }),
         columnHelper.accessor('description', {
             header: t`Description`,

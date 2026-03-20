@@ -72,7 +72,7 @@ export function DevModeToolbarItemWrapper({
                     <PopoverContent className="w-40 p-2">
                         <div className="text-xs">
                             <div className="text-muted-foreground mb-0.5">itemId</div>
-                            <CopyableText text={itemId} />
+                            <CopyableText value={itemId} />
                         </div>
                     </PopoverContent>
                 </Popover>

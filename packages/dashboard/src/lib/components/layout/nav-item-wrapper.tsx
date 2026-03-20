@@ -84,12 +84,12 @@ export function NavItemWrapper({
                                 <div className="space-y-1">
                                     <div className="text-xs">
                                         <div className="text-muted-foreground mb-0.5">locationId</div>
-                                        <CopyableText text={locationId} />
+                                        <CopyableText value={locationId} />
                                     </div>
                                     {order !== undefined && (
                                         <div className="text-xs">
                                             <div className="text-muted-foreground mb-0.5">order</div>
-                                            <CopyableText text={order.toString()} />
+                                            <CopyableText value={order.toString()} />
                                         </div>
                                     )}
                                 </div>

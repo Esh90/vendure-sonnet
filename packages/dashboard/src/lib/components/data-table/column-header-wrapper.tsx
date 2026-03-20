@@ -78,18 +78,18 @@ export function ColumnHeaderWrapper({ children, columnId }: Readonly<ColumnHeade
                                     {pageId && (
                                         <div className="text-xs">
                                             <div className="text-muted-foreground mb-0.5">pageId</div>
-                                            <CopyableText text={pageId} />
+                                            <CopyableText value={pageId} />
                                         </div>
                                     )}
                                     {blockId && (
                                         <div className="text-xs">
                                             <div className="text-muted-foreground mb-0.5">blockId</div>
-                                            <CopyableText text={blockId} />
+                                            <CopyableText value={blockId} />
                                         </div>
                                     )}
                                     <div className="text-xs">
                                         <div className="text-muted-foreground mb-0.5">column</div>
-                                        <CopyableText text={columnId} />
+                                        <CopyableText value={columnId} />
                                     </div>
                                 </div>
                             </div>

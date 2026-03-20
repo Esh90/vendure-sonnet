@@ -76,12 +76,12 @@ function DevModeActionBarWrapper({
                             {page.pageId && (
                                 <div className="text-xs">
                                     <div className="text-muted-foreground mb-0.5">pageId</div>
-                                    <CopyableText text={page.pageId} />
+                                    <CopyableText value={page.pageId} />
                                 </div>
                             )}
                             <div className="text-xs">
                                 <div className="text-muted-foreground mb-0.5">itemId</div>
-                                <CopyableText text={itemId} />
+                                <CopyableText value={itemId} />
                             </div>
                         </div>
                     </PopoverContent>
