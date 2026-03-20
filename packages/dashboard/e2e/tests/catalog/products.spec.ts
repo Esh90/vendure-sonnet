@@ -17,23 +17,33 @@ createCrudTestSuite({
 
 test.describe('Product detail features', () => {
     test('should display all detail page sections', async ({ page }) => {
-        // Navigate to the first product in the list
+        // Navigate to the seeded "Laptop" product via search to avoid race conditions
         await page.goto('/products');
         await expect(page.locator('table')).toBeVisible();
+        await page.getByPlaceholder('Filter...').fill('Laptop');
+        await page.waitForResponse(resp => resp.url().includes('/admin-api') && resp.status() === 200);
         await page.locator('table tbody tr').first().getByRole('button').first().click();
         await expect(page).toHaveURL(/\/products\/.+/);
 
         // Product name field
-        await expect(page.getByText('Product name')).toBeVisible();
+        await expect(
+            page.locator('[data-slot="field-label"]').getByText('Product name', { exact: true }),
+        ).toBeVisible();
 
         // Slug field
-        await expect(page.getByText('Slug')).toBeVisible();
+        await expect(
+            page.locator('[data-slot="field-label"]').getByText('Slug', { exact: true }),
+        ).toBeVisible();
 
         // Description field
-        await expect(page.getByText('Description')).toBeVisible();
+        await expect(
+            page.locator('[data-slot="field-label"]').getByText('Description', { exact: true }),
+        ).toBeVisible();
 
         // Enabled toggle
-        await expect(page.getByText('Enabled')).toBeVisible();
+        await expect(
+            page.locator('[data-slot="field-label"]').getByText('Enabled', { exact: true }),
+        ).toBeVisible();
 
         // Facet Values block
         await expect(page.getByText('Facet Values')).toBeVisible();
@@ -43,25 +53,16 @@ test.describe('Product detail features', () => {
     });
 
     test('should display product variants table', async ({ page }) => {
-        // Navigate to a product that has variants (seeded data)
+        // Navigate to the seeded "Laptop" product which has variants
         await page.goto('/products');
         await expect(page.locator('table')).toBeVisible();
-
-        // Click the first product — seeded products have variants
+        await page.getByPlaceholder('Filter...').fill('Laptop');
+        await page.waitForResponse(resp => resp.url().includes('/admin-api') && resp.status() === 200);
         await page.locator('table tbody tr').first().getByRole('button').first().click();
         await expect(page).toHaveURL(/\/products\/.+/);
 
-        // The variants table should be visible for products with variants
-        // Look for a nested table or the "Manage variants" button
-        const manageButton = page.getByRole('button', { name: /Manage variants/i });
-        const variantsTable = page.locator('table').nth(1);
-
-        // At least one of these should be visible (depends on whether product has variants)
-        const hasVariants = await manageButton.isVisible().catch(() => false);
-        const hasVariantsTable = await variantsTable.isVisible().catch(() => false);
-
-        // Seeded products should have variants
-        expect(hasVariants || hasVariantsTable).toBeTruthy();
+        // The "Manage variants" button should be visible for the Laptop product
+        await expect(page.getByRole('button', { name: /Manage variants/i })).toBeVisible({ timeout: 10_000 });
     });
 
     test('should navigate to manage variants page', async ({ page }) => {

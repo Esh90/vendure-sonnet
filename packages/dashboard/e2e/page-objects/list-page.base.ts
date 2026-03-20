@@ -85,8 +85,8 @@ export class BaseListPage {
     /** Open the bulk actions dropdown and click "Delete", then confirm. */
     async bulkDelete(indices: number[] | 'all') {
         await this.selectRows(indices);
-        // Open "With selected..." dropdown
-        await this.page.getByRole('button', { name: /With selected/i }).click();
+        // Open "Actions" dropdown
+        await this.page.getByRole('button', { name: /Actions/i }).click();
         // Click "Delete" in the dropdown. AlertDialogTrigger renders role="button"
         // instead of role="menuitem", so match by text within the menu.
         await this.page.locator('[role="menu"]').getByText('Delete', { exact: true }).click();

@@ -227,7 +227,7 @@ test.describe('Orders', () => {
 
             const dialog = page.locator('[role="dialog"]');
             await expect(dialog).toBeVisible();
-            await expect(dialog.getByText('Fulfill order')).toBeVisible();
+            await expect(dialog.getByRole('heading', { name: 'Fulfill order' })).toBeVisible();
 
             // The dialog should show order line items with quantity inputs
             await expect(dialog.locator('input[type="number"]').first()).toBeVisible();

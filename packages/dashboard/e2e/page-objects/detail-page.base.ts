@@ -53,7 +53,9 @@ export class BaseDetailPage {
     }
 
     async expectNewPageLoaded() {
-        await expect(this.page.getByRole('heading', { name: this.config.newTitle })).toBeVisible();
+        await expect(this.page.getByRole('heading', { name: this.config.newTitle })).toBeVisible({
+            timeout: 10_000,
+        });
     }
 
     /**

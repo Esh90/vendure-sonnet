@@ -291,9 +291,9 @@ test.describe('manage product variants', () => {
 
         // Fill in the SKU
         const skuInput = dialog
-            .locator('[data-slot="form-item"]')
+            .locator('[data-slot="field"]')
             .filter({
-                has: page.locator('[data-slot="form-label"]').getByText('SKU', { exact: true }),
+                has: page.locator('[data-slot="field-label"]').getByText('SKU', { exact: true }),
             })
             .getByRole('textbox');
         await skuInput.fill('E2E-LAPTOP-UNIQUE');
