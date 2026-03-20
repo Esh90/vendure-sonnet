@@ -360,16 +360,16 @@ export function DataTable<TData>({
             <div className="space-y-2 @container/table">
                 <div className="relative">
                     <div className={cn(
-                        "flex items-start justify-between gap-2 transition-opacity duration-150",
+                        "flex flex-wrap items-start justify-between gap-2 transition-opacity duration-150",
                         hasSelection && "opacity-0 pointer-events-none"
                     )}>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2 min-w-0 flex-1">
                             {onSearchTermChange && (
                                 <Input
                                     placeholder={t`Filter...`}
                                     value={searchTerm}
                                     onChange={event => handleSearchChange(event.target.value)}
-                                    className="h-8 w-64"
+                                    className="h-8 w-full @sm/table:w-64"
                                 />
                             )}
                             <Suspense>
@@ -389,7 +389,11 @@ export function DataTable<TData>({
                             </Suspense>
                             {onFilterChange && <AddFilterMenu columns={table.getAllColumns()} />}
                             {pageId && onFilterChange && <MyViewsButton />}
-                            {pageId && onFilterChange && globalViews.length > 0 && <GlobalViewsBar />}
+                            {pageId && onFilterChange && globalViews.length > 0 && (
+                                <div className="hidden @md/table:contents">
+                                    <GlobalViewsBar />
+                                </div>
+                            )}
                             {nonFacetedFilters.length > 0 && (
                                 <>
                                     <Separator orientation="vertical" className="self-stretch" />
@@ -433,7 +437,7 @@ export function DataTable<TData>({
                                 </>
                             )}
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-shrink-0">
                             {pageId && onFilterChange && <SaveViewButton />}
                             {!disableViewOptions && <DataTableViewOptions table={table} />}
                             {onRefresh && <RefreshButton onRefresh={onRefresh} isLoading={isLoading ?? false} />}

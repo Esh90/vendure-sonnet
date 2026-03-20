@@ -129,6 +129,11 @@ export interface ActionBarItemProps {
  * the {@link PageActionBarRight} component. Each item is given an `itemId` which allows
  * extensions to position their items relative to it using `position.itemId`.
  *
+ * **Mobile behavior:** On mobile viewports, only the **last** inline `ActionBarItem` is
+ * visible (treated as the primary action, e.g. Save/Update/Create). All other inline items
+ * and extension items are hidden. Place your primary action as the last `ActionBarItem`
+ * child of {@link PageActionBar}.
+ *
  * In developer mode, hovering over the item will show a popover with the `pageId` and `itemId`,
  * making it easy to discover the correct IDs for extension positioning.
  *

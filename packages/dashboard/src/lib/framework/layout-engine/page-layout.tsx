@@ -6,7 +6,8 @@ import { Form } from '@/vdb/components/ui/form.js';
 import { useCustomFieldConfig } from '@/vdb/hooks/use-custom-field-config.js';
 import { usePage } from '@/vdb/hooks/use-page.js';
 import { cn } from '@/vdb/lib/utils.js';
-import { useCopyToClipboard, useMediaQuery } from '@uidotdev/usehooks';
+import { useIsMobile } from '@/vdb/hooks/use-mobile.js';
+import { useCopyToClipboard } from '@uidotdev/usehooks';
 import { CheckIcon, CopyIcon, EllipsisVerticalIcon, InfoIcon } from 'lucide-react';
 import React, { ComponentProps, useMemo, useState } from 'react';
 import { Control, UseFormReturn } from 'react-hook-form';
@@ -101,9 +102,9 @@ export function Page({ children, pageId, entity, form, submitHandler, ...props }
     );
 
     const pageHeader = (
-        <div className="flex items-center justify-between">
-            {pageTitle ?? <div />}
-            {pageActionBar}
+        <div className="flex items-center justify-between gap-2">
+            <div className="min-w-0 shrink">{pageTitle ?? <div />}</div>
+            <div className="shrink-0">{pageActionBar}</div>
         </div>
     );
 
@@ -212,7 +213,7 @@ function isPageBlock(child: unknown): child is React.ReactElement<PageBlockProps
  */
 export function PageLayout({ children, className }: Readonly<PageLayoutProps>) {
     const page = usePage();
-    const isDesktop = useMediaQuery('only screen and (min-width : 769px)');
+    const isMobile = useIsMobile();
     // Separate blocks into categories
     const childArray: React.ReactElement<PageBlockProps>[] = [];
     const extensionBlocks = getDashboardPageBlocks(page.pageId ?? '');
@@ -308,7 +309,7 @@ export function PageLayout({ children, className }: Readonly<PageLayoutProps>) {
 
     return (
         <div className={cn('w-full space-y-4', className, '@container/layout')}>
-            {isDesktop ? (
+            {!isMobile ? (
                 <div className="grid grid-cols-1 gap-4 @3xl/layout:grid-cols-4">
                     {fullWidthBlocks.length > 0 && (
                         <div className="@md/layout:col-span-5 space-y-4">{fullWidthBlocks}</div>
@@ -347,6 +348,10 @@ type InlineDropdownItem = Omit<DashboardActionBarItem, 'type' | 'pageId'>;
  *
  * You can add action bar items by including {@link ActionBarItem} components as direct children.
  * For backwards compatibility, {@link PageActionBarLeft} and {@link PageActionBarRight} are also supported.
+ *
+ * **Mobile behavior:** On mobile viewports, only the last inline {@link ActionBarItem} is
+ * shown (the primary action). Extension items and plain children are hidden to prevent
+ * overflow. The dropdown menu and entity info remain visible on all viewports.
  *
  * @example
  * ```tsx
@@ -435,6 +440,8 @@ export function PageActionBar({
     // Merge and sort inline items with extension items
     const mergedItems = mergeAndSortActionBarItems(actionBarItemChildren, extensionButtonItems);
 
+    const isMobile = useIsMobile();
+
     // Determine if we should render the right section
     const hasRightContent =
         mergedItems.length > 0 ||
@@ -442,34 +449,49 @@ export function PageActionBar({
         actionBarDropdownItems.length > 0 ||
         page.entity;
 
+    // On mobile, show only the primary inline action (e.g. Update/Save/Create)
+    // and hide extensions + plain children to prevent overflow
+    let primaryItemIndex = -1;
+    for (let i = mergedItems.length - 1; i >= 0; i--) {
+        if (mergedItems[i].type === 'inline') {
+            primaryItemIndex = i;
+            break;
+        }
+    }
+    const visibleMergedItems = isMobile && mergedItems.length >= 2
+        ? (primaryItemIndex >= 0 ? [mergedItems[primaryItemIndex]] : [mergedItems[mergedItems.length - 1]])
+        : mergedItems;
+
+    const renderMergedItem = (mergedItem: MergedActionBarItem, index: number) => {
+        if (mergedItem.type === 'inline') {
+            return React.cloneElement(mergedItem.element, {
+                key: `inline-${mergedItem.element.props.itemId}`,
+            });
+        } else {
+            const extItem = mergedItem.item;
+            const itemId = extItem.id ?? `extension-${extItem.component.name || index}`;
+            return (
+                <ActionBarItemWrapper
+                    key={`ext-${extItem.id ?? extItem.pageId}-${index}`}
+                    itemId={itemId}
+                >
+                    <PageActionBarItem item={extItem} page={page} />
+                </ActionBarItemWrapper>
+            );
+        }
+    };
+
     return (
         <div className={cn('flex gap-2', leftContent.length > 0 ? 'justify-between' : 'justify-end')}>
             {leftContent.length > 0 && <div className="flex justify-start gap-2">{leftContent}</div>}
             {hasRightContent && (
                 <div className="flex justify-end gap-2">
-                    {/* Plain children (buttons etc. not wrapped in ActionBarItem) */}
-                    {plainChildren.map((child, index) => (
+                    {/* Plain children only on desktop */}
+                    {!isMobile && plainChildren.map((child, index) => (
                         <React.Fragment key={`plain-${index}`}>{child}</React.Fragment>
                     ))}
-                    {/* Merged ActionBarItem children with extensions */}
-                    {mergedItems.map((mergedItem, index) => {
-                        if (mergedItem.type === 'inline') {
-                            return React.cloneElement(mergedItem.element, {
-                                key: `inline-${mergedItem.element.props.itemId}`,
-                            });
-                        } else {
-                            const extItem = mergedItem.item;
-                            const itemId = extItem.id ?? `extension-${extItem.component.name || index}`;
-                            return (
-                                <ActionBarItemWrapper
-                                    key={`ext-${extItem.id ?? extItem.pageId}-${index}`}
-                                    itemId={itemId}
-                                >
-                                    <PageActionBarItem item={extItem} page={page} />
-                                </ActionBarItemWrapper>
-                            );
-                        }
-                    })}
+                    {/* Merged ActionBarItem children (filtered on mobile) */}
+                    {visibleMergedItems.map((mergedItem, index) => renderMergedItem(mergedItem, index))}
                     {actionBarDropdownItems.length > 0 && (
                         <PageActionBarDropdown items={actionBarDropdownItems} page={page} />
                     )}
