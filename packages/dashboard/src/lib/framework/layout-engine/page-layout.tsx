@@ -337,7 +337,7 @@ export function DetailFormGrid({ children }: Readonly<{ children: React.ReactNod
  * @since 3.3.0
  */
 export function PageTitle({ children }: Readonly<{ children: React.ReactNode }>) {
-    return <h1 className="text-2xl font-semibold font-heading">{children}</h1>;
+    return <h1 data-testid="page-heading" className="text-2xl font-semibold font-heading">{children}</h1>;
 }
 
 type InlineDropdownItem = Omit<DashboardActionBarItem, 'type' | 'pageId'>;

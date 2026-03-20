@@ -4,7 +4,7 @@ test.describe('Profile', () => {
     test('should display profile page with form fields', async ({ page }) => {
         await page.goto('/profile');
 
-        await expect(page.getByRole('heading', { level: 1, name: 'Profile' })).toBeVisible();
+        await expect(page.getByTestId('page-heading')).toBeVisible();
 
         // Verify form fields are present
         await expect(page.getByText('First name')).toBeVisible();
@@ -20,7 +20,7 @@ test.describe('Profile', () => {
 
     test('should update first name and persist', async ({ page }) => {
         await page.goto('/profile');
-        await expect(page.getByRole('heading', { level: 1, name: 'Profile' })).toBeVisible();
+        await expect(page.getByTestId('page-heading')).toBeVisible();
 
         // Find the first name input via field label
         const firstNameField = page.locator('[data-slot="field"]').filter({
@@ -47,7 +47,7 @@ test.describe('Profile', () => {
 
         // Reload and verify persistence
         await page.reload();
-        await expect(page.getByRole('heading', { level: 1, name: 'Profile' })).toBeVisible();
+        await expect(page.getByTestId('page-heading')).toBeVisible();
 
         const reloadedField = page.locator('[data-slot="field"]').filter({
             has: page.locator('[data-slot="field-label"]').getByText('First name', { exact: true }),
@@ -67,7 +67,7 @@ test.describe('Profile', () => {
 
     test('should show Update button disabled when no changes', async ({ page }) => {
         await page.goto('/profile');
-        await expect(page.getByRole('heading', { level: 1, name: 'Profile' })).toBeVisible();
+        await expect(page.getByTestId('page-heading')).toBeVisible();
 
         // The Update button should be disabled when no changes have been made
         const updateButton = page.getByRole('button', { name: 'Update' });

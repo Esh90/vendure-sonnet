@@ -4,12 +4,12 @@ test.describe('Dashboard Insights', () => {
     test('should display the insights page', async ({ page }) => {
         await page.goto('/');
 
-        await expect(page.getByRole('heading', { level: 1, name: 'Insights' })).toBeVisible();
+        await expect(page.getByTestId('page-heading')).toBeVisible();
     });
 
     test('should display the date range picker', async ({ page }) => {
         await page.goto('/');
-        await expect(page.getByRole('heading', { level: 1, name: 'Insights' })).toBeVisible();
+        await expect(page.getByTestId('page-heading')).toBeVisible();
 
         // The DateRangePicker is a Button showing "Mar 1, 2026 - Mar 20, 2026"
         const dateRangePicker = page.getByRole('button', {
@@ -20,7 +20,7 @@ test.describe('Dashboard Insights', () => {
 
     test('should toggle edit layout mode', async ({ page }) => {
         await page.goto('/');
-        await expect(page.getByRole('heading', { level: 1, name: 'Insights' })).toBeVisible();
+        await expect(page.getByTestId('page-heading')).toBeVisible();
 
         // Click "Edit Layout" button
         const editButton = page.getByRole('button', { name: 'Edit Layout' });

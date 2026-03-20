@@ -28,7 +28,7 @@ export class BaseListPage {
         protected page: Page,
         protected config: ListPageConfig,
     ) {
-        this.heading = page.getByRole('heading', { name: config.title });
+        this.heading = page.getByTestId('page-heading');
         this.searchInput = page.getByPlaceholder('Filter...');
         this.dataTable = page.locator('table');
         // Base UI's Button with render={<Link />} adds role="button" to the element

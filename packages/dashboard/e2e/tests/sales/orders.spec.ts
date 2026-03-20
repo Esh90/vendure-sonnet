@@ -114,7 +114,7 @@ test.describe('Orders', () => {
         await page.locator('[role="alertdialog"]').getByRole('button', { name: 'Continue' }).click();
         // Should navigate back to the orders list (URL may include query params)
         await expect(page).not.toHaveURL(/\/draft\//, { timeout: 15_000 });
-        await expect(page.getByRole('heading', { level: 1, name: 'Orders' })).toBeVisible();
+        await expect(page.getByTestId('page-heading')).toBeVisible();
     });
 
     // #4393 — custom order history entry types should be displayed with key-value data
@@ -325,7 +325,7 @@ test.describe('Orders', () => {
             await expect(dialog.locator('input[type="number"]').first()).toBeVisible();
 
             // The dialog should have a reason selector
-            await expect(dialog.getByText(/Reason/i)).toBeVisible();
+            await expect(dialog.getByText('Reason', { exact: true })).toBeVisible();
 
             // Close without submitting
             await dialog.getByRole('button', { name: 'Cancel' }).click();

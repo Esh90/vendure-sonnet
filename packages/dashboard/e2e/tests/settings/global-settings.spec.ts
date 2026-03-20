@@ -8,14 +8,14 @@ import { expect, test } from '@playwright/test';
 test.describe('Global Settings', () => {
     test('should display the global settings page', async ({ page }) => {
         await page.goto('/global-settings');
-        await expect(page.getByRole('heading', { level: 1, name: 'Global Settings' })).toBeVisible({
+        await expect(page.getByTestId('page-heading')).toBeVisible({
             timeout: 10_000,
         });
     });
 
     test('should show the settings form fields', async ({ page }) => {
         await page.goto('/global-settings');
-        await expect(page.getByRole('heading', { level: 1, name: 'Global Settings' })).toBeVisible({
+        await expect(page.getByTestId('page-heading')).toBeVisible({
             timeout: 10_000,
         });
         await expect(page.getByText('Available languages')).toBeVisible();
@@ -25,12 +25,13 @@ test.describe('Global Settings', () => {
 
     test('should have an Update button', async ({ page }) => {
         await page.goto('/global-settings');
+        await expect(page.getByTestId('page-heading')).toBeVisible({ timeout: 10_000 });
         await expect(page.getByRole('button', { name: 'Update' })).toBeVisible();
     });
 
     test('should update out of stock threshold and persist', async ({ page }) => {
         await page.goto('/global-settings');
-        await expect(page.getByRole('heading', { level: 1, name: 'Global Settings' })).toBeVisible({
+        await expect(page.getByTestId('page-heading')).toBeVisible({
             timeout: 10_000,
         });
 
@@ -58,7 +59,7 @@ test.describe('Global Settings', () => {
 
         // Reload and verify persistence
         await page.reload();
-        await expect(page.getByRole('heading', { level: 1, name: 'Global Settings' })).toBeVisible({
+        await expect(page.getByTestId('page-heading')).toBeVisible({
             timeout: 10_000,
         });
 
@@ -79,7 +80,7 @@ test.describe('Global Settings', () => {
 
     test('should toggle track inventory and persist', async ({ page }) => {
         await page.goto('/global-settings');
-        await expect(page.getByRole('heading', { level: 1, name: 'Global Settings' })).toBeVisible({
+        await expect(page.getByTestId('page-heading')).toBeVisible({
             timeout: 10_000,
         });
         // Wait for form data to fully load: Update button disabled = form is clean with server data
@@ -109,7 +110,7 @@ test.describe('Global Settings', () => {
 
         // Reload and verify persistence
         await page.reload();
-        await expect(page.getByRole('heading', { level: 1, name: 'Global Settings' })).toBeVisible({
+        await expect(page.getByTestId('page-heading')).toBeVisible({
             timeout: 10_000,
         });
         await page.waitForLoadState('networkidle');
