@@ -5,8 +5,8 @@ import { gql } from 'graphql-tag';
 import path from 'path';
 import { afterAll, beforeAll, describe, it } from 'vitest';
 
-import { initialData } from '../../../e2e-common/e2e-initial-data';
-import { testConfig } from '../../../e2e-common/test-config';
+import { initialData } from '../e2e-initial-data';
+import { testConfig } from '../test-config';
 
 describe('ListQueryBuilder Optimization Benchmark', () => {
     const capturedQueries: string[] = [];
@@ -57,7 +57,7 @@ describe('ListQueryBuilder Optimization Benchmark', () => {
     beforeAll(async () => {
         await server.init({
             initialData,
-            productsCsvPath: path.join(__dirname, 'fixtures/e2e-products-minimal.csv'),
+            productsCsvPath: path.join(__dirname, '../../packages/core/e2e/fixtures/e2e-products-minimal.csv'),
             customerCount: 1,
         });
         await adminClient.asSuperAdmin();
