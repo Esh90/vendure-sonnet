@@ -25,6 +25,7 @@ export function ContentLanguageSelector({ value, onChange, className }: ContentL
 
     return (
         <Select
+            items={Object.fromEntries(sortedLanguages.map(({ code, label }) => [code, label]))}
             value={currentValue}
             onValueChange={(value) => {
                 if (value != null) {

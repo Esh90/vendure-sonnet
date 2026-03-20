@@ -118,6 +118,7 @@ export function LinkDialog({ editor, isOpen, onClose }: Readonly<LinkDialogProps
                             <Trans>Link target</Trans>
                         </Label>
                         <Select
+                            items={{ '_self': 'Same window', '_blank': 'New window' }}
                             value={target}
                             onValueChange={value => setTarget(value as '_self' | '_blank')}
                         >

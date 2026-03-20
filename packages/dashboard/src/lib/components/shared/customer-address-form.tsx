@@ -163,6 +163,7 @@ export function CustomerAddressForm<T>({
                         renderFormControl={false}
                         render={({ field }) => (
                             <Select
+                                items={countriesData ? Object.fromEntries(countriesData.countries.items.map(c => [c.code, c.name])) : {}}
                                 onValueChange={field.onChange}
                                 defaultValue={field.value || undefined}
                                 value={field.value || undefined}

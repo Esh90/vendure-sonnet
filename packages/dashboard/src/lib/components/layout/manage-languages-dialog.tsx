@@ -351,6 +351,7 @@ export function ManageLanguagesDialog({ open, onClose }: ManageLanguagesDialogPr
                                             <Trans>Default Language</Trans>
                                         </Label>
                                         <Select
+                                            items={Object.fromEntries(sortedChannelLanguages.map(({ code, label }) => [code, `${label} (${code.toUpperCase()})`]))}
                                             value={channelDefaultLanguage}
                                             onValueChange={(value) => { if (value != null) setChannelDefaultLanguage(value) }}
                                             disabled={!canUpdateChannel}

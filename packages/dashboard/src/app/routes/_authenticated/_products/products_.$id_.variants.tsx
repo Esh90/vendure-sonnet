@@ -398,6 +398,7 @@ function ManageProductVariants() {
                                                     ) : (
                                                         <div className="flex items-center gap-2">
                                                             <Select
+                                                                items={Object.fromEntries(group.options.map(opt => [opt.id, opt.name]))}
                                                                 value={
                                                                     optionsToAddToVariant[variant.id]?.[
                                                                         group.id

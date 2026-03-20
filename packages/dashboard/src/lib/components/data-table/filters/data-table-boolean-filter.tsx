@@ -45,7 +45,7 @@ export function DataTableBooleanFilter({
                 </SelectContent>
             </Select>
             {operator !== 'isNull' && (
-                <Select value={value.toString()} onValueChange={v => { if (v != null) setValue(v === 'true'); }}>
+                <Select items={{ 'true': 'True', 'false': 'False' }} value={value.toString()} onValueChange={v => { if (v != null) setValue(v === 'true'); }}>
                     <SelectTrigger>
                         <SelectValue placeholder="Select value" />
                     </SelectTrigger>

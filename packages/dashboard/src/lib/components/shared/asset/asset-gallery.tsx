@@ -476,6 +476,7 @@ export function AssetGallery({
                     <div className="flex items-center gap-2">
                         <span className="text-sm text-muted-foreground"><Trans>Items per page</Trans></span>
                         <Select
+                            items={Object.fromEntries([12, 24, 48, 96].map(size => [`${size}`, size]))}
                             value={pageSize.toString()}
                             onValueChange={value => {
                                 if (value == null) return;
