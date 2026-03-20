@@ -1,4 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Inter:wght@100..900&family=Public+Sans:wght@100..900&display=swap');
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/public-sans';
+@import '@fontsource-variable/geist-mono';
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import "shadcn/tailwind.css";
