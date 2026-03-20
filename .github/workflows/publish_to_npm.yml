@@ -137,24 +137,18 @@ jobs:
       # that need to publish from a nested directory.
       - name: Publish to NPM (release)
         if: matrix.type == 'release'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          npx lerna exec --no-private -- 'publish_dir=$(node -p "require(\"./package.json\").publishConfig?.directory || \".\"") && cd "$publish_dir" && npm publish --access public'
+          npx lerna exec --no-private -- 'publish_dir=$(node -p "require(\"./package.json\").publishConfig?.directory || \".\"") && cd "$publish_dir" && npm publish --access public --dry-run'
 
       - name: Publish to NPM (master-nightly)
         if: matrix.type == 'master-nightly' && steps.commit_check.outputs.should_publish == 'true'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          npx lerna exec --no-private -- 'publish_dir=$(node -p "require(\"./package.json\").publishConfig?.directory || \".\"") && cd "$publish_dir" && npm publish --access public --tag master'
+          npx lerna exec --no-private -- 'publish_dir=$(node -p "require(\"./package.json\").publishConfig?.directory || \".\"") && cd "$publish_dir" && npm publish --access public --tag master --dry-run'
 
       - name: Publish to NPM (minor-nightly)
         if: matrix.type == 'minor-nightly' && steps.commit_check.outputs.should_publish == 'true'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          npx lerna exec --no-private -- 'publish_dir=$(node -p "require(\"./package.json\").publishConfig?.directory || \".\"") && cd "$publish_dir" && npm publish --access public --tag minor'
+          npx lerna exec --no-private -- 'publish_dir=$(node -p "require(\"./package.json\").publishConfig?.directory || \".\"") && cd "$publish_dir" && npm publish --access public --tag minor --dry-run'
 
       - name: Skip publish (no new commits)
         if: matrix.type != 'release' && steps.commit_check.outputs.should_publish == 'false'
