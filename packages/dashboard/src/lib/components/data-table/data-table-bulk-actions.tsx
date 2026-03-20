@@ -70,7 +70,8 @@ export function DataTableBulkActions<TData>({
         >
             <div className="flex items-center gap-2">
                 <Checkbox
-                    checked={allSelected ? true : someSelected ? 'indeterminate' : false}
+                    checked={allSelected || someSelected}
+                    indeterminate={someSelected && !allSelected}
                     onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
                 />
                 <span className="text-sm font-medium">
