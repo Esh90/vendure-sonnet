@@ -96,7 +96,8 @@ test.describe('Facet values', () => {
         // Wait for the table row to render
         await expect(page.locator('table tbody tr').first()).toBeVisible({ timeout: 10_000 });
 
-        const testValueButton = page.locator('table').getByRole('button', { name: 'E2E Test Value' });
+        // Use .first() in case a retry created duplicate entries
+        const testValueButton = page.locator('table').getByRole('button', { name: 'E2E Test Value' }).first();
         await testValueButton.scrollIntoViewIfNeeded();
         await testValueButton.click();
         await expect(page).toHaveURL(new RegExp(`/facets/${seededFacetId}/values/[^/]+`));
@@ -113,10 +114,16 @@ test.describe('Facet values', () => {
         await expect(page.getByText('Facet values', { exact: true })).toBeVisible({ timeout: 10_000 });
         await page.waitForResponse(resp => resp.url().includes('/admin-api') && resp.status() === 200);
 
-        const testValueButton = page.locator('table').getByRole('button', { name: 'E2E Test Value' });
+        const testValueButton = page.locator('table').getByRole('button', { name: 'E2E Test Value' }).first();
         await testValueButton.scrollIntoViewIfNeeded();
         await testValueButton.click();
         await expect(page).toHaveURL(new RegExp(`/facets/${seededFacetId}/values/[^/]+`));
+
+        // Wait for form data to fully load before editing
+        await page.waitForLoadState('networkidle');
+        await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeDisabled({
+            timeout: 5_000,
+        });
 
         // Update the name
         const nameField = page.locator('[data-slot="field"]').filter({

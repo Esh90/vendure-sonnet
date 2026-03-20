@@ -37,7 +37,10 @@ async function goToFirstProduct(page: Page) {
     // Custom fields load via separate async queries after the main product data.
     const dp = detailPage(page);
     await expect(dp.formItem('Product name').getByRole('textbox')).toHaveValue('Laptop', { timeout: 10_000 });
+    // Wait for all network requests to settle AND the Update button to be disabled
+    // (disabled = form is clean with server data loaded, no pending changes).
     await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('button', { name: 'Update', exact: true })).toBeDisabled({ timeout: 10_000 });
 }
 
 /**

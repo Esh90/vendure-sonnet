@@ -300,11 +300,12 @@ test.describe('Orders', () => {
             // The "Refund & Cancel" option is in the page action bar dropdown
             // Open the more actions dropdown (ellipsis in the action bar)
             const actionBarEllipsis = page
-                .locator('[data-slot="button"]')
+                .locator('button')
                 .filter({
                     has: page.locator('svg.lucide-ellipsis-vertical'),
                 })
                 .first();
+            await expect(actionBarEllipsis).toBeVisible({ timeout: 10_000 });
             await actionBarEllipsis.click();
 
             // Click "Refund & Cancel"
