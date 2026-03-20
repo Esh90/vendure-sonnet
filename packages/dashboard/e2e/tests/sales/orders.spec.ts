@@ -208,9 +208,238 @@ test.describe('Orders', () => {
         await recalculateCheckbox.click();
         await expect(recalculateCheckbox).toBeChecked();
     });
+
+    test.describe('Order lifecycle', () => {
+        test('should fulfill an order', async ({ page }) => {
+            test.setTimeout(60_000);
+
+            const client = new VendureAdminClient(page);
+            await client.login();
+            const orderId = await createPaidOrder(client);
+
+            await page.goto(`/orders/${orderId}`);
+            await expect(page.getByRole('button', { name: /Fulfill order/i })).toBeVisible({
+                timeout: 10_000,
+            });
+
+            // Click "Fulfill order" to open the fulfill dialog
+            await page.getByRole('button', { name: /Fulfill order/i }).click();
+
+            const dialog = page.locator('[role="dialog"]');
+            await expect(dialog).toBeVisible();
+            await expect(dialog.getByText('Fulfill order')).toBeVisible();
+
+            // The dialog should show order line items with quantity inputs
+            await expect(dialog.locator('input[type="number"]').first()).toBeVisible();
+
+            // Submit the fulfillment
+            await dialog.getByRole('button', { name: /Fulfill order/i }).click();
+
+            // Wait for the mutation and verify success
+            await expect(
+                page.locator('[data-sonner-toast]').filter({ hasNotText: /error/i }).first(),
+            ).toBeVisible({ timeout: 10_000 });
+        });
+
+        test('should transition order state', async ({ page }) => {
+            test.setTimeout(60_000);
+
+            const client = new VendureAdminClient(page);
+            await client.login();
+            const orderId = await createFulfilledOrder(client);
+
+            await page.goto(`/orders/${orderId}`);
+
+            // The state transition control is a badge with a dropdown trigger
+            // Find the ellipsis button near the state badge
+            const stateSection = page
+                .locator('[data-slot="card"]')
+                .filter({ hasText: /Fulfilled/i })
+                .first();
+            await expect(stateSection).toBeVisible({ timeout: 10_000 });
+
+            // Click the ellipsis dropdown button next to the state badge
+            const dropdownTrigger = stateSection.locator('button').filter({
+                has: page.locator('svg.lucide-ellipsis-vertical'),
+            });
+            await dropdownTrigger.click();
+
+            // Select "Transition to Shipped" from the dropdown
+            const menu = page.locator('[data-slot="dropdown-menu-content"]');
+            await expect(menu).toBeVisible();
+            await menu
+                .getByText(/Shipped/i)
+                .first()
+                .click();
+
+            // Wait for the mutation
+            await page.waitForResponse(resp => resp.url().includes('/admin-api') && resp.status() === 200);
+
+            // The state badge should update
+            await expect(page.getByText('Shipped')).toBeVisible({ timeout: 5_000 });
+        });
+
+        test('should open refund dialog and show order lines', async ({ page }) => {
+            test.setTimeout(60_000);
+
+            const client = new VendureAdminClient(page);
+            await client.login();
+            const orderId = await createPaidOrder(client);
+
+            await page.goto(`/orders/${orderId}`);
+            await expect(page.getByRole('button', { name: /Fulfill order/i })).toBeVisible({
+                timeout: 10_000,
+            });
+
+            // The "Refund & Cancel" option is in the page action bar dropdown
+            // Open the more actions dropdown (ellipsis in the action bar)
+            const actionBarEllipsis = page
+                .locator('[data-slot="button"]')
+                .filter({
+                    has: page.locator('svg.lucide-ellipsis-vertical'),
+                })
+                .first();
+            await actionBarEllipsis.click();
+
+            // Click "Refund & Cancel"
+            const menu = page.locator('[data-slot="dropdown-menu-content"]');
+            await expect(menu).toBeVisible();
+            await menu
+                .getByText(/Refund/i)
+                .first()
+                .click();
+
+            // The refund dialog should open
+            const dialog = page.locator('[role="dialog"]');
+            await expect(dialog).toBeVisible({ timeout: 5_000 });
+            await expect(dialog.getByText(/Refund/i).first()).toBeVisible();
+
+            // The dialog should show order line items
+            await expect(dialog.locator('input[type="number"]').first()).toBeVisible();
+
+            // The dialog should have a reason selector
+            await expect(dialog.getByText(/Reason/i)).toBeVisible();
+
+            // Close without submitting
+            await dialog.getByRole('button', { name: 'Cancel' }).click();
+        });
+
+        test('should process a refund', async ({ page }) => {
+            test.setTimeout(60_000);
+
+            const client = new VendureAdminClient(page);
+            await client.login();
+            const orderId = await createPaidOrder(client);
+
+            await page.goto(`/orders/${orderId}`);
+            await expect(page.getByRole('button', { name: /Fulfill order/i })).toBeVisible({
+                timeout: 10_000,
+            });
+
+            // Open the refund dialog via action bar dropdown
+            const actionBarEllipsis = page
+                .locator('[data-slot="button"]')
+                .filter({
+                    has: page.locator('svg.lucide-ellipsis-vertical'),
+                })
+                .first();
+            await actionBarEllipsis.click();
+
+            const menu = page.locator('[data-slot="dropdown-menu-content"]');
+            await menu
+                .getByText(/Refund/i)
+                .first()
+                .click();
+
+            const dialog = page.locator('[role="dialog"]');
+            await expect(dialog).toBeVisible({ timeout: 5_000 });
+
+            // Set refund quantity to 1 for the first line item
+            const quantityInput = dialog.locator('input[type="number"]').first();
+            await quantityInput.fill('1');
+
+            // Select the first available payment for refund
+            const paymentCheckbox = dialog.getByRole('checkbox').first();
+            if (await paymentCheckbox.isVisible()) {
+                await paymentCheckbox.check();
+            }
+
+            // Submit the refund
+            const refundButton = dialog.getByRole('button', { name: /Refund/i }).last();
+            await refundButton.click();
+
+            // Wait for success
+            await expect(
+                page.locator('[data-sonner-toast]').filter({ hasNotText: /error/i }).first(),
+            ).toBeVisible({ timeout: 10_000 });
+        });
+
+        test('should show order history entries for lifecycle events', async ({ page }) => {
+            test.setTimeout(60_000);
+
+            const client = new VendureAdminClient(page);
+            await client.login();
+            const orderId = await createPaidOrder(client);
+
+            await page.goto(`/orders/${orderId}`);
+            await expect(page.getByRole('button', { name: /Fulfill order/i })).toBeVisible({
+                timeout: 10_000,
+            });
+
+            // Scroll to the Order history section
+            const historyTitle = page
+                .locator('[data-slot="card-title"]')
+                .filter({ hasText: 'Order history' });
+            await historyTitle.scrollIntoViewIfNeeded();
+            await expect(historyTitle).toBeVisible();
+
+            // The history should contain payment-related entries
+            await expect(page.getByText(/Payment/i).first()).toBeVisible();
+        });
+    });
 });
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
+
+/**
+ * Creates a paid order and adds a fulfillment, returning the order ID
+ * in "Fulfilled" state.
+ */
+async function createFulfilledOrder(client: VendureAdminClient): Promise<string> {
+    const orderId = await createPaidOrder(client);
+
+    // Add fulfillment to the order
+    const { order } = await client.gql(`query ($id: ID!) { order(id: $id) { lines { id } } }`, {
+        id: orderId,
+    });
+
+    const { fulfillmentHandlers } = await client.gql(`query { fulfillmentHandlers { code } }`);
+
+    await client.gql(
+        `
+        mutation ($input: FulfillOrderInput!) {
+            addFulfillmentToOrder(input: $input) {
+                ... on Fulfillment { id state }
+                ... on ErrorResult { errorCode message }
+            }
+        }
+    `,
+        {
+            input: {
+                lines: order.lines.map((line: { id: string }) => ({
+                    orderLineId: line.id,
+                    quantity: 1,
+                })),
+                handler: {
+                    code: fulfillmentHandlers[0].code,
+                    arguments: [],
+                },
+            },
+        },
+    );
+
+    return orderId;
+}
 
 /**
  * Creates a payment method (idempotent), builds a fully-paid order via the

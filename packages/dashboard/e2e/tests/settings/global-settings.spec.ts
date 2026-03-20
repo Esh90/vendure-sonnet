@@ -23,4 +23,98 @@ test.describe('Global Settings', () => {
         await page.goto('/global-settings');
         await expect(page.getByRole('button', { name: 'Update' })).toBeVisible();
     });
+
+    test('should update out of stock threshold and persist', async ({ page }) => {
+        await page.goto('/global-settings');
+        await expect(page.getByRole('heading', { level: 1, name: 'Global Settings' })).toBeVisible();
+
+        // Find the threshold input via its label
+        const thresholdField = page.locator('[data-slot="field"]').filter({
+            has: page
+                .locator('[data-slot="field-label"]')
+                .getByText('Global out of stock threshold', { exact: true }),
+        });
+        const thresholdInput = thresholdField.getByRole('spinbutton');
+        await expect(thresholdInput).toBeVisible();
+
+        // Store original value
+        const originalValue = await thresholdInput.inputValue();
+
+        // Set a new value
+        const newValue = originalValue === '-5' ? '-10' : '-5';
+        await thresholdInput.fill(newValue);
+
+        // Click Update
+        await page.getByRole('button', { name: 'Update' }).click();
+        await expect(
+            page.locator('[data-sonner-toast]').filter({ hasNotText: /error/i }).first(),
+        ).toBeVisible({ timeout: 10_000 });
+
+        // Reload and verify persistence
+        await page.reload();
+        await expect(page.getByRole('heading', { level: 1, name: 'Global Settings' })).toBeVisible();
+
+        const reloadedField = page.locator('[data-slot="field"]').filter({
+            has: page
+                .locator('[data-slot="field-label"]')
+                .getByText('Global out of stock threshold', { exact: true }),
+        });
+        await expect(reloadedField.getByRole('spinbutton')).toHaveValue(newValue);
+
+        // Reset to original value
+        await reloadedField.getByRole('spinbutton').fill(originalValue);
+        await page.getByRole('button', { name: 'Update' }).click();
+        await expect(
+            page.locator('[data-sonner-toast]').filter({ hasNotText: /error/i }).first(),
+        ).toBeVisible({ timeout: 10_000 });
+    });
+
+    test('should toggle track inventory and persist', async ({ page }) => {
+        await page.goto('/global-settings');
+        await expect(page.getByRole('heading', { level: 1, name: 'Global Settings' })).toBeVisible();
+
+        // Find the track inventory switch via its label
+        const trackField = page.locator('[data-slot="field"]').filter({
+            has: page
+                .locator('[data-slot="field-label"]')
+                .getByText('Track inventory by default', { exact: true }),
+        });
+        const trackSwitch = trackField.getByRole('switch');
+        await expect(trackSwitch).toBeVisible();
+
+        // Store original state
+        const wasChecked = await trackSwitch.isChecked();
+
+        // Toggle the switch
+        await trackSwitch.click();
+
+        // Click Update
+        await page.getByRole('button', { name: 'Update' }).click();
+        await expect(
+            page.locator('[data-sonner-toast]').filter({ hasNotText: /error/i }).first(),
+        ).toBeVisible({ timeout: 10_000 });
+
+        // Reload and verify persistence
+        await page.reload();
+        await expect(page.getByRole('heading', { level: 1, name: 'Global Settings' })).toBeVisible();
+
+        const reloadedField = page.locator('[data-slot="field"]').filter({
+            has: page
+                .locator('[data-slot="field-label"]')
+                .getByText('Track inventory by default', { exact: true }),
+        });
+        const reloadedSwitch = reloadedField.getByRole('switch');
+        if (wasChecked) {
+            await expect(reloadedSwitch).not.toBeChecked();
+        } else {
+            await expect(reloadedSwitch).toBeChecked();
+        }
+
+        // Reset to original state
+        await reloadedSwitch.click();
+        await page.getByRole('button', { name: 'Update' }).click();
+        await expect(
+            page.locator('[data-sonner-toast]').filter({ hasNotText: /error/i }).first(),
+        ).toBeVisible({ timeout: 10_000 });
+    });
 });

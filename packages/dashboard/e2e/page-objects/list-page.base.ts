@@ -112,6 +112,67 @@ export class BaseListPage {
         expect(await this.getRows().count()).toBeGreaterThan(min);
     }
 
+    /** Click the sort button in the column header matching `name`. */
+    async clickColumnSort(name: string) {
+        const header = this.dataTable.locator('thead th').filter({ hasText: name });
+        await header.getByRole('button').first().click();
+        await this.page.waitForResponse(resp => resp.url().includes('/admin-api') && resp.status() === 200);
+    }
+
+    /** Click the "Go to next page" pagination button. */
+    async clickNextPage() {
+        await this.page.getByRole('button', { name: 'Go to next page' }).click();
+        await this.page.waitForResponse(resp => resp.url().includes('/admin-api') && resp.status() === 200);
+    }
+
+    /** Click the "Go to previous page" pagination button. */
+    async clickPreviousPage() {
+        await this.page.getByRole('button', { name: 'Go to previous page' }).click();
+        await this.page.waitForResponse(resp => resp.url().includes('/admin-api') && resp.status() === 200);
+    }
+
+    /** Get a locator for the rows-per-page Select trigger in the pagination footer. */
+    getPageSizeSelect(): Locator {
+        return this.page.locator('[data-slot="select-trigger"]').last();
+    }
+
+    /** Open the column settings dropdown (gear icon in the toolbar). */
+    async openColumnSettings() {
+        await this.page
+            .locator('button:not([data-sidebar])')
+            .filter({
+                has: this.page.locator('svg.lucide-settings2'),
+            })
+            .click();
+    }
+
+    /**
+     * Open the add filter dropdown menu (filter icon in the toolbar).
+     * Distinguishes from faceted filter buttons (which have visible text like "Facet values")
+     * by selecting only icon-only buttons with the filter icon.
+     */
+    async openAddFilterMenu() {
+        // All buttons with the lucide filter icon
+        const filterButtons = this.page
+            .locator('button')
+            .filter({ has: this.page.locator('svg.lucide-filter') });
+
+        // The icon-only add filter button has no visible text,
+        // while faceted filter buttons have labels like "Facet values".
+        // Find the one without word-character text content.
+        const count = await filterButtons.count();
+        for (let i = 0; i < count; i++) {
+            const btn = filterButtons.nth(i);
+            const text = await btn.innerText();
+            if (!text.trim()) {
+                await btn.click();
+                return;
+            }
+        }
+        // Fallback: click the last filter-icon button
+        await filterButtons.last().click();
+    }
+
     /** Wait for a success toast to appear (handles both toast.success and toast with text). */
     async expectSuccessToast(textMatch?: string | RegExp) {
         if (textMatch) {
