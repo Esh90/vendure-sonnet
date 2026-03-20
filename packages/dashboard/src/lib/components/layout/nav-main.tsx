@@ -96,7 +96,7 @@ export function NavMain({ items }: Readonly<{ items: Array<NavMenuSection | NavM
     const routerState = useRouterState();
     const { hasPermissions } = usePermissions();
     const { i18n } = useLingui();
-    const { state: sidebarState, isMobile } = useSidebar();
+    const { state: sidebarState, isMobile, setOpenMobile } = useSidebar();
     const isCollapsed = sidebarState === 'collapsed' && !isMobile;
     const currentPath = routerState.location.pathname;
     const basePath = router.basepath || '';
@@ -235,6 +235,15 @@ export function NavMain({ items }: Readonly<{ items: Array<NavMenuSection | NavM
             setOpenBottomSectionId(activeBottomSection);
         }
     }, [currentPath, items, findActiveSections]);
+
+    // Close mobile sidebar on route change
+    const prevPathRef = React.useRef(currentPath);
+    React.useEffect(() => {
+        if (prevPathRef.current !== currentPath && isMobile) {
+            setOpenMobile(false);
+        }
+        prevPathRef.current = currentPath;
+    }, [currentPath, isMobile, setOpenMobile]);
 
     const renderSection = (
         item: NavMenuSection | NavMenuItem,

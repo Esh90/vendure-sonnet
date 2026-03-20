@@ -123,3 +123,10 @@ html[dir="rtl"] * {
         animation: rotate 0.5s linear infinite;
     }
 }
+
+/* Prevent the main content area from overflowing horizontally on mobile,
+   which otherwise extends behind the sidebar Sheet backdrop and blocks
+   tap-to-close interactions. */
+[data-slot="sidebar-inset"] {
+    overflow-x: hidden;
+}
