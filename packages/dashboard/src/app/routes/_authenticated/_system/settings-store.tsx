@@ -27,7 +27,7 @@ import { Trans, useLingui } from '@lingui/react/macro';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { ColumnFilter, createColumnHelper } from '@tanstack/react-table';
-import { JsonEditor } from 'json-edit-react';
+import { JsonViewer } from '@/vdb/components/data-display/json-viewer.js';
 import { Braces } from 'lucide-react';
 import React, { useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -124,7 +124,7 @@ function JsonValueDialog({
                     </DialogDescription>
                 </DialogHeader>
                 <ScrollArea className="max-h-[500px]">
-                    <JsonEditor
+                    <JsonViewer
                         data={value}
                         viewOnly={readonly}
                         collapse={1}

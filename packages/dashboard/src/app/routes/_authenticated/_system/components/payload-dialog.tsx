@@ -7,7 +7,7 @@ import {
     DialogTrigger,
 } from '@/vdb/components/ui/dialog.js';
 import { ScrollArea } from '@/vdb/components/ui/scroll-area.js';
-import { JsonEditor } from 'json-edit-react';
+import { JsonViewer } from '@/vdb/components/data-display/json-viewer.js';
 
 type PayloadDialogProps = {
     payload: any;
@@ -33,7 +33,7 @@ export function PayloadDialog({
                     <DialogDescription>{description}</DialogDescription>
                 </DialogHeader>
                 <ScrollArea className="max-h-[600px]">
-                    <JsonEditor viewOnly data={payload} collapse={1} rootFontSize={12} />
+                    <JsonViewer viewOnly data={payload} collapse={1} rootFontSize={12} />
                 </ScrollArea>
             </DialogContent>
         </Dialog>
