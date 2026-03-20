@@ -98,7 +98,7 @@
         "@vitejs/plugin-react": "^5.2.0",
         "acorn": "^8.16.0",
         "acorn-walk": "^8.3.5",
-        "awesome-graphql-client": "^2.1.0",
+        "awesome-graphql-client": "^3.0.0",
         "clsx": "^2.1.1",
         "date-fns": "^4.0.0",
         "express-rate-limit": "^7.5.0",
