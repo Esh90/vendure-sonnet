@@ -1,3 +1,4 @@
+import { MenuBranding } from '@/vdb/components/shared/powered-by-vendure.js';
 import { useAuth } from '@/vdb/hooks/use-auth.js';
 import { Link, useNavigate, useRouter } from '@tanstack/react-router';
 import { ChevronsUpDown, LogOut, Monitor, Moon, Sparkles, Sun } from 'lucide-react';
@@ -162,6 +163,8 @@ export function NavUser() {
                                 <LogOut />
                                 <Trans>Log out</Trans>
                             </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <MenuBranding />
                         </DropdownMenuContent>
                     </DropdownMenu>
                     <LanguageDialog />

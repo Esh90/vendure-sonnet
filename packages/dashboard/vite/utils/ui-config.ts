@@ -13,7 +13,10 @@ import {
 } from '../constants.js';
 import { ResolvedUiConfig, UiConfigPluginOptions } from '../vite-plugin-ui-config.js';
 
-export function getUiConfig(config: VendureConfig, pluginOptions: UiConfigPluginOptions): ResolvedUiConfig {
+export function getUiConfig(
+    config: VendureConfig,
+    pluginOptions: UiConfigPluginOptions,
+): Omit<ResolvedUiConfig, 'version'> {
     const { authOptions, apiOptions } = config;
 
     // Merge API configuration with defaults
