@@ -118,7 +118,11 @@ function findTsConfig(dir: string): string {
                 `or provide the path to the project directory as the second argument.`,
         );
     }
-    // Prefer canonical tsconfig.json
-    const configFile = tsConfigFiles.includes('tsconfig.json') ? 'tsconfig.json' : tsConfigFiles[0];
+    // Prefer tsconfig.dashboard.json for dashboard extensions, then tsconfig.json
+    const configFile = tsConfigFiles.includes('tsconfig.dashboard.json')
+        ? 'tsconfig.dashboard.json'
+        : tsConfigFiles.includes('tsconfig.json')
+          ? 'tsconfig.json'
+          : tsConfigFiles[0];
     return path.resolve(dir, configFile);
 }
