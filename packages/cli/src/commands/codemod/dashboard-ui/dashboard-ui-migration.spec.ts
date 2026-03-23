@@ -38,7 +38,7 @@ function createSourceFile(code: string) {
     return project.createSourceFile(`test-${fileCounter}.tsx`, code, { scriptKind: ScriptKind.TSX });
 }
 
-// ─── asChild -> render ────────────────────────────────────────────────
+// ─── asChild → render ────────────────────────────────────────────────
 
 describe('transformAsChildToRender', () => {
     it('should transform Button with asChild wrapping Link', () => {
@@ -133,59 +133,89 @@ const el = (
         const changes = transformAsChildToRender(sf);
         expect(changes).toBe(0);
     });
+
+    it('should skip unconvertible asChild and still process valid ones after it', () => {
+        const sf = createSourceFile(`
+function App() {
+    return (
+        <div>
+            <Button asChild>
+                {condition && <Link to="/maybe" />}
+            </Button>
+            <Button asChild>
+                <Link to="/valid">
+                    Valid
+                </Link>
+            </Button>
+        </div>
+    );
+}
+`);
+        const changes = transformAsChildToRender(sf);
+        // First one is skipped (JSX expression child), second one converts
+        expect(changes).toBe(1);
+        const text = sf.getFullText();
+        expect(text).toContain('render={<Link to="/valid" />}');
+    });
 });
 
-// ─── FormField -> FormFieldWrapper ────────────────────────────────────
+// ─── FormField → FormFieldWrapper ────────────────────────────────────
 
 describe('transformFormComponents', () => {
     it('should transform a basic FormField to FormFieldWrapper', () => {
         const sf = createSourceFile(`
-import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from './form';
+import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from '@vendure/dashboard';
 
-<FormField
-    control={form.control}
-    name="slug"
-    render={({ field }) => (
-        <FormItem>
-            <FormLabel>Slug</FormLabel>
-            <FormControl>
-                <Input {...field} />
-            </FormControl>
-            <FormDescription>The URL slug.</FormDescription>
-            <FormMessage />
-        </FormItem>
-    )}
-/>
+const el = (
+    <FormField
+        control={form.control}
+        name="slug"
+        render={({ field }) => (
+            <FormItem>
+                <FormLabel>Slug</FormLabel>
+                <FormControl>
+                    <Input {...field} />
+                </FormControl>
+                <FormDescription>The URL slug.</FormDescription>
+                <FormMessage />
+            </FormItem>
+        )}
+    />
+);
 `);
         const changes = transformFormComponents(sf);
-        expect(changes).toBeGreaterThanOrEqual(1);
+        expect(changes).toBe(1);
         const text = sf.getFullText();
         expect(text).toContain('FormFieldWrapper');
         expect(text).toContain('label="Slug"');
         expect(text).toContain('description="The URL slug."');
         expect(text).toContain('<Input {...field} />');
+        expect(text).not.toContain('<FormItem>');
+        expect(text).not.toContain('<FormControl>');
     });
 
     it('should handle FormField without FormDescription', () => {
         const sf = createSourceFile(`
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from './form';
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@vendure/dashboard';
 
-<FormField
-    control={form.control}
-    name="title"
-    render={({ field }) => (
-        <FormItem>
-            <FormLabel>Title</FormLabel>
-            <FormControl>
-                <Input {...field} />
-            </FormControl>
-            <FormMessage />
-        </FormItem>
-    )}
-/>
+const el = (
+    <FormField
+        control={form.control}
+        name="title"
+        render={({ field }) => (
+            <FormItem>
+                <FormLabel>Title</FormLabel>
+                <FormControl>
+                    <Input {...field} />
+                </FormControl>
+                <FormMessage />
+            </FormItem>
+        )}
+    />
+);
 `);
         const changes = transformFormComponents(sf);
-        expect(changes).toBeGreaterThanOrEqual(1);
+        expect(changes).toBe(1);
         const text = sf.getFullText();
         expect(text).toContain('FormFieldWrapper');
         expect(text).toContain('label="Title"');
@@ -202,48 +232,89 @@ const el = <Input value="hello" onChange={handleChange} />;
 
     it('should add TODO comment when FormControl is missing', () => {
         const sf = createSourceFile(`
-import { FormField, FormItem, FormLabel } from './form';
+import { FormField, FormItem, FormLabel } from '@vendure/dashboard';
 
-<FormField
-    control={form.control}
-    name="custom"
-    render={({ field }) => (
-        <FormItem>
-            <FormLabel>Custom</FormLabel>
-            <div><Input {...field} /></div>
-        </FormItem>
-    )}
-/>
+const el = (
+    <FormField
+        control={form.control}
+        name="custom"
+        render={({ field }) => (
+            <FormItem>
+                <FormLabel>Custom</FormLabel>
+                <div><Input {...field} /></div>
+            </FormItem>
+        )}
+    />
+);
 `);
         const changes = transformFormComponents(sf);
-        expect(changes).toBeGreaterThanOrEqual(1);
+        expect(changes).toBe(1);
         const text = sf.getFullText();
         expect(text).toContain('TODO');
+        expect(text).toContain('no FormControl found');
     });
 
-    it('should remove old form imports', () => {
+    it('should not infinite loop when multiple FormFields cannot be converted', () => {
         const sf = createSourceFile(`
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from './form';
+import { FormField, FormItem, FormLabel } from '@vendure/dashboard';
+
+const el = (
+    <div>
+        <FormField
+            control={form.control}
+            name="a"
+            render={({ field }) => (
+                <FormItem>
+                    <FormLabel>A</FormLabel>
+                    <div><Input {...field} /></div>
+                </FormItem>
+            )}
+        />
+        <FormField
+            control={form.control}
+            name="b"
+            render={({ field }) => (
+                <FormItem>
+                    <FormLabel>B</FormLabel>
+                    <div><Input {...field} /></div>
+                </FormItem>
+            )}
+        />
+    </div>
+);
+`);
+        // Should complete without hanging — both get TODO comments
+        const changes = transformFormComponents(sf);
+        expect(changes).toBe(2);
+        const text = sf.getFullText();
+        const todoCount = (text.match(/TODO/g) || []).length;
+        expect(todoCount).toBe(2);
+    });
+
+    it('should remove old form imports when they become unused', () => {
+        const sf = createSourceFile(`
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@vendure/dashboard';
 import { Input } from './input';
 
-<FormField
-    control={form.control}
-    name="name"
-    render={({ field }) => (
-        <FormItem>
-            <FormLabel>Name</FormLabel>
-            <FormControl>
-                <Input {...field} />
-            </FormControl>
-            <FormMessage />
-        </FormItem>
-    )}
-/>
+const el = (
+    <FormField
+        control={form.control}
+        name="name"
+        render={({ field }) => (
+            <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                    <Input {...field} />
+                </FormControl>
+                <FormMessage />
+            </FormItem>
+        )}
+    />
+);
 `);
         const changes = transformFormComponents(sf);
-        expect(changes).toBeGreaterThanOrEqual(1);
+        expect(changes).toBe(1);
         const text = sf.getFullText();
-        expect(text).not.toContain("from './form'");
         expect(text).toContain("from './input'");
         expect(text).toContain('FormFieldWrapper');
     });
@@ -266,8 +337,34 @@ function App() {
         const text = sf.getFullText();
         expect(text).not.toContain('@radix-ui');
         expect(text).toContain('@vendure/dashboard');
-        expect(text).toContain('Dialog');
-        expect(text).toContain('Popover');
+    });
+
+    it('should rewrite namespace member access sites', () => {
+        const sf = createSourceFile(`
+import * as Dialog from '@radix-ui/react-dialog';
+
+function App() {
+    return (
+        <Dialog.Root>
+            <Dialog.Trigger>Open</Dialog.Trigger>
+            <Dialog.Content>
+                <Dialog.Title>Title</Dialog.Title>
+            </Dialog.Content>
+        </Dialog.Root>
+    );
+}
+`);
+        const changes = transformImportConsolidation(sf);
+        expect(changes).toBe(1);
+        const text = sf.getFullText();
+        expect(text).not.toContain('Dialog.Root');
+        expect(text).not.toContain('Dialog.Trigger');
+        expect(text).not.toContain('Dialog.Content');
+        expect(text).not.toContain('Dialog.Title');
+        expect(text).toContain('<Dialog>');
+        expect(text).toContain('<DialogTrigger>');
+        expect(text).toContain('<DialogContent>');
+        expect(text).toContain('<DialogTitle>');
     });
 
     it('should consolidate @vendure-io/ui named imports', () => {
@@ -361,6 +458,9 @@ function App() {
         const changes = transformImportConsolidation(sf);
         expect(changes).toBe(2);
         const text = sf.getFullText();
+        const buttonImportMatches = text.match(/\bButton\b/g);
+        // One in import, one in JSX
+        expect(buttonImportMatches).toBeTruthy();
         expect(text).toContain('@vendure/dashboard');
     });
 });

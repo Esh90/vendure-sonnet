@@ -1,4 +1,5 @@
-import { SourceFile } from 'ts-morph';
+import { log } from '@clack/prompts';
+import { JsxSelfClosingElement, SourceFile, SyntaxKind } from 'ts-morph';
 
 /**
  * Transforms old React Hook Form + shadcn FormField pattern to FormFieldWrapper.
@@ -34,143 +35,211 @@ import { SourceFile } from 'ts-morph';
  * />
  * ```
  *
- * For cases that can't be auto-converted, a TODO comment is added.
+ * Uses ts-morph AST for reliable parsing. Falls back to a TODO comment
+ * for patterns that can't be auto-converted.
  */
 export function transformFormComponents(sourceFile: SourceFile): number {
     let changeCount = 0;
-    let text = sourceFile.getFullText();
+    const text = sourceFile.getFullText();
 
-    // Check if there are any FormField usages
     if (!text.includes('<FormField')) {
         return 0;
     }
 
-    // Match FormField self-closing elements with render prop containing FormItem/FormLabel/FormControl
-    // This is a text-based transform due to JSX complexity
-    let changed = true;
-    while (changed) {
-        changed = false;
+    // Process iteratively — each replacement invalidates AST positions
+    let foundOne = true;
+    while (foundOne) {
+        foundOne = false;
 
-        // Match the FormField pattern with render prop
-        const formFieldRegex =
-            /<FormField\s+([\s\S]*?)render=\{\(\{[\s\t ]*field[\s\t ]*\}\)[\s\t ]*=>[\s\t ]*\(([\s\S]*?)\)\s*\}\s*\/>/;
+        // Find all self-closing <FormField /> elements
+        const formFields = sourceFile
+            .getDescendantsOfKind(SyntaxKind.JsxSelfClosingElement)
+            .filter(el => el.getTagNameNode().getText() === 'FormField');
 
-        const match = formFieldRegex.exec(text);
-        if (!match) {
+        if (formFields.length === 0) {
             break;
         }
 
-        const [fullMatch, propsStr, renderBody] = match;
+        const formField = formFields[0];
 
-        // Extract label from <FormLabel>...</FormLabel>
-        const labelMatch = /<FormLabel>(.*?)<\/FormLabel>/.exec(renderBody);
+        // Extract control and name props
+        const controlAttr = getJsxAttributeValue(formField, 'control');
+        const nameAttr = getJsxAttributeValue(formField, 'name');
+
+        // Extract the render prop's arrow function body
+        const renderAttr = formField.getAttribute('render');
+        if (!renderAttr || renderAttr.getKind() !== SyntaxKind.JsxAttribute) {
+            // No render prop — can't convert, add TODO and rename to prevent re-match
+            addTodoAndRename(formField, 'missing render prop');
+            changeCount++;
+            foundOne = true;
+            continue;
+        }
+
+        // Navigate into the render callback to find the JSX body
+        const renderInitializer = renderAttr.asKindOrThrow(SyntaxKind.JsxAttribute).getInitializer();
+        if (!renderInitializer) {
+            addTodoAndRename(formField, 'empty render prop');
+            changeCount++;
+            foundOne = true;
+            continue;
+        }
+
+        // The render body should contain a FormItem with FormLabel, FormControl, etc.
+        const renderText = renderInitializer.getText();
+
+        // Extract label from <FormLabel>plainText</FormLabel>
+        const labelMatch = /<FormLabel>([^<]*)<\/FormLabel>/.exec(renderText);
         const label = labelMatch ? labelMatch[1].trim() : undefined;
 
+        // Check for complex label (JSX inside FormLabel)
+        const complexLabelMatch = /<FormLabel>([\s\S]*?)<\/FormLabel>/.exec(renderText);
+        const hasComplexLabel = complexLabelMatch && /<[^>]+>/.test(complexLabelMatch[1]) && !labelMatch;
+
+        if (hasComplexLabel) {
+            addTodoAndRename(formField, 'complex JSX label');
+            changeCount++;
+            foundOne = true;
+            continue;
+        }
+
         // Extract description from <FormDescription>...</FormDescription>
-        const descMatch = /<FormDescription>(.*?)<\/FormDescription>/.exec(renderBody);
+        const descMatch = /<FormDescription>([^<]*)<\/FormDescription>/.exec(renderText);
         const description = descMatch ? descMatch[1].trim() : undefined;
 
         // Extract the content inside <FormControl>...</FormControl>
-        const formControlMatch = /<FormControl>([\s\S]*?)<\/FormControl>/.exec(renderBody);
-
+        const formControlMatch = /<FormControl>\s*([\s\S]*?)\s*<\/FormControl>/.exec(renderText);
         if (!formControlMatch) {
-            // Can't auto-convert - add TODO comment and skip
-            const todoComment = `{/* TODO: Migrate this FormField to FormFieldWrapper manually */}\n`;
-            text =
-                text.slice(0, match.index) +
-                todoComment +
-                fullMatch +
-                text.slice(match.index + fullMatch.length);
-            changed = true;
+            addTodoAndRename(formField, 'no FormControl found');
             changeCount++;
+            foundOne = true;
             continue;
         }
 
         const innerContent = formControlMatch[1].trim();
 
-        // Check for complex label (JSX inside FormLabel rather than plain text)
-        if (labelMatch && /<[^>]+>/.test(labelMatch[1])) {
-            // Complex label with JSX - add TODO and skip
-            const todoComment = `{/* TODO: Migrate this FormField to FormFieldWrapper manually - complex label */}\n`;
-            text =
-                text.slice(0, match.index) +
-                todoComment +
-                fullMatch +
-                text.slice(match.index + fullMatch.length);
-            changed = true;
-            changeCount++;
-            continue;
-        }
-
         // Build the replacement FormFieldWrapper
-        const existingProps = propsStr.trim();
-        let newProps = existingProps;
-
+        let props = '';
+        if (controlAttr) {
+            props += `\n    control={${controlAttr}}`;
+        }
+        if (nameAttr) {
+            props += `\n    name=${nameAttr}`;
+        }
         if (label) {
-            newProps += `\n    label="${label}"`;
+            props += `\n    label="${label}"`;
         }
         if (description) {
-            newProps += `\n    description="${description}"`;
+            props += `\n    description="${description}"`;
         }
+        props += `\n    render={({ field }) => (\n        ${innerContent}\n    )}`;
 
-        const replacement = `<FormFieldWrapper\n    ${newProps}\n    render={({ field }) => (\n        ${innerContent}\n    )}\n/>`;
+        const replacement = `<FormFieldWrapper${props}\n/>`;
 
-        text = text.slice(0, match.index) + replacement + text.slice(match.index + fullMatch.length);
+        formField.replaceWithText(replacement);
         changeCount++;
-        changed = true;
+        foundOne = true;
     }
 
     if (changeCount > 0) {
-        sourceFile.replaceWithText(text);
-
-        // Update imports: remove old form imports, add FormFieldWrapper
-        const importDeclarations = sourceFile.getImportDeclarations();
-        const newImportsNeeded: string[] = ['FormFieldWrapper'];
-
-        for (const importDecl of importDeclarations) {
-            const namedImports = importDecl.getNamedImports();
-            const formImportNames = [
-                'FormField',
-                'FormItem',
-                'FormLabel',
-                'FormControl',
-                'FormDescription',
-                'FormMessage',
-            ];
-
-            const formImports = namedImports.filter(ni => formImportNames.includes(ni.getName()));
-            if (formImports.length > 0) {
-                // Remove the form-specific imports
-                for (const fi of formImports) {
-                    fi.remove();
-                }
-                // If no named imports left, remove the entire import declaration
-                if (
-                    importDecl.getNamedImports().length === 0 &&
-                    !importDecl.getDefaultImport() &&
-                    !importDecl.getNamespaceImport()
-                ) {
-                    importDecl.remove();
-                }
-            }
-        }
-
-        // Add FormFieldWrapper import
-        const existingDashboardImport = sourceFile.getImportDeclaration(
-            decl => decl.getModuleSpecifier().getLiteralValue() === '@vendure/dashboard',
-        );
-        if (existingDashboardImport) {
-            const existing = existingDashboardImport.getNamedImports().map(ni => ni.getName());
-            if (!existing.includes('FormFieldWrapper')) {
-                existingDashboardImport.addNamedImport('FormFieldWrapper');
-            }
-        } else {
-            sourceFile.addImportDeclaration({
-                moduleSpecifier: '@vendure/dashboard',
-                namedImports: newImportsNeeded,
-            });
-        }
+        removeUnusedFormImports(sourceFile);
     }
 
     return changeCount;
+}
+
+/**
+ * Gets the raw value text of a JSX attribute (without quotes for string literals,
+ * without braces for expressions).
+ */
+function getJsxAttributeValue(element: JsxSelfClosingElement, attrName: string): string | undefined {
+    const attr = element.getAttribute(attrName);
+    if (!attr || attr.getKind() !== SyntaxKind.JsxAttribute) {
+        return undefined;
+    }
+    const initializer = attr.asKindOrThrow(SyntaxKind.JsxAttribute).getInitializer();
+    if (!initializer) {
+        return undefined;
+    }
+    const text = initializer.getText();
+    // Strip surrounding braces from {expression}
+    if (text.startsWith('{') && text.endsWith('}')) {
+        return text.slice(1, -1);
+    }
+    return text;
+}
+
+/**
+ * Adds a TODO comment and renames FormField → FormField_TODO to prevent
+ * infinite re-matching in the while loop.
+ */
+function addTodoAndRename(formField: JsxSelfClosingElement, reason: string) {
+    const filePath = formField.getSourceFile().getFilePath();
+    const line = formField.getStartLineNumber();
+    log.warn(`${filePath}:${line} — Cannot auto-convert FormField (${reason}). Added TODO comment.`);
+    const original = formField.getText();
+    formField.replaceWithText(
+        `{/* TODO: Migrate this FormField to FormFieldWrapper manually — ${reason} */}\n${original}`,
+    );
+}
+
+/**
+ * Removes old form-specific imports (FormField, FormItem, FormControl, etc.)
+ * and adds FormFieldWrapper. Import consolidation runs after this transform,
+ * so we only handle the form-specific cleanup here.
+ */
+function removeUnusedFormImports(sourceFile: SourceFile) {
+    const formImportNames = [
+        'FormField',
+        'FormItem',
+        'FormLabel',
+        'FormControl',
+        'FormDescription',
+        'FormMessage',
+    ];
+
+    const fullText = sourceFile.getFullText();
+
+    for (const importDecl of sourceFile.getImportDeclarations()) {
+        const namedImports = importDecl.getNamedImports();
+        for (const namedImport of [...namedImports]) {
+            const name = namedImport.getName();
+            if (!formImportNames.includes(name)) {
+                continue;
+            }
+            // Only remove if the name is no longer used in the file (outside of imports)
+            // Simple heuristic: count occurrences. If it only appears in the import, remove it.
+            const regex = new RegExp(`\\b${name}\\b`, 'g');
+            const matches = fullText.match(regex);
+            // 1 match = just the import itself
+            if (matches && matches.length <= 1) {
+                namedImport.remove();
+            }
+        }
+
+        // Clean up empty import declarations
+        if (
+            importDecl.getNamedImports().length === 0 &&
+            !importDecl.getDefaultImport() &&
+            !importDecl.getNamespaceImport()
+        ) {
+            importDecl.remove();
+        }
+    }
+
+    // Add FormFieldWrapper import if not already present
+    const existingDashboardImport = sourceFile.getImportDeclaration(
+        decl => decl.getModuleSpecifier().getLiteralValue() === '@vendure/dashboard',
+    );
+    if (existingDashboardImport) {
+        const existing = existingDashboardImport.getNamedImports().map(ni => ni.getName());
+        if (!existing.includes('FormFieldWrapper')) {
+            existingDashboardImport.addNamedImport('FormFieldWrapper');
+        }
+    } else {
+        sourceFile.addImportDeclaration({
+            moduleSpecifier: '@vendure/dashboard',
+            namedImports: ['FormFieldWrapper'],
+        });
+    }
 }

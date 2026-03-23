@@ -11,12 +11,17 @@ import { warnSelectItemsProp } from './transforms/select-items-prop';
 /**
  * Runs all dashboard UI migration transforms on every .tsx file in the project.
  *
- * Transforms applied (in order):
- * 1. asChild → render prop
- * 2. FormField → FormFieldWrapper
- * 3. Import consolidation (Radix / @vendure-io/ui / @base-ui → @vendure/dashboard)
- * 4. Remove deprecated Accordion props
- * 5. Warn about missing Select `items` prop
+ * Transform order matters:
+ * 1. asChild → render prop — must run before import consolidation so the
+ *    `asChild` attribute is gone before imports are rewritten.
+ * 2. FormField → FormFieldWrapper — removes old form imports and adds
+ *    FormFieldWrapper. Must run before import consolidation so that any
+ *    remaining form imports from third-party sources get caught.
+ * 3. Import consolidation — rewrites @radix-ui/*, @vendure-io/ui, @base-ui
+ *    imports to @vendure/dashboard. Runs after JSX transforms so it sees the
+ *    final set of needed imports. Also rewrites namespace member access sites.
+ * 4. Accordion prop removal — independent, order doesn't matter.
+ * 5. Select items warning — read-only, no mutations.
  */
 export async function dashboardUiMigration() {
     const s = spinner();

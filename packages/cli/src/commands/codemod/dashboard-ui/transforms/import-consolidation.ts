@@ -1,25 +1,50 @@
-import { SourceFile } from 'ts-morph';
+import { log } from '@clack/prompts';
+import { SourceFile, SyntaxKind } from 'ts-morph';
 
 import { addImportsToFile } from '../../../../utilities/ast-utils';
 
 /**
- * Rewrites imports from old Radix UI, @vendure-io/ui, and @base-ui/react
- * packages to the consolidated `@vendure/dashboard` import.
- *
- * BEFORE:
- * ```
- * import * as Dialog from '@radix-ui/react-dialog';
- * import { Button } from '@vendure-io/ui/components/ui/button';
- * import { Collapsible } from '@base-ui/react/collapsible';
- * ```
- *
- * AFTER:
- * ```
- * import { Dialog, Button, Collapsible } from '@vendure/dashboard';
- * ```
- *
- * - Namespace imports (e.g. `* as Dialog`) are converted to named imports.
- * - Merges with an existing `@vendure/dashboard` import if present.
+ * Radix namespace → flat component name mapping.
+ * Used to rewrite `Dialog.Root` → `Dialog`, `Dialog.Trigger` → `DialogTrigger`, etc.
+ */
+const NAMESPACE_MEMBER_MAP: Record<string, string> = {
+    Root: '',
+    Trigger: 'Trigger',
+    Content: 'Content',
+    Close: 'Close',
+    Title: 'Title',
+    Description: 'Description',
+    Header: 'Header',
+    Footer: 'Footer',
+    Overlay: 'Overlay',
+    Portal: 'Portal',
+    Item: 'Item',
+    Separator: 'Separator',
+    Group: 'Group',
+    Label: 'Label',
+    Sub: 'Sub',
+    SubTrigger: 'SubTrigger',
+    SubContent: 'SubContent',
+    Indicator: 'Indicator',
+    Icon: 'Icon',
+    Action: 'Action',
+    Cancel: 'Cancel',
+    Viewport: 'Viewport',
+    ScrollUpButton: 'ScrollUpButton',
+    ScrollDownButton: 'ScrollDownButton',
+    Value: 'Value',
+    Arrow: 'Arrow',
+    Thumb: 'Thumb',
+    Track: 'Track',
+    Range: 'Range',
+    List: 'List',
+    Link: 'Link',
+};
+
+/**
+ * Rewrites imports from Radix UI, @vendure-io/ui, and @base-ui/react
+ * to `@vendure/dashboard`. Also rewrites namespace member access sites
+ * (e.g. `Dialog.Root` → `Dialog`, `Dialog.Trigger` → `DialogTrigger`).
  */
 export function transformImportConsolidation(sourceFile: SourceFile): number {
     let changeCount = 0;
@@ -39,10 +64,14 @@ export function transformImportConsolidation(sourceFile: SourceFile): number {
             continue;
         }
 
-        // Collect namespace imports as named imports
+        // Handle namespace imports: `import * as Dialog from '@radix-ui/react-dialog'`
         const namespaceImport = importDecl.getNamespaceImport();
         if (namespaceImport) {
-            collectedNamedImports.push(namespaceImport.getText());
+            const nsName = namespaceImport.getText();
+            const rewrittenNames = rewriteNamespaceUsages(sourceFile, nsName);
+            for (const name of rewrittenNames) {
+                collectedNamedImports.push(name);
+            }
             declarationsToRemove.push(importDecl);
             changeCount++;
             continue;
@@ -90,4 +119,76 @@ export function transformImportConsolidation(sourceFile: SourceFile): number {
     });
 
     return changeCount;
+}
+
+/**
+ * Rewrites all usage sites of a namespace import (e.g. `Dialog.Root` → `Dialog`)
+ * throughout the source file. Returns the set of flat component names that were
+ * introduced, so they can be added as named imports.
+ */
+function rewriteNamespaceUsages(sourceFile: SourceFile, namespaceName: string): string[] {
+    const introducedNames = new Set<string>();
+
+    // Find all property access expressions like `Dialog.Root`, `Dialog.Trigger`
+    const propertyAccesses = sourceFile
+        .getDescendantsOfKind(SyntaxKind.PropertyAccessExpression)
+        .filter(pa => pa.getExpression().getText() === namespaceName);
+
+    for (const pa of [...propertyAccesses].reverse()) {
+        const memberName = pa.getName();
+        const suffix = NAMESPACE_MEMBER_MAP[memberName];
+
+        let flatName: string;
+        if (suffix === undefined) {
+            // Unknown member — use NamespaceMember as the flat name and warn
+            flatName = `${namespaceName}${memberName}`;
+            log.warn(
+                `${sourceFile.getFilePath()}:${pa.getStartLineNumber()} — ` +
+                    `Unknown namespace member ${namespaceName}.${memberName}, mapped to ${flatName}`,
+            );
+        } else if (suffix === '') {
+            // .Root → just the namespace name (e.g. Dialog.Root → Dialog)
+            flatName = namespaceName;
+        } else {
+            // .Trigger → NamespaceTrigger (e.g. Dialog.Trigger → DialogTrigger)
+            flatName = `${namespaceName}${suffix}`;
+        }
+
+        pa.replaceWithText(flatName);
+        introducedNames.add(flatName);
+    }
+
+    // Also handle JSX tag usage: <Dialog.Root> ... </Dialog.Root>
+    // ts-morph represents these as JsxOpeningElement/JsxClosingElement with dotted tag names
+    const fullText = sourceFile.getFullText();
+    const jsxPattern = new RegExp(`${namespaceName}\\.(\\w+)`, 'g');
+    let jsxMatch: RegExpExecArray | null;
+    let replaced = false;
+
+    // Use a single pass to replace any remaining dotted references in JSX
+    const newText = fullText.replace(jsxPattern, (_match, member: string) => {
+        const suffix = NAMESPACE_MEMBER_MAP[member];
+        let flatName: string;
+        if (suffix === undefined) {
+            flatName = `${namespaceName}${member}`;
+        } else if (suffix === '') {
+            flatName = namespaceName;
+        } else {
+            flatName = `${namespaceName}${suffix}`;
+        }
+        introducedNames.add(flatName);
+        replaced = true;
+        return flatName;
+    });
+
+    if (replaced) {
+        sourceFile.replaceWithText(newText);
+    }
+
+    // If no usages were found at all, still import the namespace name itself
+    if (introducedNames.size === 0) {
+        introducedNames.add(namespaceName);
+    }
+
+    return [...introducedNames];
 }
