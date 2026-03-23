@@ -55,7 +55,7 @@ export class CustomerEntityResolver {
         }
         // Re-load the customer's actual user relation rather than looking up by email,
         // since an email lookup can return a User belonging to a different Customer entity.
-        const loaded = await this.customerService.findOne(ctx, customer.id);
+        const loaded = await this.customerService.findOne(ctx, customer.id, ['user']);
         return loaded?.user ?? null;
     }
 }

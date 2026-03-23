@@ -1,15 +1,15 @@
 import { CreateCustomerInput, SetCustomerForOrderResult } from '@vendure/common/lib/generated-shop-types';
 import {
-    GuestCheckoutStrategy,
-    Order,
-    RequestContext,
-    ErrorResultUnion,
+    ChannelService,
     Customer,
     CustomerService,
+    ErrorResultUnion,
     GuestCheckoutError,
+    GuestCheckoutStrategy,
     Injector,
+    Order,
+    RequestContext,
     TransactionalConnection,
-    ChannelService,
 } from '@vendure/core';
 import {
     createErrorResultGuard,
@@ -17,19 +17,19 @@ import {
     ErrorResultGuard,
     SimpleGraphQLClient,
 } from '@vendure/testing';
+import gql from 'graphql-tag';
 import path from 'path';
 import { IsNull } from 'typeorm';
-import { it, afterAll, beforeAll, describe, expect } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { initialData } from '../../../e2e-common/e2e-initial-data';
 import { TEST_SETUP_TIMEOUT_MS, testConfig } from '../../../e2e-common/test-config';
 import { AlreadyLoggedInError } from '../src/common/error/generated-graphql-shop-errors';
-import { CustomerEvent } from '../src/index';
 
 import { testSuccessfulPaymentMethod } from './fixtures/test-payment-methods';
 import * as Codegen from './graphql/generated-e2e-admin-types';
 import * as CodegenShop from './graphql/generated-e2e-shop-types';
-import { GET_CUSTOMER_LIST, GET_PRODUCTS_WITH_VARIANT_PRICES } from './graphql/shared-definitions';
+import { GET_CUSTOMER_LIST } from './graphql/shared-definitions';
 import { ADD_ITEM_TO_ORDER, SET_CUSTOMER } from './graphql/shop-definitions';
 
 class TestGuestCheckoutStrategy implements GuestCheckoutStrategy {
@@ -80,7 +80,7 @@ class TestGuestCheckoutStrategy implements GuestCheckoutStrategy {
     }
 }
 
-describe('Order taxes', () => {
+describe('GuestCheckoutStrategy', () => {
     const { server, adminClient, shopClient } = createTestEnvironment({
         ...testConfig(),
         orderOptions: {
@@ -224,6 +224,47 @@ describe('Order taxes', () => {
         orderResultGuard.assertSuccess(setCustomerForOrder);
         expect(setCustomerForOrder.customer?.emailAddress).toBe(customers[0].emailAddress);
         expect(setCustomerForOrder.customer?.id).not.toBe(customers[0].id);
+    });
+
+    // https://github.com/vendurehq/vendure/issues/4026
+    it('guest customer with same email as registered customer should not show as verified', async () => {
+        TestGuestCheckoutStrategy.createNewCustomerOnEmailAddressConflict = true;
+
+        await shopClient.asAnonymousUser();
+        await addItemToOrder(shopClient);
+
+        const { setCustomerForOrder } = await shopClient.query<
+            CodegenShop.SetCustomerForOrderMutation,
+            CodegenShop.SetCustomerForOrderMutationVariables
+        >(SET_CUSTOMER, {
+            input: {
+                emailAddress: customers[0].emailAddress,
+                firstName: 'Guest',
+                lastName: 'Shared Email',
+            },
+        });
+
+        orderResultGuard.assertSuccess(setCustomerForOrder);
+        expect(setCustomerForOrder.customer?.id).not.toBe(customers[0].id);
+
+        // Query the active order's customer.user field directly via the shop API.
+        // The guest customer's user resolver must not return the registered customer's user.
+        const { activeOrder } = await shopClient.query(gql`
+            query {
+                activeOrder {
+                    customer {
+                        id
+                        user {
+                            id
+                            verified
+                        }
+                    }
+                }
+            }
+        `);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        expect(activeOrder?.customer?.id).toBe(setCustomerForOrder.customer!.id);
+        expect(activeOrder?.customer?.user).toBeNull();
     });
 
     it('when already logged in', async () => {

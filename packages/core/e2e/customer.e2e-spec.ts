@@ -695,45 +695,6 @@ describe('Customer resolver', () => {
             expect(createCustomer.user?.identifier).toBe(thirdCustomer.emailAddress);
         });
 
-        // https://github.com/vendurehq/vendure/issues/4026
-        it('guest Customer with same email as registered Customer should not show as verified', async () => {
-            // Create a guest customer via a guest order
-            await shopClient.asAnonymousUser();
-            await shopClient.query<AddItemToOrderMutation, AddItemToOrderMutationVariables>(
-                ADD_ITEM_TO_ORDER,
-                { productVariantId: 'T_1', quantity: 1 },
-            );
-            const { setCustomerForOrder } = await shopClient.query<
-                SetCustomerForOrderMutation,
-                SetCustomerForOrderMutationVariables
-            >(SET_CUSTOMER, {
-                input: {
-                    firstName: 'Guest',
-                    lastName: 'Shared Email',
-                    emailAddress: firstCustomer.emailAddress,
-                },
-            });
-
-            const guestCustomerId = (setCustomerForOrder as any).customer?.id;
-            if (guestCustomerId && guestCustomerId !== firstCustomer.id) {
-                // A separate guest customer entity was created; it should not
-                // inherit the verified user from the registered customer
-                const { customer: guestResult } = await adminClient.query<
-                    Codegen.GetCustomerQuery,
-                    Codegen.GetCustomerQueryVariables
-                >(GET_CUSTOMER, { id: guestCustomerId });
-                expect(guestResult?.user).toBeNull();
-            } else {
-                // The guest order was associated with the existing customer,
-                // so the user field should reflect the actual customer's user
-                const { customer: existingResult } = await adminClient.query<
-                    Codegen.GetCustomerQuery,
-                    Codegen.GetCustomerQueryVariables
-                >(GET_CUSTOMER, { id: firstCustomer.id });
-                expect(existingResult?.user?.id).toBe(firstCustomer.user?.id);
-            }
-        });
-
         // https://github.com/vendurehq/vendure/issues/1960
         it('delete a guest Customer', async () => {
             const orderErrorGuard: ErrorResultGuard<ActiveOrderCustomerFragment> = createErrorResultGuard(
