@@ -189,20 +189,19 @@ function removeUnusedFormImports(sourceFile: SourceFile) {
         'FormMessage',
     ];
 
-    const fullText = sourceFile.getFullText();
-
-    for (const importDecl of sourceFile.getImportDeclarations()) {
+    for (const importDecl of [...sourceFile.getImportDeclarations()]) {
         const namedImports = importDecl.getNamedImports();
         for (const namedImport of [...namedImports]) {
             const name = namedImport.getName();
             if (!formImportNames.includes(name)) {
                 continue;
             }
-            // Only remove if the name is no longer used in the file (outside of imports)
-            // Simple heuristic: count occurrences. If it only appears in the import, remove it.
+            // Re-read full text each iteration so we're checking against current state,
+            // not a stale snapshot from before earlier removals.
+            const currentText = sourceFile.getFullText();
             const regex = new RegExp(`\\b${name}\\b`, 'g');
-            const matches = fullText.match(regex);
-            // 1 match = just the import itself
+            const matches = currentText.match(regex);
+            // 1 match = just the import itself, safe to remove
             if (matches && matches.length <= 1) {
                 namedImport.remove();
             }

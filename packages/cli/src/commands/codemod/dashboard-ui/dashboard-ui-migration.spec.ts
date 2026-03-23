@@ -41,6 +41,10 @@ function createSourceFile(code: string) {
 // ─── asChild → render ────────────────────────────────────────────────
 
 describe('transformAsChildToRender', () => {
+    beforeEach(() => {
+        vi.mocked(log.warn).mockClear();
+    });
+
     it('should transform Button with asChild wrapping Link', () => {
         const sf = createSourceFile(`
 const el = (
@@ -59,6 +63,8 @@ const el = (
         expect(text).not.toContain('asChild');
         expect(text).toContain('<PlusIcon />');
         expect(text).toContain('New');
+        // Verify the parent is still a Button
+        expect(text).toMatch(/<Button\s/);
     });
 
     it('should transform asChild with self-closing child', () => {
@@ -74,6 +80,9 @@ const el = (
         const text = sf.getFullText();
         expect(text).toContain('render={<Link to="/home" />}');
         expect(text).not.toContain('asChild');
+        // Self-closing child with no grandchildren → parent becomes self-closing
+        expect(text).toContain('/>');
+        expect(text).not.toContain('</Button>');
     });
 
     it('should preserve other props on the parent element', () => {
@@ -95,20 +104,38 @@ const el = (
         expect(text).not.toContain('asChild');
     });
 
+    it('should move child props to render and grandchildren to parent', () => {
+        const sf = createSourceFile(`
+const el = (
+    <DialogTrigger asChild>
+        <Button variant="destructive" size="sm">
+            <TrashIcon />
+            Delete
+        </Button>
+    </DialogTrigger>
+);
+`);
+        const changes = transformAsChildToRender(sf);
+        expect(changes).toBe(1);
+        const text = sf.getFullText();
+        // Child's props (variant, size) should be in the render prop
+        expect(text).toContain('render={<Button variant="destructive" size="sm" />}');
+        // Grandchildren should be direct children of DialogTrigger now
+        expect(text).toContain('<TrashIcon />');
+        expect(text).toContain('Delete');
+        expect(text).toContain('</DialogTrigger>');
+    });
+
     it('should handle multiple asChild transforms in the same file', () => {
         const sf = createSourceFile(`
 function App() {
     return (
         <div>
             <Button asChild>
-                <Link to="/a">
-                    Go A
-                </Link>
+                <Link to="/a">Go A</Link>
             </Button>
             <Button asChild>
-                <Link to="/b">
-                    Go B
-                </Link>
+                <Link to="/b">Go B</Link>
             </Button>
         </div>
     );
@@ -125,13 +152,39 @@ function App() {
     it('should return 0 when no asChild patterns found', () => {
         const sf = createSourceFile(`
 const el = (
-    <Button onClick={handleClick}>
-        Click me
+    <Button onClick={handleClick}>Click me</Button>
+);
+`);
+        const changes = transformAsChildToRender(sf);
+        expect(changes).toBe(0);
+    });
+
+    it('should skip asChild with multiple children and warn', () => {
+        const sf = createSourceFile(`
+const el = (
+    <Button asChild>
+        <Link to="/a">A</Link>
+        <Link to="/b">B</Link>
+    </Button>
+);
+`);
+        const changes = transformAsChildToRender(sf);
+        // Cannot convert — multiple children
+        expect(changes).toBe(0);
+        expect(log.warn).toHaveBeenCalledWith(expect.stringContaining('expected exactly 1'));
+    });
+
+    it('should skip asChild with JSX expression child and warn', () => {
+        const sf = createSourceFile(`
+const el = (
+    <Button asChild>
+        {condition && <Link to="/maybe" />}
     </Button>
 );
 `);
         const changes = transformAsChildToRender(sf);
         expect(changes).toBe(0);
+        expect(log.warn).toHaveBeenCalledWith(expect.stringContaining('non-element child'));
     });
 
     it('should skip unconvertible asChild and still process valid ones after it', () => {
@@ -143,26 +196,30 @@ function App() {
                 {condition && <Link to="/maybe" />}
             </Button>
             <Button asChild>
-                <Link to="/valid">
-                    Valid
-                </Link>
+                <Link to="/valid">Valid</Link>
             </Button>
         </div>
     );
 }
 `);
         const changes = transformAsChildToRender(sf);
-        // First one is skipped (JSX expression child), second one converts
+        // First skipped (JSX expression), second converts
         expect(changes).toBe(1);
         const text = sf.getFullText();
         expect(text).toContain('render={<Link to="/valid" />}');
+        // First button still has asChild (unconverted)
+        expect(text).toContain('asChild');
     });
 });
 
 // ─── FormField → FormFieldWrapper ────────────────────────────────────
 
 describe('transformFormComponents', () => {
-    it('should transform a basic FormField to FormFieldWrapper', () => {
+    beforeEach(() => {
+        vi.mocked(log.warn).mockClear();
+    });
+
+    it('should transform a basic FormField with label, description, and control', () => {
         const sf = createSourceFile(`
 import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from '@vendure/dashboard';
 
@@ -190,8 +247,12 @@ const el = (
         expect(text).toContain('label="Slug"');
         expect(text).toContain('description="The URL slug."');
         expect(text).toContain('<Input {...field} />');
+        // Old wrapper components should be gone from the output
         expect(text).not.toContain('<FormItem>');
         expect(text).not.toContain('<FormControl>');
+        expect(text).not.toContain('<FormLabel>');
+        expect(text).not.toContain('<FormMessage');
+        expect(text).not.toContain('<FormDescription>');
     });
 
     it('should handle FormField without FormDescription', () => {
@@ -230,7 +291,7 @@ const el = <Input value="hello" onChange={handleChange} />;
         expect(changes).toBe(0);
     });
 
-    it('should add TODO comment when FormControl is missing', () => {
+    it('should add TODO when FormControl is missing and warn', () => {
         const sf = createSourceFile(`
 import { FormField, FormItem, FormLabel } from '@vendure/dashboard';
 
@@ -251,7 +312,36 @@ const el = (
         expect(changes).toBe(1);
         const text = sf.getFullText();
         expect(text).toContain('TODO');
+        expect(text).toContain('migrate manually');
+        // Tag should be renamed to FormFieldWrapper to prevent re-matching
         expect(text).toContain('FormFieldWrapper');
+        expect(log.warn).toHaveBeenCalledWith(expect.stringContaining('no FormControl found'));
+    });
+
+    it('should add TODO when FormLabel contains complex JSX and warn', () => {
+        const sf = createSourceFile(`
+import { FormField, FormItem, FormLabel, FormControl } from '@vendure/dashboard';
+
+const el = (
+    <FormField
+        control={form.control}
+        name="name"
+        render={({ field }) => (
+            <FormItem>
+                <FormLabel><span>Bold</span> label</FormLabel>
+                <FormControl>
+                    <Input {...field} />
+                </FormControl>
+            </FormItem>
+        )}
+    />
+);
+`);
+        const changes = transformFormComponents(sf);
+        expect(changes).toBe(1);
+        const text = sf.getFullText();
+        expect(text).toContain('TODO');
+        expect(log.warn).toHaveBeenCalledWith(expect.stringContaining('complex JSX label'));
     });
 
     it('should not infinite loop when multiple FormFields cannot be converted', () => {
@@ -283,17 +373,17 @@ const el = (
     </div>
 );
 `);
-        // Should complete without hanging — both get renamed with TODO comments
+        // Must complete without hanging
         const changes = transformFormComponents(sf);
         expect(changes).toBe(2);
         const text = sf.getFullText();
         const todoCount = (text.match(/TODO/g) || []).length;
         expect(todoCount).toBe(2);
-        // No raw <FormField should remain — all renamed to FormFieldWrapper
+        // All FormField tags should be renamed — none left as raw <FormField
         expect(text).not.toContain('<FormField ');
     });
 
-    it('should remove old form imports when they become unused', () => {
+    it('should remove unused form imports and add FormFieldWrapper', () => {
         const sf = createSourceFile(`
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@vendure/dashboard';
 import { Input } from './input';
@@ -317,8 +407,63 @@ const el = (
         const changes = transformFormComponents(sf);
         expect(changes).toBe(1);
         const text = sf.getFullText();
+        // Non-form import should survive
         expect(text).toContain("from './input'");
+        // FormFieldWrapper should be added
         expect(text).toContain('FormFieldWrapper');
+        // Old form imports should be gone (they're no longer referenced)
+        expect(text).not.toMatch(/\bFormItem\b/);
+        expect(text).not.toMatch(/\bFormLabel\b/);
+        expect(text).not.toMatch(/\bFormControl\b/);
+        expect(text).not.toMatch(/\bFormMessage\b/);
+    });
+
+    it('should handle multiple FormFields where form sub-components appear multiple times', () => {
+        const sf = createSourceFile(`
+import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@vendure/dashboard';
+
+const el = (
+    <div>
+        <FormField
+            control={form.control}
+            name="first"
+            render={({ field }) => (
+                <FormItem>
+                    <FormLabel>First</FormLabel>
+                    <FormControl>
+                        <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+            )}
+        />
+        <FormField
+            control={form.control}
+            name="last"
+            render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Last</FormLabel>
+                    <FormControl>
+                        <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+            )}
+        />
+    </div>
+);
+`);
+        const changes = transformFormComponents(sf);
+        expect(changes).toBe(2);
+        const text = sf.getFullText();
+        expect(text).toContain('label="First"');
+        expect(text).toContain('label="Last"');
+        // Both should be converted — no raw <FormField remaining (only FormFieldWrapper)
+        expect(text).not.toMatch(/<FormField[\s>]/);
+        expect(text).not.toMatch(/<FormField\n/);
+        // Old sub-components should be cleaned up
+        expect(text).not.toMatch(/\bFormItem\b/);
+        expect(text).not.toMatch(/\bFormControl\b/);
     });
 });
 
@@ -338,10 +483,10 @@ function App() {
         expect(changes).toBe(2);
         const text = sf.getFullText();
         expect(text).not.toContain('@radix-ui');
-        expect(text).toContain('@vendure/dashboard');
+        expect(text).toContain("from '@vendure/dashboard'");
     });
 
-    it('should rewrite namespace member access sites', () => {
+    it('should rewrite namespace member access sites to flat names', () => {
         const sf = createSourceFile(`
 import * as Dialog from '@radix-ui/react-dialog';
 
@@ -359,14 +504,19 @@ function App() {
         const changes = transformImportConsolidation(sf);
         expect(changes).toBe(1);
         const text = sf.getFullText();
+        // All dotted namespace access should be gone
         expect(text).not.toContain('Dialog.Root');
         expect(text).not.toContain('Dialog.Trigger');
         expect(text).not.toContain('Dialog.Content');
         expect(text).not.toContain('Dialog.Title');
+        // Replaced with flat component names
         expect(text).toContain('<Dialog>');
+        expect(text).toContain('</Dialog>');
         expect(text).toContain('<DialogTrigger>');
         expect(text).toContain('<DialogContent>');
         expect(text).toContain('<DialogTitle>');
+        // Import should list the flat names
+        expect(text).toContain("from '@vendure/dashboard'");
     });
 
     it('should consolidate @vendure-io/ui named imports', () => {
@@ -382,7 +532,7 @@ function App() {
         expect(changes).toBe(2);
         const text = sf.getFullText();
         expect(text).not.toContain('@vendure-io/ui');
-        expect(text).toContain('@vendure/dashboard');
+        expect(text).toContain("from '@vendure/dashboard'");
         expect(text).toContain('Button');
         expect(text).toContain('Input');
     });
@@ -399,7 +549,7 @@ function App() {
         expect(changes).toBe(1);
         const text = sf.getFullText();
         expect(text).not.toContain('@base-ui/react');
-        expect(text).toContain('@vendure/dashboard');
+        expect(text).toContain("from '@vendure/dashboard'");
         expect(text).toContain('Collapsible');
     });
 
@@ -416,13 +566,14 @@ function App() {
         expect(changes).toBe(1);
         const text = sf.getFullText();
         expect(text).not.toContain('@vendure-io/ui');
-        const dashboardImports = text.match(/@vendure\/dashboard/g);
-        expect(dashboardImports?.length).toBe(1);
+        // Should have exactly one @vendure/dashboard import with both symbols
+        const dashboardImportCount = (text.match(/@vendure\/dashboard/g) || []).length;
+        expect(dashboardImportCount).toBe(1);
         expect(text).toContain('usePageContext');
         expect(text).toContain('Button');
     });
 
-    it('should handle aliased imports', () => {
+    it('should preserve aliased imports in the consolidated import', () => {
         const sf = createSourceFile(`
 import { Button as RadixButton } from '@radix-ui/react-button';
 
@@ -433,7 +584,27 @@ function App() {
         const changes = transformImportConsolidation(sf);
         expect(changes).toBe(1);
         const text = sf.getFullText();
-        expect(text).toContain('@vendure/dashboard');
+        // Old source should be gone
+        expect(text).not.toContain('@radix-ui');
+        // Alias should be preserved in the new import
+        expect(text).toContain('Button as RadixButton');
+        expect(text).toContain("from '@vendure/dashboard'");
+    });
+
+    it('should handle default imports from Radix packages', () => {
+        const sf = createSourceFile(`
+import Checkbox from '@radix-ui/react-checkbox';
+
+function App() {
+    return <Checkbox />;
+}
+`);
+        const changes = transformImportConsolidation(sf);
+        expect(changes).toBe(1);
+        const text = sf.getFullText();
+        expect(text).not.toContain('@radix-ui');
+        expect(text).toContain("from '@vendure/dashboard'");
+        expect(text).toContain('Checkbox');
     });
 
     it('should return 0 when no matching imports found', () => {
@@ -448,7 +619,7 @@ function App() {
         expect(changes).toBe(0);
     });
 
-    it('should deduplicate imports when the same name appears in multiple sources', () => {
+    it('should deduplicate when same name appears in multiple sources', () => {
         const sf = createSourceFile(`
 import { Button } from '@radix-ui/react-button';
 import { Button } from '@vendure-io/ui/components/ui/button';
@@ -460,10 +631,12 @@ function App() {
         const changes = transformImportConsolidation(sf);
         expect(changes).toBe(2);
         const text = sf.getFullText();
-        const buttonImportMatches = text.match(/\bButton\b/g);
-        // One in import, one in JSX
-        expect(buttonImportMatches).toBeTruthy();
-        expect(text).toContain('@vendure/dashboard');
+        expect(text).not.toContain('@radix-ui');
+        expect(text).not.toContain('@vendure-io/ui');
+        expect(text).toContain("from '@vendure/dashboard'");
+        // Button should appear exactly twice: once in import, once in JSX
+        const buttonMatches = text.match(/\bButton\b/g) || [];
+        expect(buttonMatches.length).toBe(2);
     });
 });
 
@@ -529,7 +702,7 @@ const el = (
         expect(text).toContain('className="w-full"');
     });
 
-    it('should not touch non-Accordion elements', () => {
+    it('should not touch non-Accordion elements with type prop', () => {
         const sf = createSourceFile(`
 const el = (
     <Select type="single">
@@ -539,14 +712,13 @@ const el = (
 `);
         const changes = transformAccordionProps(sf);
         expect(changes).toBe(0);
+        expect(sf.getFullText()).toContain('type="single"');
     });
 
     it('should return 0 when no Accordion elements found', () => {
         const sf = createSourceFile(`
 const el = (
-    <div className="container">
-        <p>Hello</p>
-    </div>
+    <div className="container"><p>Hello</p></div>
 );
 `);
         const changes = transformAccordionProps(sf);
@@ -562,6 +734,7 @@ const el = <Accordion type="single" collapsible />;
         const text = sf.getFullText();
         expect(text).not.toContain('type="single"');
         expect(text).not.toContain('collapsible');
+        expect(text).toContain('<Accordion');
     });
 });
 
@@ -572,7 +745,7 @@ describe('warnSelectItemsProp', () => {
         vi.mocked(log.warn).mockClear();
     });
 
-    it('should warn when Select is missing items prop', () => {
+    it('should warn when Select is missing items prop with file path and line', () => {
         const sf = createSourceFile(`
 const el = (
     <Select value={value} onChange={handleChange}>
@@ -582,7 +755,10 @@ const el = (
 `);
         warnSelectItemsProp(sf);
         expect(log.warn).toHaveBeenCalledTimes(1);
-        expect(log.warn).toHaveBeenCalledWith(expect.stringContaining('missing the required "items" prop'));
+        const warnMessage = vi.mocked(log.warn).mock.calls[0][0];
+        expect(warnMessage).toContain('missing the required "items" prop');
+        // Should include file path and line number for CLI usefulness
+        expect(warnMessage).toMatch(/\.tsx:\d+/);
     });
 
     it('should not warn when Select has items prop', () => {
@@ -612,6 +788,15 @@ const el = (
 `);
         warnSelectItemsProp(sf);
         expect(log.warn).toHaveBeenCalledTimes(2);
+    });
+
+    it('should warn for self-closing Select without items', () => {
+        const sf = createSourceFile(`
+const el = <Select value={value} />;
+`);
+        warnSelectItemsProp(sf);
+        expect(log.warn).toHaveBeenCalledTimes(1);
+        expect(log.warn).toHaveBeenCalledWith(expect.stringContaining('missing the required "items" prop'));
     });
 
     it('should not warn for non-Select elements', () => {
