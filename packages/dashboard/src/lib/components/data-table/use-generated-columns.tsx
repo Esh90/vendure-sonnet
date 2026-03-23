@@ -270,7 +270,7 @@ function getRowActions(
                                 ))}
                             </DropdownMenuGroup>
                         )}
-                        {hasBulkActions && bulkActionGroups.map((group, groupIndex) => {
+                        {hasBulkActions && bulkActionGroups?.map((group, groupIndex) => {
                             if (group.actions.length === 0) return null;
                             const showSeparator = hasRowActions || groupIndex > 0;
                             return (
