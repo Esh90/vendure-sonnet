@@ -201,16 +201,21 @@ export const cliCommands: CliCommandDefinition[] = [
     {
         name: 'codemod',
         description: 'Run codemods to update your Vendure project code',
-        options: [
+        arguments: [
             {
-                long: '--dashboard-ui',
-                description: 'Migrate dashboard extensions from Radix UI to Base UI patterns',
+                name: 'transform',
+                description: 'Name of the codemod to run (e.g. dashboard-ui)',
+                required: false,
+            },
+            {
+                name: 'path',
+                description: 'Path to the files or directory to transform',
                 required: false,
             },
         ],
-        action: async options => {
+        action: async (transform, path, _options) => {
             const { codemodCommand } = await import('./codemod/codemod');
-            await codemodCommand(options);
+            await codemodCommand(transform, path);
             process.exit(0);
         },
     },
@@ -251,7 +256,7 @@ export const cliCommands: CliCommandDefinition[] = [
         action: async options => {
             const { schemaCommand } = await import('./schema/schema');
             await schemaCommand({
-                ...(options as any),
+                ...options,
                 outputDir: options?.dir,
             });
             process.exit(0);
