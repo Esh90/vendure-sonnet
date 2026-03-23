@@ -159,6 +159,25 @@ const el = (
         expect(changes).toBe(0);
     });
 
+    it('should preserve inline whitespace between JSX expression children', () => {
+        const sf = createSourceFile(`
+const el = (
+    <Button asChild variant="ghost">
+        <Link to={\`/customers/\${value.id}\`}>
+            {value.firstName} {value.lastName}
+        </Link>
+    </Button>
+);
+`);
+        const changes = transformAsChildToRender(sf);
+        expect(changes).toBe(1);
+        const text = sf.getFullText();
+        expect(text).toContain('render={<Link to={`/customers/${value.id}`} />}');
+        // The space between the two expressions must be preserved
+        expect(text).toContain('{value.firstName} {value.lastName}');
+        expect(text).not.toContain('{value.firstName}{value.lastName}');
+    });
+
     it('should skip asChild with multiple children and warn', () => {
         const sf = createSourceFile(`
 const el = (

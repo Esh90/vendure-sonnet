@@ -103,10 +103,15 @@ export function transformAsChildToRender(sourceFile: SourceFile): number {
                     .getAttributes()
                     .map(a => a.getText())
                     .join(' ');
-                grandchildrenText = childEl
-                    .getJsxChildren()
-                    .map(c => c.getText())
-                    .join('');
+                // Use raw source text to preserve inline whitespace between JSX children
+                // (e.g. `{value.firstName} {value.lastName}` — the space would be lost
+                // if we relied on getJsxChildren().map(c => c.getText()).join(''))
+                const innerStart = childOpening.getEnd();
+                const closingElement = childEl.getClosingElement();
+                const innerEnd = closingElement.getStart();
+                const rawInner = sourceFile.getFullText().substring(innerStart, innerEnd);
+                const childIndent = getLineIndent(sourceFile, childOpening.getStartLineNumber());
+                grandchildrenText = childIndent > 0 ? dedentText(rawInner, childIndent) : rawInner;
             } else {
                 const childEl = childNode as JsxSelfClosingElement;
                 childTagName = childEl.getTagNameNode().getText();
@@ -153,4 +158,15 @@ export function transformAsChildToRender(sourceFile: SourceFile): number {
     }
 
     return changeCount;
+}
+
+function getLineIndent(sourceFile: SourceFile, lineNumber: number): number {
+    const lineText = sourceFile.getFullText().split('\n')[lineNumber - 1] ?? '';
+    const match = lineText.match(/^(\s*)/);
+    return match ? match[1].length : 0;
+}
+
+function dedentText(text: string, amount: number): string {
+    const regex = new RegExp(`^ {1,${amount}}`, 'gm');
+    return text.replace(regex, '');
 }
