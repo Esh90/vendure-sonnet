@@ -199,6 +199,22 @@ export const cliCommands: CliCommandDefinition[] = [
         },
     },
     {
+        name: 'codemod',
+        description: 'Run codemods to update your Vendure project code',
+        options: [
+            {
+                long: '--dashboard-ui',
+                description: 'Migrate dashboard extensions from Radix UI to Base UI patterns',
+                required: false,
+            },
+        ],
+        action: async options => {
+            const { codemodCommand } = await import('./codemod/codemod');
+            await codemodCommand(options);
+            process.exit(0);
+        },
+    },
+    {
         name: 'schema',
         description: 'Generate a schema file from your GraphQL APIs',
         options: [
