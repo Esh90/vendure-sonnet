@@ -1,8 +1,9 @@
 import { log, spinner } from '@clack/prompts';
 import fs from 'fs-extra';
 import path from 'node:path';
+import { Project } from 'ts-morph';
 
-import { getTsMorphProject } from '../../../utilities/ast-utils';
+import { defaultManipulationSettings } from '../../../constants';
 
 import { transformAccordionProps } from './transforms/accordion-props';
 import { transformAsChildToRender } from './transforms/as-child-to-render';
@@ -15,6 +16,10 @@ import { warnSelectItemsProp } from './transforms/select-items-prop';
  *
  * @param targetPath — Optional absolute path to the project directory.
  *                     If omitted, uses the current working directory.
+ *
+ * Creates its own ts-morph Project directly instead of using getTsMorphProject(),
+ * because that function does vendure-specific monorepo/package.json detection
+ * which fails in external projects. The codemod just needs to load TSX files.
  *
  * Transform order matters:
  * 1. asChild → render prop — must run before import consolidation so the
@@ -32,30 +37,37 @@ export async function dashboardUiMigration(targetPath?: string) {
     const s = spinner();
     s.start('Analyzing project...');
 
-    // Resolve the tsconfig path. When a target path is provided, look there.
-    // Otherwise fall back to the current working directory.
     const projectDir = targetPath ?? process.cwd();
     const tsConfigPath = findTsConfig(projectDir);
 
-    let project;
+    let project: Project;
     try {
-        const result = await getTsMorphProject({}, tsConfigPath);
-        project = result.project;
+        project = new Project({
+            tsConfigFilePath: tsConfigPath,
+            manipulationSettings: defaultManipulationSettings,
+            compilerOptions: {
+                skipLibCheck: true,
+            },
+        });
+        project.enableLogging(false);
     } catch (e: unknown) {
         s.stop('Failed to initialize project');
         const message = e instanceof Error ? e.message : String(e);
-        const searchDir = targetPath ?? process.cwd();
         throw new Error(
             `Could not load TypeScript project: ${message}\n` +
-                `Searched in: ${searchDir}\n` +
-                `Make sure you are running the codemod from a directory with a tsconfig.json, ` +
-                `or provide the path to the project directory as the second argument.`,
+                `Searched in: ${projectDir}\n` +
+                `Make sure the tsconfig.json at ${tsConfigPath} is valid.`,
         );
     }
 
     const sourceFiles = project.getSourceFiles().filter(sf => sf.getFilePath().endsWith('.tsx'));
 
     s.stop(`Found ${sourceFiles.length} TSX files`);
+
+    if (sourceFiles.length === 0) {
+        log.info(`No .tsx files found in the project at ${projectDir}`);
+        return;
+    }
 
     let totalChanges = 0;
     let filesChanged = 0;
