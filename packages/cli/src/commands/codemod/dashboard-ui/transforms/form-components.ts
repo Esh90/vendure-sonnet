@@ -81,32 +81,34 @@ export function transformFormComponents(sourceFile: SourceFile): number {
         const renderText = renderInitializer.getText();
 
         // Extract label from <FormLabel>plainText</FormLabel>
+        // Uses [^<]* which cannot backtrack (no ambiguous quantifiers)
         const labelMatch = /<FormLabel>([^<]*)<\/FormLabel>/.exec(renderText);
         const label = labelMatch ? labelMatch[1].trim() : undefined;
 
-        // Check for complex label (JSX inside FormLabel)
-        const complexLabelMatch = /<FormLabel>([\s\S]*?)<\/FormLabel>/.exec(renderText);
-        const hasComplexLabel = complexLabelMatch && /<[^>]+>/.test(complexLabelMatch[1]) && !labelMatch;
-
-        if (hasComplexLabel) {
+        // If <FormLabel> exists but didn't match plain text, it contains JSX — bail out
+        if (!labelMatch && renderText.includes('<FormLabel>')) {
             addTodoComment(formField, 'complex JSX label');
             changeCount++;
             continue;
         }
 
-        // Extract description from <FormDescription>...</FormDescription>
+        // Extract description from <FormDescription>plainText</FormDescription>
         const descMatch = /<FormDescription>([^<]*)<\/FormDescription>/.exec(renderText);
         const description = descMatch ? descMatch[1].trim() : undefined;
 
         // Extract the content inside <FormControl>...</FormControl>
-        const formControlMatch = /<FormControl>\s*([\s\S]*?)\s*<\/FormControl>/.exec(renderText);
-        if (!formControlMatch) {
+        // Use indexOf-based extraction instead of regex to avoid backtracking
+        const fcOpenTag = '<FormControl>';
+        const fcCloseTag = '</FormControl>';
+        const fcStart = renderText.indexOf(fcOpenTag);
+        const fcEnd = renderText.indexOf(fcCloseTag);
+        if (fcStart === -1 || fcEnd === -1 || fcEnd <= fcStart) {
             addTodoComment(formField, 'no FormControl found');
             changeCount++;
             continue;
         }
 
-        const innerContent = formControlMatch[1].trim();
+        const innerContent = renderText.slice(fcStart + fcOpenTag.length, fcEnd).trim();
 
         // Build the replacement FormFieldWrapper
         let props = '';
