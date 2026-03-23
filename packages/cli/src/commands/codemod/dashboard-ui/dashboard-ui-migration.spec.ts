@@ -6,7 +6,7 @@ import { transformAccordionProps } from './transforms/accordion-props';
 import { transformAsChildToRender } from './transforms/as-child-to-render';
 import { transformFormComponents } from './transforms/form-components';
 import { transformImportConsolidation } from './transforms/import-consolidation';
-import { warnSelectItemsProp } from './transforms/select-items-prop';
+import { transformSelectItemsProp } from './transforms/select-items-prop';
 
 vi.mock('@clack/prompts', () => ({
     log: {
@@ -854,72 +854,104 @@ const el = <Accordion type="single" collapsible />;
     });
 });
 
-// ─── Select items prop warning ───────────────────────────────────────
+// ─── Select items prop ───────────────────────────────────────────────
 
-describe('warnSelectItemsProp', () => {
+describe('transformSelectItemsProp', () => {
     beforeEach(() => {
         vi.mocked(log.warn).mockClear();
     });
 
-    it('should warn when Select is missing items prop with file path and line', () => {
+    it('should auto-add items prop from static SelectItem children', () => {
         const sf = createSourceFile(`
 const el = (
-    <Select value={value} onChange={handleChange}>
-        <option>One</option>
+    <Select value={value} onValueChange={setValue}>
+        <SelectTrigger>
+            <SelectValue placeholder="Pick" />
+        </SelectTrigger>
+        <SelectContent>
+            <SelectItem value="draft">Draft</SelectItem>
+            <SelectItem value="published">Published</SelectItem>
+            <SelectItem value="archived">Archived</SelectItem>
+        </SelectContent>
     </Select>
 );
 `);
-        warnSelectItemsProp(sf);
-        expect(log.warn).toHaveBeenCalledTimes(1);
-        const warnMessage = vi.mocked(log.warn).mock.calls[0][0];
-        expect(warnMessage).toContain('missing the required "items" prop');
-        // Should include file path and line number for CLI usefulness
-        expect(warnMessage).toMatch(/\.tsx:\d+/);
+        const changes = transformSelectItemsProp(sf);
+        expect(changes).toBe(1);
+        const text = sf.getFullText();
+        expect(text).toContain('items={{');
+        expect(text).toContain("'draft': 'Draft'");
+        expect(text).toContain("'published': 'Published'");
+        expect(text).toContain("'archived': 'Archived'");
     });
 
-    it('should not warn when Select has items prop', () => {
+    it('should not touch Select that already has items prop', () => {
         const sf = createSourceFile(`
 const el = (
-    <Select items={options} value={value} onChange={handleChange}>
-        <option>One</option>
+    <Select items={options} value={value} onValueChange={setValue}>
+        <SelectTrigger>
+            <SelectValue placeholder="Pick" />
+        </SelectTrigger>
+        <SelectContent>
+            <SelectItem value="a">A</SelectItem>
+        </SelectContent>
     </Select>
 );
 `);
-        warnSelectItemsProp(sf);
+        const changes = transformSelectItemsProp(sf);
+        expect(changes).toBe(0);
         expect(log.warn).not.toHaveBeenCalled();
     });
 
-    it('should warn for each Select missing items', () => {
+    it('should warn when SelectItem values are dynamic expressions', () => {
         const sf = createSourceFile(`
 const el = (
-    <div>
-        <Select value={a}>
-            <option>A</option>
-        </Select>
-        <Select value={b}>
-            <option>B</option>
-        </Select>
-    </div>
+    <Select value={value} onValueChange={setValue}>
+        <SelectContent>
+            <SelectItem value={item.code}>{item.name}</SelectItem>
+        </SelectContent>
+    </Select>
 );
 `);
-        warnSelectItemsProp(sf);
-        expect(log.warn).toHaveBeenCalledTimes(2);
+        const changes = transformSelectItemsProp(sf);
+        expect(changes).toBe(0);
+        expect(log.warn).toHaveBeenCalledTimes(1);
+        expect(log.warn).toHaveBeenCalledWith(expect.stringContaining('dynamic'));
+    });
+
+    it('should warn when no SelectItem children are found', () => {
+        const sf = createSourceFile(`
+const el = (
+    <Select value={value} onValueChange={setValue}>
+        <SelectTrigger>
+            <SelectValue placeholder="Pick" />
+        </SelectTrigger>
+        <SelectContent>
+            {options.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
+        </SelectContent>
+    </Select>
+);
+`);
+        const changes = transformSelectItemsProp(sf);
+        expect(changes).toBe(0);
+        expect(log.warn).toHaveBeenCalledTimes(1);
     });
 
     it('should warn for self-closing Select without items', () => {
         const sf = createSourceFile(`
 const el = <Select value={value} />;
 `);
-        warnSelectItemsProp(sf);
+        const changes = transformSelectItemsProp(sf);
+        expect(changes).toBe(0);
         expect(log.warn).toHaveBeenCalledTimes(1);
-        expect(log.warn).toHaveBeenCalledWith(expect.stringContaining('missing the required "items" prop'));
     });
 
-    it('should not warn for non-Select elements', () => {
+    it('should return 0 for non-Select elements', () => {
         const sf = createSourceFile(`
 const el = <Input value="hello" />;
 `);
-        warnSelectItemsProp(sf);
+        const changes = transformSelectItemsProp(sf);
+        expect(changes).toBe(0);
         expect(log.warn).not.toHaveBeenCalled();
     });
 });

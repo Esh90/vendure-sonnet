@@ -9,7 +9,7 @@ import { transformAccordionProps } from './transforms/accordion-props';
 import { transformAsChildToRender } from './transforms/as-child-to-render';
 import { transformFormComponents } from './transforms/form-components';
 import { transformImportConsolidation } from './transforms/import-consolidation';
-import { warnSelectItemsProp } from './transforms/select-items-prop';
+import { transformSelectItemsProp } from './transforms/select-items-prop';
 
 /**
  * Runs all dashboard UI migration transforms on every .tsx file in the project.
@@ -90,7 +90,7 @@ export async function dashboardUiMigration(targetPath?: string) {
             fileChanges += transformFormComponents(sourceFile);
             fileChanges += transformImportConsolidation(sourceFile);
             fileChanges += transformAccordionProps(sourceFile);
-            warnSelectItemsProp(sourceFile);
+            fileChanges += transformSelectItemsProp(sourceFile);
         } catch (e: unknown) {
             const message = e instanceof Error ? e.message : String(e);
             log.warn(`Error processing ${filePath}: ${message}`);
