@@ -282,7 +282,7 @@ export function AssetGallery({
     );
 
     // Handle selection
-    const handleSelect = (asset: Asset, event: React.MouseEvent) => {
+    const handleSelect = (asset: Asset, event: React.MouseEvent | React.KeyboardEvent) => {
         if (multiSelect === 'auto') {
             toggleAssetSelection(asset);
             return;
@@ -619,7 +619,7 @@ interface AssetViewProps {
     isLoading: boolean;
     selectable: boolean;
     isSelected: (asset: Asset) => boolean;
-    handleSelect: (asset: Asset, event: React.MouseEvent) => void;
+    handleSelect: (asset: Asset, event: React.MouseEvent | React.KeyboardEvent) => void;
     toggleAssetSelection: (asset: Asset) => void;
 }
 
