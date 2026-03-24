@@ -177,9 +177,9 @@ function buildFieldFallbackChain(
     // System default language (reuse cached lookup when available)
     const defaultTrans =
         cachedDefaultTranslation ??
-        (selectedTranslation.languageCode !== DEFAULT_LANGUAGE_CODE
-            ? translations.find(t => t.languageCode === DEFAULT_LANGUAGE_CODE)
-            : undefined);
+        (selectedTranslation.languageCode === DEFAULT_LANGUAGE_CODE
+            ? undefined
+            : translations.find(t => t.languageCode === DEFAULT_LANGUAGE_CODE));
     addIfNew(defaultTrans);
 
     // Last resort: first available translation
