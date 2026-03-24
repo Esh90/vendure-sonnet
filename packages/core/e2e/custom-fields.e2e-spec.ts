@@ -154,6 +154,11 @@ const customConfig = mergeConfig(testConfig(), {
                 public: true,
             },
             {
+                name: 'dashboardHiddenWritable',
+                type: 'string',
+                ui: { dashboard: false },
+            },
+            {
                 name: 'stringList',
                 type: 'string',
                 list: true,
@@ -309,6 +314,7 @@ describe('Custom fields', () => {
                 // { name: 'internalString', type: 'string' },
                 // dashboard: false fields ARE still exposed in the legacy customFieldConfig
                 { name: 'dashboardHidden', type: 'boolean', list: false },
+                { name: 'dashboardHiddenWritable', type: 'string', list: false },
                 { name: 'stringList', type: 'string', list: true },
                 { name: 'localeStringList', type: 'localeString', list: true },
                 { name: 'stringListWithDefault', type: 'string', list: true },
@@ -429,6 +435,22 @@ describe('Custom fields', () => {
             }
         `);
         expect(product.customFields.dashboardHidden).toBeNull();
+    });
+
+    it('ui.dashboard: false field is still writable via Admin API', async () => {
+        const { updateProduct } = await adminClient.query(gql`
+            mutation {
+                updateProduct(
+                    input: { id: "T_1", customFields: { dashboardHiddenWritable: "set-by-plugin" } }
+                ) {
+                    id
+                    customFields {
+                        dashboardHiddenWritable
+                    }
+                }
+            }
+        `);
+        expect(updateProduct.customFields.dashboardHiddenWritable).toBe('set-by-plugin');
     });
 
     it('get nullable with no default', async () => {
