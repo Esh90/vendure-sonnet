@@ -49,6 +49,11 @@ async function goToLaptopProduct(page: Page) {
  * the new language and re-fetches all data.
  */
 async function switchContentLanguage(page: Page, languageCode: string) {
+    // Navigate to the app first if on about:blank (localStorage requires a real origin)
+    if (page.url() === 'about:blank') {
+        await page.goto('/');
+        await page.waitForLoadState('networkidle');
+    }
     await page.evaluate(langCode => {
         const key = 'vendure-user-settings';
         const settings = JSON.parse(localStorage.getItem(key) || '{}');
