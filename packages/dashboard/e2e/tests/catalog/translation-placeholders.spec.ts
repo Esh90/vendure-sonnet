@@ -41,30 +41,21 @@ async function goToLaptopProduct(page: Page) {
 }
 
 /**
- * Switch the dashboard content language via the channel-switcher sidebar menu.
+ * Switch the dashboard content language by updating localStorage directly.
  *
- * Opens the channel-switcher dropdown, hovers the "Content:" sub-trigger to
- * open the language submenu, then clicks the target language option.
+ * This is more reliable than navigating the channel-switcher dropdown in CI,
+ * where nested submenus and hover interactions can be flaky. After updating
+ * the setting, a full page reload is triggered so the dashboard picks up
+ * the new language and re-fetches all data.
  */
-async function switchContentLanguage(page: Page, languageLabel: string) {
-    // Open the channel-switcher dropdown in the sidebar
-    const channelButton = page.locator('[data-slot="sidebar-menu-button"]').first();
-    await channelButton.click();
-
-    // Hover the "Content:" sub-trigger to open the language submenu
-    const contentSubTrigger = page.locator('[data-slot="dropdown-menu-sub-trigger"]').filter({
-        hasText: 'Content:',
-    });
-    await contentSubTrigger.hover();
-
-    // Wait for the submenu to appear
-    const subContent = page.locator('[data-slot="dropdown-menu-sub-content"]');
-    await expect(subContent).toBeVisible({ timeout: 5_000 });
-
-    // Click the target language
-    await subContent.locator('[data-slot="dropdown-menu-item"]').filter({ hasText: languageLabel }).click();
-
-    // Wait for the page to re-fetch data in the new language
+async function switchContentLanguage(page: Page, languageCode: string) {
+    await page.evaluate(langCode => {
+        const key = 'vendure-user-settings';
+        const settings = JSON.parse(localStorage.getItem(key) || '{}');
+        settings.contentLanguage = langCode;
+        localStorage.setItem(key, JSON.stringify(settings));
+    }, languageCode);
+    await page.reload();
     await page.waitForLoadState('networkidle');
 }
 
@@ -140,16 +131,11 @@ test.describe('Translation fallback placeholders', () => {
     test('should show fallback placeholder for name field when switching to non-default language', async ({
         page,
     }) => {
-        // Force a full page reload so the dashboard picks up the channel config
-        // change from beforeAll (German was added via direct GraphQL mutation,
-        // but the dashboard's channel cache still shows English-only).
-        await page.goto('/');
-        await page.waitForLoadState('networkidle');
+        // Switch content language to German (this reloads the page, picking up
+        // the channel config change from beforeAll)
+        await switchContentLanguage(page, 'de');
 
         await goToLaptopProduct(page);
-
-        // Switch content language to German
-        await switchContentLanguage(page, 'German');
 
         // The name input should now show the English name as a placeholder
         const nameInput = detailPage(page).formItem('Product name').getByRole('textbox');
@@ -160,7 +146,7 @@ test.describe('Translation fallback placeholders', () => {
 
     test('should show fallback placeholder for slug field', async ({ page }) => {
         await goToLaptopProduct(page);
-        await switchContentLanguage(page, 'German');
+        await switchContentLanguage(page, 'de');
 
         // The slug input is inside a SlugInput component. When no value is
         // set for German and the slug is in readonly mode, the external
@@ -174,6 +160,8 @@ test.describe('Translation fallback placeholders', () => {
     // ── Test 3: No placeholder on default language ──────────────────────
 
     test('should NOT show placeholder when on default language', async ({ page }) => {
+        // Switch back to English
+        await switchContentLanguage(page, 'en');
         await goToLaptopProduct(page);
 
         // We're on English (default language) - no placeholder should be present
@@ -191,7 +179,7 @@ test.describe('Translation fallback placeholders', () => {
 
     test('should remove placeholder when user types a translation', async ({ page }) => {
         await goToLaptopProduct(page);
-        await switchContentLanguage(page, 'German');
+        await switchContentLanguage(page, 'de');
 
         const nameInput = detailPage(page).formItem('Product name').getByRole('textbox');
 
@@ -210,7 +198,7 @@ test.describe('Translation fallback placeholders', () => {
 
     test('should show placeholder for rich text description', async ({ page }) => {
         await goToLaptopProduct(page);
-        await switchContentLanguage(page, 'German');
+        await switchContentLanguage(page, 'de');
 
         // TipTap's Placeholder extension adds a `data-placeholder` attribute to
         // the first empty child element with class `is-editor-empty`. The CSS
