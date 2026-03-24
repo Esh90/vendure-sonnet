@@ -167,7 +167,11 @@ export class AdministratorService {
         if (input.emailAddress) {
             const normalizedEmail = normalizeEmailAddress(input.emailAddress);
             await this.checkForDuplicateEmailAddress(ctx, normalizedEmail, input.id);
-            updatedAdministrator.user.identifier = input.emailAddress;
+            updatedAdministrator.emailAddress = normalizedEmail;
+            updatedAdministrator.user.identifier = normalizedEmail;
+            await this.connection
+                .getRepository(ctx, Administrator)
+                .save(updatedAdministrator, { reload: false });
             await this.connection.getRepository(ctx, User).save(updatedAdministrator.user);
         }
         if (input.password) {
