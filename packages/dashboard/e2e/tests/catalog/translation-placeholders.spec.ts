@@ -136,11 +136,10 @@ test.describe('Translation fallback placeholders', () => {
     test('should show fallback placeholder for name field when switching to non-default language', async ({
         page,
     }) => {
-        // Switch content language to German (this reloads the page, picking up
-        // the channel config change from beforeAll)
-        await switchContentLanguage(page, 'de');
-
+        // Navigate to the product while on English (default) so goToLaptopProduct
+        // assertions pass, then switch to German which reloads the same page.
         await goToLaptopProduct(page);
+        await switchContentLanguage(page, 'de');
 
         // The name input should now show the English name as a placeholder
         const nameInput = detailPage(page).formItem('Product name').getByRole('textbox');
