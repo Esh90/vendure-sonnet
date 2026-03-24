@@ -15,7 +15,7 @@ import { ConfigService } from './config.service';
 export class ConfigModule implements OnApplicationBootstrap, OnApplicationShutdown {
     constructor(
         private configService: ConfigService,
-        @Optional() private moduleRef: ModuleRef,
+        @Optional() private moduleRef?: ModuleRef,
     ) {}
 
     async onApplicationBootstrap() {
@@ -37,10 +37,12 @@ export class ConfigModule implements OnApplicationBootstrap, OnApplicationShutdo
     }
 
     private async initInjectableStrategies() {
-        const injector = new Injector(this.moduleRef);
-        for (const strategy of this.getInjectableStrategies()) {
-            if (typeof strategy.init === 'function') {
-                await strategy.init(injector);
+        if (this.moduleRef) {
+            const injector = new Injector(this.moduleRef);
+            for (const strategy of this.getInjectableStrategies()) {
+                if (typeof strategy.init === 'function') {
+                    await strategy.init(injector);
+                }
             }
         }
     }
@@ -54,9 +56,11 @@ export class ConfigModule implements OnApplicationBootstrap, OnApplicationShutdo
     }
 
     private async initConfigurableOperations() {
-        const injector = new Injector(this.moduleRef);
-        for (const operation of this.getConfigurableOperations()) {
-            await operation.init(injector);
+        if (this.moduleRef) {
+            const injector = new Injector(this.moduleRef);
+            for (const operation of this.getConfigurableOperations()) {
+                await operation.init(injector);
+            }
         }
     }
 

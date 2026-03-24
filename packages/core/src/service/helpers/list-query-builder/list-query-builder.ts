@@ -698,7 +698,18 @@ export class ListQueryBuilder implements OnApplicationBootstrap {
                     // to join the associated relations.
                     continue;
                 }
-                const relationPath = path.split('.').slice(0, -1);
+                const parts = path.split('.');
+                const relationPath = parts.slice(0, -1);
+
+                // Optimization: If the custom property is a ManyToOne relation and is NOT being used for sorting,
+                // we can skip the JOIN and let the filter be handled by an EXISTS subquery.
+                if (relationPath.length === 1) {
+                    const relationMetadata = metadata.findRelationWithPropertyPath(relationPath[0]);
+                    if (relationMetadata?.isManyToOne && !options.sort?.[property]) {
+                        continue;
+                    }
+                }
+
                 let targetMetadata = metadata;
                 const reconstructedPath = [];
                 for (const relationPathPart of relationPath) {

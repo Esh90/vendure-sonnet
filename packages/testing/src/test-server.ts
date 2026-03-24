@@ -76,13 +76,19 @@ export class TestServer {
         let file: any;
         let frame: any;
 
-        const pst = Error.prepareStackTrace.bind(Error);
-        Error.prepareStackTrace = (_: any, _stack: any) => {
-            Error.prepareStackTrace = pst;
-            return _stack;
-        };
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        const pst = Error.prepareStackTrace;
+        if (typeof pst === 'function') {
+            Error.prepareStackTrace = (_, _stack) => {
+                Error.prepareStackTrace = pst;
+                return _stack;
+            };
+        }
 
         stack = new Error().stack;
+        if (typeof pst === 'function') {
+            Error.prepareStackTrace = pst;
+        }
         stack = stack.slice(depth + 1);
 
         do {

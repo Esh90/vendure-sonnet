@@ -45,7 +45,7 @@ export class BraintreeResolver {
         }
         const order = await this.orderService.findOne(ctx, sessionOrder.id);
         if (order) {
-            const customerId = (order.customer?.customFields as any).braintreeCustomerId ?? undefined;
+            const customerId = order.customer?.customFields.braintreeCustomerId;
             const args = await this.getPaymentMethodArgs(ctx);
             const gateway = getGateway(args, this.options);
             try {
@@ -61,8 +61,8 @@ export class BraintreeResolver {
                         // to be generated when the payment is created.
                         if (this.options.storeCustomersInBraintree) {
                             const customer = order.customer;
-                            if (customer && (customer.customFields as any).braintreeCustomerId) {
-                                (customer.customFields as any).braintreeCustomerId = undefined;
+                            if (customer && customer.customFields.braintreeCustomerId) {
+                                customer.customFields.braintreeCustomerId = undefined;
                                 await this.connection.getRepository(ctx, Customer).save(customer);
                             }
                         }
