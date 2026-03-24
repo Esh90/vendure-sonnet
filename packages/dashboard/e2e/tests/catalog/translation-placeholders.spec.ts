@@ -116,6 +116,12 @@ test.describe('Translation fallback placeholders', () => {
     test('should show fallback placeholder for name field when switching to non-default language', async ({
         page,
     }) => {
+        // Force a full page reload so the dashboard picks up the channel config
+        // change from beforeAll (German was added via direct GraphQL mutation,
+        // but the dashboard's channel cache still shows English-only).
+        await page.goto('/');
+        await page.waitForLoadState('networkidle');
+
         await goToLaptopProduct(page);
 
         // Switch content language to German
