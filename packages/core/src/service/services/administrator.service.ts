@@ -128,8 +128,10 @@ export class AdministratorService {
      */
     async create(ctx: RequestContext, input: CreateAdministratorInput): Promise<Administrator> {
         await this.checkActiveUserCanGrantRoles(ctx, input.roleIds);
+        const normalizedEmail = normalizeEmailAddress(input.emailAddress);
+        await this.checkForDuplicateEmailAddress(ctx, normalizedEmail);
         const administrator = new Administrator(input);
-        administrator.emailAddress = normalizeEmailAddress(input.emailAddress);
+        administrator.emailAddress = normalizedEmail;
         administrator.user = await this.userService.createAdminUser(ctx, input.emailAddress, input.password);
         let createdAdministrator = await this.connection
             .getRepository(ctx, Administrator)
@@ -163,6 +165,8 @@ export class AdministratorService {
         await this.connection.getRepository(ctx, Administrator).save(administrator, { reload: false });
 
         if (input.emailAddress) {
+            const normalizedEmail = normalizeEmailAddress(input.emailAddress);
+            await this.checkForDuplicateEmailAddress(ctx, normalizedEmail, input.id);
             updatedAdministrator.user.identifier = input.emailAddress;
             await this.connection.getRepository(ctx, User).save(updatedAdministrator.user);
         }
@@ -275,10 +279,23 @@ export class AdministratorService {
      * Resolves to `true` if the administrator ID belongs to the only Administrator
      * with SuperAdmin permissions.
      */
+    private async checkForDuplicateEmailAddress(ctx: RequestContext, emailAddress: string, excludeId?: ID) {
+        const existing = await this.connection.getRepository(ctx, Administrator).findOne({
+            where: {
+                emailAddress,
+                deletedAt: IsNull(),
+            },
+        });
+        if (existing && (!excludeId || !idsAreEqual(existing.id, excludeId))) {
+            throw new UserInputError('An administrator with this email address already exists');
+        }
+    }
+
     private async isSoleSuperadmin(ctx: RequestContext, id: ID) {
         const superAdminRole = await this.roleService.getSuperAdminRole(ctx);
         const allAdmins = await this.connection.getRepository(ctx, Administrator).find({
             relations: ['user', 'user.roles'],
+            where: { deletedAt: IsNull() },
         });
         const superAdmins = allAdmins.filter(
             admin => !!admin.user.roles.find(r => r.id === superAdminRole.id),
