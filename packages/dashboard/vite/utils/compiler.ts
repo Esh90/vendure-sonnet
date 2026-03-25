@@ -78,18 +78,17 @@ export async function compile(options: CompilerOptions): Promise<CompileResult> 
     );
 
     // 3. Load the compiled config
-    // Use the source root to compute the config's location in the output directory.
-    // When all files are under the config's directory, sourceRoot === dirname(configPath)
-    // and configFileName is at the output root. When files span multiple directories
-    // (e.g. monorepo path aliases), the config may be in a subdirectory.
-    const configRelativePath = path.relative(sourceRoot, vendureConfigPath).replace(/\.ts$/, '.js');
+    // Note: configFileName is kept as the basename to preserve the public API contract.
+    // Custom pathAdapter implementations (e.g. in monorepos) rely on this being just
+    // the filename, not a relative path — they hardcode the directory structure themselves.
+    const configFileName = path.basename(vendureConfigPath);
     const compiledConfigFilePath = pathToFileURL(
         getCompiledConfigPath({
-            inputRootDir: sourceRoot,
+            inputRootDir: path.dirname(vendureConfigPath),
             outputPath,
-            configFileName: configRelativePath,
+            configFileName,
         }),
-    ).href;
+    ).href.replace(/.ts$/, '.js');
 
     // Create package.json with type commonjs
     await fs.writeFile(
