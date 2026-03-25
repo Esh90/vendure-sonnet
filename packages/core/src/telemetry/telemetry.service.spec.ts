@@ -260,7 +260,6 @@ describe('TelemetryService', () => {
                 const fetchCall = mockFetch.mock.calls[0];
                 const body = JSON.parse(fetchCall[1].body);
 
-                expect(body.timestamp).toBeDefined();
                 // Verify it's a valid ISO date string
                 const date = new Date(body.timestamp);
                 expect(date.toISOString()).toBe(body.timestamp);
@@ -392,6 +391,130 @@ describe('TelemetryService', () => {
 
                 expect(() => service.onApplicationBootstrap()).not.toThrow();
                 await flushPromises();
+            });
+        });
+
+        describe('error paths — individual collector failures', () => {
+            it('silently handles installationIdCollector failure', async () => {
+                mockInstallationIdCollector.collect = vi.fn().mockRejectedValue(new Error('ID error'));
+                service.onApplicationBootstrap();
+                await flushPromises();
+                expect(mockFetch).not.toHaveBeenCalled();
+            });
+
+            it('silently handles systemInfoCollector failure', async () => {
+                mockSystemInfoCollector.collect = vi.fn().mockImplementation(() => {
+                    throw new Error('System error');
+                });
+                service.onApplicationBootstrap();
+                await flushPromises();
+                expect(mockFetch).not.toHaveBeenCalled();
+            });
+
+            it('silently handles pluginCollector failure', async () => {
+                mockPluginCollector.collect = vi.fn().mockImplementation(() => {
+                    throw new Error('Plugin error');
+                });
+                service.onApplicationBootstrap();
+                await flushPromises();
+                expect(mockFetch).not.toHaveBeenCalled();
+            });
+
+            it('silently handles configCollector failure', async () => {
+                mockConfigCollector.collect = vi.fn().mockImplementation(() => {
+                    throw new Error('Config error');
+                });
+                service.onApplicationBootstrap();
+                await flushPromises();
+                expect(mockFetch).not.toHaveBeenCalled();
+            });
+
+            it('silently handles deploymentCollector failure', async () => {
+                mockDeploymentCollector.collect = vi.fn().mockImplementation(() => {
+                    throw new Error('Deployment error');
+                });
+                service.onApplicationBootstrap();
+                await flushPromises();
+                expect(mockFetch).not.toHaveBeenCalled();
+            });
+
+            it('silently handles featuresCollector failure', async () => {
+                mockFeaturesCollector.collect = vi.fn().mockRejectedValue(new Error('Features error'));
+                service.onApplicationBootstrap();
+                await flushPromises();
+                expect(mockFetch).not.toHaveBeenCalled();
+            });
+
+            it('silently handles databaseCollector failure', async () => {
+                mockDatabaseCollector.collect = vi.fn().mockRejectedValue(new Error('DB error'));
+                service.onApplicationBootstrap();
+                await flushPromises();
+                expect(mockFetch).not.toHaveBeenCalled();
+            });
+
+            it('handles databaseInfo with missing metrics gracefully', async () => {
+                mockDatabaseCollector.collect = vi.fn().mockResolvedValue({
+                    databaseType: 'postgres',
+                });
+                service.onApplicationBootstrap();
+                await flushPromises();
+                expect(mockFetch).toHaveBeenCalled();
+                const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+                expect(body.databaseType).toBe('postgres');
+                expect(body.metrics).toBeUndefined();
+            });
+
+            it('handles databaseInfo with missing entities gracefully', async () => {
+                mockDatabaseCollector.collect = vi.fn().mockResolvedValue({
+                    databaseType: 'postgres',
+                    metrics: { custom: { entityCount: 0 } },
+                });
+                service.onApplicationBootstrap();
+                await flushPromises();
+                expect(mockFetch).toHaveBeenCalled();
+                const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+                expect(body.config.channelCount).toBeUndefined();
+            });
+
+            it('handles systemInfoCollector returning empty object', async () => {
+                mockSystemInfoCollector.collect = vi.fn().mockReturnValue({});
+                service.onApplicationBootstrap();
+                await flushPromises();
+                expect(mockFetch).toHaveBeenCalled();
+                const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+                expect(body.nodeVersion).toBeUndefined();
+                expect(body.platform).toBeUndefined();
+            });
+
+            it('silently swallows non-OK fetch responses (500)', async () => {
+                mockFetch.mockResolvedValue({ ok: false, status: 500 });
+                service.onApplicationBootstrap();
+                await flushPromises();
+                // No error thrown — the 500 is silently ignored
+                expect(mockFetch).toHaveBeenCalled();
+            });
+
+            it('silently swallows non-OK fetch responses (403)', async () => {
+                mockFetch.mockResolvedValue({ ok: false, status: 403 });
+                service.onApplicationBootstrap();
+                await flushPromises();
+                // No error thrown — the 403 is silently ignored
+                expect(mockFetch).toHaveBeenCalled();
+            });
+
+            it('handles double onApplicationBootstrap call without error', async () => {
+                service.onApplicationBootstrap();
+                service.onApplicationBootstrap();
+                await flushPromises();
+                // At least one fetch call should succeed
+                expect(mockFetch).toHaveBeenCalled();
+            });
+
+            it('onApplicationShutdown is safe after telemetry already sent', async () => {
+                service.onApplicationBootstrap();
+                await flushPromises(); // telemetry fires
+                expect(mockFetch).toHaveBeenCalled();
+                expect(() => service.onApplicationShutdown()).not.toThrow();
             });
         });
     });

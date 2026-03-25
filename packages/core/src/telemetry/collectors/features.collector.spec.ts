@@ -263,8 +263,96 @@ describe('FeaturesCollector', () => {
             // All starts should come before any ends (parallel, not sequential)
             const starts = callOrder.filter(e => e.endsWith('-start'));
             const firstEnd = callOrder.findIndex(e => e.endsWith('-end'));
-            expect(starts.length).toBeGreaterThanOrEqual(4);
+            expect(starts.length).toBe(4);
             expect(firstEnd).toBeGreaterThanOrEqual(starts.length);
+        });
+    });
+
+    describe('error paths — forcing failures', () => {
+        it('rawConnection is entirely undefined', async () => {
+            mockConnection.rawConnection = undefined;
+
+            const result = await collector.collect(baseConfig);
+
+            expect(result.multiChannel).toBeUndefined();
+            expect(result.multiVendor).toBeUndefined();
+            expect(result.multiStockLocation).toBeUndefined();
+            expect(result.apiKeysEnabled).toBeUndefined();
+            expect(result.customFieldsInUse).toBe(true);
+            expect(result.scheduledTasks).toBe(true);
+        });
+
+        it('rawConnection is null', async () => {
+            mockConnection.rawConnection = null;
+
+            const result = await collector.collect(baseConfig);
+
+            expect(result.multiChannel).toBeUndefined();
+            expect(result.multiVendor).toBeUndefined();
+            expect(result.multiStockLocation).toBeUndefined();
+            expect(result.apiKeysEnabled).toBeUndefined();
+            expect(result.customFieldsInUse).toBe(true);
+            expect(result.scheduledTasks).toBe(true);
+        });
+
+        it('all 4 DB queries fail simultaneously', async () => {
+            for (const repo of Object.values(mockRepositories)) {
+                repo.count.mockRejectedValue(new Error('Connection lost'));
+            }
+
+            const result = await collector.collect(baseConfig);
+
+            expect(result.multiChannel).toBeUndefined();
+            expect(result.multiVendor).toBe(false);
+            expect(result.multiStockLocation).toBeUndefined();
+            expect(result.apiKeysEnabled).toBeUndefined();
+            expect(result.customFieldsInUse).toBe(true);
+            expect(result.scheduledTasks).toBe(true);
+        });
+
+        it('getRepository() throws synchronously', async () => {
+            mockConnection.rawConnection.getRepository = vi.fn().mockImplementation(() => {
+                throw new Error('Entity not registered');
+            });
+
+            const result = await collector.collect(baseConfig);
+
+            expect(result.multiChannel).toBeUndefined();
+            expect(result.multiStockLocation).toBeUndefined();
+            expect(result.apiKeysEnabled).toBeUndefined();
+        });
+
+        it('config.orderSellerStrategy is undefined — exercises ?? "unknown" fallback', async () => {
+            const config = { ...baseConfig, orderSellerStrategy: undefined };
+
+            const result = await collector.collect(config);
+
+            // undefined falls back to 'unknown', which is treated as not-custom
+            expect(result.multiVendor).toBe(false);
+        });
+
+        it('Channel count is exactly 0 — boundary', async () => {
+            mockRepositories.Channel.count.mockResolvedValue(0);
+
+            const result = await collector.collect(baseConfig);
+
+            expect(result.multiChannel).toBe(false);
+        });
+
+        it('StockLocation count is exactly 0 — boundary', async () => {
+            mockRepositories.StockLocation.count.mockResolvedValue(0);
+
+            const result = await collector.collect(baseConfig);
+
+            expect(result.multiStockLocation).toBe(false);
+        });
+
+        it('config with all fields undefined — empty config object', async () => {
+            const result = await collector.collect({});
+
+            expect(result.customFieldsInUse).toBe(false);
+            expect(result.scheduledTasks).toBe(false);
+            expect(result.multiVendor).toBe(false);
         });
     });
 });

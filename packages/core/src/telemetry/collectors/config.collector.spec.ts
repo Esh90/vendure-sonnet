@@ -525,5 +525,170 @@ describe('ConfigCollector', () => {
                 });
             });
         });
+
+        describe('error paths — forcing failures', () => {
+            it('defaultLanguage returns undefined when defaultLanguageCode throws', () => {
+                Object.defineProperty(mockConfigService, 'defaultLanguageCode', {
+                    get() {
+                        throw new Error('Config not initialized');
+                    },
+                    configurable: true,
+                });
+
+                const result = collector.collect();
+
+                expect(result.defaultLanguage).toBeUndefined();
+            });
+
+            it('defaultLanguage returns undefined when defaultLanguageCode is undefined', () => {
+                mockConfigService.defaultLanguageCode = undefined;
+
+                const result = collector.collect();
+
+                expect(result.defaultLanguage).toBeUndefined();
+            });
+
+            it('handles multiple config sections being undefined simultaneously', () => {
+                mockConfigService.assetOptions = undefined as any;
+                mockConfigService.jobQueueOptions = undefined as any;
+                mockConfigService.entityOptions = undefined as any;
+                mockConfigService.systemOptions = undefined as any;
+                mockConfigService.taxOptions = undefined as any;
+
+                const result = collector.collect();
+
+                expect(result).toBeDefined();
+                expect(result.assetStorageType).toBe('unknown');
+                expect(result.jobQueueType).toBe('unknown');
+                // entityOptions is undefined so accessing entityOptions.entityIdStrategy
+                // throws before reaching the fallback, caught by try/catch → 'unknown'
+                expect(result.entityIdStrategy).toBe('unknown');
+                expect(result.cacheStrategy).toBe('unknown');
+                expect(result.taxLineCalculationStrategy).toBe('unknown');
+                expect(result.moneyStrategy).toBe('unknown');
+                expect(result.customFieldsCount).toBe(3);
+                expect(result.authenticationMethods).toEqual(['google', 'native']);
+                expect(result.paymentHandlerCodes).toEqual([
+                    'dummy-payment-handler',
+                    'stripe-payment-handler',
+                ]);
+                expect(result.shippingCalculatorCodes).toEqual(['default-shipping-calculator']);
+                expect(result.fulfillmentHandlerCodes).toEqual(['manual-fulfillment']);
+                expect(result.promotionConditionCount).toBe(2);
+                expect(result.promotionActionCount).toBe(1);
+                expect(result.scheduledTaskCount).toBe(1);
+                expect(result.hasCustomOrderProcess).toBe(false);
+                expect(result.hasCustomPaymentProcess).toBe(false);
+                expect(result.hasCustomFulfillmentProcess).toBe(false);
+            });
+
+            it('paymentHandlerCodes includes undefined for handlers missing .code', () => {
+                mockConfigService.paymentOptions = {
+                    paymentMethodHandlers: [{ code: 'valid' }, {}, { code: undefined }],
+                    process: [],
+                } as any;
+
+                const result = collector.collect();
+
+                expect(result.paymentHandlerCodes).toEqual(['valid', undefined, undefined]);
+            });
+
+            it('shippingCalculatorCodes returns [] when .code getter throws', () => {
+                const throwingEntry = {};
+                Object.defineProperty(throwingEntry, 'code', {
+                    get() {
+                        throw new Error('code access error');
+                    },
+                    configurable: true,
+                    enumerable: true,
+                });
+                mockConfigService.shippingOptions = {
+                    shippingCalculators: [throwingEntry],
+                    fulfillmentHandlers: [],
+                    process: [],
+                } as any;
+
+                const result = collector.collect();
+
+                expect(result.shippingCalculatorCodes).toEqual([]);
+            });
+
+            it('promotionConditionCount returns 0 when promotionConditions is not an array', () => {
+                mockConfigService.promotionOptions = {
+                    promotionConditions: 42,
+                    promotionActions: [],
+                } as any;
+
+                const result = collector.collect();
+
+                expect(result.promotionConditionCount).toBe(0);
+            });
+
+            it('customFields handles entities with various broken values', () => {
+                mockConfigService.customFields = {
+                    Product: [{ name: 'f1' }],
+                    Customer: null,
+                    Order: 'not an array',
+                    Facet: { length: 5 },
+                    Address: undefined,
+                } as any;
+
+                const result = collector.collect();
+
+                expect(result.customFieldsPerEntity).toEqual({ Product: 1 });
+                expect(result.customFieldsCount).toBe(1);
+            });
+
+            it('collect() returns safe defaults when all config sections throw on access', () => {
+                const throwingProps = [
+                    'assetOptions',
+                    'jobQueueOptions',
+                    'systemOptions',
+                    'taxOptions',
+                    'paymentOptions',
+                    'shippingOptions',
+                    'promotionOptions',
+                    'schedulerOptions',
+                    'orderOptions',
+                    'authOptions',
+                    'entityOptions',
+                    'customFields',
+                    'defaultLanguageCode',
+                    'entityIdStrategy',
+                ];
+                for (const prop of throwingProps) {
+                    Object.defineProperty(mockConfigService, prop, {
+                        get() {
+                            throw new Error(`${prop} exploded`);
+                        },
+                        configurable: true,
+                    });
+                }
+
+                const result = collector.collect();
+
+                expect(result).toBeDefined();
+                expect(result.assetStorageType).toBe('unknown');
+                expect(result.jobQueueType).toBe('unknown');
+                expect(result.entityIdStrategy).toBe('unknown');
+                expect(result.defaultLanguage).toBeUndefined();
+                expect(result.customFieldsCount).toBe(0);
+                expect(result.customFieldsPerEntity).toEqual({});
+                expect(result.authenticationMethods).toEqual([]);
+                expect(result.moneyStrategy).toBe('unknown');
+                expect(result.cacheStrategy).toBe('unknown');
+                expect(result.taxLineCalculationStrategy).toBe('unknown');
+                expect(result.orderSellerStrategy).toBe('unknown');
+                expect(result.paymentHandlerCodes).toEqual([]);
+                expect(result.shippingCalculatorCodes).toEqual([]);
+                expect(result.fulfillmentHandlerCodes).toEqual([]);
+                expect(result.promotionConditionCount).toBe(0);
+                expect(result.promotionActionCount).toBe(0);
+                expect(result.scheduledTaskCount).toBe(0);
+                expect(result.hasCustomOrderProcess).toBe(false);
+                expect(result.hasCustomPaymentProcess).toBe(false);
+                expect(result.hasCustomFulfillmentProcess).toBe(false);
+            });
+        });
     });
 });

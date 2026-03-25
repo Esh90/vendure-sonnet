@@ -19,7 +19,7 @@ export class ConfigCollector {
             assetStorageType: this.getAssetStorageType(),
             jobQueueType: this.getJobQueueType(),
             entityIdStrategy: this.getEntityIdStrategy(),
-            defaultLanguage: this.configService.defaultLanguageCode,
+            defaultLanguage: this.getDefaultLanguage(),
             customFieldsCount,
             authenticationMethods: this.getAuthenticationMethods(),
             moneyStrategy: this.getMoneyStrategy(),
@@ -37,6 +37,14 @@ export class ConfigCollector {
             hasCustomPaymentProcess: this.hasCustomPaymentProcess(),
             hasCustomFulfillmentProcess: this.hasCustomFulfillmentProcess(),
         };
+    }
+
+    private getDefaultLanguage(): string | undefined {
+        try {
+            return this.configService.defaultLanguageCode;
+        } catch {
+            return undefined;
+        }
     }
 
     private getAssetStorageType(): string {

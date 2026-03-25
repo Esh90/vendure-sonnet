@@ -4,7 +4,10 @@
  * then falls back to `constructor.name`. Returns 'unknown' if the name
  * appears to be minified (single char or empty).
  */
-export function getStrategyName(strategy: object): string {
+export function getStrategyName(strategy: object | null | undefined): string {
+    if (strategy == null) {
+        return 'unknown';
+    }
     const name = (strategy as any).name;
     if (typeof name === 'string' && name.length > 1) {
         return name;

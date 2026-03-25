@@ -104,7 +104,7 @@ export class TelemetryService implements OnApplicationBootstrap, OnApplicationSh
 
         // Merge scale indicator counts from already-collected entity metrics
         // into a new object to avoid mutating the collector's return value
-        const entities = databaseInfo.metrics.entities;
+        const entities = databaseInfo.metrics?.entities ?? {};
         const config = {
             ...collectedConfig,
             channelCount: entities.Channel ?? collectedConfig.channelCount,

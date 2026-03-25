@@ -51,4 +51,35 @@ describe('getStrategyName()', () => {
         strategy.constructor = undefined;
         expect(getStrategyName(strategy)).toBe('unknown');
     });
+
+    describe('error and edge cases', () => {
+        it('null input returns "unknown"', () => {
+            expect(getStrategyName(null)).toBe('unknown');
+        });
+
+        it('undefined input returns "unknown"', () => {
+            expect(getStrategyName(undefined)).toBe('unknown');
+        });
+
+        it('numeric .name is ignored, falls back to constructor.name', () => {
+            const strategy = { name: 42, constructor: { name: 'FallbackName' } };
+            expect(getStrategyName(strategy as any)).toBe('FallbackName');
+        });
+
+        it('two-character .name passes the length check', () => {
+            const strategy = { name: 'ab' };
+            expect(getStrategyName(strategy)).toBe('ab');
+        });
+
+        it('boolean .name is ignored, falls back to constructor.name', () => {
+            const strategy = { name: true, constructor: { name: 'RealName' } };
+            expect(getStrategyName(strategy as any)).toBe('RealName');
+        });
+
+        it('array .name is ignored, returns "unknown" with no constructor fallback', () => {
+            const strategy = Object.create(null);
+            strategy.name = ['not', 'a', 'string'];
+            expect(getStrategyName(strategy)).toBe('unknown');
+        });
+    });
 });
