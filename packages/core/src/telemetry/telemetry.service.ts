@@ -6,6 +6,7 @@ import { VENDURE_VERSION } from '../version';
 import { ConfigCollector } from './collectors/config.collector';
 import { DatabaseCollector } from './collectors/database.collector';
 import { DeploymentCollector } from './collectors/deployment.collector';
+import { FeaturesCollector } from './collectors/features.collector';
 import { InstallationIdCollector } from './collectors/installation-id.collector';
 import { PluginCollector } from './collectors/plugin.collector';
 import { SystemInfoCollector } from './collectors/system-info.collector';
@@ -49,6 +50,7 @@ export class TelemetryService implements OnApplicationBootstrap, OnApplicationSh
         private readonly pluginCollector: PluginCollector,
         private readonly configCollector: ConfigCollector,
         private readonly deploymentCollector: DeploymentCollector,
+        private readonly featuresCollector: FeaturesCollector,
     ) {}
 
     onApplicationBootstrap() {
@@ -94,11 +96,18 @@ export class TelemetryService implements OnApplicationBootstrap, OnApplicationSh
     private async collectPayload(): Promise<TelemetryPayload> {
         const installationId = await this.installationIdCollector.collect();
         const databaseInfo = await this.databaseCollector.collect();
+        const features = await this.featuresCollector.collect();
 
         const systemInfo = this.systemInfoCollector.collect();
         const plugins = this.pluginCollector.collect();
         const config = this.configCollector.collect();
         const deployment = this.deploymentCollector.collect();
+
+        // Populate scale indicator counts from already-collected database metrics
+        const entities = databaseInfo.metrics.entities;
+        if (entities.Channel) config.channelCount = entities.Channel;
+        if (entities.PaymentMethod) config.paymentMethodCount = entities.PaymentMethod;
+        if (entities.ShippingMethod) config.shippingMethodCount = entities.ShippingMethod;
 
         return {
             // Required fields
@@ -115,6 +124,7 @@ export class TelemetryService implements OnApplicationBootstrap, OnApplicationSh
             metrics: databaseInfo.metrics,
             deployment,
             config,
+            features,
         };
     }
 
