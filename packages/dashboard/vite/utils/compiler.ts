@@ -248,12 +248,15 @@ async function collectLocalSourceFiles(
 
     async function processFile(filePath: string) {
         const resolved = await resolveSourceFile(filePath);
-        if (!resolved || visited.has(resolved)) return;
-        visited.add(resolved);
+        if (!resolved) return;
 
-        // Skip declaration files and non-source files
+        // Skip declaration files and non-source files before adding to visited,
+        // so they don't leak into the returned sourceFiles array.
         if (resolved.endsWith('.d.ts') || resolved.endsWith('.d.tsx')) return;
         if (!/\.(ts|tsx|js|jsx)$/.test(resolved)) return;
+
+        if (visited.has(resolved)) return;
+        visited.add(resolved);
 
         const content = await fs.readFile(resolved, 'utf-8');
         const sf = ts.createSourceFile(resolved, content, ts.ScriptTarget.Latest, true);
