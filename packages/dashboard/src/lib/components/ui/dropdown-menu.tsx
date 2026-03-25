@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { cn } from '@/vdb/lib/utils.js';
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
@@ -22,13 +22,12 @@ import {
  * `w-(--anchor-width)` constraint. Dropdown menus should auto-size
  * to their content, not be constrained to the trigger button's width.
  */
-const DropdownMenuContent = React.forwardRef<
-    React.ComponentRef<typeof OriginalDropdownMenuContent>,
-    React.ComponentProps<typeof OriginalDropdownMenuContent>
->(({ className, ...props }, ref) => (
-    <OriginalDropdownMenuContent ref={ref} className={`w-auto ${className ?? ''}`} {...props} />
-));
-DropdownMenuContent.displayName = 'DropdownMenuContent';
+function DropdownMenuContent({
+    className,
+    ...props
+}: React.ComponentProps<typeof OriginalDropdownMenuContent>) {
+    return <OriginalDropdownMenuContent className={cn('w-auto', className)} {...props} />;
+}
 
 export {
     DropdownMenu,

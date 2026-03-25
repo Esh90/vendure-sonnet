@@ -1,4 +1,4 @@
-import type React from 'react';
+import { cn } from '@/vdb/lib/utils.js';
 import {
     Sheet,
     SheetClose,
@@ -21,7 +21,7 @@ function SheetContent({
 }: React.ComponentProps<typeof OriginalSheetContent>) {
     return (
         <OriginalSheetContent
-            className={`data-[side=left]:sm:max-w-lg data-[side=right]:sm:max-w-lg ${className ?? ''}`}
+            className={cn('data-[side=left]:sm:max-w-lg data-[side=right]:sm:max-w-lg', className)}
             {...props}
         />
     );

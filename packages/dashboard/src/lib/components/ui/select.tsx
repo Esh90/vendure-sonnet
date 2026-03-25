@@ -21,14 +21,21 @@ import {
  *
  * Deriving a key from children values causes unmount/remount of the popup,
  * which forces items to re-register in Base UI's collection.
+ *
+ * NOTE: Only inspects top-level children. If SelectItems are nested
+ * inside SelectGroup or fragments, the key may not update correctly.
  */
 function SelectContent({
     children,
     ...props
 }: React.ComponentProps<typeof OriginalSelectContent>) {
-    const childrenKey = React.Children.toArray(children)
-        .map(c => (React.isValidElement(c) ? (c.props as any)?.value ?? c.key : ''))
-        .join('|');
+    const childrenKey = React.useMemo(
+        () =>
+            React.Children.toArray(children)
+                .map(c => (React.isValidElement(c) ? (c.props as any)?.value ?? c.key : ''))
+                .join('|'),
+        [children],
+    );
 
     return (
         <OriginalSelectContent key={childrenKey} {...props}>
