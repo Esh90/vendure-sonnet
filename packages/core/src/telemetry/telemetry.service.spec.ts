@@ -6,6 +6,7 @@ import { VENDURE_VERSION } from '../version';
 import { ConfigCollector } from './collectors/config.collector';
 import { DatabaseCollector } from './collectors/database.collector';
 import { DeploymentCollector } from './collectors/deployment.collector';
+import { FeaturesCollector } from './collectors/features.collector';
 import { InstallationIdCollector } from './collectors/installation-id.collector';
 import { PluginCollector } from './collectors/plugin.collector';
 import { SystemInfoCollector } from './collectors/system-info.collector';
@@ -24,6 +25,7 @@ describe('TelemetryService', () => {
     let mockPluginCollector: Partial<PluginCollector>;
     let mockConfigCollector: Partial<ConfigCollector>;
     let mockDeploymentCollector: Partial<DeploymentCollector>;
+    let mockFeaturesCollector: Partial<FeaturesCollector>;
     let mockIsCI: ReturnType<typeof vi.fn>;
     let mockFetch: ReturnType<typeof vi.fn>;
 
@@ -38,6 +40,7 @@ describe('TelemetryService', () => {
             mockPluginCollector as PluginCollector,
             mockConfigCollector as ConfigCollector,
             mockDeploymentCollector as DeploymentCollector,
+            mockFeaturesCollector as FeaturesCollector,
         );
     }
 
@@ -77,7 +80,12 @@ describe('TelemetryService', () => {
             collect: vi.fn().mockResolvedValue({
                 databaseType: 'postgres',
                 metrics: {
-                    entities: { Product: '1-100' },
+                    entities: {
+                        Product: '1-100',
+                        Channel: '1-100',
+                        PaymentMethod: '1-100',
+                        ShippingMethod: '1-100',
+                    },
                     custom: { entityCount: 0 },
                 },
             }),
@@ -102,6 +110,17 @@ describe('TelemetryService', () => {
                 containerized: false,
                 workerMode: 'integrated',
                 serverless: false,
+            }),
+        };
+
+        mockFeaturesCollector = {
+            collect: vi.fn().mockResolvedValue({
+                multiChannel: false,
+                multiVendor: false,
+                multiStockLocation: false,
+                apiKeysEnabled: false,
+                customFieldsInUse: false,
+                scheduledTasks: false,
             }),
         };
 
@@ -175,6 +194,7 @@ describe('TelemetryService', () => {
                 expect(mockPluginCollector.collect).toHaveBeenCalled();
                 expect(mockConfigCollector.collect).toHaveBeenCalled();
                 expect(mockDeploymentCollector.collect).toHaveBeenCalled();
+                expect(mockFeaturesCollector.collect).toHaveBeenCalled();
             });
 
             it('still calls remaining collectors after one fails', async () => {
@@ -264,6 +284,35 @@ describe('TelemetryService', () => {
                 const body = JSON.parse(fetchCall[1].body);
 
                 expect(body.environment).toBeUndefined();
+            });
+
+            it('includes features in the payload', async () => {
+                service.onApplicationBootstrap();
+                await flushPromises();
+
+                const fetchCall = mockFetch.mock.calls[0];
+                const body = JSON.parse(fetchCall[1].body);
+
+                expect(body.features).toEqual({
+                    multiChannel: false,
+                    multiVendor: false,
+                    multiStockLocation: false,
+                    apiKeysEnabled: false,
+                    customFieldsInUse: false,
+                    scheduledTasks: false,
+                });
+            });
+
+            it('populates scale indicator config fields from entity metrics', async () => {
+                service.onApplicationBootstrap();
+                await flushPromises();
+
+                const fetchCall = mockFetch.mock.calls[0];
+                const body = JSON.parse(fetchCall[1].body);
+
+                expect(body.config.channelCount).toBe('1-100');
+                expect(body.config.paymentMethodCount).toBe('1-100');
+                expect(body.config.shippingMethodCount).toBe('1-100');
             });
         });
 
