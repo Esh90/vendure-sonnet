@@ -59,7 +59,6 @@ export async function compile(options: CompilerOptions): Promise<CompileResult> 
         inputPath: vendureConfigPath,
         outputPath,
         logger,
-        transformTsConfigPathMappings,
         module: options.module ?? 'commonjs',
     });
     logger.info(`TypeScript compilation completed in ${Date.now() - compileStart}ms`);
@@ -154,13 +153,11 @@ async function compileTypeScript({
     inputPath,
     outputPath,
     logger,
-    transformTsConfigPathMappings,
     module,
 }: {
     inputPath: string;
     outputPath: string;
     logger: Logger;
-    transformTsConfigPathMappings: Required<PathAdapter>['transformTsConfigPathMappings'];
     module: 'commonjs' | 'esm';
 }): Promise<{ sourceRoot: string }> {
     await fs.ensureDir(outputPath);
