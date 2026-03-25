@@ -87,7 +87,7 @@ export async function compile(options: CompilerOptions): Promise<CompileResult> 
             outputPath,
             configFileName,
         }),
-    ).href.replace(/.ts$/, '.js');
+    ).href.replace(/\.ts$/, '.js');
 
     // Create package.json with type commonjs
     await fs.writeFile(
@@ -159,7 +159,7 @@ async function compileTypeScript({
     outputPath: string;
     logger: Logger;
     module: 'commonjs' | 'esm';
-}): Promise<{ sourceRoot: string }> {
+}): Promise<void> {
     await fs.ensureDir(outputPath);
 
     // Find tsconfig paths for resolving path aliases in the import tree
@@ -190,10 +190,14 @@ async function compileTypeScript({
         });
     }
 
-    // 3. Compute source root as common ancestor of all files
-    // This ensures files outside the config's directory (e.g. via path aliases
-    // pointing to sibling directories) get correct output paths.
-    const sourceRoot = computeCommonDirectory(sourceFiles);
+    // 3. Use the config file's directory as the source root.
+    // This matches ts.createProgram's behaviour when given a single root file,
+    // and preserves the public getCompiledConfigPath API contract where
+    // configFileName is the basename at the output root. Files outside this
+    // directory (e.g. via path aliases to sibling dirs) get ../prefixed output
+    // paths, which is correct — those files are npm packages or pre-built libs
+    // that are resolved at runtime, not from the output directory.
+    const sourceRoot = path.dirname(inputPath);
 
     // 4. Transpile each file individually
     // Note: emitDecoratorMetadata with transpileModule emits `Object` for all
@@ -226,8 +230,6 @@ async function compileTypeScript({
         await fs.ensureDir(path.dirname(outputFilePath));
         await fs.writeFile(outputFilePath, result.outputText);
     }
-
-    return { sourceRoot };
 }
 
 /**
@@ -283,31 +285,6 @@ async function collectLocalSourceFiles(
 
     await processFile(entryFile);
     return [...visited];
-}
-
-/**
- * Computes the longest common directory path from an array of file paths.
- * Used to determine the source root for computing output directory structure.
- */
-function computeCommonDirectory(filePaths: string[]): string {
-    if (filePaths.length === 0) return process.cwd();
-    if (filePaths.length === 1) return path.dirname(filePaths[0]);
-
-    const dirs = filePaths.map(f => path.dirname(f));
-    const parts = dirs.map(d => d.split(path.sep));
-    const minLength = Math.min(...parts.map(p => p.length));
-
-    let commonLength = 0;
-    for (let i = 0; i < minLength; i++) {
-        const segment = parts[0][i];
-        if (parts.every(p => p[i] === segment)) {
-            commonLength = i + 1;
-        } else {
-            break;
-        }
-    }
-
-    return parts[0].slice(0, commonLength).join(path.sep) || path.sep;
 }
 
 async function registerTsConfigPaths(options: {
