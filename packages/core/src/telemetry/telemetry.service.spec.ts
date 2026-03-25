@@ -114,14 +114,16 @@ describe('TelemetryService', () => {
         };
 
         mockFeaturesCollector = {
-            collect: vi.fn().mockResolvedValue({
-                multiChannel: false,
-                multiVendor: false,
-                multiStockLocation: false,
-                apiKeysEnabled: false,
-                customFieldsInUse: false,
-                scheduledTasks: false,
-            }),
+            collect: vi.fn().mockImplementation((_config: any) =>
+                Promise.resolve({
+                    multiChannel: false,
+                    multiVendor: false,
+                    multiStockLocation: false,
+                    apiKeysEnabled: false,
+                    customFieldsInUse: false,
+                    scheduledTasks: false,
+                }),
+            ),
         };
 
         service = createService();
@@ -197,15 +199,17 @@ describe('TelemetryService', () => {
                 expect(mockFeaturesCollector.collect).toHaveBeenCalled();
             });
 
-            it('still calls remaining collectors after one fails', async () => {
+            it('does not send telemetry when a required collector fails', async () => {
                 mockDatabaseCollector.collect = vi.fn().mockRejectedValue(new Error('DB error'));
 
                 service.onApplicationBootstrap();
                 await flushPromises();
 
-                // The error is caught, so we won't see fetch called, but we can verify
-                // the error doesn't propagate
-                expect(() => service.onApplicationBootstrap()).not.toThrow();
+                // When databaseCollector rejects, sendTelemetry catches the error
+                // and the fetch is never called
+                expect(mockFetch).not.toHaveBeenCalled();
+                // But the sync collectors that ran before the failure were still called
+                expect(mockInstallationIdCollector.collect).toHaveBeenCalled();
             });
         });
 

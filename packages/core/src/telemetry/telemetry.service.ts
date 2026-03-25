@@ -96,18 +96,25 @@ export class TelemetryService implements OnApplicationBootstrap, OnApplicationSh
     private async collectPayload(): Promise<TelemetryPayload> {
         const installationId = await this.installationIdCollector.collect();
         const databaseInfo = await this.databaseCollector.collect();
-        const features = await this.featuresCollector.collect();
 
         const systemInfo = this.systemInfoCollector.collect();
         const plugins = this.pluginCollector.collect();
-        const config = this.configCollector.collect();
+        const collectedConfig = this.configCollector.collect();
         const deployment = this.deploymentCollector.collect();
 
-        // Populate scale indicator counts from already-collected database metrics
+        // Merge scale indicator counts from already-collected entity metrics
+        // into a new object to avoid mutating the collector's return value
         const entities = databaseInfo.metrics.entities;
-        if (entities.Channel) config.channelCount = entities.Channel;
-        if (entities.PaymentMethod) config.paymentMethodCount = entities.PaymentMethod;
-        if (entities.ShippingMethod) config.shippingMethodCount = entities.ShippingMethod;
+        const config = {
+            ...collectedConfig,
+            channelCount: entities.Channel ?? collectedConfig.channelCount,
+            paymentMethodCount: entities.PaymentMethod ?? collectedConfig.paymentMethodCount,
+            shippingMethodCount: entities.ShippingMethod ?? collectedConfig.shippingMethodCount,
+        };
+
+        // FeaturesCollector derives flags from already-collected config
+        // to avoid duplicating custom-field/scheduler iteration logic
+        const features = await this.featuresCollector.collect(config);
 
         return {
             // Required fields

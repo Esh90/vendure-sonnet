@@ -1,108 +1,81 @@
 import { Injectable } from '@nestjs/common';
 
-import { ConfigService } from '../../config/config.service';
 import { TransactionalConnection } from '../../connection/transactional-connection';
 import { ApiKey } from '../../entity/api-key/api-key.entity';
 import { Channel } from '../../entity/channel/channel.entity';
 import { Seller } from '../../entity/seller/seller.entity';
 import { StockLocation } from '../../entity/stock-location/stock-location.entity';
-import { getStrategyName } from '../helpers/strategy-name.helper';
-import { TelemetryFeatures } from '../telemetry.types';
+import { TelemetryConfig, TelemetryFeatures } from '../telemetry.types';
 
 /**
  * Collects feature adoption flags for telemetry.
- * Each flag is derived independently so a single failure does not affect the others.
+ * DB-dependent flags are resolved in parallel. Each flag is derived
+ * independently so a single failure does not affect the others.
+ *
+ * Config-derived flags (`customFieldsInUse`, `scheduledTasks`) are read
+ * from the already-collected `TelemetryConfig` to avoid duplicating
+ * iteration logic that lives in `ConfigCollector`.
  */
 @Injectable()
 export class FeaturesCollector {
-    constructor(
-        private readonly connection: TransactionalConnection,
-        private readonly configService: ConfigService,
-    ) {}
+    constructor(private readonly connection: TransactionalConnection) {}
 
-    async collect(): Promise<TelemetryFeatures> {
+    async collect(config: TelemetryConfig): Promise<TelemetryFeatures> {
         const rawConnection = this.connection.rawConnection;
         const dbReady = rawConnection?.isInitialized;
 
-        const features: TelemetryFeatures = {};
+        // Run all DB queries in parallel — they are independent
+        const [multiChannel, sellerCount, multiStockLocation, apiKeysEnabled] = await Promise.all([
+            this.safeCount(dbReady, Channel, count => count > 1),
+            this.safeCount(dbReady, Seller, count => count),
+            this.safeCount(dbReady, StockLocation, count => count > 1),
+            this.safeCount(dbReady, ApiKey, count => count > 0),
+        ]);
 
-        features.multiChannel = await this.detectMultiChannel(dbReady);
-        features.multiVendor = await this.detectMultiVendor(dbReady);
-        features.multiStockLocation = await this.detectMultiStockLocation(dbReady);
-        features.apiKeysEnabled = await this.detectApiKeysEnabled(dbReady);
-        features.customFieldsInUse = this.detectCustomFieldsInUse();
-        features.scheduledTasks = this.detectScheduledTasks();
-
-        return features;
+        return {
+            multiChannel,
+            multiVendor: this.deriveMultiVendor(sellerCount, dbReady, config),
+            multiStockLocation,
+            apiKeysEnabled,
+            // Derived from already-collected config — no duplicate iteration
+            customFieldsInUse: (config.customFieldsCount ?? 0) > 0,
+            scheduledTasks: (config.scheduledTaskCount ?? 0) > 0,
+        };
     }
 
-    private async detectMultiChannel(dbReady: boolean | undefined): Promise<boolean | undefined> {
+    /**
+     * Derives multiVendor from seller count + strategy name.
+     * When DB is unavailable, returns `undefined` to stay consistent
+     * with other DB-dependent flags — the strategy check alone is
+     * not authoritative enough to report a definitive value.
+     */
+    private deriveMultiVendor(
+        sellerCount: number | undefined,
+        dbReady: boolean | undefined,
+        config: TelemetryConfig,
+    ): boolean | undefined {
         try {
             if (!dbReady) return undefined;
-            const count = await this.connection.rawConnection.getRepository(Channel).count();
-            return count > 1;
-        } catch {
-            return undefined;
-        }
-    }
-
-    private async detectMultiVendor(dbReady: boolean | undefined): Promise<boolean | undefined> {
-        try {
-            let multipleSellers = false;
-            if (dbReady) {
-                const count = await this.connection.rawConnection.getRepository(Seller).count();
-                multipleSellers = count > 1;
-            }
-
-            const strategyName = getStrategyName(this.configService.orderOptions.orderSellerStrategy);
+            const multipleSellers = sellerCount !== undefined && sellerCount > 1;
+            const strategyName = config.orderSellerStrategy ?? 'unknown';
             const customStrategy =
                 strategyName !== 'DefaultOrderSellerStrategy' && strategyName !== 'unknown';
-
             return multipleSellers || customStrategy;
         } catch {
             return undefined;
         }
     }
 
-    private async detectMultiStockLocation(dbReady: boolean | undefined): Promise<boolean | undefined> {
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    private async safeCount<T>(
+        dbReady: boolean | undefined,
+        entity: Function,
+        map: (count: number) => T,
+    ): Promise<T | undefined> {
         try {
             if (!dbReady) return undefined;
-            const count = await this.connection.rawConnection.getRepository(StockLocation).count();
-            return count > 1;
-        } catch {
-            return undefined;
-        }
-    }
-
-    private async detectApiKeysEnabled(dbReady: boolean | undefined): Promise<boolean | undefined> {
-        try {
-            if (!dbReady) return undefined;
-            const count = await this.connection.rawConnection.getRepository(ApiKey).count();
-            return count > 0;
-        } catch {
-            return undefined;
-        }
-    }
-
-    private detectCustomFieldsInUse(): boolean | undefined {
-        try {
-            const customFields = this.configService.customFields;
-            let total = 0;
-            for (const key of Object.keys(customFields)) {
-                const fields = customFields[key as keyof typeof customFields];
-                if (Array.isArray(fields)) {
-                    total += fields.length;
-                }
-            }
-            return total > 0;
-        } catch {
-            return undefined;
-        }
-    }
-
-    private detectScheduledTasks(): boolean | undefined {
-        try {
-            return (this.configService.schedulerOptions.tasks?.length ?? 0) > 0;
+            const count = await this.connection.rawConnection.getRepository(entity).count();
+            return map(count);
         } catch {
             return undefined;
         }

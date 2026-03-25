@@ -13,12 +13,14 @@ export class ConfigCollector {
     constructor(private readonly configService: ConfigService) {}
 
     collect(): TelemetryConfig {
+        const customFieldsPerEntity = this.getCustomFieldsPerEntity();
+        const customFieldsCount = Object.values(customFieldsPerEntity).reduce((sum, c) => sum + c, 0);
         return {
             assetStorageType: this.getAssetStorageType(),
             jobQueueType: this.getJobQueueType(),
             entityIdStrategy: this.getEntityIdStrategy(),
             defaultLanguage: this.configService.defaultLanguageCode,
-            customFieldsCount: this.countCustomFields(),
+            customFieldsCount,
             authenticationMethods: this.getAuthenticationMethods(),
             moneyStrategy: this.getMoneyStrategy(),
             cacheStrategy: this.getCacheStrategy(),
@@ -30,7 +32,7 @@ export class ConfigCollector {
             promotionConditionCount: this.getPromotionConditionCount(),
             promotionActionCount: this.getPromotionActionCount(),
             scheduledTaskCount: this.getScheduledTaskCount(),
-            customFieldsPerEntity: this.getCustomFieldsPerEntity(),
+            customFieldsPerEntity,
             hasCustomOrderProcess: this.hasCustomOrderProcess(),
             hasCustomPaymentProcess: this.hasCustomPaymentProcess(),
             hasCustomFulfillmentProcess: this.hasCustomFulfillmentProcess(),
@@ -60,15 +62,6 @@ export class ConfigCollector {
             return strategy ? getStrategyName(strategy) : 'unknown';
         } catch {
             return 'unknown';
-        }
-    }
-
-    private countCustomFields(): number {
-        try {
-            const perEntity = this.getCustomFieldsPerEntity();
-            return Object.values(perEntity).reduce((sum, count) => sum + count, 0);
-        } catch {
-            return 0;
         }
     }
 
