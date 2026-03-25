@@ -55,7 +55,7 @@ export async function compile(options: CompilerOptions): Promise<CompileResult> 
 
     // 1. Compile TypeScript files
     const compileStart = Date.now();
-    const { sourceRoot } = await compileTypeScript({
+    await compileTypeScript({
         inputPath: vendureConfigPath,
         outputPath,
         logger,

@@ -19,8 +19,7 @@ export async function resolveSourceFile(filePath: string): Promise<string | unde
         path.join(filePath, 'index.js'),
     ];
     if (filePath.endsWith('.js')) {
-        candidates.push(filePath.replace(/\.js$/, '.ts'));
-        candidates.push(filePath.replace(/\.js$/, '.tsx'));
+        candidates.push(filePath.replace(/\.js$/, '.ts'), filePath.replace(/\.js$/, '.tsx'));
     }
     for (const candidate of candidates) {
         try {
@@ -40,29 +39,21 @@ export async function resolveSourceFile(filePath: string): Promise<string | unde
  * Only matches path aliases — relative imports and npm packages are not handled.
  */
 export function resolvePathAliasImports(importPath: string, tsConfigInfo?: TsConfigPathsConfig): string[] {
-    const resolved: string[] = [];
     if (!tsConfigInfo) {
-        return resolved;
+        return [];
     }
+    const resolved: string[] = [];
     for (const [alias, patterns] of Object.entries(tsConfigInfo.paths)) {
         const hasWildcard = alias.includes('*');
-        if (hasWildcard) {
-            // Wildcard alias: "@plugins/*" matches "@plugins/foo" but not "@plugins-other/foo"
-            const prefix = alias.replace(/\*$/, '');
-            if (importPath.startsWith(prefix)) {
-                const suffix = importPath.slice(prefix.length);
-                for (const pattern of patterns) {
-                    const target = pattern.replace(/\*$/, '');
-                    resolved.push(path.resolve(tsConfigInfo.baseUrl, target, suffix));
-                }
-            }
-        } else {
-            // Exact alias: "@app" matches only "@app", not "@app-other"
-            if (importPath === alias) {
-                for (const pattern of patterns) {
-                    resolved.push(path.resolve(tsConfigInfo.baseUrl, pattern));
-                }
-            }
+        const prefix = hasWildcard ? alias.replace(/\*$/, '') : alias;
+        const isMatch = hasWildcard ? importPath.startsWith(prefix) : importPath === alias;
+        if (!isMatch) {
+            continue;
+        }
+        const suffix = hasWildcard ? importPath.slice(prefix.length) : '';
+        for (const pattern of patterns) {
+            const target = hasWildcard ? pattern.replace(/\*$/, '') : pattern;
+            resolved.push(path.resolve(tsConfigInfo.baseUrl, target, suffix));
         }
     }
     return resolved;
