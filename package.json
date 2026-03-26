@@ -110,11 +110,6 @@
       "pre-commit": "NODE_OPTIONS=\"--max-old-space-size=8096\" lint-staged"
     }
   },
-  "overrides": {
-    "@apollo/server-plugin-landing-page-graphql-playground": {
-      "@apollo/server": "^5.4.0"
-    }
-  },
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^5.54.1",
     "@typescript-eslint/parser": "^5.54.1",
