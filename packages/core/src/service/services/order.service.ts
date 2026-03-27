@@ -216,27 +216,22 @@ export class OrderService {
         relations?: RelationPaths<Order>,
     ): Promise<Order | undefined> {
         const qb = this.connection.getRepository(ctx, Order).createQueryBuilder('order');
-        const effectiveRelations = relations ?? [
-            'channels',
-            'customer',
-            'customer.user',
-            'lines',
-            'lines.productVariant',
-            'lines.productVariant.taxCategory',
-            'lines.productVariant.productVariantPrices',
-            'lines.productVariant.translations',
-            'lines.featuredAsset',
-            'lines.taxCategory',
-            'shippingLines',
-            'surcharges',
-        ];
-        if (
-            relations &&
-            effectiveRelations.includes('lines.productVariant') &&
-            !effectiveRelations.includes('lines.productVariant.taxCategory')
-        ) {
-            effectiveRelations.push('lines.productVariant.taxCategory');
-        }
+        const effectiveRelations = this.normalizeOrderRelations(
+            relations ?? [
+                'channels',
+                'customer',
+                'customer.user',
+                'lines',
+                'lines.productVariant',
+                'lines.productVariant.taxCategory',
+                'lines.productVariant.productVariantPrices',
+                'lines.productVariant.translations',
+                'lines.featuredAsset',
+                'lines.taxCategory',
+                'shippingLines',
+                'surcharges',
+            ],
+        );
 
         // Split relations into two groups for different loading strategies:
         // Main order relations - loaded with 'query' strategy for performance
@@ -2001,6 +1996,7 @@ export class OrderService {
                 'lines',
                 'lines.productVariant',
                 'lines.productVariant.productVariantPrices',
+                'lines.productVariant.translations',
                 'shippingLines',
                 'surcharges',
                 'customer',
@@ -2018,6 +2014,37 @@ export class OrderService {
             throw new UserInputError('error.order-does-not-contain-line-with-id', { id: orderLineId });
         }
         return orderLine;
+    }
+
+    private normalizeOrderRelations(relations: RelationPaths<Order>): RelationPaths<Order> {
+        const normalizedRelations = [...relations];
+        const hasLineProductVariantRelation = normalizedRelations.some(
+            relation => relation === 'lines.productVariant' || relation.startsWith('lines.productVariant.'),
+        );
+        const hasLineProductVariantProductRelation = normalizedRelations.some(
+            relation =>
+                relation === 'lines.productVariant.product' ||
+                relation.startsWith('lines.productVariant.product.'),
+        );
+
+        if (hasLineProductVariantRelation) {
+            this.addRelationIfMissing(normalizedRelations, 'lines.productVariant');
+            this.addRelationIfMissing(normalizedRelations, 'lines.productVariant.taxCategory');
+            this.addRelationIfMissing(normalizedRelations, 'lines.productVariant.translations');
+        }
+
+        if (hasLineProductVariantProductRelation) {
+            this.addRelationIfMissing(normalizedRelations, 'lines.productVariant.product');
+            this.addRelationIfMissing(normalizedRelations, 'lines.productVariant.product.translations');
+        }
+
+        return normalizedRelations;
+    }
+
+    private addRelationIfMissing(relations: string[], relation: string) {
+        if (!relations.includes(relation)) {
+            relations.push(relation);
+        }
     }
 
     /**
