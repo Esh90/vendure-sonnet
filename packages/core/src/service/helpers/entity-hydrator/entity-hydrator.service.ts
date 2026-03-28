@@ -234,7 +234,7 @@ export class EntityHydrator {
             return;
         }
         if (value === undefined) {
-            this.addRelationPrefixes(traversedPath, missingRelations);
+            this.addRelationPrefixes([...traversedPath, ...parts.slice(partIndex + 1)], missingRelations);
             traversedPath.pop();
             return;
         }
