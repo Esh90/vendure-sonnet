@@ -154,18 +154,37 @@ describe('migrateAssetTranslationData()', () => {
         }
     });
 
-    it('should use the default channel language code', async () => {
+    it('should use the default channel language code, not other channels', async () => {
         try {
+            // Create a second channel with a different language code
+            const cols = [
+                esc('code'),
+                esc('token'),
+                esc('defaultLanguageCode'),
+                esc('defaultCurrencyCode'),
+                esc('pricesIncludeTax'),
+                esc('trackInventory'),
+                esc('outOfStockThreshold'),
+            ].join(', ');
+            await queryRunner.query(
+                `INSERT INTO ${esc('channel')} (${cols})
+                 VALUES ('second-channel', 'second-channel-token', 'de', 'EUR', FALSE, TRUE, 0)`,
+            );
+
             await simulatePreMigrationState();
             await migrateAssetTranslationData(queryRunner);
 
+            // All translations should use the default channel's language, not 'de'
             const translations: Array<{ languageCode: string }> = await queryRunner.query(
                 `SELECT DISTINCT ${esc('languageCode')} FROM ${esc('asset_translation')}`,
             );
 
             expect(translations).toHaveLength(1);
             expect(translations[0].languageCode).toBe(defaultLanguageCode);
+            expect(translations[0].languageCode).not.toBe('de');
         } finally {
+            // Clean up second channel
+            await queryRunner.query(`DELETE FROM ${esc('channel')} WHERE ${esc('code')} = 'second-channel'`);
             await restoreOriginalState();
         }
     });
@@ -174,9 +193,9 @@ describe('migrateAssetTranslationData()', () => {
         try {
             await simulatePreMigrationState();
 
-            // Set one asset's name to NULL to simulate corrupt/incomplete data
+            // Set the first asset's name to NULL to simulate corrupt/incomplete data
             const assets: Array<{ id: number }> = await queryRunner.query(
-                `SELECT ${esc('id')} FROM ${esc('asset')} LIMIT 1`,
+                `SELECT ${esc('id')} FROM ${esc('asset')} ORDER BY ${esc('id')} LIMIT 1`,
             );
             const nullAssetId = assets[0].id;
             await queryRunner.query(
@@ -193,6 +212,103 @@ describe('migrateAssetTranslationData()', () => {
             expect(translations.length).toBe(originalTranslations.length - 1);
             expect(translations.map(t => t.baseId)).not.toContain(nullAssetId);
         } finally {
+            await restoreOriginalState();
+        }
+    });
+
+    it('should handle partial migration (crash recovery)', async () => {
+        try {
+            await simulatePreMigrationState();
+
+            // Pre-insert a translation for one asset to simulate a partial migration
+            const firstAsset: Array<{ id: number; name: string; createdAt: string; updatedAt: string }> =
+                await queryRunner.query(
+                    `SELECT ${esc('id')}, ${esc('name')}, ${esc('createdAt')}, ${esc('updatedAt')}
+                     FROM ${esc('asset')} ORDER BY ${esc('id')} LIMIT 1`,
+                );
+            const a = firstAsset[0];
+            const escapedName = a.name.replace(/'/g, "''");
+            const insertCols = [
+                esc('createdAt'),
+                esc('updatedAt'),
+                esc('languageCode'),
+                esc('name'),
+                esc('baseId'),
+            ].join(', ');
+            await queryRunner.query(
+                `INSERT INTO ${esc('asset_translation')} (${insertCols})
+                 VALUES ('${a.createdAt}', '${a.updatedAt}',
+                         '${defaultLanguageCode}', '${escapedName}', ${a.id})`,
+            );
+
+            // Run the migration — should fill in the rest without duplicating the existing one
+            await migrateAssetTranslationData(queryRunner);
+
+            const translations: Array<{ baseId: number }> = await queryRunner.query(
+                `SELECT ${esc('baseId')} FROM ${esc('asset_translation')}`,
+            );
+            expect(translations.length).toBe(originalTranslations.length);
+
+            // Verify no duplicates
+            const baseIds = translations.map(t => t.baseId);
+            expect(new Set(baseIds).size).toBe(baseIds.length);
+        } finally {
+            await restoreOriginalState();
+        }
+    });
+
+    it('should handle asset names with special characters', async () => {
+        try {
+            await simulatePreMigrationState();
+
+            // Insert an asset with a tricky name
+            const specialName = 'it\'s a "test" — asset (1)';
+            const assetCols = [
+                esc('name'),
+                esc('type'),
+                esc('mimeType'),
+                esc('width'),
+                esc('height'),
+                esc('fileSize'),
+                esc('source'),
+                esc('preview'),
+            ].join(', ');
+            await queryRunner.query(
+                `INSERT INTO ${esc('asset')} (${assetCols})
+                 VALUES ('${specialName.replace(/'/g, "''")}', 'IMAGE',
+                         'image/jpeg', 100, 100, 1000,
+                         'test-source', 'test-preview')`,
+            );
+            const inserted: Array<{ id: number }> = await queryRunner.query(
+                `SELECT ${esc('id')} FROM ${esc('asset')} WHERE ${esc('source')} = 'test-source'`,
+            );
+            // Assign the asset to the default channel
+            const defaultChannel: Array<{ id: number }> = await queryRunner.query(
+                `SELECT ${esc('id')} FROM ${esc('channel')} WHERE ${esc('code')} = '__default_channel__'`,
+            );
+            await queryRunner.query(
+                `INSERT INTO ${esc('asset_channels_channel')} (${esc('assetId')}, ${esc('channelId')})
+                 VALUES (${inserted[0].id}, ${defaultChannel[0].id})`,
+            );
+
+            await migrateAssetTranslationData(queryRunner);
+
+            const translation: Array<{ name: string }> = await queryRunner.query(
+                `SELECT ${esc('name')} FROM ${esc('asset_translation')} WHERE ${esc('baseId')} = ${inserted[0].id}`,
+            );
+            expect(translation).toHaveLength(1);
+            expect(translation[0].name).toBe(specialName);
+        } finally {
+            // Clean up the test asset
+            const subquery =
+                `SELECT ${esc('id')} FROM ${esc('asset')}` + ` WHERE ${esc('source')} = 'test-source'`;
+            await queryRunner.query(
+                `DELETE FROM ${esc('asset_channels_channel')}` + ` WHERE ${esc('assetId')} IN (${subquery})`,
+            );
+            await queryRunner.query(
+                `DELETE FROM ${esc('asset_translation')}` + ` WHERE ${esc('baseId')} IN (${subquery})`,
+            );
+            await queryRunner.query(`DELETE FROM ${esc('asset')} WHERE ${esc('source')} = 'test-source'`);
             await restoreOriginalState();
         }
     });

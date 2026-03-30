@@ -53,7 +53,12 @@ export async function migrateAssetTranslationData(queryRunner: QueryRunner): Pro
     const rows: Array<{ defaultLanguageCode: string }> = await queryRunner.query(
         `SELECT ${esc('defaultLanguageCode')} FROM ${esc('channel')} WHERE ${esc('code')} = '__default_channel__'`,
     );
-    const defaultLanguageCode = rows?.[0]?.defaultLanguageCode ?? 'en';
+    if (!rows?.length) {
+        throw new Error(
+            'Could not find the default channel. The __default_channel__ must exist before running this migration.',
+        );
+    }
+    const defaultLanguageCode = rows[0].defaultLanguageCode;
 
     // 2. Copy asset names into the asset_translation table
     await queryRunner.query(
