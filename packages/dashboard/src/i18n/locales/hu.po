@@ -16,7 +16,7 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:158
 msgid "API Keys"
-msgstr "API kulcsok"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/lib/hooks/use-extended-list-query.ts:41
@@ -78,7 +78,7 @@ msgstr "Termékváltozatok"
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:45
 msgid "Option Groups"
-msgstr "Opciocsoportok"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:52
@@ -144,7 +144,7 @@ msgstr "Ütemezett feladatok"
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:151
 msgid "Settings Store"
-msgstr "Beallitasok tarolo"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:167
@@ -772,7 +772,7 @@ msgstr "Megjegyzés törlése sikertelen"
 #. placeholder {0}: selected.length
 #: src/lib/components/shared/asset/asset-gallery.tsx:469
 msgid ", {0} selected"
-msgstr ", {0} kivalasztva"
+msgstr ""
 
 #: src/lib/components/data-table/human-readable-operator.tsx:26
 msgid "!="
@@ -848,7 +848,7 @@ msgstr "{operator}"
 
 #: src/app/routes/_authenticated/_products/components/shared-option-group-warning.tsx:13
 msgid "{productCount, plural, one {This option group is used by one other product. Changes will affect it too.} other {This option group is shared across # products. Changes will affect all of them.}}"
-msgstr "{productCount, plural, one {Ezt az opciocsoportot egy masik termek hasznalja. A valtoztatasok azt is erintik.} other {Ezt az opciocsoportot # termek osztja meg. A valtoztatasok mindegyiket erintik.}}"
+msgstr ""
 
 #: src/lib/components/data-table/data-table-pagination.tsx:17
 #~ msgid "{selectedRowCount} of {0} row(s) selected."
@@ -865,7 +865,7 @@ msgstr "{title}"
 #. placeholder {0}: totalItems === 1 ? 'asset' : 'assets'
 #: src/lib/components/shared/asset/asset-gallery.tsx:465
 msgid "{totalItems} {0} found"
-msgstr "{totalItems} {0} talalat"
+msgstr ""
 
 #: src/app/routes/_authenticated/_orders/components/order-history/default-order-history-components.tsx:117
 msgid "{totalQuantity} item(s) refunded"
@@ -906,7 +906,7 @@ msgstr "Aktív"
 
 #: src/lib/components/data-table/data-table-active-filters-popover.tsx:27
 msgid "Active filters"
-msgstr "Aktiv szurok"
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/components/product-option-select.tsx:79
 msgid "Add \"{newOptionInput}\""
@@ -923,7 +923,7 @@ msgstr "Új cím hozzáadása a vásárlóhoz."
 
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:144
 msgid "Add a new option value to the {groupName} option group"
-msgstr "Uj opcioertek hozzaadasa a(z) {groupName} opciocsoporthoz"
+msgstr ""
 
 #: src/app/routes/_authenticated/_product-variants/components/add-currency-dropdown.tsx:35
 msgid "Add a price in another currency"
@@ -931,7 +931,7 @@ msgstr "Ár hozzáadása másik pénznemben"
 
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:196
 msgid "Add an option group to get started with variants."
-msgstr "Adjon hozza egy opciocsoportot a variansokkal valo munka megkezdesehez."
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/components/create-product-options-dialog.tsx:318
 #~ msgid "Add another option group"
@@ -1030,7 +1030,7 @@ msgstr "Tulajdonságértékek hozzáadása vagy eltávolítása: {0} {entityType
 
 #: src/app/routes/_authenticated/_orders/components/add-manual-payment-dialog.tsx:121
 msgid "Add payment"
-msgstr "Fizetes hozzaadasa"
+msgstr ""
 
 #. placeholder {0}: formatCurrency(outstandingAmount, currencyCode)
 #: src/app/routes/_authenticated/_orders/components/add-manual-payment-dialog.tsx:177
@@ -1169,7 +1169,7 @@ msgstr "Értesítések"
 
 #: src/app/routes/_authenticated/_orders/components/order-process-dialog.tsx:85
 msgid "All possible order states and their transitions. The current state is highlighted."
-msgstr "Minden lehetseges rendelesi allapot es azok atmeneti. A jelenlegi allapot ki van emelve."
+msgstr ""
 
 #: src/app/routes/_authenticated/_system/healthchecks.tsx:67
 #~ msgid "All resources are up and running"
@@ -1178,7 +1178,7 @@ msgstr "Minden lehetseges rendelesi allapot es azok atmeneti. A jelenlegi allapo
 #: src/lib/components/shared/asset/asset-gallery.tsx:367
 #: src/lib/components/shared/asset/asset-gallery.tsx:379
 msgid "All types"
-msgstr "Minden tipus"
+msgstr ""
 
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:450
 msgid "Allocated"
@@ -1212,17 +1212,17 @@ msgstr "Emelet, ajtó stb."
 
 #: src/app/routes/_authenticated/_api-keys/components/api-key-secret-dialog.tsx:85
 msgid "API Key"
-msgstr "API kulcs"
+msgstr ""
 
 #: src/app/routes/_authenticated/_api-keys/components/rotate-api-key-button.tsx:32
 msgid "API key rotated successfully"
-msgstr "API kulcs sikeresen rotava"
+msgstr ""
 
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:48
 #: src/app/routes/_authenticated/_api-keys/api-keys.tsx:14
 #: src/app/routes/_authenticated/_api-keys/api-keys.tsx:25
 msgid "API Keys"
-msgstr "API kulcsok"
+msgstr ""
 
 #: src/lib/components/data-table/views-sheet.tsx:49
 msgid "Applied global view \"{viewName}\""
@@ -1298,7 +1298,7 @@ msgstr "Biztosan el szeretné távolítani ezt az opciócsoportot a termékből?
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:376
 msgid "Asset type"
-msgstr "Eszkoz tipusa"
+msgstr ""
 
 #: src/app/routes/_authenticated/_assets/assets_.$id.tsx:39
 #: src/app/routes/_authenticated/_assets/assets.tsx:17
@@ -1319,11 +1319,11 @@ msgstr "{entityType} hozzárendelése csatornához"
 
 #: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:144
 msgid "Assign an existing option group or create a new one"
-msgstr "Meglevo opciocsoport hozzarendelese vagy uj letrehozasa"
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:151
 msgid "Assign existing"
-msgstr "Meglevo hozzarendelese"
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/components/create-product-options-dialog.tsx:325
 #~ msgid "Assign options to existing variant"
@@ -1336,7 +1336,7 @@ msgstr "Hozzárendelés csatornához"
 
 #: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:261
 msgid "Assigned"
-msgstr "Hozzarendelve"
+msgstr ""
 
 #: src/app/routes/_authenticated/_profile/profile.tsx:120
 msgid "Authentication methods"
@@ -1410,7 +1410,7 @@ msgstr "Számlázási cím eltávolítva a megrendelésről"
 #: src/lib/components/shared/asset/asset-gallery.tsx:370
 #: src/lib/components/shared/asset/asset-gallery.tsx:382
 msgid "Binary"
-msgstr "Binaris"
+msgstr ""
 
 #: src/lib/components/shared/facet-value-selector.tsx:155
 #: src/lib/components/shared/facet-value-selector.tsx:172
@@ -1499,7 +1499,7 @@ msgstr "Csatornák"
 
 #: src/lib/components/layout/language-dialog.tsx:52
 msgid "Choose your preferred display language and locale settings"
-msgstr "Valassza ki a kivan megjelenesi nyelvet es teruleti beallitasokat"
+msgstr ""
 
 #: src/app/routes/_authenticated/_customers/components/customer-address-form.tsx:138
 #: src/app/routes/_authenticated/_shipping-methods/components/test-address-form.tsx:196
@@ -1533,7 +1533,7 @@ msgstr "Kattintson a \"Teszt futtatása\" gombra a szállítási mód tesztelés
 
 #: src/app/routes/_authenticated/_api-keys/components/api-key-secret-dialog.tsx:125
 msgid "Close"
-msgstr "Bezaras"
+msgstr ""
 
 #: src/app/routes/_authenticated/_channels/channels_.$id.tsx:132
 #: src/app/routes/_authenticated/_countries/countries_.$id.tsx:110
@@ -1597,7 +1597,7 @@ msgstr "Konfigurálja az áruháza és csatornái számára elérhető nyelveket
 #. placeholder {0}: entityName.toLowerCase()
 #: src/app/common/duplicate-entity-dialog.tsx:87
 msgid "Configure duplication settings for {0}s"
-msgstr "Duplikacios beallitasok konfiguralaasa a(z) {0}s szamara"
+msgstr ""
 
 #: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:355
 #: src/lib/components/shared/navigation-confirmation.tsx:58
@@ -1702,15 +1702,15 @@ msgstr "\"{0}\" létrehozása"
 
 #: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:294
 msgid "Create {enabledCount} variants"
-msgstr "{enabledCount}arians letrehozasa"
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/components/add-product-variant-dialog.tsx:234
 msgid "Create a new product variant with options, pricing, and stock"
-msgstr "Uj termekarians letrehozasa opciokkal, arazassal es keszlettel"
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:155
 msgid "Create new"
-msgstr "Uj letrehozasa"
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/components/create-product-options-dialog.tsx:249
 #: src/app/routes/_authenticated/_products/components/create-product-options-dialog.tsx:408
@@ -1748,7 +1748,7 @@ msgstr "Létrehozva"
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:210
 #: src/app/routes/_authenticated/_api-keys/api-keys.tsx:66
 msgid "Created by"
-msgstr "Letrehozta"
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:292
 msgid "Creating..."
@@ -1919,7 +1919,7 @@ msgstr "Sor törlése"
 
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:454
 msgid "Delete variant"
-msgstr "Varians torlese"
+msgstr ""
 
 #: src/lib/components/data-table/views-sheet.tsx:163
 msgid "Delete View"
@@ -1961,7 +1961,7 @@ msgstr "Fejlesztői mód"
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:746
 msgid "Dimensions"
-msgstr "Meretek"
+msgstr ""
 
 #: src/app/routes/_authenticated/_system/scheduled-tasks.tsx:220
 msgid "Disable"
@@ -1996,7 +1996,7 @@ msgstr "nem tartalmazza"
 
 #: src/app/routes/_authenticated/_api-keys/components/api-key-secret-dialog.tsx:108
 msgid "Download as .env file"
-msgstr "Letoltes .env fajlkent"
+msgstr ""
 
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:304
 #: src/app/routes/_authenticated/_orders/orders.tsx:115
@@ -2021,7 +2021,7 @@ msgstr "Húzza az átrendezéshez"
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:438
 msgid "Drop files here to upload"
-msgstr "Huzza ide a fajlokat a feltolteshez"
+msgstr ""
 
 #: src/app/common/duplicate-bulk-action.tsx:131
 #: src/app/common/duplicate-entity-dialog.tsx:115
@@ -2082,7 +2082,7 @@ msgstr "Kép szerkesztése"
 
 #: src/app/routes/_authenticated/_system/settings-store.tsx:123
 msgid "Edit JSON value"
-msgstr "JSON ertek szerkesztese"
+msgstr ""
 
 #: src/app/routes/_authenticated/index.tsx:190
 msgid "Edit Layout"
@@ -2115,11 +2115,11 @@ msgstr "Szerkessze az alábbi cím adatait."
 
 #: src/lib/components/shared/rich-text-editor/image-dialog.tsx:109
 msgid "Edit the selected image properties"
-msgstr "A kivalasztott kep tulajdonsagainak szerkesztese"
+msgstr ""
 
 #: src/lib/components/shared/rich-text-editor/link-dialog.tsx:87
 msgid "Edit the selected link properties"
-msgstr "A kivalasztott hivatkozas tulajdonsagainak szerkesztese"
+msgstr ""
 
 #: src/lib/components/login/login-form.tsx:84
 msgid "Email"
@@ -2242,7 +2242,7 @@ msgstr "adó nélkül:"
 
 #: src/lib/components/layout/nav-user.tsx:102
 msgid "Explore Platform & Cloud"
-msgstr "Platform es Cloud felfedezese"
+msgstr ""
 
 #: src/app/routes/_authenticated/_facets/facets_.$facetId.values_.$id.tsx:119
 msgid "Facet"
@@ -2293,7 +2293,7 @@ msgstr "{entityIdsLength} {entityType} csatornához rendelése sikertelen"
 
 #: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:75
 msgid "Failed to assign option group"
-msgstr "Opciocsoport hozzarendelese sikertelen"
+msgstr ""
 
 #: src/app/routes/_authenticated/_orders/hooks/use-refund-order.ts:259
 msgid "Failed to cancel order items"
@@ -2322,7 +2322,7 @@ msgstr "Rendszergazda létrehozása sikertelen"
 
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:121
 msgid "Failed to create API key"
-msgstr "API kulcs letrehozasa sikertelen"
+msgstr ""
 
 #: src/app/routes/_authenticated/_channels/channels_.$id.tsx:90
 #: src/app/routes/_authenticated/_channels/channels_.$id.tsx:96
@@ -2420,7 +2420,7 @@ msgstr "Adókulcs létrehozása sikertelen"
 
 #: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:151
 msgid "Failed to create variants"
-msgstr "Variansok letrehozasa sikertelen"
+msgstr ""
 
 #: src/app/routes/_authenticated/_zones/zones_.$id.tsx:68
 msgid "Failed to create zone"
@@ -2488,7 +2488,7 @@ msgstr "Visszatérítés feldolgozása sikertelen"
 
 #: src/lib/components/shared/assigned-channels.tsx:52
 msgid "Failed to remove {entityType} from channel"
-msgstr "{entityType} eltavolitasa a csatornasbol sikertelen"
+msgstr ""
 
 #: src/app/routes/_authenticated/_zones/components/zone-bulk-actions.tsx:36
 msgid "Failed to remove countries from zone"
@@ -2504,7 +2504,7 @@ msgstr "Tulajdonság eltávolítása a csatornából sikertelen: {message}"
 
 #: src/app/routes/_authenticated/_option-groups/components/option-group-bulk-actions.tsx:78
 msgid "Failed to remove option group from channel: {message}"
-msgstr "Opciocsoport eltavolitasa a csatornabol sikertelen: {message}"
+msgstr ""
 
 #: src/lib/components/shared/assigned-channels.tsx:43
 #~ msgid "Failed to remove product from channel"
@@ -2524,7 +2524,7 @@ msgstr "Elemek átrendezése sikertelen"
 
 #: src/app/routes/_authenticated/_api-keys/components/rotate-api-key-button.tsx:35
 msgid "Failed to rotate API key"
-msgstr "API kulcs rotacioja sikertelen"
+msgstr ""
 
 #: src/app/routes/_authenticated/_orders/components/payment-details.tsx:48
 #: src/app/routes/_authenticated/_orders/components/payment-details.tsx:52
@@ -2550,7 +2550,7 @@ msgstr "Rendszergazda frissítése sikertelen"
 
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:121
 msgid "Failed to update API key"
-msgstr "API kulcs frissitese sikertelen"
+msgstr ""
 
 #: src/app/routes/_authenticated/_assets/assets_.$id.tsx:89
 msgid "Failed to update asset"
@@ -2602,7 +2602,7 @@ msgstr "Globális beállítások frissítése sikertelen"
 
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$id.tsx:138
 msgid "Failed to update option group"
-msgstr "Opciocsoport frissitese sikertelen"
+msgstr ""
 
 #: src/app/routes/_authenticated/_orders/components/order-detail-shared.tsx:96
 #: src/app/routes/_authenticated/_orders/orders_.$id_.modify.tsx:63
@@ -2669,7 +2669,7 @@ msgstr "Adókulcs frissítése sikertelen"
 
 #: src/app/routes/_authenticated/_system/settings-store.tsx:239
 msgid "Failed to update value"
-msgstr "Ertek frissitese sikertelen"
+msgstr ""
 
 #: src/app/routes/_authenticated/_zones/zones_.$id.tsx:68
 msgid "Failed to update zone"
@@ -2677,7 +2677,7 @@ msgstr "Zóna frissítése sikertelen"
 
 #: src/lib/utils/get-locale-fallback-placeholder.ts:31
 msgid "Fallback: {value}"
-msgstr "Tartalek: {value}"
+msgstr ""
 
 #: src/lib/components/data-table/filters/data-table-boolean-filter.tsx:57
 msgid "False"
@@ -2856,7 +2856,7 @@ msgstr "nagyobb vagy egyenlő"
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:395
 msgid "Grid view"
-msgstr "Racs nezet"
+msgstr ""
 
 #: src/app/routes/_authenticated/_product-variants/components/variant-price-detail.tsx:86
 msgid "Gross price: <0/>"
@@ -2904,7 +2904,7 @@ msgstr "Jelszó elrejtése"
 
 #: src/app/routes/_authenticated/_api-keys/components/api-key-secret-dialog.tsx:118
 msgid "I have saved this API key"
-msgstr "Elmentettem ezt az API kulcsot"
+msgstr ""
 
 #: src/app/routes/_authenticated/_system/scheduled-tasks.tsx:108
 msgid "ID"
@@ -2926,7 +2926,7 @@ msgstr "Kép"
 #: src/lib/components/shared/asset/asset-gallery.tsx:368
 #: src/lib/components/shared/asset/asset-gallery.tsx:380
 msgid "Images"
-msgstr "Kepek"
+msgstr ""
 
 #: src/lib/components/data-table/human-readable-operator.tsx:36
 msgid "in"
@@ -2947,11 +2947,11 @@ msgstr "Öröklés a globális beállításokból"
 
 #: src/lib/components/shared/rich-text-editor/link-dialog.tsx:87
 msgid "Insert a new hyperlink with URL and target options"
-msgstr "Uj hiperhivatkozas beszurasa URL-lel es cel beallitasokkal"
+msgstr ""
 
 #: src/lib/components/shared/rich-text-editor/image-dialog.tsx:109
 msgid "Insert a new image with source, title, and dimensions"
-msgstr "Uj kep beszurasa forrassal, cimmel es meretekkel"
+msgstr ""
 
 #: src/lib/components/shared/rich-text-editor/image-dialog.tsx:106
 #: src/lib/components/shared/rich-text-editor/image-dialog.tsx:211
@@ -2968,7 +2968,7 @@ msgstr "Elemzések"
 
 #: src/app/routes/_authenticated/_system/settings-store.tsx:169
 msgid "Invalid number"
-msgstr "Ervenytelen szam"
+msgstr ""
 
 #: src/lib/components/data-table/human-readable-operator.tsx:30
 msgid "is after"
@@ -3028,7 +3028,7 @@ msgstr "Tétel hozzáadva a megrendeléshez"
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:476
 msgid "Items per page"
-msgstr "Elemek oldalankent"
+msgstr ""
 
 #: src/app/routes/_authenticated/_orders/components/order-history/order-history-utils.tsx:110
 msgid "Items refunded"
@@ -3041,7 +3041,7 @@ msgstr "Feladatsor"
 
 #: src/app/routes/_authenticated/_system/settings-store.tsx:260
 msgid "Key"
-msgstr "Kulcs"
+msgstr ""
 
 #: src/lib/components/layout/nav-user.tsx:112
 msgid "Language"
@@ -3088,7 +3088,7 @@ msgstr "Utolsó eredmény"
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:214
 #: src/app/routes/_authenticated/_api-keys/api-keys.tsx:46
 msgid "Last used"
-msgstr "Utolso hasznalat"
+msgstr ""
 
 #: src/lib/framework/dashboard-widget/latest-orders-widget/index.tsx:78
 msgid "Latest Orders"
@@ -3121,7 +3121,7 @@ msgstr "Link title"
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:398
 msgid "List view"
-msgstr "Lista nezet"
+msgstr ""
 
 #. placeholder {0}: Math.min(remaining, CHILDREN_PAGE_SIZE)
 #: src/app/routes/_authenticated/_collections/collections.tsx:477
@@ -3177,7 +3177,7 @@ msgstr "Kijelentkezés"
 #: src/app/routes/_authenticated/_api-keys/api-keys.tsx:60
 #: src/app/routes/_authenticated/_api-keys/components/api-key-secret-dialog.tsx:95
 msgid "Lookup ID"
-msgstr "Keresesi ID"
+msgstr ""
 
 #: src/lib/components/data-table/views-sheet.tsx:261
 msgid "Make Global"
@@ -3337,7 +3337,7 @@ msgstr "Új rendszergazda"
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:136
 #: src/app/routes/_authenticated/_api-keys/api-keys.tsx:79
 msgid "New API Key"
-msgstr "Uj API kulcs"
+msgstr ""
 
 #: src/app/routes/_authenticated/_assets/assets_.$id.tsx:40
 msgid "New asset"
@@ -3415,11 +3415,11 @@ msgstr "Új opció"
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$id.tsx:82
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$id.tsx:149
 msgid "New option group"
-msgstr "Uj opciocsoport"
+msgstr ""
 
 #: src/app/routes/_authenticated/_option-groups/option-groups.tsx:71
 msgid "New Option Group"
-msgstr "Uj opciocsoport"
+msgstr ""
 
 #: src/app/routes/_authenticated/_payment-methods/payment-methods_.$id.tsx:42
 #: src/app/routes/_authenticated/_payment-methods/payment-methods_.$id.tsx:124
@@ -3533,7 +3533,7 @@ msgstr "Következő végrehajtás"
 
 #: src/app/routes/_authenticated/_system/settings-store.tsx:327
 msgid "No"
-msgstr "Nem"
+msgstr ""
 
 #: src/lib/components/data-table/data-table-bulk-actions.tsx:107
 #: src/lib/components/shared/asset/asset-bulk-actions.tsx:98
@@ -3554,7 +3554,7 @@ msgstr "Nincsenek értesítések"
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:628
 msgid "No assets found. Try adjusting your filters."
-msgstr "Nem talalhato eszkoz. Probalja modositani a szuroket."
+msgstr ""
 
 #: src/app/routes/_authenticated/_orders/orders_.$id_.modify.tsx:300
 msgid "No billing address"
@@ -3624,7 +3624,7 @@ msgstr "Még nincsenek opciócsoportok megadva. Adjon hozzá opciócsoportokat a
 
 #: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:239
 msgid "No option groups found"
-msgstr "Nem talalhato opciocsoport"
+msgstr ""
 
 #: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:334
 msgid "No payment or refund is required for these changes."
@@ -3636,7 +3636,7 @@ msgstr "Nem szükséges fizetés vagy visszatérítés"
 
 #: src/app/routes/_authenticated/_option-groups/components/option-group-products-block.tsx:63
 msgid "No products found"
-msgstr "Nem talalhato termek"
+msgstr ""
 
 #: src/app/routes/_authenticated/_system/job-queue.tsx:164
 #: src/app/routes/_authenticated/_system/scheduled-tasks.tsx:186
@@ -3736,7 +3736,7 @@ msgstr "Csak piszkozat megrendelések teljesíthetők"
 
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:195
 msgid "Only roles assigned to your account are available."
-msgstr "Csak a fiokjahoz rendelt szerepkorok erhatok el."
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:293
 msgid "Option"
@@ -3744,7 +3744,7 @@ msgstr "Opció"
 
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$groupId.options_.$id.tsx:186
 msgid "Option Group"
-msgstr "Opciocsoport"
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/components/create-product-options-dialog.tsx:368
 #~ msgid "Option group {0}"
@@ -3870,7 +3870,7 @@ msgstr "Megrendelés leadva"
 
 #: src/app/routes/_authenticated/_orders/components/order-process-dialog.tsx:82
 msgid "Order process"
-msgstr "Rendelesi folyamat"
+msgstr ""
 
 #: src/app/routes/_authenticated/_orders/components/order-history/order-history-utils.tsx:88
 #: src/app/routes/_authenticated/_orders/components/order-history/order-history-utils.tsx:94
@@ -3916,7 +3916,7 @@ msgstr "{0}. oldal / {1}"
 
 #: src/app/routes/_authenticated/_option-groups/components/option-group-products-block.tsx:80
 msgid "Page {page} of {totalPages}"
-msgstr "{page}. oldal / {totalPages}"
+msgstr ""
 
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:475
 msgid "Parent product"
@@ -4037,7 +4037,7 @@ msgstr "Kérjük, adjon hozzá termékeket és töltse ki a szállítási címet
 
 #: src/app/routes/_authenticated/_api-keys/components/api-key-secret-dialog.tsx:53
 msgid "Please confirm you have saved the API key before closing."
-msgstr "Kerem erositsen meg, hogy elmentette az API kulcsot a bezaras elott."
+msgstr ""
 
 #: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:312
 msgid "Please select a target collection"
@@ -4129,7 +4129,7 @@ msgstr "Termékopciók"
 
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:191
 msgid "Product variants"
-msgstr "Termekariansok"
+msgstr ""
 
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:69
 #: src/app/routes/_authenticated/_product-variants/product-variants.tsx:19
@@ -4187,7 +4187,7 @@ msgstr "Kulcs"
 #: src/app/routes/_authenticated/_system/settings-store.tsx:293
 #: src/app/routes/_authenticated/_system/settings-store.tsx:324
 msgid "Readonly"
-msgstr "Csak olvasasi"
+msgstr ""
 
 #: src/app/routes/_authenticated/_orders/components/payment-details.tsx:233
 #: src/app/routes/_authenticated/_orders/components/refund-order-dialog.tsx:217
@@ -4310,7 +4310,7 @@ msgstr "Eltávolítás"
 
 #: src/lib/components/shared/remove-from-channel-bulk-action.tsx:82
 msgid "Remove from channel"
-msgstr "Eltavolitas a csatornabol"
+msgstr ""
 
 #: src/lib/components/shared/remove-from-channel-bulk-action.tsx:82
 #~ msgid "Remove from current channel"
@@ -4365,7 +4365,7 @@ msgstr "Visszaállítás"
 
 #: src/lib/components/data-table/data-table-bulk-actions.tsx:119
 msgid "Reset selection"
-msgstr "Kivalasztas visszaallitasa"
+msgstr ""
 
 #: src/app/routes/_authenticated/_orders/components/refund-order-dialog.tsx:105
 msgid "Return to stock"
@@ -4386,16 +4386,16 @@ msgstr "Szerepkörök"
 
 #: src/app/routes/_authenticated/_api-keys/components/rotate-api-key-button.tsx:51
 msgid "Rotate API Key"
-msgstr "API kulcs rotalasa"
+msgstr ""
 
 #: src/app/routes/_authenticated/_api-keys/components/rotate-api-key-button.tsx:45
 #: src/app/routes/_authenticated/_api-keys/components/rotate-api-key-button.tsx:68
 msgid "Rotate Key"
-msgstr "Kulcs rotalasa"
+msgstr ""
 
 #: src/app/routes/_authenticated/_api-keys/components/rotate-api-key-button.tsx:53
 msgid "Rotating this key will immediately invalidate the current key. Any integrations using it will stop working until updated with the new key."
-msgstr "Ennek a kulcsnak a rotalasa azonnal ervenyteleniti a jelenlegi kulcsot. Minden integracio, amely hasznalja, leall, amig nem frissitik az uj kulccsal."
+msgstr ""
 
 #: src/lib/components/data-table/data-table-pagination.tsx:20
 msgid "Rows per page"
@@ -4484,7 +4484,7 @@ msgstr "Ütemezett feladatok"
 #: src/app/routes/_authenticated/_system/settings-store.tsx:281
 #: src/app/routes/_authenticated/_system/settings-store.tsx:314
 msgid "Scope"
-msgstr "Hatakor"
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/components/product-option-select.tsx:64
 msgid "Search {name}..."
@@ -4492,7 +4492,7 @@ msgstr "{name} keresése..."
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:349
 msgid "Search assets..."
-msgstr "Eszozok keresese..."
+msgstr ""
 
 #: src/lib/components/shared/channel-selector.tsx:48
 msgid "Search channels..."
@@ -4521,7 +4521,7 @@ msgstr "Nyelvek keresése..."
 
 #: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:233
 msgid "Search option groups..."
-msgstr "Opciocsoportok keresese..."
+msgstr ""
 
 #: src/app/routes/_authenticated/_orders/components/add-manual-payment-dialog.tsx:107
 msgid "Search payment methods..."
@@ -4534,7 +4534,7 @@ msgstr "Szerepkörök keresése..."
 
 #: src/lib/components/shared/seller-selector.tsx:37
 msgid "Search sellers..."
-msgstr "Eladok keresese..."
+msgstr ""
 
 #. placeholder {0}: entityName.toLowerCase()
 #. placeholder {0}: group.name
@@ -4667,7 +4667,7 @@ msgstr "Válassza ki a teljesítendő mennyiségeket és konfigurálja a teljes�
 
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:187
 msgid "Select roles"
-msgstr "Szerepkorok kivalasztasa"
+msgstr ""
 
 #: src/lib/components/shared/seller-selector.tsx:39
 msgid "Select seller"
@@ -4713,7 +4713,7 @@ msgstr "Egyéni mezők beállítása"
 
 #: src/lib/components/data-table/data-table-filter-dialog.tsx:55
 msgid "Set filter criteria for the {columnId} column"
-msgstr "Szurofeltetelek beallitasa a(z) {columnId} oszlophoz"
+msgstr ""
 
 #: src/lib/components/shared/asset/asset-focal-point-editor.tsx:97
 msgid "Set Focal Point"
@@ -4739,7 +4739,7 @@ msgstr "Beállítja azt a készletszintet, amelynél ez a termékváltozat kész
 #: src/app/routes/_authenticated/_system/settings-store.tsx:37
 #: src/app/routes/_authenticated/_system/settings-store.tsx:304
 msgid "Settings Store"
-msgstr "Beallitasok tarolo"
+msgstr ""
 
 #: src/app/routes/_authenticated/_orders/components/payment-details.tsx:142
 msgid "Settle payment"
@@ -4837,7 +4837,7 @@ msgstr "Bejelentkezés az adminisztrációs felület eléréséhez"
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:745
 msgid "Size"
-msgstr "Meret"
+msgstr ""
 
 #: src/app/routes/_authenticated/_orders/components/add-surcharge-form.tsx:83
 #: src/app/routes/_authenticated/_orders/components/edit-order-table.tsx:96
@@ -4966,7 +4966,7 @@ msgstr "{entityIdsLength} {entityType} sikeresen hozzárendelve a csatornához"
 
 #: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:71
 msgid "Successfully assigned option group"
-msgstr "Opciocsoport sikeresen hozzarendelve"
+msgstr ""
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:77
 msgid "Successfully created administrator"
@@ -4974,7 +4974,7 @@ msgstr "A rendszergazda sikeresen létrehozva"
 
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:108
 msgid "Successfully created API key"
-msgstr "API kulcs sikeresen letrehozva"
+msgstr ""
 
 #: src/app/routes/_authenticated/_channels/channels_.$id.tsx:83
 msgid "Successfully created channel"
@@ -5064,7 +5064,7 @@ msgstr "Az adókulcs sikeresen létrehozva"
 
 #: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:148
 msgid "Successfully created variants"
-msgstr "Variansok sikeresen letrehozva"
+msgstr ""
 
 #: src/app/routes/_authenticated/_zones/zones_.$id.tsx:61
 msgid "Successfully created zone"
@@ -5080,7 +5080,7 @@ msgstr "Megrendelés sikeresen teljesítve"
 
 #: src/lib/components/shared/assigned-channels.tsx:48
 msgid "Successfully removed {entityType} from channel"
-msgstr "{entityType} sikeresen eltavolitva a csatornabol"
+msgstr ""
 
 #: src/lib/components/shared/remove-from-channel-bulk-action.tsx:53
 msgid "Successfully removed {selectionLength} {entityType} from channel"
@@ -5092,7 +5092,7 @@ msgstr "{successCount} tulajdonság sikeresen eltávolítva a csatornából"
 
 #: src/app/routes/_authenticated/_option-groups/components/option-group-bulk-actions.tsx:87
 msgid "Successfully removed {successCount} option groups from channel"
-msgstr "{successCount} opciocsoport sikeresen eltavolitva a csatornabol"
+msgstr ""
 
 #: src/lib/components/shared/assigned-channels.tsx:39
 #~ msgid "Successfully removed product from channel"
@@ -5104,7 +5104,7 @@ msgstr "Rendszergazda sikeresen frissítve"
 
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:115
 msgid "Successfully updated API key"
-msgstr "API kulcs sikeresen frissitve"
+msgstr ""
 
 #: src/app/routes/_authenticated/_assets/assets_.$id.tsx:85
 msgid "Successfully updated asset"
@@ -5148,7 +5148,7 @@ msgstr "Általános beállítások sikeresen frissítve"
 
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$id.tsx:127
 msgid "Successfully updated option group"
-msgstr "Opciocsoport sikeresen frissitve"
+msgstr ""
 
 #: src/app/routes/_authenticated/_orders/components/order-detail-shared.tsx:92
 #: src/app/routes/_authenticated/_orders/orders_.$id_.modify.tsx:59
@@ -5318,7 +5318,7 @@ msgstr "Szállítási módok tesztelése folyamatban..."
 
 #: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:164
 msgid "The assigned option groups have no options yet. Add options to your option groups before generating variants."
-msgstr "A hozzarendelt opciocsoportoknak meg nincsenek opcioik. Adjon hozza opciot az opciocsoportjaihoz a variansok generalasa elott."
+msgstr ""
 
 #: src/app/routes/_authenticated/_system/job-queue.tsx:136
 msgid "The data that has been passed to the job"
@@ -5359,7 +5359,7 @@ msgstr "Ezek a nyelvek minden csatorna számára elérhetők lesznek"
 
 #: src/app/routes/_authenticated/_system/settings-store.tsx:123
 msgid "This field is readonly"
-msgstr "Ez a mezo csak olvashato"
+msgstr ""
 
 #: src/app/routes/_authenticated/_roles/roles.tsx:53
 msgid "This is a default Role and cannot be modified"
@@ -5375,7 +5375,7 @@ msgstr "Ez a <0>{collectionName}</0> gyűjtemény tartalma."
 
 #: src/app/routes/_authenticated/_api-keys/components/api-key-secret-dialog.tsx:77
 msgid "This is the only time the full API key will be displayed. Copy or download it now — it cannot be retrieved later."
-msgstr "Ez az egyetlen alkalom, amikor a teljes API kulcs megjelenik. Masolja vagy toltse le most — kesobb nem kerheto le."
+msgstr ""
 
 #: src/lib/components/date-range-picker.tsx:71
 msgctxt "date-range"
@@ -5493,7 +5493,7 @@ msgstr "Igaz"
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:744
 msgid "Type"
-msgstr "Tipus"
+msgstr ""
 
 #: src/lib/components/shared/facet-value-selector.tsx:147
 msgid "Type at least 2 characters to search..."
@@ -5598,11 +5598,11 @@ msgstr "Natív hitelesítési stratégia használata"
 
 #: src/app/routes/_authenticated/_system/settings-store.tsx:268
 msgid "Value"
-msgstr "Ertek"
+msgstr ""
 
 #: src/app/routes/_authenticated/_system/settings-store.tsx:236
 msgid "Value updated"
-msgstr "Ertek frissitve"
+msgstr ""
 
 #: src/app/routes/_authenticated/_facets/facets.tsx:50
 msgid "Values"
@@ -5635,7 +5635,7 @@ msgstr "Ellenőrzött"
 #: src/lib/components/shared/asset/asset-gallery.tsx:369
 #: src/lib/components/shared/asset/asset-gallery.tsx:381
 msgid "Video"
-msgstr "Video"
+msgstr ""
 
 #: src/app/routes/_authenticated/_customers/components/customer-history/default-customer-history-components.tsx:33
 #: src/app/routes/_authenticated/_customers/components/customer-history/default-customer-history-components.tsx:86
@@ -5673,7 +5673,7 @@ msgstr "Feladat eredményének megtekintése"
 
 #: src/app/routes/_authenticated/_orders/components/order-process-dialog.tsx:73
 msgid "View order process"
-msgstr "Rendelesi folyamat megtekintese"
+msgstr ""
 
 #: src/lib/components/data-table/views-sheet.tsx:63
 msgid "View renamed successfully"
@@ -5731,7 +5731,7 @@ msgstr "Kijelöltekkel..."
 
 #: src/app/routes/_authenticated/_system/settings-store.tsx:326
 msgid "Yes"
-msgstr "Igen"
+msgstr ""
 
 #: src/lib/components/date-range-picker.tsx:31
 msgctxt "date-range"
@@ -5752,7 +5752,7 @@ msgstr "Még nem mentett egyetlen nézetet sem."
 
 #: src/app/routes/_authenticated/_api-keys/components/api-key-secret-dialog.tsx:67
 msgid "Your API Key"
-msgstr "Az On API kulcsa"
+msgstr ""
 
 #: src/lib/framework/dashboard-widget/latest-orders-widget/index.tsx:78
 msgid "Your latest orders"
