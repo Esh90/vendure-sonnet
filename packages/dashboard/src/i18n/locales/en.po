@@ -14,9 +14,16 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/lib/framework/defaults.ts:158
-msgid "API Keys"
-msgstr "API Keys"
+#: src/lib/hooks/use-extended-detail-query.ts:23
+#: src/lib/hooks/use-extended-list-query.ts:64
+msgid "Query extension error"
+msgstr "Query extension error"
+
+#. js-lingui-explicit-id
+#: src/lib/hooks/use-extended-detail-query.ts:25
+#: src/lib/hooks/use-extended-list-query.ts:66
+msgid "The page will continue with the default query."
+msgstr "The page will continue with the default query."
 
 #. js-lingui-explicit-id
 #: src/lib/hooks/use-extended-list-query.ts:41
@@ -42,18 +49,6 @@ msgstr "Query extension contains invalid GraphQL syntax"
 #: src/lib/hooks/use-extended-list-query.ts:51
 msgid "Query extension error: "
 msgstr "Query extension error: "
-
-#. js-lingui-explicit-id
-#: src/lib/hooks/use-extended-detail-query.ts:23
-#: src/lib/hooks/use-extended-list-query.ts:64
-msgid "Query extension error"
-msgstr "Query extension error"
-
-#. js-lingui-explicit-id
-#: src/lib/hooks/use-extended-detail-query.ts:25
-#: src/lib/hooks/use-extended-list-query.ts:66
-msgid "The page will continue with the default query."
-msgstr "The page will continue with the default query."
 
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:16
@@ -145,6 +140,11 @@ msgstr "Scheduled Tasks"
 #: src/lib/framework/defaults.ts:151
 msgid "Settings Store"
 msgstr "Settings Store"
+
+#. js-lingui-explicit-id
+#: src/lib/framework/defaults.ts:158
+msgid "API Keys"
+msgstr "API Keys"
 
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:167
