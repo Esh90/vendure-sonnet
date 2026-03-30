@@ -56,6 +56,44 @@ describe('form-schema-tools', () => {
             expect(() => schema.parse(123)).toThrow();
         });
 
+        it('should accept empty strings for non-nullable String fields', () => {
+            // In GraphQL, String! means "not null", not "not empty".
+            // An empty string is a valid non-null string value.
+            const field = createMockField('name', 'String', false);
+            const schema = getZodTypeFromField(field);
+
+            expect(() => schema.parse('test')).not.toThrow();
+            expect(() => schema.parse('')).not.toThrow();
+        });
+
+        it('should accept empty strings for nullable String fields', () => {
+            const field = createMockField('name', 'String', true);
+            const schema = getZodTypeFromField(field);
+
+            expect(() => schema.parse('test')).not.toThrow();
+            expect(() => schema.parse('')).not.toThrow();
+            expect(() => schema.parse(null)).not.toThrow();
+        });
+
+        it('should accept empty strings for non-nullable ID fields', () => {
+            // ID fields are server-assigned and default to '' for new entities,
+            // so they must not have min(1) validation applied.
+            const field = createMockField('id', 'ID', false);
+            const schema = getZodTypeFromField(field);
+
+            expect(() => schema.parse('123')).not.toThrow();
+            expect(() => schema.parse('')).not.toThrow();
+        });
+
+        it('should accept empty strings for non-nullable DateTime fields', () => {
+            // In GraphQL, DateTime! means "not null", not "not empty".
+            const field = createMockField('date', 'DateTime', false);
+            const schema = getZodTypeFromField(field);
+
+            expect(() => schema.parse('2024-01-01')).not.toThrow();
+            expect(() => schema.parse('')).not.toThrow();
+        });
+
         it('should create number type for Int fields', () => {
             const field = createMockField('age', 'Int');
             const schema = getZodTypeFromField(field);
@@ -582,8 +620,7 @@ describe('form-schema-tools', () => {
             const fields: FieldInfo[] = [
                 createMockField('translations', 'Object', false, true, [
                     createMockField('id', 'ID'),
-                    createMockField('languageCode', 'String'),
-                    createMockField('name', 'String'),
+                    createMockField('languageCode', 'LanguageCode'),
                     {
                         name: 'customFields',
                         type: 'CustomFieldsInput',
