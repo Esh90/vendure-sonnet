@@ -235,8 +235,12 @@ describe('migrateAssetTranslationData()', () => {
                 esc('name'),
                 esc('baseId'),
             ].join(', ');
-            const createdAt = new Date(a.createdAt).toISOString();
-            const updatedAt = new Date(a.updatedAt).toISOString();
+            // MariaDB/MySQL reject ISO 8601 "T" and "Z" — use "YYYY-MM-DD HH:mm:ss" which
+            // is valid across SQLite, Postgres, MySQL, and MariaDB.
+            const toDbTimestamp = (d: Date | string) =>
+                new Date(d).toISOString().replace('T', ' ').replace('Z', '');
+            const createdAt = toDbTimestamp(a.createdAt);
+            const updatedAt = toDbTimestamp(a.updatedAt);
             await queryRunner.query(
                 `INSERT INTO ${esc('asset_translation')} (${insertCols})
                  VALUES ('${createdAt}', '${updatedAt}',
