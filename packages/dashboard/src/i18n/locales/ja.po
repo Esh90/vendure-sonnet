@@ -14,18 +14,6 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/lib/hooks/use-extended-detail-query.ts:23
-#: src/lib/hooks/use-extended-list-query.ts:64
-msgid "Query extension error"
-msgstr "クエリ拡張エラー"
-
-#. js-lingui-explicit-id
-#: src/lib/hooks/use-extended-detail-query.ts:25
-#: src/lib/hooks/use-extended-list-query.ts:66
-msgid "The page will continue with the default query."
-msgstr "ページはデフォルトのクエリで続行されます。"
-
-#. js-lingui-explicit-id
 #: src/lib/hooks/use-extended-list-query.ts:41
 msgid "Failed to extend query document"
 msgstr "クエリドキュメントの拡張に失敗しました"
@@ -49,6 +37,18 @@ msgstr "クエリ拡張に無効なGraphQL構文が含まれています"
 #: src/lib/hooks/use-extended-list-query.ts:51
 msgid "Query extension error: "
 msgstr "クエリ拡張エラー："
+
+#. js-lingui-explicit-id
+#: src/lib/hooks/use-extended-detail-query.ts:23
+#: src/lib/hooks/use-extended-list-query.ts:64
+msgid "Query extension error"
+msgstr "クエリ拡張エラー"
+
+#. js-lingui-explicit-id
+#: src/lib/hooks/use-extended-detail-query.ts:25
+#: src/lib/hooks/use-extended-list-query.ts:66
+msgid "The page will continue with the default query."
+msgstr "ページはデフォルトのクエリで続行されます。"
 
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:16
@@ -812,7 +812,7 @@ msgid "{0} selected"
 msgstr "{0} 件選択中"
 
 #. placeholder {0}: row.original.productVariantCount
-#: src/app/routes/_authenticated/_collections/collections.tsx:332
+#: src/app/routes/_authenticated/_collections/collections.tsx:408
 msgid "{0} variants"
 msgstr "{0} 件のバリエーション"
 
@@ -853,7 +853,7 @@ msgstr "{totalQuantity}点返金済み"
 msgid "+ {0} more"
 msgstr "+ {0} 件"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:350
+#: src/app/routes/_authenticated/_collections/collections.tsx:426
 msgid "+ {leftOver} more"
 msgstr "+ {leftOver} 件"
 
@@ -933,7 +933,7 @@ msgstr "国を追加"
 msgid "Add coupon code"
 msgstr "クーポンコードを追加"
 
-#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:129
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:136
 msgid "Add customer"
 msgstr "顧客を追加"
 
@@ -1235,6 +1235,11 @@ msgstr "このゾーンから{0} {1}を削除してもよろしいですか？"
 msgid "Are you sure you want to remove {0} {entityType} from the current channel?"
 msgstr "現在のチャネルから{0}{entityType}を削除してもよろしいですか？"
 
+#. placeholder {0}: selection.length
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-bulk-actions.tsx:39
+msgid "Are you sure you want to remove {0} customers from this group?"
+msgstr "このグループから{0}人の顧客を削除してもよろしいですか？"
+
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:320
 msgid "Are you sure you want to remove this option group from the product?"
 msgstr "この商品からオプショングループを削除してもよろしいですか？"
@@ -1346,7 +1351,7 @@ msgstr "計算機"
 
 #: src/app/common/duplicate-entity-dialog.tsx:108
 #: src/app/routes/_authenticated/_assets/components/manage-tags-dialog.tsx:203
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:417
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:418
 #: src/app/routes/_authenticated/_customers/components/customer-address-form.tsx:337
 #: src/app/routes/_authenticated/_orders/components/add-manual-payment-dialog.tsx:168
 #: src/app/routes/_authenticated/_orders/components/fulfill-order-dialog.tsx:307
@@ -1383,7 +1388,7 @@ msgstr "変更をキャンセル"
 msgid "Cancel payment"
 msgstr "支払いをキャンセル"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:213
+#: src/app/routes/_authenticated/_collections/collections.tsx:290
 msgid "Cannot move a collection into its own descendant"
 msgstr "コレクションを自身の子孫に移動することはできません"
 
@@ -1462,17 +1467,17 @@ msgstr "コード"
 msgid "Collection contents for {collectionName}"
 msgstr "{collectionName}のコレクション内容"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:251
+#: src/app/routes/_authenticated/_collections/collections.tsx:327
 msgid "Collection moved to new parent"
 msgstr "コレクションを新しい親に移動しました"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:245
+#: src/app/routes/_authenticated/_collections/collections.tsx:325
 msgid "Collection position updated"
 msgstr "コレクションの位置を更新しました"
 
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:48
-#: src/app/routes/_authenticated/_collections/collections.tsx:38
-#: src/app/routes/_authenticated/_collections/collections.tsx:265
+#: src/app/routes/_authenticated/_collections/collections.tsx:52
+#: src/app/routes/_authenticated/_collections/collections.tsx:341
 msgid "Collections"
 msgstr "コレクション"
 
@@ -1529,7 +1534,7 @@ msgid "Content:"
 msgstr "内容:"
 
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:253
-#: src/app/routes/_authenticated/_collections/collections.tsx:325
+#: src/app/routes/_authenticated/_collections/collections.tsx:401
 msgid "Contents"
 msgstr "内容"
 
@@ -1670,7 +1675,7 @@ msgstr "カスタムフィールドを変更しました"
 msgid "Customer"
 msgstr "顧客"
 
-#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:55
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:61
 msgid "Customer added to group"
 msgstr "顧客をグループに追加しました"
 
@@ -2125,7 +2130,7 @@ msgstr "{facetName}のファセット値"
 msgid "Facets"
 msgstr "ファセット"
 
-#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:61
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:67
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:135
 msgid "Failed to add customer to group"
 msgstr "顧客のグループへの追加に失敗しました"
@@ -2317,7 +2322,7 @@ msgstr "グローバル設定の読み込みに失敗しました"
 msgid "Failed to modify order"
 msgstr "注文の変更に失敗しました"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:293
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:294
 msgid "Failed to move collections"
 msgstr "コレクションの移動に失敗しました"
 
@@ -2332,6 +2337,10 @@ msgstr "ゾーンから国を削除できませんでした"
 
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:145
 msgid "Failed to remove customer from group"
+msgstr "グループからの顧客の削除に失敗しました"
+
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-bulk-actions.tsx:24
+msgid "Failed to remove customers from group"
 msgstr "グループからの顧客の削除に失敗しました"
 
 #: src/app/routes/_authenticated/_facets/components/facet-bulk-actions.tsx:73
@@ -2389,7 +2398,7 @@ msgstr "チャネルの更新に失敗しました"
 msgid "Failed to update collection"
 msgstr "コレクションの更新に失敗しました"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:256
+#: src/app/routes/_authenticated/_collections/collections.tsx:332
 msgid "Failed to update collection position"
 msgstr "コレクションの位置の更新に失敗しました"
 
@@ -2499,7 +2508,7 @@ msgstr "偽"
 msgid "Filter by {columnId}"
 msgstr "{columnId}でフィルター"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:369
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:370
 msgid "Filter by collection name"
 msgstr "コレクション名でフィルター"
 
@@ -2896,7 +2905,7 @@ msgid "Link title"
 msgstr "リンクタイトル"
 
 #. placeholder {0}: Math.min(remaining, CHILDREN_PAGE_SIZE)
-#: src/app/routes/_authenticated/_collections/collections.tsx:395
+#: src/app/routes/_authenticated/_collections/collections.tsx:476
 msgid "Load {0} more ({remaining} remaining)"
 msgstr "さらに{0}件読み込む (残り{remaining}件)"
 
@@ -2909,7 +2918,7 @@ msgstr "さらに読み込む"
 msgid "Loading addresses..."
 msgstr "住所を読み込み中..."
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:378
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:379
 msgid "Loading collections..."
 msgstr "コレクションを読み込み中..."
 
@@ -3028,12 +3037,12 @@ msgstr "今月の累計"
 msgid "More views"
 msgstr "その他のビュー"
 
-#: src/app/routes/_authenticated/_collections/components/collection-bulk-actions.tsx:118
+#: src/app/routes/_authenticated/_collections/components/collection-bulk-actions.tsx:116
 msgid "Move"
 msgstr "移動"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:339
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:426
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:340
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:427
 msgid "Move Collections"
 msgstr "コレクションを移動"
 
@@ -3048,7 +3057,7 @@ msgstr "トップレベルに移動"
 msgid "Moving {0} collection{1} into {2}"
 msgstr "{0}個のコレクションを{2}に移動中"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:424
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:425
 msgid "Moving..."
 msgstr "移動中..."
 
@@ -3110,7 +3119,7 @@ msgstr "新しいチャネル"
 msgid "New collection"
 msgstr "新しいコレクション"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:450
+#: src/app/routes/_authenticated/_collections/collections.tsx:531
 msgid "New Collection"
 msgstr "新しいコレクション"
 
@@ -3742,7 +3751,7 @@ msgstr "注文日時"
 msgid "Please add products and complete the shipping address to run the test."
 msgstr "テストを実行するには、商品を追加して配送先住所を入力してください。"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:311
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:312
 msgid "Please select a target collection"
 msgstr "ターゲットコレクションを選択してください"
 
@@ -4003,6 +4012,10 @@ msgstr "削除"
 msgid "Remove from current channel"
 msgstr "現在のチャネルから削除"
 
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-bulk-actions.tsx:37
+msgid "Remove from group"
+msgstr "グループから削除"
+
 #: src/app/routes/_authenticated/_zones/components/zone-bulk-actions.tsx:49
 msgid "Remove from zone"
 msgstr "ゾーンから削除"
@@ -4028,6 +4041,11 @@ msgstr "オプショングループを削除"
 #: src/app/routes/_authenticated/_zones/components/zone-bulk-actions.tsx:31
 msgid "Removed {0} {1} from zone"
 msgstr "ゾーンから{0} {1}を削除しました"
+
+#. placeholder {0}: selection.length
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-bulk-actions.tsx:19
+msgid "Removed {0} customers from group"
+msgstr "{0}人の顧客をグループから削除しました"
 
 #: src/app/routes/_authenticated/_orders/components/order-modification-summary.tsx:221
 msgid "Removed coupon codes"
@@ -4247,7 +4265,7 @@ msgid "Select a role"
 msgstr "ロールを選択"
 
 #. placeholder {0}: collectionsToMove.length === 1 ? 'this collection' : `${collectionsToMove.length} collections`
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:342
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:343
 msgid "Select a target collection to move {0} to."
 msgstr "{0}を移動するターゲットコレクションを選択してください。"
 
@@ -4454,7 +4472,7 @@ msgstr "短い日付"
 #. placeholder {0}: group.entries.length - 2
 #: src/lib/components/shared/history-timeline/history-timeline-with-grouping.tsx:129
 msgid "Show all ({0})"
-msgstr "すべて表示 ({0})"
+msgstr ""
 
 #: src/lib/components/shared/history-timeline/history-timeline-with-grouping.tsx:124
 msgid "Show less"

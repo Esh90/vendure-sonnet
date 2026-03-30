@@ -14,18 +14,6 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/lib/hooks/use-extended-detail-query.ts:23
-#: src/lib/hooks/use-extended-list-query.ts:64
-msgid "Query extension error"
-msgstr "Errore di estensione query"
-
-#. js-lingui-explicit-id
-#: src/lib/hooks/use-extended-detail-query.ts:25
-#: src/lib/hooks/use-extended-list-query.ts:66
-msgid "The page will continue with the default query."
-msgstr "La pagina continuerà con la query predefinita."
-
-#. js-lingui-explicit-id
 #: src/lib/hooks/use-extended-list-query.ts:41
 msgid "Failed to extend query document"
 msgstr "Impossibile estendere il documento query"
@@ -49,6 +37,18 @@ msgstr "L'estensione query contiene sintassi GraphQL non valida"
 #: src/lib/hooks/use-extended-list-query.ts:51
 msgid "Query extension error: "
 msgstr "Errore estensione query: "
+
+#. js-lingui-explicit-id
+#: src/lib/hooks/use-extended-detail-query.ts:23
+#: src/lib/hooks/use-extended-list-query.ts:64
+msgid "Query extension error"
+msgstr "Errore di estensione query"
+
+#. js-lingui-explicit-id
+#: src/lib/hooks/use-extended-detail-query.ts:25
+#: src/lib/hooks/use-extended-list-query.ts:66
+msgid "The page will continue with the default query."
+msgstr "La pagina continuerà con la query predefinita."
 
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:16
@@ -812,7 +812,7 @@ msgid "{0} selected"
 msgstr "{0} selezionati"
 
 #. placeholder {0}: row.original.productVariantCount
-#: src/app/routes/_authenticated/_collections/collections.tsx:332
+#: src/app/routes/_authenticated/_collections/collections.tsx:408
 msgid "{0} variants"
 msgstr "{0} varianti"
 
@@ -853,7 +853,7 @@ msgstr "{totalQuantity} articolo/i rimborsato/i"
 msgid "+ {0} more"
 msgstr "+ {0} altri"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:350
+#: src/app/routes/_authenticated/_collections/collections.tsx:426
 msgid "+ {leftOver} more"
 msgstr "+ {leftOver} altri"
 
@@ -933,7 +933,7 @@ msgstr "Aggiungi paese"
 msgid "Add coupon code"
 msgstr "Aggiungi codice coupon"
 
-#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:129
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:136
 msgid "Add customer"
 msgstr "Aggiungi cliente"
 
@@ -1235,6 +1235,11 @@ msgstr "Sei sicuro di voler rimuovere {0} {1} da questa zona?"
 msgid "Are you sure you want to remove {0} {entityType} from the current channel?"
 msgstr "Sei sicuro di voler rimuovere {0} {entityType} dal canale corrente?"
 
+#. placeholder {0}: selection.length
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-bulk-actions.tsx:39
+msgid "Are you sure you want to remove {0} customers from this group?"
+msgstr "Sei sicuro di voler rimuovere {0} clienti da questo gruppo?"
+
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:320
 msgid "Are you sure you want to remove this option group from the product?"
 msgstr "Sei sicuro di voler rimuovere questo gruppo di opzioni dal prodotto?"
@@ -1346,7 +1351,7 @@ msgstr "Calcolatrice"
 
 #: src/app/common/duplicate-entity-dialog.tsx:108
 #: src/app/routes/_authenticated/_assets/components/manage-tags-dialog.tsx:203
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:417
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:418
 #: src/app/routes/_authenticated/_customers/components/customer-address-form.tsx:337
 #: src/app/routes/_authenticated/_orders/components/add-manual-payment-dialog.tsx:168
 #: src/app/routes/_authenticated/_orders/components/fulfill-order-dialog.tsx:307
@@ -1383,7 +1388,7 @@ msgstr "Annulla modifica"
 msgid "Cancel payment"
 msgstr "Annulla pagamento"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:213
+#: src/app/routes/_authenticated/_collections/collections.tsx:290
 msgid "Cannot move a collection into its own descendant"
 msgstr "Non è possibile spostare una collezione in un suo discendente"
 
@@ -1462,17 +1467,17 @@ msgstr "Codice"
 msgid "Collection contents for {collectionName}"
 msgstr "Contenuti della collezione {collectionName}"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:251
+#: src/app/routes/_authenticated/_collections/collections.tsx:327
 msgid "Collection moved to new parent"
 msgstr "Collezione spostata al nuovo genitore"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:245
+#: src/app/routes/_authenticated/_collections/collections.tsx:325
 msgid "Collection position updated"
 msgstr "Posizione della collezione aggiornata"
 
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:48
-#: src/app/routes/_authenticated/_collections/collections.tsx:38
-#: src/app/routes/_authenticated/_collections/collections.tsx:265
+#: src/app/routes/_authenticated/_collections/collections.tsx:52
+#: src/app/routes/_authenticated/_collections/collections.tsx:341
 msgid "Collections"
 msgstr "Collezioni"
 
@@ -1529,7 +1534,7 @@ msgid "Content:"
 msgstr "Contenuto:"
 
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:253
-#: src/app/routes/_authenticated/_collections/collections.tsx:325
+#: src/app/routes/_authenticated/_collections/collections.tsx:401
 msgid "Contents"
 msgstr "Contenuti"
 
@@ -1670,7 +1675,7 @@ msgstr "Campi personalizzati modificati"
 msgid "Customer"
 msgstr "Cliente"
 
-#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:55
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:61
 msgid "Customer added to group"
 msgstr "Cliente aggiunto al gruppo"
 
@@ -2125,7 +2130,7 @@ msgstr "Valori attributo per {facetName}"
 msgid "Facets"
 msgstr "Facette"
 
-#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:61
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:67
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:135
 msgid "Failed to add customer to group"
 msgstr "Impossibile aggiungere cliente al gruppo"
@@ -2317,7 +2322,7 @@ msgstr "Impossibile caricare impostazioni globali"
 msgid "Failed to modify order"
 msgstr "Impossibile modificare ordine"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:293
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:294
 msgid "Failed to move collections"
 msgstr "Impossibile spostare collezioni"
 
@@ -2333,6 +2338,10 @@ msgstr "Impossibile rimuovere i paesi dalla zona"
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:145
 msgid "Failed to remove customer from group"
 msgstr "Impossibile rimuovere cliente dal gruppo"
+
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-bulk-actions.tsx:24
+msgid "Failed to remove customers from group"
+msgstr "Impossibile rimuovere i clienti dal gruppo"
 
 #: src/app/routes/_authenticated/_facets/components/facet-bulk-actions.tsx:73
 msgid "Failed to remove facet from channel: {message}"
@@ -2389,7 +2398,7 @@ msgstr "Impossibile aggiornare canale"
 msgid "Failed to update collection"
 msgstr "Impossibile aggiornare collezione"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:256
+#: src/app/routes/_authenticated/_collections/collections.tsx:332
 msgid "Failed to update collection position"
 msgstr "Impossibile aggiornare la posizione della collezione"
 
@@ -2499,7 +2508,7 @@ msgstr "Falso"
 msgid "Filter by {columnId}"
 msgstr "Filtra per {columnId}"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:369
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:370
 msgid "Filter by collection name"
 msgstr "Filtra per nome collezione"
 
@@ -2896,7 +2905,7 @@ msgid "Link title"
 msgstr "Titolo link"
 
 #. placeholder {0}: Math.min(remaining, CHILDREN_PAGE_SIZE)
-#: src/app/routes/_authenticated/_collections/collections.tsx:395
+#: src/app/routes/_authenticated/_collections/collections.tsx:476
 msgid "Load {0} more ({remaining} remaining)"
 msgstr "Carica altri {0} ({remaining} rimanenti)"
 
@@ -2909,7 +2918,7 @@ msgstr "Carica altro"
 msgid "Loading addresses..."
 msgstr "Caricamento indirizzi..."
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:378
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:379
 msgid "Loading collections..."
 msgstr "Caricamento collezioni..."
 
@@ -3028,12 +3037,12 @@ msgstr "Mese corrente"
 msgid "More views"
 msgstr "Altre viste"
 
-#: src/app/routes/_authenticated/_collections/components/collection-bulk-actions.tsx:118
+#: src/app/routes/_authenticated/_collections/components/collection-bulk-actions.tsx:116
 msgid "Move"
 msgstr "Sposta"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:339
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:426
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:340
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:427
 msgid "Move Collections"
 msgstr "Sposta collezioni"
 
@@ -3048,7 +3057,7 @@ msgstr "Sposta al livello superiore"
 msgid "Moving {0} collection{1} into {2}"
 msgstr "Spostamento di {0} collezione/i in {2}"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:424
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:425
 msgid "Moving..."
 msgstr "Spostamento in corso..."
 
@@ -3110,7 +3119,7 @@ msgstr "Nuovo canale"
 msgid "New collection"
 msgstr "Nuova collezione"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:450
+#: src/app/routes/_authenticated/_collections/collections.tsx:531
 msgid "New Collection"
 msgstr "Nuova collezione"
 
@@ -3742,7 +3751,7 @@ msgstr "Effettuato il"
 msgid "Please add products and complete the shipping address to run the test."
 msgstr "Aggiungi prodotti e completa l'indirizzo di spedizione per eseguire il test."
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:311
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:312
 msgid "Please select a target collection"
 msgstr "Seleziona una collezione di destinazione"
 
@@ -4003,6 +4012,10 @@ msgstr "Rimuovi"
 msgid "Remove from current channel"
 msgstr "Rimuovi dal canale corrente"
 
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-bulk-actions.tsx:37
+msgid "Remove from group"
+msgstr "Rimuovi dal gruppo"
+
 #: src/app/routes/_authenticated/_zones/components/zone-bulk-actions.tsx:49
 msgid "Remove from zone"
 msgstr "Rimuovi dalla zona"
@@ -4028,6 +4041,11 @@ msgstr "Rimuovi gruppo di opzioni"
 #: src/app/routes/_authenticated/_zones/components/zone-bulk-actions.tsx:31
 msgid "Removed {0} {1} from zone"
 msgstr "{0} {1} rimossi dalla zona"
+
+#. placeholder {0}: selection.length
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-bulk-actions.tsx:19
+msgid "Removed {0} customers from group"
+msgstr "{0} clienti rimossi dal gruppo"
 
 #: src/app/routes/_authenticated/_orders/components/order-modification-summary.tsx:221
 msgid "Removed coupon codes"
@@ -4247,7 +4265,7 @@ msgid "Select a role"
 msgstr "Seleziona un ruolo"
 
 #. placeholder {0}: collectionsToMove.length === 1 ? 'this collection' : `${collectionsToMove.length} collections`
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:342
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:343
 msgid "Select a target collection to move {0} to."
 msgstr "Seleziona una collezione di destinazione in cui spostare {0}."
 
@@ -4454,7 +4472,7 @@ msgstr "Data breve"
 #. placeholder {0}: group.entries.length - 2
 #: src/lib/components/shared/history-timeline/history-timeline-with-grouping.tsx:129
 msgid "Show all ({0})"
-msgstr "Mostra tutto ({0})"
+msgstr ""
 
 #: src/lib/components/shared/history-timeline/history-timeline-with-grouping.tsx:124
 msgid "Show less"

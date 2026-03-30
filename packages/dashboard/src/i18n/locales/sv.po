@@ -14,18 +14,6 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/lib/hooks/use-extended-detail-query.ts:23
-#: src/lib/hooks/use-extended-list-query.ts:64
-msgid "Query extension error"
-msgstr "Frågeförlängningsfel"
-
-#. js-lingui-explicit-id
-#: src/lib/hooks/use-extended-detail-query.ts:25
-#: src/lib/hooks/use-extended-list-query.ts:66
-msgid "The page will continue with the default query."
-msgstr "Sidan kommer fortsätta med standardfrågan."
-
-#. js-lingui-explicit-id
 #: src/lib/hooks/use-extended-list-query.ts:41
 msgid "Failed to extend query document"
 msgstr "Misslyckades att förlänga frågedokument"
@@ -49,6 +37,18 @@ msgstr "Frågeförlängning innehåller ogiltig GraphQL-syntax"
 #: src/lib/hooks/use-extended-list-query.ts:51
 msgid "Query extension error: "
 msgstr "Frågeförlängningsfel:"
+
+#. js-lingui-explicit-id
+#: src/lib/hooks/use-extended-detail-query.ts:23
+#: src/lib/hooks/use-extended-list-query.ts:64
+msgid "Query extension error"
+msgstr "Frågeförlängningsfel"
+
+#. js-lingui-explicit-id
+#: src/lib/hooks/use-extended-detail-query.ts:25
+#: src/lib/hooks/use-extended-list-query.ts:66
+msgid "The page will continue with the default query."
+msgstr "Sidan kommer fortsätta med standardfrågan."
 
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:16
@@ -812,7 +812,7 @@ msgid "{0} selected"
 msgstr "{0} valda"
 
 #. placeholder {0}: row.original.productVariantCount
-#: src/app/routes/_authenticated/_collections/collections.tsx:332
+#: src/app/routes/_authenticated/_collections/collections.tsx:408
 msgid "{0} variants"
 msgstr "{0} varianter"
 
@@ -853,7 +853,7 @@ msgstr "{totalQuantity} artikel/artiklar återbetalade"
 msgid "+ {0} more"
 msgstr "+ {0} till"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:350
+#: src/app/routes/_authenticated/_collections/collections.tsx:426
 msgid "+ {leftOver} more"
 msgstr "+ {leftOver} till"
 
@@ -933,7 +933,7 @@ msgstr "Lägg till land"
 msgid "Add coupon code"
 msgstr "Lägg till kupongkod"
 
-#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:129
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:136
 msgid "Add customer"
 msgstr "Lägg till kund"
 
@@ -1235,6 +1235,11 @@ msgstr "Är du säker på att du vill ta bort {0} {1} från denna zon?"
 msgid "Are you sure you want to remove {0} {entityType} from the current channel?"
 msgstr "Är du säker på att du vill ta bort {0} {entityType} från nuvarande kanal?"
 
+#. placeholder {0}: selection.length
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-bulk-actions.tsx:39
+msgid "Are you sure you want to remove {0} customers from this group?"
+msgstr "Är du säker på att du vill ta bort {0} kunder från denna grupp?"
+
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:320
 msgid "Are you sure you want to remove this option group from the product?"
 msgstr "Är du säker på att du vill ta bort denna alternativgrupp från produkten?"
@@ -1346,7 +1351,7 @@ msgstr "Kalkylator"
 
 #: src/app/common/duplicate-entity-dialog.tsx:108
 #: src/app/routes/_authenticated/_assets/components/manage-tags-dialog.tsx:203
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:417
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:418
 #: src/app/routes/_authenticated/_customers/components/customer-address-form.tsx:337
 #: src/app/routes/_authenticated/_orders/components/add-manual-payment-dialog.tsx:168
 #: src/app/routes/_authenticated/_orders/components/fulfill-order-dialog.tsx:307
@@ -1383,7 +1388,7 @@ msgstr "Avbryt ändring"
 msgid "Cancel payment"
 msgstr "Avbryt betalning"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:213
+#: src/app/routes/_authenticated/_collections/collections.tsx:290
 msgid "Cannot move a collection into its own descendant"
 msgstr "Kan inte flytta en samling till sin egen underordnade"
 
@@ -1462,17 +1467,17 @@ msgstr "Kod"
 msgid "Collection contents for {collectionName}"
 msgstr "Kollektionsinnehåll för {collectionName}"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:251
+#: src/app/routes/_authenticated/_collections/collections.tsx:327
 msgid "Collection moved to new parent"
 msgstr "Samling flyttad till ny förälder"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:245
+#: src/app/routes/_authenticated/_collections/collections.tsx:325
 msgid "Collection position updated"
 msgstr "Samlingsposition uppdaterad"
 
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:48
-#: src/app/routes/_authenticated/_collections/collections.tsx:38
-#: src/app/routes/_authenticated/_collections/collections.tsx:265
+#: src/app/routes/_authenticated/_collections/collections.tsx:52
+#: src/app/routes/_authenticated/_collections/collections.tsx:341
 msgid "Collections"
 msgstr "Kollektioner"
 
@@ -1529,7 +1534,7 @@ msgid "Content:"
 msgstr "Innehåll:"
 
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:253
-#: src/app/routes/_authenticated/_collections/collections.tsx:325
+#: src/app/routes/_authenticated/_collections/collections.tsx:401
 msgid "Contents"
 msgstr "Innehåll"
 
@@ -1670,7 +1675,7 @@ msgstr "Anpassade fält ändrade"
 msgid "Customer"
 msgstr "Kund"
 
-#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:55
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:61
 msgid "Customer added to group"
 msgstr "Kund tillagd i grupp"
 
@@ -2125,7 +2130,7 @@ msgstr "Facettvärden för {facetName}"
 msgid "Facets"
 msgstr "Facetter"
 
-#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:61
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:67
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:135
 msgid "Failed to add customer to group"
 msgstr "Misslyckades att lägga till kund i grupp"
@@ -2317,7 +2322,7 @@ msgstr "Misslyckades att ladda globala inställningar"
 msgid "Failed to modify order"
 msgstr "Misslyckades att ändra beställning"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:293
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:294
 msgid "Failed to move collections"
 msgstr "Misslyckades att flytta kollektioner"
 
@@ -2333,6 +2338,10 @@ msgstr "Misslyckades med att ta bort länder från zonen"
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:145
 msgid "Failed to remove customer from group"
 msgstr "Misslyckades att ta bort kund från grupp"
+
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-bulk-actions.tsx:24
+msgid "Failed to remove customers from group"
+msgstr "Det gick inte att ta bort kunder från gruppen"
 
 #: src/app/routes/_authenticated/_facets/components/facet-bulk-actions.tsx:73
 msgid "Failed to remove facet from channel: {message}"
@@ -2389,7 +2398,7 @@ msgstr "Misslyckades att uppdatera kanal"
 msgid "Failed to update collection"
 msgstr "Misslyckades att uppdatera kollektion"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:256
+#: src/app/routes/_authenticated/_collections/collections.tsx:332
 msgid "Failed to update collection position"
 msgstr "Misslyckades med att uppdatera samlingsposition"
 
@@ -2499,7 +2508,7 @@ msgstr "Falskt"
 msgid "Filter by {columnId}"
 msgstr "Filtrera efter {columnId}"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:369
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:370
 msgid "Filter by collection name"
 msgstr "Filtrera efter kollektionsnamn"
 
@@ -2896,7 +2905,7 @@ msgid "Link title"
 msgstr "Länktitel"
 
 #. placeholder {0}: Math.min(remaining, CHILDREN_PAGE_SIZE)
-#: src/app/routes/_authenticated/_collections/collections.tsx:395
+#: src/app/routes/_authenticated/_collections/collections.tsx:476
 msgid "Load {0} more ({remaining} remaining)"
 msgstr "Ladda {0} fler ({remaining} kvar)"
 
@@ -2909,7 +2918,7 @@ msgstr "Ladda fler"
 msgid "Loading addresses..."
 msgstr "Laddar adresser..."
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:378
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:379
 msgid "Loading collections..."
 msgstr "Laddar kollektioner..."
 
@@ -3028,12 +3037,12 @@ msgstr "Månad hittills"
 msgid "More views"
 msgstr "Fler vyer"
 
-#: src/app/routes/_authenticated/_collections/components/collection-bulk-actions.tsx:118
+#: src/app/routes/_authenticated/_collections/components/collection-bulk-actions.tsx:116
 msgid "Move"
 msgstr "Flytta"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:339
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:426
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:340
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:427
 msgid "Move Collections"
 msgstr "Flytta kollektioner"
 
@@ -3048,7 +3057,7 @@ msgstr "Flytta till toppnivå"
 msgid "Moving {0} collection{1} into {2}"
 msgstr "Flyttar {0} kollektion{1} till {2}"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:424
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:425
 msgid "Moving..."
 msgstr "Flyttar..."
 
@@ -3110,7 +3119,7 @@ msgstr "Ny kanal"
 msgid "New collection"
 msgstr "Ny kollektion"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:450
+#: src/app/routes/_authenticated/_collections/collections.tsx:531
 msgid "New Collection"
 msgstr "Ny kollektion"
 
@@ -3742,7 +3751,7 @@ msgstr "Placerad"
 msgid "Please add products and complete the shipping address to run the test."
 msgstr "Lägg till produkter och fyll i leveransadress för att köra testet."
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:311
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:312
 msgid "Please select a target collection"
 msgstr "Välj en målkollektion"
 
@@ -4003,6 +4012,10 @@ msgstr "Ta bort"
 msgid "Remove from current channel"
 msgstr "Ta bort från nuvarande kanal"
 
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-bulk-actions.tsx:37
+msgid "Remove from group"
+msgstr "Ta bort från grupp"
+
 #: src/app/routes/_authenticated/_zones/components/zone-bulk-actions.tsx:49
 msgid "Remove from zone"
 msgstr "Ta bort från zon"
@@ -4028,6 +4041,11 @@ msgstr "Ta bort alternativgrupp"
 #: src/app/routes/_authenticated/_zones/components/zone-bulk-actions.tsx:31
 msgid "Removed {0} {1} from zone"
 msgstr "Tog bort {0} {1} från zonen"
+
+#. placeholder {0}: selection.length
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-bulk-actions.tsx:19
+msgid "Removed {0} customers from group"
+msgstr "{0} kunder borttagna från gruppen"
 
 #: src/app/routes/_authenticated/_orders/components/order-modification-summary.tsx:221
 msgid "Removed coupon codes"
@@ -4247,7 +4265,7 @@ msgid "Select a role"
 msgstr "Välj en roll"
 
 #. placeholder {0}: collectionsToMove.length === 1 ? 'this collection' : `${collectionsToMove.length} collections`
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:342
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:343
 msgid "Select a target collection to move {0} to."
 msgstr "Välj en målkollektion att flytta {0} till."
 
@@ -4454,7 +4472,7 @@ msgstr "Kort datum"
 #. placeholder {0}: group.entries.length - 2
 #: src/lib/components/shared/history-timeline/history-timeline-with-grouping.tsx:129
 msgid "Show all ({0})"
-msgstr "Visa alla ({0})"
+msgstr ""
 
 #: src/lib/components/shared/history-timeline/history-timeline-with-grouping.tsx:124
 msgid "Show less"

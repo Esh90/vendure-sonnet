@@ -14,18 +14,6 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/lib/hooks/use-extended-detail-query.ts:23
-#: src/lib/hooks/use-extended-list-query.ts:64
-msgid "Query extension error"
-msgstr "Greška proširenja upita"
-
-#. js-lingui-explicit-id
-#: src/lib/hooks/use-extended-detail-query.ts:25
-#: src/lib/hooks/use-extended-list-query.ts:66
-msgid "The page will continue with the default query."
-msgstr "Stranica će nastaviti sa zadanim upitom."
-
-#. js-lingui-explicit-id
 #: src/lib/hooks/use-extended-list-query.ts:41
 msgid "Failed to extend query document"
 msgstr "Proširenje dokumenta upita nije uspjelo"
@@ -49,6 +37,18 @@ msgstr "Proširenje upita sadrži nevaljanu GraphQL sintaksu"
 #: src/lib/hooks/use-extended-list-query.ts:51
 msgid "Query extension error: "
 msgstr "Greška proširenja upita:"
+
+#. js-lingui-explicit-id
+#: src/lib/hooks/use-extended-detail-query.ts:23
+#: src/lib/hooks/use-extended-list-query.ts:64
+msgid "Query extension error"
+msgstr "Greška proširenja upita"
+
+#. js-lingui-explicit-id
+#: src/lib/hooks/use-extended-detail-query.ts:25
+#: src/lib/hooks/use-extended-list-query.ts:66
+msgid "The page will continue with the default query."
+msgstr "Stranica će nastaviti sa zadanim upitom."
 
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:16
@@ -812,7 +812,7 @@ msgid "{0} selected"
 msgstr "{0} odabrano"
 
 #. placeholder {0}: row.original.productVariantCount
-#: src/app/routes/_authenticated/_collections/collections.tsx:332
+#: src/app/routes/_authenticated/_collections/collections.tsx:408
 msgid "{0} variants"
 msgstr "{0} varijanti"
 
@@ -853,7 +853,7 @@ msgstr "{totalQuantity} stavki vraćeno"
 msgid "+ {0} more"
 msgstr "+ {0} više"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:350
+#: src/app/routes/_authenticated/_collections/collections.tsx:426
 msgid "+ {leftOver} more"
 msgstr "+ {leftOver} više"
 
@@ -933,7 +933,7 @@ msgstr "Dodaj zemlju"
 msgid "Add coupon code"
 msgstr "Dodaj kod kupona"
 
-#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:129
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:136
 msgid "Add customer"
 msgstr "Dodaj kupca"
 
@@ -1235,6 +1235,11 @@ msgstr "Jeste li sigurni da želite ukloniti {0} {1} iz ove zone?"
 msgid "Are you sure you want to remove {0} {entityType} from the current channel?"
 msgstr "Jeste li sigurni da želite ukloniti {0} {entityType} iz trenutnog kanala?"
 
+#. placeholder {0}: selection.length
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-bulk-actions.tsx:39
+msgid "Are you sure you want to remove {0} customers from this group?"
+msgstr "Jeste li sigurni da želite ukloniti {0} kupaca iz ove grupe?"
+
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:320
 msgid "Are you sure you want to remove this option group from the product?"
 msgstr "Jeste li sigurni da želite ukloniti ovu grupu opcija s proizvoda?"
@@ -1346,7 +1351,7 @@ msgstr "Kalkulator"
 
 #: src/app/common/duplicate-entity-dialog.tsx:108
 #: src/app/routes/_authenticated/_assets/components/manage-tags-dialog.tsx:203
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:417
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:418
 #: src/app/routes/_authenticated/_customers/components/customer-address-form.tsx:337
 #: src/app/routes/_authenticated/_orders/components/add-manual-payment-dialog.tsx:168
 #: src/app/routes/_authenticated/_orders/components/fulfill-order-dialog.tsx:307
@@ -1383,7 +1388,7 @@ msgstr "Otkaži izmjenu"
 msgid "Cancel payment"
 msgstr "Otkaži uplatu"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:213
+#: src/app/routes/_authenticated/_collections/collections.tsx:290
 msgid "Cannot move a collection into its own descendant"
 msgstr "Nije moguće premjestiti kolekciju u vlastiti podskup"
 
@@ -1462,17 +1467,17 @@ msgstr "Kod"
 msgid "Collection contents for {collectionName}"
 msgstr "Sadržaj kolekcije {collectionName}"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:251
+#: src/app/routes/_authenticated/_collections/collections.tsx:327
 msgid "Collection moved to new parent"
 msgstr "Kolekcija premještena u novi nadređeni element"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:245
+#: src/app/routes/_authenticated/_collections/collections.tsx:325
 msgid "Collection position updated"
 msgstr "Pozicija kolekcije ažurirana"
 
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:48
-#: src/app/routes/_authenticated/_collections/collections.tsx:38
-#: src/app/routes/_authenticated/_collections/collections.tsx:265
+#: src/app/routes/_authenticated/_collections/collections.tsx:52
+#: src/app/routes/_authenticated/_collections/collections.tsx:341
 msgid "Collections"
 msgstr "Kolekcije"
 
@@ -1529,7 +1534,7 @@ msgid "Content:"
 msgstr "Sadržaj:"
 
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:253
-#: src/app/routes/_authenticated/_collections/collections.tsx:325
+#: src/app/routes/_authenticated/_collections/collections.tsx:401
 msgid "Contents"
 msgstr "Sadržaj"
 
@@ -1670,7 +1675,7 @@ msgstr "Prilagođena polja promijenjena"
 msgid "Customer"
 msgstr "Kupac"
 
-#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:55
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:61
 msgid "Customer added to group"
 msgstr "Kupac dodan u grupu"
 
@@ -2125,7 +2130,7 @@ msgstr "Vrijednosti svojstava za {facetName}"
 msgid "Facets"
 msgstr "Svojstva"
 
-#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:61
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:67
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:135
 msgid "Failed to add customer to group"
 msgstr "Dodavanje kupca u grupu nije uspjelo"
@@ -2317,7 +2322,7 @@ msgstr "Učitavanje globalnih postavki nije uspjelo"
 msgid "Failed to modify order"
 msgstr "Izmjena narudžbe nije uspjela"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:293
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:294
 msgid "Failed to move collections"
 msgstr "Premještanje kolekcija nije uspjelo"
 
@@ -2333,6 +2338,10 @@ msgstr "Nije uspjelo ukloniti države iz zone"
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:145
 msgid "Failed to remove customer from group"
 msgstr "Uklanjanje kupca iz grupe nije uspjelo"
+
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-bulk-actions.tsx:24
+msgid "Failed to remove customers from group"
+msgstr "Nije uspjelo uklanjanje kupaca iz grupe"
 
 #: src/app/routes/_authenticated/_facets/components/facet-bulk-actions.tsx:73
 msgid "Failed to remove facet from channel: {message}"
@@ -2389,7 +2398,7 @@ msgstr "Ažuriranje kanala nije uspjelo"
 msgid "Failed to update collection"
 msgstr "Ažuriranje kolekcije nije uspjelo"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:256
+#: src/app/routes/_authenticated/_collections/collections.tsx:332
 msgid "Failed to update collection position"
 msgstr "Nije uspjelo ažurirati poziciju kolekcije"
 
@@ -2499,7 +2508,7 @@ msgstr "Netočno"
 msgid "Filter by {columnId}"
 msgstr "Filtriraj po {columnId}"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:369
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:370
 msgid "Filter by collection name"
 msgstr "Filtriraj po nazivu kolekcije"
 
@@ -2896,7 +2905,7 @@ msgid "Link title"
 msgstr "Naslov poveznice"
 
 #. placeholder {0}: Math.min(remaining, CHILDREN_PAGE_SIZE)
-#: src/app/routes/_authenticated/_collections/collections.tsx:395
+#: src/app/routes/_authenticated/_collections/collections.tsx:476
 msgid "Load {0} more ({remaining} remaining)"
 msgstr "Učitaj još {0} ({remaining} preostalo)"
 
@@ -2909,7 +2918,7 @@ msgstr "Učitaj više"
 msgid "Loading addresses..."
 msgstr "Učitavanje adresa..."
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:378
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:379
 msgid "Loading collections..."
 msgstr "Učitavanje kolekcija..."
 
@@ -3028,12 +3037,12 @@ msgstr "Od početka mjeseca"
 msgid "More views"
 msgstr "Više prikaza"
 
-#: src/app/routes/_authenticated/_collections/components/collection-bulk-actions.tsx:118
+#: src/app/routes/_authenticated/_collections/components/collection-bulk-actions.tsx:116
 msgid "Move"
 msgstr "Premjesti"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:339
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:426
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:340
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:427
 msgid "Move Collections"
 msgstr "Premjesti kolekcije"
 
@@ -3048,7 +3057,7 @@ msgstr "Premjesti na najvišu razinu"
 msgid "Moving {0} collection{1} into {2}"
 msgstr "Premještanje {0} kolekcija u {2}"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:424
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:425
 msgid "Moving..."
 msgstr "Premještanje..."
 
@@ -3110,7 +3119,7 @@ msgstr "Novi kanal"
 msgid "New collection"
 msgstr "Nova kolekcija"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:450
+#: src/app/routes/_authenticated/_collections/collections.tsx:531
 msgid "New Collection"
 msgstr "Nova kolekcija"
 
@@ -3742,7 +3751,7 @@ msgstr "Naručeno"
 msgid "Please add products and complete the shipping address to run the test."
 msgstr "Molimo dodajte proizvode i dovršite adresu za dostavu kako biste pokrenuli test."
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:311
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:312
 msgid "Please select a target collection"
 msgstr "Molimo odaberite ciljnu kolekciju"
 
@@ -4003,6 +4012,10 @@ msgstr "Ukloni"
 msgid "Remove from current channel"
 msgstr "Ukloni iz trenutnog kanala"
 
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-bulk-actions.tsx:37
+msgid "Remove from group"
+msgstr "Ukloni iz grupe"
+
 #: src/app/routes/_authenticated/_zones/components/zone-bulk-actions.tsx:49
 msgid "Remove from zone"
 msgstr "Ukloni iz zone"
@@ -4028,6 +4041,11 @@ msgstr "Ukloni grupu opcija"
 #: src/app/routes/_authenticated/_zones/components/zone-bulk-actions.tsx:31
 msgid "Removed {0} {1} from zone"
 msgstr "Uklonjeno {0} {1} iz zone"
+
+#. placeholder {0}: selection.length
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-bulk-actions.tsx:19
+msgid "Removed {0} customers from group"
+msgstr "Uklonjeno {0} kupaca iz grupe"
 
 #: src/app/routes/_authenticated/_orders/components/order-modification-summary.tsx:221
 msgid "Removed coupon codes"
@@ -4247,7 +4265,7 @@ msgid "Select a role"
 msgstr "Odaberite uloga"
 
 #. placeholder {0}: collectionsToMove.length === 1 ? 'this collection' : `${collectionsToMove.length} collections`
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:342
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:343
 msgid "Select a target collection to move {0} to."
 msgstr "Odaberite ciljnu kolekciju za premještanje {0}."
 
@@ -4454,7 +4472,7 @@ msgstr "Kratki datum"
 #. placeholder {0}: group.entries.length - 2
 #: src/lib/components/shared/history-timeline/history-timeline-with-grouping.tsx:129
 msgid "Show all ({0})"
-msgstr "Prikaži sve ({0})"
+msgstr ""
 
 #: src/lib/components/shared/history-timeline/history-timeline-with-grouping.tsx:124
 msgid "Show less"

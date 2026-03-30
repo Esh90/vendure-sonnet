@@ -14,18 +14,6 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/lib/hooks/use-extended-detail-query.ts:23
-#: src/lib/hooks/use-extended-list-query.ts:64
-msgid "Query extension error"
-msgstr "שגיאה בהרחבת שאילתה"
-
-#. js-lingui-explicit-id
-#: src/lib/hooks/use-extended-detail-query.ts:25
-#: src/lib/hooks/use-extended-list-query.ts:66
-msgid "The page will continue with the default query."
-msgstr "הדף ימשיך עם שאילתת ברירת המחדל."
-
-#. js-lingui-explicit-id
 #: src/lib/hooks/use-extended-list-query.ts:41
 msgid "Failed to extend query document"
 msgstr "הרחבת מסמך השאילתה נכשלה"
@@ -49,6 +37,18 @@ msgstr "הרחבת השאילתה מכילה תחביר GraphQL לא תקין"
 #: src/lib/hooks/use-extended-list-query.ts:51
 msgid "Query extension error: "
 msgstr "שגיאה בהרחבת שאילתה:"
+
+#. js-lingui-explicit-id
+#: src/lib/hooks/use-extended-detail-query.ts:23
+#: src/lib/hooks/use-extended-list-query.ts:64
+msgid "Query extension error"
+msgstr "שגיאה בהרחבת שאילתה"
+
+#. js-lingui-explicit-id
+#: src/lib/hooks/use-extended-detail-query.ts:25
+#: src/lib/hooks/use-extended-list-query.ts:66
+msgid "The page will continue with the default query."
+msgstr "הדף ימשיך עם שאילתת ברירת המחדל."
 
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:16
@@ -812,7 +812,7 @@ msgid "{0} selected"
 msgstr "{0} נבחרו"
 
 #. placeholder {0}: row.original.productVariantCount
-#: src/app/routes/_authenticated/_collections/collections.tsx:332
+#: src/app/routes/_authenticated/_collections/collections.tsx:408
 msgid "{0} variants"
 msgstr "{0} גרסאות"
 
@@ -853,7 +853,7 @@ msgstr "{totalQuantity} פריט(ים) הוחזרו"
 msgid "+ {0} more"
 msgstr "+ {0} נוספים"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:350
+#: src/app/routes/_authenticated/_collections/collections.tsx:426
 msgid "+ {leftOver} more"
 msgstr "+ {leftOver} נוספים"
 
@@ -933,7 +933,7 @@ msgstr "הוסף מדינה"
 msgid "Add coupon code"
 msgstr "הוסף קוד קופון"
 
-#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:129
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:136
 msgid "Add customer"
 msgstr "הוסף לקוח"
 
@@ -1235,6 +1235,11 @@ msgstr "האם אתה בטוח שברצונך להסיר {0} {1} מאזור זה
 msgid "Are you sure you want to remove {0} {entityType} from the current channel?"
 msgstr "האם אתה בטוח שברצונך להסיר {0} {entityType} מהערוץ הנוכחי?"
 
+#. placeholder {0}: selection.length
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-bulk-actions.tsx:39
+msgid "Are you sure you want to remove {0} customers from this group?"
+msgstr "האם אתה בטוח שברצונך להסיר {0} לקוחות מקבוצה זו?"
+
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:320
 msgid "Are you sure you want to remove this option group from the product?"
 msgstr "האם אתה בטוח שברצונך להסיר את קבוצת האפשרויות הזו מהמוצר?"
@@ -1346,7 +1351,7 @@ msgstr "מחשבון"
 
 #: src/app/common/duplicate-entity-dialog.tsx:108
 #: src/app/routes/_authenticated/_assets/components/manage-tags-dialog.tsx:203
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:417
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:418
 #: src/app/routes/_authenticated/_customers/components/customer-address-form.tsx:337
 #: src/app/routes/_authenticated/_orders/components/add-manual-payment-dialog.tsx:168
 #: src/app/routes/_authenticated/_orders/components/fulfill-order-dialog.tsx:307
@@ -1383,7 +1388,7 @@ msgstr "בטל שינוי"
 msgid "Cancel payment"
 msgstr "בטל תשלום"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:213
+#: src/app/routes/_authenticated/_collections/collections.tsx:290
 msgid "Cannot move a collection into its own descendant"
 msgstr "לא ניתן להעביר אוסף לצאצא של עצמו"
 
@@ -1462,17 +1467,17 @@ msgstr "קוד"
 msgid "Collection contents for {collectionName}"
 msgstr "תוכן האוסף {collectionName}"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:251
+#: src/app/routes/_authenticated/_collections/collections.tsx:327
 msgid "Collection moved to new parent"
 msgstr "האוסף הועבר להורה חדש"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:245
+#: src/app/routes/_authenticated/_collections/collections.tsx:325
 msgid "Collection position updated"
 msgstr "מיקום האוסף עודכן"
 
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:48
-#: src/app/routes/_authenticated/_collections/collections.tsx:38
-#: src/app/routes/_authenticated/_collections/collections.tsx:265
+#: src/app/routes/_authenticated/_collections/collections.tsx:52
+#: src/app/routes/_authenticated/_collections/collections.tsx:341
 msgid "Collections"
 msgstr "אוספים"
 
@@ -1529,7 +1534,7 @@ msgid "Content:"
 msgstr "תוכן:"
 
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:253
-#: src/app/routes/_authenticated/_collections/collections.tsx:325
+#: src/app/routes/_authenticated/_collections/collections.tsx:401
 msgid "Contents"
 msgstr "תוכן"
 
@@ -1670,7 +1675,7 @@ msgstr "השדות המותאמים אישית השתנו"
 msgid "Customer"
 msgstr "לקוח"
 
-#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:55
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:61
 msgid "Customer added to group"
 msgstr "הלקוח נוסף לקבוצה"
 
@@ -2125,7 +2130,7 @@ msgstr "ערכי מאפיינים עבור {facetName}"
 msgid "Facets"
 msgstr "מאפיינים"
 
-#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:61
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:67
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:135
 msgid "Failed to add customer to group"
 msgstr "הוספת הלקוח לקבוצה נכשלה"
@@ -2317,7 +2322,7 @@ msgstr "טעינת ההגדרות הגלובליות נכשלה"
 msgid "Failed to modify order"
 msgstr "שינוי ההזמנה נכשל"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:293
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:294
 msgid "Failed to move collections"
 msgstr "העברת האוספים נכשלה"
 
@@ -2333,6 +2338,10 @@ msgstr "נכשל בהסרת מדינות מהאזור"
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:145
 msgid "Failed to remove customer from group"
 msgstr "הסרת הלקוח מהקבוצה נכשלה"
+
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-bulk-actions.tsx:24
+msgid "Failed to remove customers from group"
+msgstr "הסרת לקוחות מהקבוצה נכשלה"
 
 #: src/app/routes/_authenticated/_facets/components/facet-bulk-actions.tsx:73
 msgid "Failed to remove facet from channel: {message}"
@@ -2389,7 +2398,7 @@ msgstr "עדכון הערוץ נכשל"
 msgid "Failed to update collection"
 msgstr "עדכון האוסף נכשל"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:256
+#: src/app/routes/_authenticated/_collections/collections.tsx:332
 msgid "Failed to update collection position"
 msgstr "נכשל בעדכון מיקום האוסף"
 
@@ -2499,7 +2508,7 @@ msgstr "שקר"
 msgid "Filter by {columnId}"
 msgstr "סנן לפי {columnId}"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:369
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:370
 msgid "Filter by collection name"
 msgstr "סנן לפי שם אוסף"
 
@@ -2896,7 +2905,7 @@ msgid "Link title"
 msgstr "כותרת קישור"
 
 #. placeholder {0}: Math.min(remaining, CHILDREN_PAGE_SIZE)
-#: src/app/routes/_authenticated/_collections/collections.tsx:395
+#: src/app/routes/_authenticated/_collections/collections.tsx:476
 msgid "Load {0} more ({remaining} remaining)"
 msgstr "טען עוד {0} ({remaining} נותרו)"
 
@@ -2909,7 +2918,7 @@ msgstr "טען עוד"
 msgid "Loading addresses..."
 msgstr "טוען כתובות..."
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:378
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:379
 msgid "Loading collections..."
 msgstr "טוען אוספים..."
 
@@ -3028,12 +3037,12 @@ msgstr "מתחילת החודש"
 msgid "More views"
 msgstr "תצוגות נוספות"
 
-#: src/app/routes/_authenticated/_collections/components/collection-bulk-actions.tsx:118
+#: src/app/routes/_authenticated/_collections/components/collection-bulk-actions.tsx:116
 msgid "Move"
 msgstr "העבר"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:339
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:426
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:340
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:427
 msgid "Move Collections"
 msgstr "העבר אוספים"
 
@@ -3048,7 +3057,7 @@ msgstr "העבר לרמה העליונה"
 msgid "Moving {0} collection{1} into {2}"
 msgstr "מעביר {0} אוספים ל-{2}"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:424
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:425
 msgid "Moving..."
 msgstr "מעביר..."
 
@@ -3110,7 +3119,7 @@ msgstr "ערוץ חדש"
 msgid "New collection"
 msgstr "אוסף חדש"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:450
+#: src/app/routes/_authenticated/_collections/collections.tsx:531
 msgid "New Collection"
 msgstr "אוסף חדש"
 
@@ -3742,7 +3751,7 @@ msgstr "בוצעה ב"
 msgid "Please add products and complete the shipping address to run the test."
 msgstr "אנא הוסף מוצרים והשלם את כתובת המשלוח כדי להריץ את הבדיקה."
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:311
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:312
 msgid "Please select a target collection"
 msgstr "אנא בחר אוסף יעד"
 
@@ -4003,6 +4012,10 @@ msgstr "הסר"
 msgid "Remove from current channel"
 msgstr "הסר מהערוץ הנוכחי"
 
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-bulk-actions.tsx:37
+msgid "Remove from group"
+msgstr "הסרה מהקבוצה"
+
 #: src/app/routes/_authenticated/_zones/components/zone-bulk-actions.tsx:49
 msgid "Remove from zone"
 msgstr "הסר מהאזור"
@@ -4028,6 +4041,11 @@ msgstr "הסרת קבוצת אפשרויות"
 #: src/app/routes/_authenticated/_zones/components/zone-bulk-actions.tsx:31
 msgid "Removed {0} {1} from zone"
 msgstr "{0} {1} הוסרו מהאזור"
+
+#. placeholder {0}: selection.length
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-bulk-actions.tsx:19
+msgid "Removed {0} customers from group"
+msgstr "{0} לקוחות הוסרו מהקבוצה"
 
 #: src/app/routes/_authenticated/_orders/components/order-modification-summary.tsx:221
 msgid "Removed coupon codes"
@@ -4247,7 +4265,7 @@ msgid "Select a role"
 msgstr "בחר תפקיד"
 
 #. placeholder {0}: collectionsToMove.length === 1 ? 'this collection' : `${collectionsToMove.length} collections`
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:342
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:343
 msgid "Select a target collection to move {0} to."
 msgstr "בחר אוסף יעד להעברת {0} אליו."
 
@@ -4454,7 +4472,7 @@ msgstr "תאריך קצר"
 #. placeholder {0}: group.entries.length - 2
 #: src/lib/components/shared/history-timeline/history-timeline-with-grouping.tsx:129
 msgid "Show all ({0})"
-msgstr "הצג הכל ({0})"
+msgstr ""
 
 #: src/lib/components/shared/history-timeline/history-timeline-with-grouping.tsx:124
 msgid "Show less"
