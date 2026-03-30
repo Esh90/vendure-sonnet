@@ -14,23 +14,6 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/i18n/common-strings.ts:7
-msgid "fulfillmentState.Created"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/lib/hooks/use-extended-detail-query.ts:23
-#: src/lib/hooks/use-extended-list-query.ts:64
-msgid "Query extension error"
-msgstr "خطای گسترش پرس‌وجو"
-
-#. js-lingui-explicit-id
-#: src/lib/hooks/use-extended-detail-query.ts:25
-#: src/lib/hooks/use-extended-list-query.ts:66
-msgid "The page will continue with the default query."
-msgstr "صفحه با پرس‌وجوی پیش‌فرض ادامه می‌یابد."
-
-#. js-lingui-explicit-id
 #: src/lib/hooks/use-extended-list-query.ts:41
 msgid "Failed to extend query document"
 msgstr "گسترش سند پرس‌وجو ناموفق بود"
@@ -54,6 +37,18 @@ msgstr "گسترش پرس‌وجو حاوی نحو نامعتبر GraphQL است
 #: src/lib/hooks/use-extended-list-query.ts:51
 msgid "Query extension error: "
 msgstr "خطای گسترش پرس‌وجو:"
+
+#. js-lingui-explicit-id
+#: src/lib/hooks/use-extended-detail-query.ts:23
+#: src/lib/hooks/use-extended-list-query.ts:64
+msgid "Query extension error"
+msgstr "خطای گسترش پرس‌وجو"
+
+#. js-lingui-explicit-id
+#: src/lib/hooks/use-extended-detail-query.ts:25
+#: src/lib/hooks/use-extended-list-query.ts:66
+msgid "The page will continue with the default query."
+msgstr "صفحه با پرس‌وجوی پیش‌فرض ادامه می‌یابد."
 
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:16
@@ -817,7 +812,7 @@ msgid "{0} selected"
 msgstr "{0} انتخاب شده"
 
 #. placeholder {0}: row.original.productVariantCount
-#: src/app/routes/_authenticated/_collections/collections.tsx:332
+#: src/app/routes/_authenticated/_collections/collections.tsx:408
 msgid "{0} variants"
 msgstr "{0} نوع"
 
@@ -839,8 +834,6 @@ msgstr "{operator}"
 #. placeholder {0}: table.getFilteredRowModel().rows.length
 #: src/lib/components/data-table/data-table-pagination.tsx:17
 msgid "{selectedRowCount} of {0} row(s) selected."
-msgstr ""
-
 msgstr "{selectedRowCount} از {0} ردیف انتخاب شده."
 
 #: src/app/routes/_authenticated/_orders/hooks/use-refund-order.ts:286
@@ -860,7 +853,7 @@ msgstr "{totalQuantity} کالا بازپرداخت شد"
 msgid "+ {0} more"
 msgstr "+ {0} بیشتر"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:350
+#: src/app/routes/_authenticated/_collections/collections.tsx:426
 msgid "+ {leftOver} more"
 msgstr "+ {leftOver} بیشتر"
 
@@ -1314,8 +1307,6 @@ msgstr "میانگین ارزش سفارش"
 
 #: src/lib/components/data-table/data-table-facet-value-faceted-filter.tsx:207
 msgid "Back"
-msgstr ""
-
 msgstr "بازگشت"
 
 #: src/lib/components/shared/facet-value-selector.tsx:191
@@ -1360,7 +1351,7 @@ msgstr "ماشین‌حساب"
 
 #: src/app/common/duplicate-entity-dialog.tsx:108
 #: src/app/routes/_authenticated/_assets/components/manage-tags-dialog.tsx:203
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:417
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:418
 #: src/app/routes/_authenticated/_customers/components/customer-address-form.tsx:337
 #: src/app/routes/_authenticated/_orders/components/add-manual-payment-dialog.tsx:168
 #: src/app/routes/_authenticated/_orders/components/fulfill-order-dialog.tsx:307
@@ -1397,7 +1388,7 @@ msgstr "لغو تغییر"
 msgid "Cancel payment"
 msgstr "لغو پرداخت"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:213
+#: src/app/routes/_authenticated/_collections/collections.tsx:290
 msgid "Cannot move a collection into its own descendant"
 msgstr "نمی‌توان یک مجموعه را به زیرمجموعه خودش منتقل کرد"
 
@@ -1476,17 +1467,17 @@ msgstr "کد"
 msgid "Collection contents for {collectionName}"
 msgstr "محتویات مجموعه {collectionName}"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:251
+#: src/app/routes/_authenticated/_collections/collections.tsx:327
 msgid "Collection moved to new parent"
 msgstr "مجموعه به والد جدید منتقل شد"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:245
+#: src/app/routes/_authenticated/_collections/collections.tsx:325
 msgid "Collection position updated"
 msgstr "موقعیت مجموعه به‌روزرسانی شد"
 
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:48
-#: src/app/routes/_authenticated/_collections/collections.tsx:38
-#: src/app/routes/_authenticated/_collections/collections.tsx:265
+#: src/app/routes/_authenticated/_collections/collections.tsx:52
+#: src/app/routes/_authenticated/_collections/collections.tsx:341
 msgid "Collections"
 msgstr "مجموعه‌ها"
 
@@ -1543,7 +1534,7 @@ msgid "Content:"
 msgstr "محتوا:"
 
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:253
-#: src/app/routes/_authenticated/_collections/collections.tsx:325
+#: src/app/routes/_authenticated/_collections/collections.tsx:401
 msgid "Contents"
 msgstr "محتویات"
 
@@ -1867,10 +1858,6 @@ msgstr "غیرفعال"
 msgid "Discount"
 msgstr "تخفیف"
 
-#: src/app/routes/_authenticated/_orders/components/order-table.tsx:128
-msgid "Discounts"
-msgstr ""
-
 #: src/app/routes/_authenticated/_orders/components/order-table.tsx:122
 msgid "Discounts"
 msgstr "تخفیف‌ها"
@@ -2038,8 +2025,6 @@ msgstr "فعال"
 
 #: src/lib/components/data-table/data-table-filter-badge.tsx:111
 msgid "end"
-msgstr ""
-
 msgstr "پایان"
 
 #: src/app/routes/_authenticated/_promotions/promotions_.$id.tsx:198
@@ -2145,7 +2130,7 @@ msgstr "مقادیر ویژگی برای {facetName}"
 msgid "Facets"
 msgstr "ویژگی‌ها"
 
-#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:61
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:67
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:135
 msgid "Failed to add customer to group"
 msgstr "افزودن مشتری به گروه ناموفق بود"
@@ -2337,7 +2322,7 @@ msgstr "بارگذاری تنظیمات عمومی ناموفق بود"
 msgid "Failed to modify order"
 msgstr "تغییر سفارش ناموفق بود"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:293
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:294
 msgid "Failed to move collections"
 msgstr "جابجایی مجموعه‌ها ناموفق بود"
 
@@ -2413,7 +2398,7 @@ msgstr "به‌روزرسانی کانال ناموفق بود"
 msgid "Failed to update collection"
 msgstr "به‌روزرسانی مجموعه ناموفق بود"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:256
+#: src/app/routes/_authenticated/_collections/collections.tsx:332
 msgid "Failed to update collection position"
 msgstr "به‌روزرسانی موقعیت مجموعه ناموفق بود"
 
@@ -2523,7 +2508,7 @@ msgstr "نادرست"
 msgid "Filter by {columnId}"
 msgstr "فیلتر بر اساس {columnId}"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:369
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:370
 msgid "Filter by collection name"
 msgstr "فیلتر بر اساس نام مجموعه"
 
@@ -2920,7 +2905,7 @@ msgid "Link title"
 msgstr "عنوان پیوند"
 
 #. placeholder {0}: Math.min(remaining, CHILDREN_PAGE_SIZE)
-#: src/app/routes/_authenticated/_collections/collections.tsx:395
+#: src/app/routes/_authenticated/_collections/collections.tsx:476
 msgid "Load {0} more ({remaining} remaining)"
 msgstr "بارگذاری {0} مورد دیگر ({remaining} باقی‌مانده)"
 
@@ -2933,7 +2918,7 @@ msgstr "بارگذاری بیشتر"
 msgid "Loading addresses..."
 msgstr "در حال بارگذاری آدرس‌ها..."
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:378
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:379
 msgid "Loading collections..."
 msgstr "در حال بارگذاری مجموعه‌ها..."
 
@@ -3052,12 +3037,12 @@ msgstr "از ابتدای ماه تاکنون"
 msgid "More views"
 msgstr "نماهای بیشتر"
 
-#: src/app/routes/_authenticated/_collections/components/collection-bulk-actions.tsx:118
+#: src/app/routes/_authenticated/_collections/components/collection-bulk-actions.tsx:116
 msgid "Move"
 msgstr "جابجایی"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:339
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:426
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:340
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:427
 msgid "Move Collections"
 msgstr "جابجایی مجموعه‌ها"
 
@@ -3072,7 +3057,7 @@ msgstr "جابجایی به سطح بالا"
 msgid "Moving {0} collection{1} into {2}"
 msgstr "جابجایی {0} مجموعه به {2}"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:424
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:425
 msgid "Moving..."
 msgstr "در حال جابجایی..."
 
@@ -3134,7 +3119,7 @@ msgstr "کانال جدید"
 msgid "New collection"
 msgstr "مجموعه جدید"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:450
+#: src/app/routes/_authenticated/_collections/collections.tsx:531
 msgid "New Collection"
 msgstr "مجموعه جدید"
 
@@ -3437,8 +3422,6 @@ msgstr "هیچ ترجمه‌ای برای {0} یافت نشد"
 
 #: src/app/routes/_authenticated/index.tsx:225
 msgid "No widgets available"
-msgstr ""
-
 msgstr "هیچ ابزارکی در دسترس نیست"
 
 #: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:75
@@ -3472,8 +3455,6 @@ msgstr "یادداشت خصوصی است"
 
 #: src/lib/components/data-input/datetime-input.tsx:185
 msgid "Now"
-msgstr ""
-
 msgstr "اکنون"
 
 #: src/app/routes/_authenticated/_system/job-queue.tsx:70
@@ -3770,7 +3751,7 @@ msgstr "ثبت شده در"
 msgid "Please add products and complete the shipping address to run the test."
 msgstr "لطفا برای اجرای آزمون محصولات اضافه کنید و آدرس ارسال را تکمیل کنید."
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:311
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:312
 msgid "Please select a target collection"
 msgstr "لطفا یک مجموعه هدف انتخاب کنید"
 
@@ -3923,8 +3904,6 @@ msgstr "بازسازی فهرست جستجو"
 
 #: src/app/routes/_authenticated/_orders/components/order-modification-summary.tsx:262
 msgid "Recalculate shipping"
-msgstr ""
-
 msgstr "محاسبه مجدد هزینه ارسال"
 
 #: src/app/routes/_authenticated/_system/healthchecks.tsx:47
@@ -4286,7 +4265,7 @@ msgid "Select a role"
 msgstr "یک نقش انتخاب کنید"
 
 #. placeholder {0}: collectionsToMove.length === 1 ? 'this collection' : `${collectionsToMove.length} collections`
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:342
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:343
 msgid "Select a target collection to move {0} to."
 msgstr "یک مجموعه هدف برای جابجایی {0} انتخاب کنید."
 
@@ -4494,12 +4473,6 @@ msgstr "تاریخ کوتاه"
 #: src/lib/components/shared/history-timeline/history-timeline-with-grouping.tsx:129
 msgid "Show all ({0})"
 msgstr ""
-
-#: src/lib/components/shared/history-timeline/history-timeline-with-grouping.tsx:124
-msgid "Show less"
-msgstr ""
-
-msgstr "نمایش همه ({0})"
 
 #: src/lib/components/shared/history-timeline/history-timeline-with-grouping.tsx:124
 msgid "Show less"

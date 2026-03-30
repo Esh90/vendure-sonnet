@@ -14,23 +14,6 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/i18n/common-strings.ts:7
-msgid "fulfillmentState.Created"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/lib/hooks/use-extended-detail-query.ts:23
-#: src/lib/hooks/use-extended-list-query.ts:64
-msgid "Query extension error"
-msgstr "Erreur d'extension de requête"
-
-#. js-lingui-explicit-id
-#: src/lib/hooks/use-extended-detail-query.ts:25
-#: src/lib/hooks/use-extended-list-query.ts:66
-msgid "The page will continue with the default query."
-msgstr "La page continuera avec la requête par défaut."
-
-#. js-lingui-explicit-id
 #: src/lib/hooks/use-extended-list-query.ts:41
 msgid "Failed to extend query document"
 msgstr "Échec d'extension du document de requête"
@@ -54,6 +37,18 @@ msgstr "L'extension de requête contient une syntaxe GraphQL invalide"
 #: src/lib/hooks/use-extended-list-query.ts:51
 msgid "Query extension error: "
 msgstr "Erreur d'extension de requête : "
+
+#. js-lingui-explicit-id
+#: src/lib/hooks/use-extended-detail-query.ts:23
+#: src/lib/hooks/use-extended-list-query.ts:64
+msgid "Query extension error"
+msgstr "Erreur d'extension de requête"
+
+#. js-lingui-explicit-id
+#: src/lib/hooks/use-extended-detail-query.ts:25
+#: src/lib/hooks/use-extended-list-query.ts:66
+msgid "The page will continue with the default query."
+msgstr "La page continuera avec la requête par défaut."
 
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:16
@@ -817,7 +812,7 @@ msgid "{0} selected"
 msgstr "{0} sélectionné(s)"
 
 #. placeholder {0}: row.original.productVariantCount
-#: src/app/routes/_authenticated/_collections/collections.tsx:332
+#: src/app/routes/_authenticated/_collections/collections.tsx:408
 msgid "{0} variants"
 msgstr "{0} variantes"
 
@@ -839,8 +834,6 @@ msgstr "{operator}"
 #. placeholder {0}: table.getFilteredRowModel().rows.length
 #: src/lib/components/data-table/data-table-pagination.tsx:17
 msgid "{selectedRowCount} of {0} row(s) selected."
-msgstr ""
-
 msgstr "{selectedRowCount} sur {0} ligne(s) sélectionnée(s)."
 
 #: src/app/routes/_authenticated/_orders/hooks/use-refund-order.ts:286
@@ -860,7 +853,7 @@ msgstr "{totalQuantity} article(s) remboursé(s)"
 msgid "+ {0} more"
 msgstr "+ {0} de plus"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:350
+#: src/app/routes/_authenticated/_collections/collections.tsx:426
 msgid "+ {leftOver} more"
 msgstr "+ {leftOver} de plus"
 
@@ -1314,8 +1307,6 @@ msgstr "Valeur moyenne des commandes"
 
 #: src/lib/components/data-table/data-table-facet-value-faceted-filter.tsx:207
 msgid "Back"
-msgstr ""
-
 msgstr "Retour"
 
 #: src/lib/components/shared/facet-value-selector.tsx:191
@@ -1360,7 +1351,7 @@ msgstr "Calculateur"
 
 #: src/app/common/duplicate-entity-dialog.tsx:108
 #: src/app/routes/_authenticated/_assets/components/manage-tags-dialog.tsx:203
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:417
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:418
 #: src/app/routes/_authenticated/_customers/components/customer-address-form.tsx:337
 #: src/app/routes/_authenticated/_orders/components/add-manual-payment-dialog.tsx:168
 #: src/app/routes/_authenticated/_orders/components/fulfill-order-dialog.tsx:307
@@ -1397,7 +1388,7 @@ msgstr "Annuler la modification"
 msgid "Cancel payment"
 msgstr "Annuler le paiement"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:213
+#: src/app/routes/_authenticated/_collections/collections.tsx:290
 msgid "Cannot move a collection into its own descendant"
 msgstr "Impossible de déplacer une collection dans son propre descendant"
 
@@ -1476,17 +1467,17 @@ msgstr "Code"
 msgid "Collection contents for {collectionName}"
 msgstr "Contenu de la collection pour {collectionName}"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:251
+#: src/app/routes/_authenticated/_collections/collections.tsx:327
 msgid "Collection moved to new parent"
 msgstr "Collection déplacée vers le nouveau parent"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:245
+#: src/app/routes/_authenticated/_collections/collections.tsx:325
 msgid "Collection position updated"
 msgstr "Position de la collection mise à jour"
 
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:48
-#: src/app/routes/_authenticated/_collections/collections.tsx:38
-#: src/app/routes/_authenticated/_collections/collections.tsx:265
+#: src/app/routes/_authenticated/_collections/collections.tsx:52
+#: src/app/routes/_authenticated/_collections/collections.tsx:341
 msgid "Collections"
 msgstr "Collections"
 
@@ -1543,7 +1534,7 @@ msgid "Content:"
 msgstr "Contenu :"
 
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:253
-#: src/app/routes/_authenticated/_collections/collections.tsx:325
+#: src/app/routes/_authenticated/_collections/collections.tsx:401
 msgid "Contents"
 msgstr "Contenu"
 
@@ -1867,10 +1858,6 @@ msgstr "Désactivé"
 msgid "Discount"
 msgstr "Remise"
 
-#: src/app/routes/_authenticated/_orders/components/order-table.tsx:128
-msgid "Discounts"
-msgstr ""
-
 #: src/app/routes/_authenticated/_orders/components/order-table.tsx:122
 msgid "Discounts"
 msgstr "Remises"
@@ -2038,8 +2025,6 @@ msgstr "Activé"
 
 #: src/lib/components/data-table/data-table-filter-badge.tsx:111
 msgid "end"
-msgstr ""
-
 msgstr "fin"
 
 #: src/app/routes/_authenticated/_promotions/promotions_.$id.tsx:198
@@ -2145,7 +2130,7 @@ msgstr "Valeurs de facette pour {facetName}"
 msgid "Facets"
 msgstr "Facettes"
 
-#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:61
+#: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:67
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:135
 msgid "Failed to add customer to group"
 msgstr "Échec de l'ajout du client au groupe"
@@ -2337,7 +2322,7 @@ msgstr "Échec du chargement des paramètres globaux"
 msgid "Failed to modify order"
 msgstr "Échec de la modification de la commande"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:293
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:294
 msgid "Failed to move collections"
 msgstr "Échec du déplacement des collections"
 
@@ -2413,7 +2398,7 @@ msgstr "Échec de la mise à jour du canal"
 msgid "Failed to update collection"
 msgstr "Échec de la mise à jour de la collection"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:256
+#: src/app/routes/_authenticated/_collections/collections.tsx:332
 msgid "Failed to update collection position"
 msgstr "Échec de la mise à jour de la position de la collection"
 
@@ -2523,7 +2508,7 @@ msgstr "Faux"
 msgid "Filter by {columnId}"
 msgstr "Filtrer par {columnId}"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:369
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:370
 msgid "Filter by collection name"
 msgstr "Filtrer par nom de collection"
 
@@ -2920,7 +2905,7 @@ msgid "Link title"
 msgstr "Titre du lien"
 
 #. placeholder {0}: Math.min(remaining, CHILDREN_PAGE_SIZE)
-#: src/app/routes/_authenticated/_collections/collections.tsx:395
+#: src/app/routes/_authenticated/_collections/collections.tsx:476
 msgid "Load {0} more ({remaining} remaining)"
 msgstr "Charger {0} de plus ({remaining} restants)"
 
@@ -2933,7 +2918,7 @@ msgstr "Charger plus"
 msgid "Loading addresses..."
 msgstr "Chargement des adresses..."
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:378
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:379
 msgid "Loading collections..."
 msgstr "Chargement des collections..."
 
@@ -3052,12 +3037,12 @@ msgstr "Mois en cours"
 msgid "More views"
 msgstr "Plus de vues"
 
-#: src/app/routes/_authenticated/_collections/components/collection-bulk-actions.tsx:118
+#: src/app/routes/_authenticated/_collections/components/collection-bulk-actions.tsx:116
 msgid "Move"
 msgstr "Déplacer"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:339
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:426
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:340
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:427
 msgid "Move Collections"
 msgstr "Déplacer les collections"
 
@@ -3072,7 +3057,7 @@ msgstr "Déplacer au niveau supérieur"
 msgid "Moving {0} collection{1} into {2}"
 msgstr "Déplacement de {0} collection{1} dans {2}"
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:424
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:425
 msgid "Moving..."
 msgstr "Déplacement..."
 
@@ -3134,7 +3119,7 @@ msgstr "Nouveau canal"
 msgid "New collection"
 msgstr "Nouvelle collection"
 
-#: src/app/routes/_authenticated/_collections/collections.tsx:450
+#: src/app/routes/_authenticated/_collections/collections.tsx:531
 msgid "New Collection"
 msgstr "Nouvelle collection"
 
@@ -3437,8 +3422,6 @@ msgstr "Aucune traduction trouvée pour {0}"
 
 #: src/app/routes/_authenticated/index.tsx:225
 msgid "No widgets available"
-msgstr ""
-
 msgstr "Aucun widget disponible"
 
 #: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:75
@@ -3472,8 +3455,6 @@ msgstr "La note est privée"
 
 #: src/lib/components/data-input/datetime-input.tsx:185
 msgid "Now"
-msgstr ""
-
 msgstr "Maintenant"
 
 #: src/app/routes/_authenticated/_system/job-queue.tsx:70
@@ -3770,7 +3751,7 @@ msgstr "Passée le"
 msgid "Please add products and complete the shipping address to run the test."
 msgstr "Veuillez ajouter des produits et compléter l'adresse de livraison pour exécuter le test."
 
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:311
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:312
 msgid "Please select a target collection"
 msgstr "Veuillez sélectionner une collection cible"
 
@@ -3923,8 +3904,6 @@ msgstr "Reconstruire l'index de recherche"
 
 #: src/app/routes/_authenticated/_orders/components/order-modification-summary.tsx:262
 msgid "Recalculate shipping"
-msgstr ""
-
 msgstr "Recalculer les frais de livraison"
 
 #: src/app/routes/_authenticated/_system/healthchecks.tsx:47
@@ -4286,7 +4265,7 @@ msgid "Select a role"
 msgstr "Sélectionner un rôle"
 
 #. placeholder {0}: collectionsToMove.length === 1 ? 'this collection' : `${collectionsToMove.length} collections`
-#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:342
+#: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:343
 msgid "Select a target collection to move {0} to."
 msgstr "Sélectionnez une collection cible vers laquelle déplacer {0}."
 
@@ -4494,12 +4473,6 @@ msgstr "Date courte"
 #: src/lib/components/shared/history-timeline/history-timeline-with-grouping.tsx:129
 msgid "Show all ({0})"
 msgstr ""
-
-#: src/lib/components/shared/history-timeline/history-timeline-with-grouping.tsx:124
-msgid "Show less"
-msgstr ""
-
-msgstr "Tout afficher ({0})"
 
 #: src/lib/components/shared/history-timeline/history-timeline-with-grouping.tsx:124
 msgid "Show less"
