@@ -515,8 +515,8 @@ export function ListPage<
     const tableSettings = pageId ? settings.tableSettings?.[pageId] : undefined;
 
     const pagination = {
-        page: routeSearch.page ? parseInt(routeSearch.page) : 1,
-        itemsPerPage: routeSearch.perPage ? parseInt(routeSearch.perPage) : (tableSettings?.pageSize ?? 10),
+        page: routeSearch.page ? Number.parseInt(routeSearch.page) : 1,
+        itemsPerPage: routeSearch.perPage ? Number.parseInt(routeSearch.perPage) : (tableSettings?.pageSize ?? 10),
     };
 
     const columnVisibility = pageId
@@ -558,7 +558,8 @@ export function ListPage<
         const sort = sortToString(listState.sort ?? tableState.sorting);
         const filters = listState.filters ?? tableState.columnFilters;
         navigate({
-            search: () => ({ sort, page, perPage, filters: filters.length ? filters : undefined }) as never,
+            search: (prev: Record<string, unknown>) =>
+                ({ ...prev, sort, page, perPage, filters: filters.length ? filters : undefined }) as never,
         });
     }
 
