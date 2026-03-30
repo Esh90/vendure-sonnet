@@ -235,9 +235,11 @@ describe('migrateAssetTranslationData()', () => {
                 esc('name'),
                 esc('baseId'),
             ].join(', ');
+            const createdAt = new Date(a.createdAt).toISOString();
+            const updatedAt = new Date(a.updatedAt).toISOString();
             await queryRunner.query(
                 `INSERT INTO ${esc('asset_translation')} (${insertCols})
-                 VALUES ('${a.createdAt}', '${a.updatedAt}',
+                 VALUES ('${createdAt}', '${updatedAt}',
                          '${defaultLanguageCode}', '${escapedName}', ${a.id})`,
             );
 
