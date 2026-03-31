@@ -1,5 +1,6 @@
 import { Module, OnApplicationBootstrap, OnApplicationShutdown } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
+import { DEFAULT_REFUND_DESTINATION_CODE } from '@vendure/common/lib/shared-constants';
 
 import { ConfigurableOperationDef } from '../common/configurable-operation';
 import { Injector } from '../common/injector';
@@ -19,6 +20,7 @@ export class ConfigModule implements OnApplicationBootstrap, OnApplicationShutdo
     ) {}
 
     async onApplicationBootstrap() {
+        this.validateRefundDestinations();
         await this.initInjectableStrategies();
         await this.initConfigurableOperations();
     }
@@ -34,6 +36,18 @@ export class ConfigModule implements OnApplicationBootstrap, OnApplicationShutdo
          * hard-to-debug errors. So resetting is a precaution against this scenario.
          */
         resetConfig();
+    }
+
+    private validateRefundDestinations() {
+        const refundDestinations = this.configService.paymentOptions.refundDestinations ?? [];
+        for (const strategy of refundDestinations) {
+            if (strategy.code === DEFAULT_REFUND_DESTINATION_CODE) {
+                throw new Error(
+                    `RefundDestinationStrategy code "${DEFAULT_REFUND_DESTINATION_CODE}" is reserved ` +
+                        `for the built-in default destination. Please use a different code for your strategy.`,
+                );
+            }
+        }
     }
 
     private async initInjectableStrategies() {
@@ -110,12 +124,16 @@ export class ConfigModule implements OnApplicationBootstrap, OnApplicationShutdo
             process: fulfillmentProcess,
             shippingLineAssignmentStrategy,
         } = this.configService.shippingOptions;
-        const { customPaymentProcess, process: paymentProcess } = this.configService.paymentOptions;
+        const {
+            customPaymentProcess,
+            process: paymentProcess,
+            refundDestinations,
+        } = this.configService.paymentOptions;
         const { entityIdStrategy: entityIdStrategyDeprecated } = this.configService;
         const { entityIdStrategy: entityIdStrategyCurrent } = this.configService.entityOptions;
         const { healthChecks, errorHandlers } = this.configService.systemOptions;
         const { assetImportStrategy } = this.configService.importExportOptions;
-        const { refundProcess: refundProcess } = this.configService.paymentOptions;
+        const { refundProcess } = this.configService.paymentOptions;
         const { cacheStrategy, instrumentationStrategy } = this.configService.systemOptions;
         const entityIdStrategy = entityIdStrategyCurrent ?? entityIdStrategyDeprecated;
         return [
@@ -159,6 +177,7 @@ export class ConfigModule implements OnApplicationBootstrap, OnApplicationShutdo
             productVariantPriceSelectionStrategy,
             guestCheckoutStrategy,
             ...refundProcess,
+            ...(refundDestinations ?? []),
             cacheStrategy,
             ...(instrumentationStrategy ? [instrumentationStrategy] : []),
             ...orderInterceptors,
