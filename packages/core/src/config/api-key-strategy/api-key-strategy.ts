@@ -79,7 +79,7 @@ export interface ApiKeyStrategy extends InjectableStrategy {
      * @description
      * Defines a custom strategy for how API-Keys get hashed and checked.
      *
-     * :::important Performance Consideration
+     * :::caution Performance Consideration
      *
      * Vendure does not store API-Keys in plain text, but rather a hashed version of the key,
      * similar to how passwords are handled. This means that when a request comes in with an API-Key,
