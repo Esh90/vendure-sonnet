@@ -47,6 +47,8 @@ export type ApiKeyStrategyParseResult = null | {
  * :::
  *
  * @docsCategory auth
+ * @docsPage ApiKeyStrategy
+ * @docsWeight 0
  * @since 3.6.0
  */
 export interface ApiKeyStrategy extends InjectableStrategy {
@@ -162,8 +164,13 @@ export interface ApiKeyStrategy extends InjectableStrategy {
 }
 
 /**
+ * @description
  * Intended to be extended by consumers of the {@link ApiKeyStrategy} if they do not
- * require their own construction/parsing logic.
+ * require their own construction/parsing logic. Provides default implementations of
+ * `constructApiKey`, `parse`, `delimiter`, and `lastUsedAtUpdateInterval`.
+ *
+ * @docsCategory auth
+ * @docsPage ApiKeyStrategy
  */
 export abstract class BaseApiKeyStrategy implements ApiKeyStrategy {
     abstract hashingStrategy: PasswordHashingStrategy;
