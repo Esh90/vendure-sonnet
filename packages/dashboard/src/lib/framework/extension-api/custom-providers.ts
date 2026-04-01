@@ -46,11 +46,33 @@ export function registerDashboardCustomProvider(customProvider: DashboardCustomP
     });
 }
 
-export function registerDashboardCustomProviders(providers?: DashboardCustomProviderDefinition[]) {
-    if (providers) {
-        for (const provider of providers) {
-            registerDashboardCustomProvider(provider);
+export function registerDashboardCustomProviders(providers: DashboardCustomProviderDefinition[] | undefined) {
+    if (!providers?.length) {
+        return;
+    }
+    const registry = getDashboardCustomProvidersRegistry();
+    const allIds = [...registry.keys(), ...providers.map(p => p.id)];
+    const seen = new Set<string>();
+    const duplicateIds = new Set<string>();
+    for (const id of allIds) {
+        if (seen.has(id)) {
+            duplicateIds.add(id);
+        } else {
+            seen.add(id);
         }
+    }
+
+    if (duplicateIds.size) {
+        const duplicates = Array.from(duplicateIds).sort();
+        throw new Error(
+            `Duplicate dashboard custom provider ids detected: ` +
+                `${duplicates.map(id => `"${id}"`).join(', ')}. ` +
+                `Provider ids must be globally unique.`,
+        );
+    }
+
+    for (const provider of providers) {
+        registerDashboardCustomProvider(provider);
     }
 }
 
