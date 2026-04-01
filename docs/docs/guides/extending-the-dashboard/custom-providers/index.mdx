@@ -13,8 +13,6 @@ telemetry, or theming that should apply to dashboard pages.
 A custom provider is a React component that receives `children` and returns a wrapped subtree:
 
 ```tsx
-import type { ReactNode } from 'react';
-
 export function MyProvider({ children }: { children: ReactNode }) {
     return children;
 }
@@ -24,7 +22,6 @@ You register it via `defineDashboardExtension()`:
 
 ```tsx
 import { defineDashboardExtension } from '@vendure/dashboard';
-import type { ReactNode } from 'react';
 
 function MyProvider({ children }: { children: ReactNode }) {
     return children;
