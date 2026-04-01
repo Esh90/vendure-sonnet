@@ -2,7 +2,6 @@ import { CustomerGroupChip } from '@/vdb/components/shared/customer-group-chip.j
 import { CustomerGroupSelector } from '@/vdb/components/shared/customer-group-selector.js';
 import { ErrorPage } from '@/vdb/components/shared/error-page.js';
 import { FormFieldWrapper } from '@/vdb/components/shared/form-field-wrapper.js';
-import { PermissionGuard } from '@/vdb/components/shared/permission-guard.js';
 import { Button } from '@/vdb/components/ui/button.js';
 import {
     Dialog,
@@ -20,11 +19,11 @@ import {
     DetailFormGrid,
     Page,
     PageActionBar,
-    PageActionBarRight,
     PageBlock,
     PageLayout,
     PageTitle,
 } from '@/vdb/framework/layout-engine/page-layout.js';
+import { ActionBarItem } from '@/vdb/framework/layout-engine/action-bar-item-wrapper.js';
 import { detailPageRouteLoader } from '@/vdb/framework/page/detail-page-route-loader.js';
 import { useDetailPage } from '@/vdb/framework/page/use-detail-page.js';
 import { api } from '@/vdb/graphql/api.js';
@@ -152,16 +151,14 @@ function CustomerDetailPage() {
         <Page pageId={pageId} form={form} submitHandler={submitHandler} entity={entity}>
             <PageTitle>{creatingNewEntity ? <Trans>New customer</Trans> : customerName}</PageTitle>
             <PageActionBar>
-                <PageActionBarRight>
-                    <PermissionGuard requires={['UpdateCustomer']}>
-                        <Button
-                            type="submit"
-                            disabled={!form.formState.isDirty || !form.formState.isValid || isPending}
-                        >
-                            {creatingNewEntity ? <Trans>Create</Trans> : <Trans>Update</Trans>}
-                        </Button>
-                    </PermissionGuard>
-                </PageActionBarRight>
+                <ActionBarItem itemId="save-button" requiresPermission={['UpdateCustomer']}>
+                    <Button
+                        type="submit"
+                        disabled={!form.formState.isDirty || !form.formState.isValid || isPending}
+                    >
+                        {creatingNewEntity ? <Trans>Create</Trans> : <Trans>Update</Trans>}
+                    </Button>
+                </ActionBarItem>
             </PageActionBar>
             <PageLayout>
                 <PageBlock column="main" blockId="main-form">
@@ -222,10 +219,8 @@ function CustomerDetailPage() {
                             </DetailFormGrid>
 
                             <Dialog open={newAddressOpen} onOpenChange={setNewAddressOpen}>
-                                <DialogTrigger asChild>
-                                    <Button variant="outline">
-                                        <Plus className="w-4 h-4" /> <Trans>Add new address</Trans>
-                                    </Button>
+                                <DialogTrigger render={<Button variant="outline" />}>
+                                    <Plus className="w-4 h-4" /> <Trans>Add new address</Trans>
                                 </DialogTrigger>
                                 <DialogContent>
                                     <DialogHeader>
