@@ -68,20 +68,19 @@ export const renderProviders = (
     return createElement(ProviderComponent, null, renderProviders(remainingProviders, children));
 };
 
-export const CustomProviders = ({
-    location,
-    children,
-}: {
+export interface CustomProvidersProps {
     location: DashboardCustomProviderDefinition['location'];
     children: ReactNode;
-}) => {
-    const { reloadCount } = useDashboardExtensions();
+}
+
+export function CustomProviders({ location, children }: Readonly<CustomProvidersProps>) {
+    const { extensionsLoaded, reloadCount } = useDashboardExtensions();
     const providersToRender = useMemo(() => {
         const customProviders = Array.from(getDashboardCustomProvidersRegistry().values());
         return customProviders
             .filter(provider => provider.location === location)
             .sort((a, b) => (a.order || 0) - (b.order || 0));
-    }, [reloadCount, location]);
+    }, [extensionsLoaded, reloadCount, location]);
 
     return renderProviders(providersToRender, children);
-};
+}
