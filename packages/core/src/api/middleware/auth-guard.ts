@@ -111,6 +111,15 @@ export class AuthGuard implements CanActivate {
                 // To avoid assigning the customer to the active channel on every request,
                 // it is only done on the first request and whenever the channel changes
                 if (customer) {
+                    const shouldAssign =
+                        await this.configService.authOptions.customerChannelAssignmentStrategy.canAssignCustomerToChannel(
+                            requestContext,
+                            customer,
+                            requestContext.channelId,
+                        );
+                    if (!shouldAssign) {
+                        return false;
+                    }
                     try {
                         await this.channelService.assignToChannels(requestContext, Customer, customer.id, [
                             requestContext.channelId,

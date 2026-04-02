@@ -19,6 +19,7 @@ import { AssetPreviewStrategy } from './asset-preview-strategy/asset-preview-str
 import { AssetStorageStrategy } from './asset-storage-strategy/asset-storage-strategy';
 import { AuthenticationStrategy } from './auth/authentication-strategy';
 import { EntityAccessControlStrategy } from './auth/entity-access-control-strategy';
+import { CustomerChannelAssignmentStrategy } from './auth/customer-channel-assignment-strategy';
 import { PasswordHashingStrategy } from './auth/password-hashing-strategy';
 import { PasswordValidationStrategy } from './auth/password-validation-strategy';
 import { VerificationTokenStrategy } from './auth/verification-token-strategy';
@@ -553,6 +554,16 @@ export interface AuthOptions {
      * @experimental
      */
     entityAccessControlStrategy?: EntityAccessControlStrategy;
+    /**
+     * @description
+     * Assigns a {@link Customer} to the active channel if they are not yet a member of it.
+     * when the {@link AuthGuard} detects they are not yet a member of it.
+     *
+     *
+     * @default DefaultCustomerChannelAssignmentStrategy
+     * @since 3.4.0
+     */
+    customerChannelAssignmentStrategy?: CustomerChannelAssignmentStrategy;
 }
 
 /**
