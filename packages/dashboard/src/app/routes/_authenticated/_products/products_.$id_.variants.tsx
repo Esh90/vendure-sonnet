@@ -38,7 +38,7 @@ import { Plus, Save, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import * as z from 'zod';
+import * as z from 'zod/v3';
 import { AddOptionGroupDialog } from './components/add-option-group-dialog.js';
 import { AddProductVariantDialog } from './components/add-product-variant-dialog.js';
 import {

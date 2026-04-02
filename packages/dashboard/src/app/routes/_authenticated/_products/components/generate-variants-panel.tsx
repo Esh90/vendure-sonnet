@@ -15,7 +15,7 @@ import { useMemo } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { Form } from '@/vdb/components/ui/form.js';
 import { toast } from 'sonner';
-import { z } from 'zod';
+import { z } from 'zod/v3';
 import { createProductVariantsDocument } from '../products.graphql.js';
 
 interface OptionGroup {
@@ -37,7 +37,7 @@ interface GeneratedVariant {
 }
 
 const variantSchema = z.object({
-    enabled: z.boolean().default(true),
+    enabled: z.boolean(),
     sku: z.string().min(1, { message: 'SKU is required' }),
     price: z.string().refine(val => !isNaN(Number(val)) && Number(val) >= 0, {
         message: 'Price must be a positive number',

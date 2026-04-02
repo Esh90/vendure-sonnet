@@ -12,7 +12,7 @@ import { Trans } from '@lingui/react/macro';
 import { VariablesOf } from 'gql.tada';
 import { Plus } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { z } from 'zod/v3';
 import { modifyOrderDocument } from '../orders.graphql.js';
 
 type ModifyOrderInput = VariablesOf<typeof modifyOrderDocument>['input'];
@@ -24,7 +24,7 @@ const surchargeFormSchema = z.object({
     price: z.string().refine(val => !Number.isNaN(Number(val)) && Number(val) > 0, {
         message: 'Price must be a positive number',
     }),
-    priceIncludesTax: z.boolean().default(false),
+    priceIncludesTax: z.boolean(),
     taxRate: z.number().nonnegative().max(100),
     taxDescription: z.string().optional(),
 });

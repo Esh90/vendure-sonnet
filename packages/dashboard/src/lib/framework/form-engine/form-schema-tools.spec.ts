@@ -376,7 +376,7 @@ describe('form-schema-tools', () => {
                 schema.parse({ customFields: { sku: 'invalid' } });
                 expect.fail('Should have thrown validation error');
             } catch (error: any) {
-                expect(error.errors[0].message).toContain('Value must match pattern');
+                expect(error.issues[0].message).toContain('Value must match pattern');
             }
         });
 
@@ -390,7 +390,7 @@ describe('form-schema-tools', () => {
                 schema.parse({ customFields: { quantity: 0 } });
                 expect.fail('Should have thrown validation error');
             } catch (error: any) {
-                expect(error.errors[0].message).toContain('Value must be at least 1');
+                expect(error.issues[0].message).toContain('Value must be at least 1');
             }
         });
 
@@ -404,7 +404,7 @@ describe('form-schema-tools', () => {
                 schema.parse({ customFields: { quantity: 101 } });
                 expect.fail('Should have thrown validation error');
             } catch (error: any) {
-                expect(error.errors[0].message).toContain('Value must be at most 100');
+                expect(error.issues[0].message).toContain('Value must be at most 100');
             }
         });
 

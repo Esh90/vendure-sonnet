@@ -12,7 +12,7 @@ import {
     StructCustomFieldConfig,
     StructField,
 } from '@/vdb/framework/form-engine/form-engine-types.js';
-import { z, ZodRawShape, ZodType, ZodTypeAny } from 'zod';
+import { z, ZodRawShape, ZodType, ZodTypeAny } from 'zod/v3';
 
 function mapGraphQLCustomFieldToConfig(field: StructField) {
     const { __typename, ...rest } = field;

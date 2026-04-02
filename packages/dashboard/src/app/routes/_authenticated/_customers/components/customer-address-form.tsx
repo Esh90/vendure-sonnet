@@ -12,7 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useQuery } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { z } from 'zod/v3';
 import { addressFragment } from '../customers.graphql.js';
 
 // Query document to fetch available countries
@@ -40,8 +40,8 @@ const addressFormSchema = z.object({
     postalCode: z.string().optional(),
     countryCode: z.string().min(1, { message: 'Country is required' }),
     phoneNumber: z.string().optional(),
-    defaultShippingAddress: z.boolean().default(false),
-    defaultBillingAddress: z.boolean().default(false),
+    defaultShippingAddress: z.boolean(),
+    defaultBillingAddress: z.boolean(),
     customFields: z.any().optional(),
 });
 

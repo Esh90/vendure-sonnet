@@ -9,7 +9,7 @@ import { Loader2 } from 'lucide-react';
 import * as React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from '@/vdb/components/ui/sonner.js';
-import { z } from 'zod';
+import { z } from 'zod/v3';
 import { useLoginExtensions } from '../../framework/extension-api/use-login-extensions.js';
 import { LogoMark } from '../shared/logo-mark.js';
 import { Form } from '../ui/form.js';

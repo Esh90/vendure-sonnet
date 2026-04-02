@@ -22,7 +22,7 @@ import { Plus } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import * as z from 'zod';
+import * as z from 'zod/v3';
 import { createProductOptionDocument, createProductVariantsDocument } from '../products.graphql.js';
 import { ProductOptionSelect } from './product-option-select.js';
 
