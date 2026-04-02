@@ -1,23 +1,19 @@
 import { CustomFieldListInput } from '@/vdb/components/data-input/custom-field-list-input.js';
 import { StructFormInput } from '@/vdb/components/data-input/struct-form-input.js';
-import {
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from '@/vdb/components/ui/form.js';
+import { Field, FieldDescription, FieldError, FieldLabel } from '@/vdb/components/ui/field.js';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/vdb/components/ui/tabs.js';
 import { CustomFormComponent } from '@/vdb/framework/form-engine/custom-form-component.js';
 import { ConfigurableFieldDef } from '@/vdb/framework/form-engine/form-engine-types.js';
+import { useChannel } from '@/vdb/hooks/use-channel.js';
 import { useCustomFieldConfig } from '@/vdb/hooks/use-custom-field-config.js';
 import { useUserSettings } from '@/vdb/hooks/use-user-settings.js';
+import { getLocaleFallbackPlaceholder } from '@/vdb/utils/get-locale-fallback-placeholder.js';
 import { customFieldConfigFragment } from '@/vdb/providers/server-config.js';
 import { useLingui } from '@lingui/react/macro';
 import { ResultOf } from 'gql.tada';
 import React, { useMemo } from 'react';
-import { Control } from 'react-hook-form';
+import { Control, Controller, ControllerFieldState, useFormContext } from 'react-hook-form';
+import { applyControlProps } from './apply-control-props.js';
 import { FormControlAdapter } from '../../framework/form-engine/form-control-adapter.js';
 import { TranslatableFormField } from './translatable-form-field.js';
 
@@ -27,9 +23,10 @@ interface CustomFieldsFormProps {
     entityType: string;
     control: Control<any, any>;
     formPathPrefix?: string;
+    disabled?: boolean;
 }
 
-export function CustomFieldsForm({ entityType, control, formPathPrefix }: Readonly<CustomFieldsFormProps>) {
+export function CustomFieldsForm({ entityType, control, formPathPrefix, disabled }: Readonly<CustomFieldsFormProps>) {
     const { t } = useLingui();
     const customFields = useCustomFieldConfig(entityType);
 
@@ -86,6 +83,7 @@ export function CustomFieldsForm({ entityType, control, formPathPrefix }: Readon
                         fieldDef={fieldDef}
                         control={control}
                         fieldName={getFieldName(fieldDef)}
+                        disabled={disabled}
                     />
                 ))}
             </div>
@@ -111,6 +109,7 @@ export function CustomFieldsForm({ entityType, control, formPathPrefix }: Readon
                                 fieldDef={fieldDef}
                                 control={control}
                                 fieldName={getFieldName(fieldDef)}
+                                disabled={disabled}
                             />
                         ))}
                     </div>
@@ -124,12 +123,17 @@ interface CustomFieldItemProps {
     fieldDef: ConfigurableFieldDef;
     control: Control<any>;
     fieldName: string;
+    disabled?: boolean;
 }
 
-function CustomFieldItem({ fieldDef, control, fieldName }: Readonly<CustomFieldItemProps>) {
+function CustomFieldItem({ fieldDef, control, fieldName, disabled }: Readonly<CustomFieldItemProps>) {
     const {
-        settings: { displayLanguage },
+        settings: { displayLanguage, contentLanguage },
     } = useUserSettings();
+    const { activeChannel } = useChannel();
+    const { watch } = useFormContext();
+    const translations = watch('translations');
+    const defaultLanguageCode = activeChannel?.defaultLanguageCode;
 
     const getTranslation = (
         input: string | Array<{ languageCode: string; value: string }> | null | undefined,
@@ -145,6 +149,14 @@ function CustomFieldItem({ fieldDef, control, fieldName }: Readonly<CustomFieldI
     const containerClassName = shouldBeFullWidth ? 'col-span-2' : '';
     const isReadonly = (fieldDef as CustomFieldConfig).readonly ?? false;
 
+    const localeFallbackPlaceholder = useMemo(
+        () =>
+            isLocaleField
+                ? getLocaleFallbackPlaceholder(translations, defaultLanguageCode, contentLanguage, `customFields.${fieldDef.name}`)
+                : undefined,
+        [isLocaleField, translations, defaultLanguageCode, contentLanguage, fieldDef.name],
+    );
+
     // For locale fields, always use TranslatableFormField regardless of custom components
     if (isLocaleField) {
         return (
@@ -152,24 +164,30 @@ function CustomFieldItem({ fieldDef, control, fieldName }: Readonly<CustomFieldI
                 <TranslatableFormField
                     control={control}
                     name={fieldName}
-                    render={({ field, ...props }) => (
-                        <FormItem>
-                            <FormLabel>{getTranslation(fieldDef.label) ?? field.name}</FormLabel>
-                            <FormControl>
-                                {hasCustomFormComponent ? (
-                                    <CustomFormComponent fieldDef={fieldDef} {...field} />
-                                ) : (
-                                    <FormControlAdapter
-                                        fieldDef={fieldDef}
-                                        field={field}
-                                        valueMode="native"
-                                    />
-                                )}
-                            </FormControl>
-                            <FormDescription>{getTranslation(fieldDef.description)}</FormDescription>
-                            <FormMessage />
-                        </FormItem>
-                    )}
+                    disabled={disabled}
+                    render={({ field, fieldState }) => {
+                        const inputElement = hasCustomFormComponent ? (
+                            <CustomFormComponent fieldDef={fieldDef} {...field} />
+                        ) : (
+                            <FormControlAdapter
+                                fieldDef={fieldDef}
+                                field={field}
+                                valueMode="native"
+                            />
+                        );
+                        return (
+                            <CustomFieldFormItem
+                                fieldDef={fieldDef}
+                                getTranslation={getTranslation}
+                                fieldName={field.name}
+                                fieldState={fieldState}
+                            >
+                                {localeFallbackPlaceholder
+                                    ? applyControlProps(inputElement, { placeholder: localeFallbackPlaceholder })
+                                    : inputElement}
+                            </CustomFieldFormItem>
+                        );
+                    }}
                 />
             </div>
         );
@@ -179,16 +197,18 @@ function CustomFieldItem({ fieldDef, control, fieldName }: Readonly<CustomFieldI
     if (hasCustomFormComponent) {
         return (
             <div className={containerClassName}>
-                <FormField
+                <Controller
                     control={control}
                     name={fieldName}
-                    render={fieldProps => (
+                    disabled={disabled}
+                    render={({ field, fieldState }) => (
                         <CustomFieldFormItem
                             fieldDef={fieldDef}
                             getTranslation={getTranslation}
-                            fieldName={fieldProps.field.name}
+                            fieldName={field.name}
+                            fieldState={fieldState}
                         >
-                            <CustomFormComponent fieldDef={fieldDef} {...fieldProps.field} />
+                            <CustomFormComponent fieldDef={fieldDef} {...field} />
                         </CustomFieldFormItem>
                     )}
                 />
@@ -204,25 +224,26 @@ function CustomFieldItem({ fieldDef, control, fieldName }: Readonly<CustomFieldI
         if (isList) {
             return (
                 <div className={containerClassName}>
-                    <FormField
+                    <Controller
                         control={control}
                         name={fieldName}
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>{getTranslation(fieldDef.label) ?? fieldDef.name}</FormLabel>
-                                <FormControl>
-                                    <CustomFieldListInput
-                                        {...field}
-                                        disabled={isReadonly}
-                                        renderInput={(index, inputField) => (
-                                            <StructFormInput {...inputField} fieldDef={fieldDef} />
-                                        )}
-                                        defaultValue={{}} // Empty struct object as default
-                                    />
-                                </FormControl>
-                                <FormDescription>{getTranslation(fieldDef.description)}</FormDescription>
-                                <FormMessage />
-                            </FormItem>
+                        disabled={disabled}
+                        render={({ field, fieldState }) => (
+                            <CustomFieldFormItem
+                                fieldDef={fieldDef}
+                                getTranslation={getTranslation}
+                                fieldName={fieldDef.name}
+                                fieldState={fieldState}
+                            >
+                                <CustomFieldListInput
+                                    {...field}
+                                    disabled={isReadonly}
+                                    renderInput={(index, inputField) => (
+                                        <StructFormInput {...inputField} fieldDef={fieldDef} />
+                                    )}
+                                    defaultValue={{}} // Empty struct object as default
+                                />
+                            </CustomFieldFormItem>
                         )}
                     />
                 </div>
@@ -232,18 +253,19 @@ function CustomFieldItem({ fieldDef, control, fieldName }: Readonly<CustomFieldI
         // Handle single struct fields
         return (
             <div className={containerClassName}>
-                <FormField
+                <Controller
                     control={control}
                     name={fieldName}
-                    render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>{getTranslation(fieldDef.label) ?? fieldDef.name}</FormLabel>
-                            <FormControl>
-                                <StructFormInput {...field} fieldDef={fieldDef} />
-                            </FormControl>
-                            <FormDescription>{getTranslation(fieldDef.description)}</FormDescription>
-                            <FormMessage />
-                        </FormItem>
+                    disabled={disabled}
+                    render={({ field, fieldState }) => (
+                        <CustomFieldFormItem
+                            fieldDef={fieldDef}
+                            getTranslation={getTranslation}
+                            fieldName={fieldDef.name}
+                            fieldState={fieldState}
+                        >
+                            <StructFormInput {...field} fieldDef={fieldDef} />
+                        </CustomFieldFormItem>
                     )}
                 />
             </div>
@@ -253,14 +275,16 @@ function CustomFieldItem({ fieldDef, control, fieldName }: Readonly<CustomFieldI
     // For regular fields without custom components
     return (
         <div className={containerClassName}>
-            <FormField
+            <Controller
                 control={control}
                 name={fieldName}
-                render={({ field }) => (
+                disabled={disabled}
+                render={({ field, fieldState }) => (
                     <CustomFieldFormItem
                         fieldDef={fieldDef}
                         getTranslation={getTranslation}
                         fieldName={fieldDef.name}
+                        fieldState={fieldState}
                     >
                         <FormControlAdapter fieldDef={fieldDef} field={field} valueMode="native" />
                     </CustomFieldFormItem>
@@ -276,6 +300,7 @@ interface CustomFieldFormItemProps {
         input: string | Array<{ languageCode: string; value: string }> | null | undefined,
     ) => string | undefined;
     fieldName: string;
+    fieldState?: ControllerFieldState;
     children: React.ReactNode;
 }
 
@@ -283,14 +308,18 @@ function CustomFieldFormItem({
     fieldDef,
     getTranslation,
     fieldName,
+    fieldState,
     children,
 }: Readonly<CustomFieldFormItemProps>) {
+    const fieldId = `field-${fieldName}`;
     return (
-        <FormItem>
-            <FormLabel>{getTranslation(fieldDef.label) ?? fieldName}</FormLabel>
-            <FormControl>{children}</FormControl>
-            <FormDescription>{getTranslation(fieldDef.description)}</FormDescription>
-            <FormMessage />
-        </FormItem>
+        <Field data-invalid={fieldState?.invalid || undefined}>
+            <FieldLabel htmlFor={fieldId}>{getTranslation(fieldDef.label) ?? fieldName}</FieldLabel>
+            {children}
+            {getTranslation(fieldDef.description) && (
+                <FieldDescription>{getTranslation(fieldDef.description)}</FieldDescription>
+            )}
+            {fieldState?.invalid && <FieldError errors={[fieldState.error]} />}
+        </Field>
     );
 }

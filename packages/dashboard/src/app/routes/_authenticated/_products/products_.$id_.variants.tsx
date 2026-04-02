@@ -1,11 +1,23 @@
+import { ConfirmationDialog } from '@/vdb/components/shared/confirmation-dialog.js';
 import { ErrorPage } from '@/vdb/components/shared/error-page.js';
 import { FormFieldWrapper } from '@/vdb/components/shared/form-field-wrapper.js';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/vdb/components/ui/alert-dialog.js';
 import { Badge } from '@/vdb/components/ui/badge.js';
 import { Button } from '@/vdb/components/ui/button.js';
 import {
     Dialog,
     DialogContent,
     DialogFooter,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -17,7 +29,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Page, PageBlock, PageLayout, PageTitle } from '@/vdb/framework/layout-engine/page-layout.js';
 import { api } from '@/vdb/graphql/api.js';
 import { ResultOf } from '@/vdb/graphql/graphql.js';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useChannel } from '@/vdb/hooks/use-channel.js';
+import { z, zodResolver } from '@/vdb/lib/zod.js';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
@@ -25,7 +38,6 @@ import { Plus, Save, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import * as z from 'zod';
 import { AddOptionGroupDialog } from './components/add-option-group-dialog.js';
 import { AddProductVariantDialog } from './components/add-product-variant-dialog.js';
 import {
@@ -60,11 +72,6 @@ export const Route = createFileRoute('/_authenticated/_products/products_/$id_/v
     errorComponent: ({ error }) => <ErrorPage message={error.message} />,
 });
 
-const optionGroupSchema = z.object({
-    name: z.string().min(1, 'Option group name is required'),
-    values: z.array(z.string()).min(1, 'At least one option value is required'),
-});
-
 const addOptionValueSchema = z.object({
     name: z.string().min(1, 'Option value name is required'),
 });
@@ -83,6 +90,7 @@ function AddOptionValueDialog({
 }>) {
     const [open, setOpen] = useState(false);
     const { t } = useLingui();
+    const { activeChannel } = useChannel();
 
     const form = useForm<AddOptionValueFormValues>({
         resolver: zodResolver(addOptionValueSchema),
@@ -113,7 +121,7 @@ function AddOptionValueDialog({
                 code: values.name.toLowerCase().replace(/\s+/g, '-'),
                 translations: [
                     {
-                        languageCode: 'en',
+                        languageCode: activeChannel?.defaultLanguageCode ?? 'en',
                         name: values.name,
                     },
                 ],
@@ -123,16 +131,17 @@ function AddOptionValueDialog({
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                <Button size="icon" variant="ghost">
-                    <Plus className="h-3 w-3" />
-                </Button>
+            <DialogTrigger render={<Button size="icon" variant="ghost" />}>
+                <Plus className="h-3 w-3" />
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>
                         <Trans>Add option value to {groupName}</Trans>
                     </DialogTitle>
+                    <DialogDescription className="sr-only">
+                        <Trans>Add a new option value to the {groupName} option group</Trans>
+                    </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -184,9 +193,25 @@ function ManageProductVariants() {
         },
     });
 
+    const [forceRemoveGroupId, setForceRemoveGroupId] = useState<string | null>(null);
+
     const removeOptionGroupMutation = useMutation({
         mutationFn: api.mutate(removeOptionGroupFromProductDocument),
+        onSuccess: (result: any, variables: any) => {
+            const removeResult = result?.removeOptionGroupFromProduct;
+            if (removeResult && '__typename' in removeResult && removeResult.__typename === 'ProductOptionInUseError') {
+                setForceRemoveGroupId(variables.optionGroupId);
+                return;
+            }
+            toast.success(t`Option group removed`);
+            refetch();
+        },
+    });
+
+    const forceRemoveOptionGroupMutation = useMutation({
+        mutationFn: api.mutate(removeOptionGroupFromProductDocument),
         onSuccess: () => {
+            setForceRemoveGroupId(null);
             toast.success(t`Option group removed`);
             refetch();
         },
@@ -232,10 +257,8 @@ function ManageProductVariants() {
         });
     };
 
-    const deleteVariant = async (variant: Variant) => {
-        if (confirm(t`Are you sure you want to delete this variant?`)) {
-            await deleteVariantMutation.mutateAsync({ id: variant.id });
-        }
+    const deleteVariant = async (variantId: string) => {
+        await deleteVariantMutation.mutateAsync({ id: variantId });
     };
 
     const getOption = (variant: Variant, groupId: string) => {
@@ -270,7 +293,7 @@ function ManageProductVariants() {
                                         </label>
                                         <Input value={group.name} disabled />
                                     </div>
-                                    <div className="col-span-8">
+                                    <div className="col-span-7">
                                         <label className="text-sm font-medium">
                                             <Trans>Option values</Trans>
                                         </label>
@@ -287,11 +310,33 @@ function ManageProductVariants() {
                                             />
                                         </div>
                                     </div>
+                                    <div className="col-span-1 flex items-end justify-end">
+                                        <ConfirmationDialog
+                                            title={t`Remove option group`}
+                                            description={t`Are you sure you want to remove this option group from the product?`}
+                                            onConfirm={() => removeOptionGroupMutation.mutate({
+                                                productId: id,
+                                                optionGroupId: group.id,
+                                            })}
+                                        >
+                                            <Button
+                                                size="icon"
+                                                variant="ghost"
+                                                disabled={removeOptionGroupMutation.isPending}
+                                            >
+                                                <Trash2 className="h-4 w-4 text-destructive" />
+                                            </Button>
+                                        </ConfirmationDialog>
+                                    </div>
                                 </div>
                             ))
                         )}
                     </div>
-                    <AddOptionGroupDialog productId={id} onSuccess={() => refetch()} />
+                    <AddOptionGroupDialog
+                        productId={id}
+                        existingGroupIds={productData.product.optionGroups.map(g => g.id)}
+                        onSuccess={() => refetch()}
+                    />
                 </PageBlock>
 
                 <PageBlock column="main" blockId="product-variants" title={<Trans>Variants</Trans>}>
@@ -352,6 +397,7 @@ function ManageProductVariants() {
                                                     ) : (
                                                         <div className="flex items-center gap-2">
                                                             <Select
+                                                                items={Object.fromEntries(group.options.map(opt => [opt.id, opt.name]))}
                                                                 value={
                                                                     optionsToAddToVariant[variant.id]?.[
                                                                         group.id
@@ -403,13 +449,20 @@ function ManageProductVariants() {
                                             );
                                         })}
                                         <TableCell>
-                                            <Button
-                                                size="sm"
-                                                variant="ghost"
-                                                onClick={() => deleteVariant(variant)}
+                                            <ConfirmationDialog
+                                                title={t`Delete variant`}
+                                                description={t`Are you sure you want to delete this variant?`}
+                                                onConfirm={() => deleteVariant(variant.id)}
                                             >
-                                                <Trash2 className="h-4 w-4 text-destructive" />
-                                            </Button>
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    disabled={deleteVariantMutation.isPending}
+                                                    data-testid="variant-delete-btn"
+                                                >
+                                                    <Trash2 className="h-4 w-4 text-destructive" />
+                                                </Button>
+                                            </ConfirmationDialog>
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -417,14 +470,42 @@ function ManageProductVariants() {
                         </Table>
                     </div>
 
-                    <AddProductVariantDialog
-                        productId={id}
-                        onSuccess={() => {
-                            refetch();
-                        }}
-                    />
+                    {productData.product.optionGroups.length > 0 && (
+                        <AddProductVariantDialog
+                            productId={id}
+                            onSuccess={() => {
+                                refetch();
+                            }}
+                        />
+                    )}
                 </PageBlock>
             </PageLayout>
+            <AlertDialog open={!!forceRemoveGroupId} onOpenChange={(open) => { if (!open) setForceRemoveGroupId(null); }}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle><Trans>Force remove option group</Trans></AlertDialogTitle>
+                        <AlertDialogDescription>
+                            <Trans>This option group is in use by existing variants. Force removing it may affect those variants. Are you sure?</Trans>
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setForceRemoveGroupId(null)}>
+                            <Trans>Cancel</Trans>
+                        </AlertDialogCancel>
+                        <AlertDialogAction onClick={() => {
+                            if (forceRemoveGroupId) {
+                                forceRemoveOptionGroupMutation.mutate({
+                                    productId: id,
+                                    optionGroupId: forceRemoveGroupId,
+                                    force: true,
+                                });
+                            }
+                        }}>
+                            <Trans>Force remove</Trans>
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </Page>
     );
 }

@@ -16,7 +16,7 @@ import { AnyRoute, AnyRouter, useNavigate } from '@tanstack/react-router';
 import { ColumnFiltersState, SortingState, Table } from '@tanstack/react-table';
 import { TableOptions } from '@tanstack/table-core';
 
-import { BulkAction } from '@/vdb/framework/extension-api/types/index.js';
+import { BulkActionsInput } from '@/vdb/framework/extension-api/types/index.js';
 import {
     FullWidthPageBlock,
     Page,
@@ -361,7 +361,7 @@ export interface ListPageProps<
      * />
      * ```
      */
-    bulkActions?: BulkAction[];
+    bulkActions?: BulkActionsInput;
     /**
      * @description
      * Register a function that allows you to assign a refresh function for
@@ -464,11 +464,9 @@ export interface ListPageProps<
  *             }}
  *         >
  *             <PageActionBarRight>
- *                 <Button asChild>
- *                     <Link to="./new">
- *                         <PlusIcon className="mr-2 h-4 w-4" />
- *                         New article
- *                     </Link>
+ *                 <Button render={<Link to="./new" />}>
+ *                     <PlusIcon className="mr-2 h-4 w-4" />
+ *                     New article
  *                 </Button>
  *             </PageActionBarRight>
  *         </ListPage>
@@ -515,8 +513,8 @@ export function ListPage<
     const tableSettings = pageId ? settings.tableSettings?.[pageId] : undefined;
 
     const pagination = {
-        page: routeSearch.page ? parseInt(routeSearch.page) : 1,
-        itemsPerPage: routeSearch.perPage ? parseInt(routeSearch.perPage) : (tableSettings?.pageSize ?? 10),
+        page: routeSearch.page ? Number.parseInt(routeSearch.page) : 1,
+        itemsPerPage: routeSearch.perPage ? Number.parseInt(routeSearch.perPage) : (tableSettings?.pageSize ?? 10),
     };
 
     const columnVisibility = pageId
@@ -558,7 +556,8 @@ export function ListPage<
         const sort = sortToString(listState.sort ?? tableState.sorting);
         const filters = listState.filters ?? tableState.columnFilters;
         navigate({
-            search: () => ({ sort, page, perPage, filters: filters.length ? filters : undefined }) as never,
+            search: (prev: Record<string, unknown>) =>
+                ({ ...prev, sort, page, perPage, filters: filters.length ? filters : undefined }) as never,
         });
     }
 

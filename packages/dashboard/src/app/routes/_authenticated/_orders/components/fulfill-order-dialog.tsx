@@ -272,8 +272,9 @@ export function FulfillOrderDialog({ order, onSuccess }: Readonly<FulfillOrderDi
                                                     min="0"
                                                     max={quantity.max}
                                                     value={quantity.fulfillCount}
+                                                    data-testid="fulfill-quantity"
                                                     onChange={e => {
-                                                        const value = parseInt(e.target.value) || 0;
+                                                        const value = Number.parseInt(e.target.value) || 0;
                                                         updateFulfillmentQuantity(line.id, value);
                                                     }}
                                                     className="w-20"
@@ -292,7 +293,9 @@ export function FulfillOrderDialog({ order, onSuccess }: Readonly<FulfillOrderDi
                                     render={({ field }) => (
                                         <ConfigurableOperationInput
                                             operationDefinition={selectedHandler}
-                                            value={field.value}
+                                            value={
+                                                field.value ?? { code: selectedHandler.code, arguments: [] }
+                                            }
                                             onChange={field.onChange}
                                             readonly={false}
                                             removable={false}
