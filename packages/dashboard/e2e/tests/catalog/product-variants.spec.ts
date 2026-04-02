@@ -39,11 +39,10 @@ test.describe('product variant generation', () => {
             timeout: 10_000,
         });
 
-        // The empty state card should have an inline "Add option group" button
-        await expect(page.getByRole('button', { name: 'Add option group' })).toBeVisible();
-
-        // Click the "Add option group" button
-        await page.getByRole('button', { name: 'Add option group' }).click();
+        // The variant choice cards should be visible — click "Product with options"
+        // to open the Add Option Group dialog
+        await expect(page.getByRole('button', { name: /Product with options/i })).toBeVisible();
+        await page.getByRole('button', { name: /Product with options/i }).click();
 
         // The dialog should open with "Assign existing" and "Create new" tabs
         await expect(page.getByRole('dialog')).toBeVisible();
