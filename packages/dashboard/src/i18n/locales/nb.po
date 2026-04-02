@@ -533,7 +533,7 @@ msgstr "Søk betalingsmetoder..."
 msgid "Shipping address unset for order"
 msgstr "Leveringsadresse fjernet for bestilling"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:335
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:332
 msgid "Create {enabledCount} variants"
 msgstr "{enabledCount} 件のバリエーションを作成"
 
@@ -2646,7 +2646,7 @@ msgstr "Produktopsjoner"
 msgid "Select country"
 msgstr "Velg land"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:331
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:330
 msgid "Creating..."
 msgstr "Oppretter..."
 
@@ -2943,7 +2943,7 @@ msgid "Track"
 msgstr "Spor"
 
 #: src/app/routes/_authenticated/_products/components/add-product-variant-dialog.tsx:322
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:333
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:331
 msgid "Create variant"
 msgstr "Opprett variant"
 

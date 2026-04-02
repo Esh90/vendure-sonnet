@@ -533,7 +533,7 @@ msgstr "Hledat způsoby platby..."
 msgid "Shipping address unset for order"
 msgstr "Dodací adresa zrušena pro objednávku"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:335
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:332
 msgid "Create {enabledCount} variants"
 msgstr "Vytvořit {enabledCount} variant"
 
@@ -2646,7 +2646,7 @@ msgstr "Volby produktu"
 msgid "Select country"
 msgstr "Vybrat zemi"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:331
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:330
 msgid "Creating..."
 msgstr "Vytváření..."
 
@@ -2943,7 +2943,7 @@ msgid "Track"
 msgstr "Sledovat"
 
 #: src/app/routes/_authenticated/_products/components/add-product-variant-dialog.tsx:322
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:333
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:331
 msgid "Create variant"
 msgstr "Vytvořit variantu"
 

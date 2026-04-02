@@ -533,7 +533,7 @@ msgstr "Sök betalningsmetoder..."
 msgid "Shipping address unset for order"
 msgstr "Leveransadress borttagen för beställning"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:335
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:332
 msgid "Create {enabledCount} variants"
 msgstr "Utwórz {enabledCount} wariantów"
 
@@ -2646,7 +2646,7 @@ msgstr "Produktalternativ"
 msgid "Select country"
 msgstr "Välj land"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:331
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:330
 msgid "Creating..."
 msgstr "Skapar..."
 
@@ -2943,7 +2943,7 @@ msgid "Track"
 msgstr "Spåra"
 
 #: src/app/routes/_authenticated/_products/components/add-product-variant-dialog.tsx:322
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:333
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:331
 msgid "Create variant"
 msgstr "Skapa variant"
 

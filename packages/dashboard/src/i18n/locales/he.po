@@ -533,7 +533,7 @@ msgstr "חפש אמצעי תשלום..."
 msgid "Shipping address unset for order"
 msgstr "כתובת משלוח בוטלה להזמנה"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:335
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:332
 msgid "Create {enabledCount} variants"
 msgstr "יצירת {enabledCount} גרסאות"
 
@@ -2646,7 +2646,7 @@ msgstr "אפשרויות מוצר"
 msgid "Select country"
 msgstr "בחר מדינה"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:331
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:330
 msgid "Creating..."
 msgstr "יוצר..."
 
@@ -2943,7 +2943,7 @@ msgid "Track"
 msgstr "עקוב"
 
 #: src/app/routes/_authenticated/_products/components/add-product-variant-dialog.tsx:322
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:333
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:331
 msgid "Create variant"
 msgstr "צור גרסה"
 

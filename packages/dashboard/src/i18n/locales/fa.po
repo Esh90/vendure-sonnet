@@ -533,7 +533,7 @@ msgstr "جستجوی روش‌های پرداخت..."
 msgid "Shipping address unset for order"
 msgstr "آدرس حمل و نقل برای سفارش لغو شد"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:335
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:332
 msgid "Create {enabledCount} variants"
 msgstr "ایجاد {enabledCount} گونه"
 
@@ -2646,7 +2646,7 @@ msgstr "گزینه‌های محصول"
 msgid "Select country"
 msgstr "انتخاب کشور"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:331
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:330
 msgid "Creating..."
 msgstr "در حال ایجاد..."
 
@@ -2943,7 +2943,7 @@ msgid "Track"
 msgstr "دنبال کردن"
 
 #: src/app/routes/_authenticated/_products/components/add-product-variant-dialog.tsx:322
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:333
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:331
 msgid "Create variant"
 msgstr "ایجاد نوع"
 

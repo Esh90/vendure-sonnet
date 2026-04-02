@@ -533,7 +533,7 @@ msgstr "Ödeme yöntemlerini ara..."
 msgid "Shipping address unset for order"
 msgstr "Sipariş için kargo adresi kaldırıldı"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:335
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:332
 msgid "Create {enabledCount} variants"
 msgstr "Создать {enabledCount} вариантов"
 
@@ -2646,7 +2646,7 @@ msgstr "Ürün Seçenekleri"
 msgid "Select country"
 msgstr "Ülke seç"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:331
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:330
 msgid "Creating..."
 msgstr "Oluşturuluyor..."
 
@@ -2943,7 +2943,7 @@ msgid "Track"
 msgstr "İzle"
 
 #: src/app/routes/_authenticated/_products/components/add-product-variant-dialog.tsx:322
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:333
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:331
 msgid "Create variant"
 msgstr "Varyant oluştur"
 

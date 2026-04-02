@@ -533,7 +533,7 @@ msgstr "Пошук способів оплати..."
 msgid "Shipping address unset for order"
 msgstr "Адресу доставки знято для замовлення"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:335
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:332
 msgid "Create {enabledCount} variants"
 msgstr "Створити {enabledCount} варіантів"
 
@@ -2646,7 +2646,7 @@ msgstr "Опції товару"
 msgid "Select country"
 msgstr "Вибрати країну"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:331
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:330
 msgid "Creating..."
 msgstr "Створення..."
 
@@ -2943,7 +2943,7 @@ msgid "Track"
 msgstr "Відстежувати"
 
 #: src/app/routes/_authenticated/_products/components/add-product-variant-dialog.tsx:322
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:333
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:331
 msgid "Create variant"
 msgstr "Створити варіант"
 

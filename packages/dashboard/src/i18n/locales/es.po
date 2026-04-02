@@ -533,7 +533,7 @@ msgstr "Buscar métodos de pago..."
 msgid "Shipping address unset for order"
 msgstr "Dirección de envío removida del pedido"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:335
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:332
 msgid "Create {enabledCount} variants"
 msgstr "Crear {enabledCount} variantes"
 
@@ -2646,7 +2646,7 @@ msgstr "Opciones de Producto"
 msgid "Select country"
 msgstr "Seleccionar país"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:331
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:330
 msgid "Creating..."
 msgstr "Creando..."
 
@@ -2943,7 +2943,7 @@ msgid "Track"
 msgstr "Rastrear"
 
 #: src/app/routes/_authenticated/_products/components/add-product-variant-dialog.tsx:322
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:333
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:331
 msgid "Create variant"
 msgstr "Crear variante"
 

@@ -533,7 +533,7 @@ msgstr "搜索支付方式..."
 msgid "Shipping address unset for order"
 msgstr "订单已取消配送地址"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:335
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:332
 msgid "Create {enabledCount} variants"
 msgstr "创建 {enabledCount} 个变体"
 
@@ -2646,7 +2646,7 @@ msgstr "商品选项"
 msgid "Select country"
 msgstr "选择国家"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:331
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:330
 msgid "Creating..."
 msgstr "正在创建..."
 
@@ -2943,7 +2943,7 @@ msgid "Track"
 msgstr "跟踪"
 
 #: src/app/routes/_authenticated/_products/components/add-product-variant-dialog.tsx:322
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:333
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:331
 msgid "Create variant"
 msgstr "创建变体"
 
