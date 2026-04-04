@@ -116,6 +116,7 @@ export class StockMovementService {
                     quantity: delta,
                     stockLocation: { id: input.stockLocationId },
                     productVariant: { id: productVariantId },
+                    partitionKey: input.partitionKey ?? '',
                 }),
             );
             await this.stockLevelService.updateStockOnHandForLocation(
@@ -176,6 +177,7 @@ export class StockMovementService {
                     stockLocation: allocationLocation.location,
                     quantity: allocationLocation.quantity,
                     orderLine,
+                    partitionKey: allocationLocation.partitionKey ?? '',
                 });
                 allocations.push(allocation);
 
@@ -232,6 +234,7 @@ export class StockMovementService {
                     quantity: lineRow.quantity * -1,
                     orderLine,
                     stockLocation: saleLocation.location,
+                    partitionKey: saleLocation.partitionKey ?? '',
                 });
                 sales.push(sale);
 
@@ -295,6 +298,7 @@ export class StockMovementService {
                     quantity: lineInput.quantity,
                     orderLine,
                     stockLocation: cancellationLocation.location,
+                    partitionKey: cancellationLocation.partitionKey ?? '',
                 });
                 cancellations.push(cancellation);
 
@@ -346,6 +350,7 @@ export class StockMovementService {
                     quantity: lineInput.quantity,
                     orderLine,
                     stockLocation: releaseLocation.location,
+                    partitionKey: releaseLocation.partitionKey ?? '',
                 });
                 releases.push(release);
                 if (this.trackInventoryForVariant(orderLine.productVariant, globalTrackInventory)) {

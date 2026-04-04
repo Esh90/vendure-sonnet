@@ -35,6 +35,20 @@ export abstract class StockMovement extends VendureEntity implements HasCustomFi
     @EntityId()
     stockLocationId: ID;
 
+    /**
+     * @description
+     * An optional key that identifies which stock partition this movement is associated with.
+     * When set, it corresponds to the {@link StockLevel}'s `partitionKey`, enabling
+     * per-partition stock movement history (e.g. tracking movements for a specific batch or lot).
+     *
+     * Defaults to an empty string, which indicates the default (non-partitioned) stock.
+     *
+     * @default ''
+     * @since 3.7.0
+     */
+    @Column({ default: '' })
+    partitionKey: string;
+
     @Column()
     quantity: number;
 
