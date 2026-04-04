@@ -34,26 +34,11 @@ export interface LocationWithQuantity {
     quantity: number;
     /**
      * @description
-     * If set, identifies the specific {@link StockLevel} record to use for this
-     * allocation/sale/release/cancellation. This is useful when working with
-     * partitioned stock levels (e.g. batch/lot tracking).
-     *
-     * **Precedence rule:** When both `stockLevelId` and `partitionKey` are provided,
-     * `stockLevelId` takes precedence — the system will target that exact StockLevel
-     * record and ignore `partitionKey`. When only `partitionKey` is provided, the
-     * system will look up the StockLevel matching the given location and partition key.
-     * When neither is set, the default partition (empty string) is used.
-     *
-     * @since 3.7.0
-     */
-    stockLevelId?: ID;
-    /**
-     * @description
      * If set, identifies the partition key of the {@link StockLevel} to use.
      * This enables strategies to target a specific stock partition (e.g. a batch
      * or lot number) when allocating, selling, releasing, or cancelling stock.
      *
-     * If `stockLevelId` is also provided, it takes precedence over `partitionKey`.
+     * When not set, the default partition (empty string) is used.
      *
      * @since 3.7.0
      */
