@@ -132,6 +132,7 @@ input CreateProductVariantOptionInput {
 input StockLevelInput {
     stockLocationId: ID!
     stockOnHand: Int!
+    partitionKey: String
 }
 
 

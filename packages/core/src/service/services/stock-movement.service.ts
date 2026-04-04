@@ -103,6 +103,7 @@ export class StockMovementService {
                 ctx,
                 productVariantId,
                 input.stockLocationId,
+                input.partitionKey,
             );
             const oldStockLevel = stockLevel.stockOnHand;
             const newStockLevel = input.stockOnHand;
@@ -122,6 +123,7 @@ export class StockMovementService {
                 productVariantId,
                 input.stockLocationId,
                 delta,
+                input.partitionKey,
             );
             await this.eventBus.publish(new StockMovementEvent(ctx, [adjustment]));
             adjustments.push(adjustment);
@@ -183,6 +185,7 @@ export class StockMovementService {
                         orderLine.productVariantId,
                         allocationLocation.location.id,
                         allocationLocation.quantity,
+                        allocationLocation.partitionKey,
                     );
                 }
             }
@@ -238,12 +241,14 @@ export class StockMovementService {
                         orderLine.productVariantId,
                         saleLocation.location.id,
                         -saleLocation.quantity,
+                        saleLocation.partitionKey,
                     );
                     await this.stockLevelService.updateStockOnHandForLocation(
                         ctx,
                         orderLine.productVariantId,
                         saleLocation.location.id,
                         -saleLocation.quantity,
+                        saleLocation.partitionKey,
                     );
                 }
             }
@@ -299,6 +304,7 @@ export class StockMovementService {
                         orderLine.productVariantId,
                         cancellationLocation.location.id,
                         cancellationLocation.quantity,
+                        cancellationLocation.partitionKey,
                     );
                 }
             }
@@ -348,6 +354,7 @@ export class StockMovementService {
                         orderLine.productVariantId,
                         releaseLocation.location.id,
                         -releaseLocation.quantity,
+                        releaseLocation.partitionKey,
                     );
                 }
             }

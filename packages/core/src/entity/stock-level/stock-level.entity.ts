@@ -16,7 +16,7 @@ import { StockLocation } from '../stock-location/stock-location.entity';
  * @docsCategory entities
  */
 @Entity()
-@Index(['productVariantId', 'stockLocationId'], { unique: true })
+@Index(['productVariantId', 'stockLocationId', 'partitionKey'], { unique: true })
 export class StockLevel extends VendureEntity implements HasCustomFields {
     constructor(input: DeepPartial<StockLevel>) {
         super(input);
@@ -35,6 +35,25 @@ export class StockLevel extends VendureEntity implements HasCustomFields {
 
     @EntityId()
     stockLocationId: ID;
+
+    /**
+     * @description
+     * An optional key used to partition stock within a single StockLocation.
+     * This enables use cases such as batch/lot tracking, serial number management,
+     * or expiration-date-based stock rotation (FIFO/LIFO).
+     *
+     * When set to a non-empty string, multiple StockLevel records can exist for the
+     * same ProductVariant and StockLocation combination, each identified by a unique
+     * partitionKey.
+     *
+     * Defaults to an empty string, which preserves the existing behavior of a single
+     * StockLevel per ProductVariant/StockLocation pair.
+     *
+     * @default ''
+     * @since 3.7.0
+     */
+    @Column({ default: '' })
+    partitionKey: string;
 
     @Column()
     stockOnHand: number;

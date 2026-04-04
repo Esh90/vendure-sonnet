@@ -32,12 +32,19 @@ export class StockLevelService {
     /**
      * @description
      * Returns the StockLevel for the given {@link ProductVariant} and {@link StockLocation}.
+     * If a `partitionKey` is provided, the lookup will match on that specific partition.
      */
-    async getStockLevel(ctx: RequestContext, productVariantId: ID, stockLocationId: ID): Promise<StockLevel> {
+    async getStockLevel(
+        ctx: RequestContext,
+        productVariantId: ID,
+        stockLocationId: ID,
+        partitionKey?: string,
+    ): Promise<StockLevel> {
         const stockLevel = await this.connection.getRepository(ctx, StockLevel).findOne({
             where: {
                 productVariantId,
                 stockLocationId,
+                ...(partitionKey != null ? { partitionKey } : {}),
             },
         });
         if (stockLevel) {
@@ -49,6 +56,7 @@ export class StockLevelService {
                 stockLocationId,
                 stockOnHand: 0,
                 stockAllocated: 0,
+                ...(partitionKey != null ? { partitionKey } : {}),
             }),
         );
     }
@@ -82,17 +90,20 @@ export class StockLevelService {
     /**
      * @description
      * Updates the `stockOnHand` for the given {@link ProductVariant} and {@link StockLocation}.
+     * If a `partitionKey` is provided, only the matching partitioned StockLevel will be updated.
      */
     async updateStockOnHandForLocation(
         ctx: RequestContext,
         productVariantId: ID,
         stockLocationId: ID,
         change: number,
+        partitionKey?: string,
     ) {
         const stockLevel = await this.connection.getRepository(ctx, StockLevel).findOne({
             where: {
                 productVariantId,
                 stockLocationId,
+                ...(partitionKey != null ? { partitionKey } : {}),
             },
         });
         if (!stockLevel) {
@@ -102,6 +113,7 @@ export class StockLevelService {
                     stockLocationId,
                     stockOnHand: change,
                     stockAllocated: 0,
+                    ...(partitionKey != null ? { partitionKey } : {}),
                 }),
             );
         }
@@ -115,17 +127,20 @@ export class StockLevelService {
     /**
      * @description
      * Updates the `stockAllocated` for the given {@link ProductVariant} and {@link StockLocation}.
+     * If a `partitionKey` is provided, only the matching partitioned StockLevel will be updated.
      */
     async updateStockAllocatedForLocation(
         ctx: RequestContext,
         productVariantId: ID,
         stockLocationId: ID,
         change: number,
+        partitionKey?: string,
     ) {
         const stockLevel = await this.connection.getRepository(ctx, StockLevel).findOne({
             where: {
                 productVariantId,
                 stockLocationId,
+                ...(partitionKey != null ? { partitionKey } : {}),
             },
         });
         if (stockLevel) {
