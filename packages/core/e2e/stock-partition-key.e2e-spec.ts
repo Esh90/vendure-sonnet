@@ -1,4 +1,4 @@
-import { mergeConfig } from '@vendure/core';
+import { DEFAULT_STOCK_LOCATION_PARTITION_KEY, mergeConfig } from '@vendure/core';
 import { createTestEnvironment } from '@vendure/testing';
 import path from 'path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -82,7 +82,7 @@ describe('Stock level partitionKey', () => {
             sl => sl.stockLocationId === defaultStockLocationId,
         );
         expect(defaultLevel).toBeDefined();
-        expect(defaultLevel?.partitionKey).toBe('');
+        expect(defaultLevel?.partitionKey).toBe(DEFAULT_STOCK_LOCATION_PARTITION_KEY);
     });
 
     it('can set stock with a partitionKey', async () => {
@@ -136,7 +136,7 @@ describe('Stock level partitionKey', () => {
         });
 
         const levels = productVariant?.stockLevels ?? [];
-        const defaultLevel = levels.find(sl => sl.partitionKey === '');
+        const defaultLevel = levels.find(sl => sl.partitionKey === DEFAULT_STOCK_LOCATION_PARTITION_KEY);
         const batch1 = levels.find(sl => sl.partitionKey === 'BATCH-001');
         const batch2 = levels.find(sl => sl.partitionKey === 'BATCH-002');
 
@@ -153,7 +153,9 @@ describe('Stock level partitionKey', () => {
             id: variantId,
         });
         const beforeLevels = before?.stockLevels ?? [];
-        const initialDefaultStock = beforeLevels.find(sl => sl.partitionKey === '')?.stockOnHand;
+        const initialDefaultStock = beforeLevels.find(
+            sl => sl.partitionKey === DEFAULT_STOCK_LOCATION_PARTITION_KEY,
+        )?.stockOnHand;
         const initialBatch2Stock = beforeLevels.find(sl => sl.partitionKey === 'BATCH-002')?.stockOnHand;
 
         // Update only BATCH-001
@@ -177,7 +179,7 @@ describe('Stock level partitionKey', () => {
         const levels = productVariant?.stockLevels ?? [];
         const batch1 = levels.find(sl => sl.partitionKey === 'BATCH-001');
         const batch2 = levels.find(sl => sl.partitionKey === 'BATCH-002');
-        const defaultLevel = levels.find(sl => sl.partitionKey === '');
+        const defaultLevel = levels.find(sl => sl.partitionKey === DEFAULT_STOCK_LOCATION_PARTITION_KEY);
 
         expect(batch1?.stockOnHand).toBe(99); // Updated
         expect(batch2?.stockOnHand).toBe(initialBatch2Stock); // Unchanged

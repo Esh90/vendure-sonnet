@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { DEFAULT_STOCK_LOCATION_PARTITION_KEY } from '../../common/constants';
 import { StockLevel } from '../../entity/stock-level/stock-level.entity';
 
 import { StockLevelService } from './stock-level.service';
@@ -26,7 +27,7 @@ function createMockRepository() {
                 id: entity.id ?? nextId++,
             });
             if (saved.partitionKey === undefined || saved.partitionKey === null) {
-                saved.partitionKey = '';
+                saved.partitionKey = DEFAULT_STOCK_LOCATION_PARTITION_KEY;
             }
             store.push(saved);
             return saved;
@@ -64,14 +65,14 @@ describe('StockLevelService - partitionKey', () => {
             expect(result.stockLocationId).toBe(locationId);
             expect(result.stockOnHand).toBe(0);
             expect(result.stockAllocated).toBe(0);
-            expect(result.partitionKey).toBe('');
+            expect(result.partitionKey).toBe(DEFAULT_STOCK_LOCATION_PARTITION_KEY);
         });
 
         it('returns existing default-partition StockLevel on second call', async () => {
             const first = await service.getStockLevel(ctx, variantId, locationId);
             const result = await service.getStockLevel(ctx, variantId, locationId);
             expect(result.id).toBe(first.id);
-            expect(result.partitionKey).toBe('');
+            expect(result.partitionKey).toBe(DEFAULT_STOCK_LOCATION_PARTITION_KEY);
             expect(repo.save).toHaveBeenCalledTimes(1);
         });
 

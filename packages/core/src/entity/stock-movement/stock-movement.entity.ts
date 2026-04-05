@@ -2,6 +2,7 @@ import { StockMovementType } from '@vendure/common/lib/generated-types';
 import { ID } from '@vendure/common/lib/shared-types';
 import { Column, Entity, Index, ManyToOne, TableInheritance } from 'typeorm';
 
+import { DEFAULT_STOCK_LOCATION_PARTITION_KEY } from '../../common/constants';
 import { HasCustomFields } from '../../config/custom-field/custom-field-types';
 import { VendureEntity } from '../base/base.entity';
 import { CustomStockMovementFields } from '../custom-entity-fields';
@@ -46,7 +47,7 @@ export abstract class StockMovement extends VendureEntity implements HasCustomFi
      * @default ''
      * @since 3.7.0
      */
-    @Column({ default: '' })
+    @Column({ default: DEFAULT_STOCK_LOCATION_PARTITION_KEY })
     partitionKey: string;
 
     @Column()

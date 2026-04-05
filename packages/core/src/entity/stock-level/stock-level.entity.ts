@@ -1,6 +1,7 @@
 import { DeepPartial, ID } from '@vendure/common/lib/shared-types';
 import { Column, Entity, Index, ManyToOne } from 'typeorm';
 
+import { DEFAULT_STOCK_LOCATION_PARTITION_KEY } from '../../common/constants';
 import { HasCustomFields } from '../../config/custom-field/custom-field-types';
 import { VendureEntity } from '../base/base.entity';
 import { CustomStockLevelFields } from '../custom-entity-fields';
@@ -52,7 +53,7 @@ export class StockLevel extends VendureEntity implements HasCustomFields {
      * @default ''
      * @since 3.7.0
      */
-    @Column({ default: '' })
+    @Column({ default: DEFAULT_STOCK_LOCATION_PARTITION_KEY })
     partitionKey: string;
 
     @Column()
