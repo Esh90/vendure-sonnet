@@ -33,6 +33,19 @@ export const Route = createFileRoute('/_authenticated/_system/job-queue')({
     loader: () => ({ breadcrumb: () => <Trans>Job Queue</Trans> }),
 });
 
+function formatDurationMs(ms: number): string {
+    const seconds = Math.floor(ms / 1000);
+    if (seconds < 1) return '< 1s';
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    const parts: string[] = [];
+    if (h > 0) parts.push(`${h}h`);
+    if (m > 0) parts.push(`${m}m`);
+    if (s > 0 || parts.length === 0) parts.push(`${s}s`);
+    return parts.join(' ');
+}
+
 const STATES = [
     {
         label: 'Pending',
@@ -203,7 +216,9 @@ function JobQueuePage() {
                 },
                 duration: {
                     cell: ({ row }) => {
-                        return row.original.duration ? `${row.original.duration}ms` : null;
+                        return row.original.duration
+                            ? formatDurationMs(row.original.duration)
+                            : null;
                     },
                 },
             }}
