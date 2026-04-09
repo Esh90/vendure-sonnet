@@ -131,7 +131,7 @@ import { DefaultJobQueueOptions } from './types';
             ? [JobRecord, JobRecordBuffer]
             : [JobRecord],
     configuration: config => {
-        const { pollInterval, concurrency, backoffStrategy, setRetries, gracefulShutdownTimeout } =
+        const { pollInterval, concurrency, backoffStrategy, setRetries, gracefulShutdownTimeout, rateLimit } =
             DefaultJobQueuePlugin.options ?? {};
         config.jobQueueOptions.jobQueueStrategy = new SqlJobQueueStrategy({
             concurrency,
@@ -139,6 +139,7 @@ import { DefaultJobQueueOptions } from './types';
             backoffStrategy,
             setRetries,
             gracefulShutdownTimeout,
+            rateLimit,
         });
         if (DefaultJobQueuePlugin.options.useDatabaseForBuffer === true) {
             config.jobQueueOptions.jobBufferStorageStrategy = new SqlJobBufferStorageStrategy();

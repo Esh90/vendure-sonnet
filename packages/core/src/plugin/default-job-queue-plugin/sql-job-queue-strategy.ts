@@ -8,6 +8,7 @@ import { Logger } from '../../config/logger/vendure-logger';
 import { TransactionalConnection } from '../../connection/transactional-connection';
 import { Job, JobData, JobQueueStrategyJobOptions } from '../../job-queue';
 import { PollingJobQueueStrategy } from '../../job-queue/polling-job-queue-strategy';
+import { parseDuration } from '../../job-queue/rate-limiter';
 import { ListQueryBuilder } from '../../service/helpers/list-query-builder/list-query-builder';
 
 import { JobRecord } from './job-record.entity';
@@ -36,12 +37,17 @@ export class SqlJobQueueStrategy extends PollingJobQueueStrategy implements Insp
         super.destroy();
     }
 
-    async add<Data extends JobData<Data> = object>(job: Job<Data>, jobOptions?: JobQueueStrategyJobOptions<Data>): Promise<Job<Data>> {
+    async add<Data extends JobData<Data> = object>(
+        job: Job<Data>,
+        jobOptions?: JobQueueStrategyJobOptions<Data>,
+    ): Promise<Job<Data>> {
         if (!this.connectionAvailable(this.rawConnection)) {
             throw new Error('Connection not available');
         }
-        const jobRecordRepository = jobOptions?.ctx && this.connection ? this.connection.getRepository(jobOptions.ctx, JobRecord) :
-            this.rawConnection.getRepository(JobRecord);
+        const jobRecordRepository =
+            jobOptions?.ctx && this.connection
+                ? this.connection.getRepository(jobOptions.ctx, JobRecord)
+                : this.rawConnection.getRepository(JobRecord);
         const constrainedData = this.constrainDataSize(job);
         const newRecord = this.toRecord(job, constrainedData, this.setRetries(job.queueName, job));
         const record = await jobRecordRepository.save(newRecord);
@@ -118,6 +124,31 @@ export class SqlJobQueueStrategy extends PollingJobQueueStrategy implements Insp
         setLock: boolean,
         waitingJobIds: ID[] = [],
     ): Promise<Job | undefined> {
+        // Cross-worker rate-limit gate. We count jobs in this queue that have
+        // started within the configured window. We count `startedAt` (not
+        // `settledAt`) so that crashed workers' jobs continue to consume their
+        // slot until the window rolls forward — this is the desired shed-load
+        // behavior against a rate-limited downstream.
+        //
+        // Note: the COUNT query is not globally locked, so under contention
+        // two workers may each observe `N-1` and both claim a slot, giving a
+        // transient overshoot of up to `(numWorkers - 1)` per window.
+        const rateLimit = this.resolveRateLimit(queueName);
+        if (rateLimit) {
+            const durationMs = parseDuration(rateLimit.duration);
+            const since = new Date(Date.now() - durationMs);
+            const recentCount = await manager
+                .getRepository(JobRecord)
+                .createQueryBuilder('record')
+                .where('record.queueName = :queueName', { queueName })
+                .andWhere('record.startedAt IS NOT NULL')
+                .andWhere('record.startedAt > :since', { since })
+                .getCount();
+            if (recentCount >= rateLimit.max) {
+                return undefined;
+            }
+        }
+
         const qb = manager
             .getRepository(JobRecord)
             .createQueryBuilder('record')

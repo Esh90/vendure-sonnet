@@ -1,4 +1,4 @@
-import { BackoffStrategy, Job } from '../../job-queue';
+import { BackoffStrategy, Job, RateLimit } from '../../job-queue';
 import { ScheduledTaskConfig } from '../../scheduler';
 
 /**
@@ -115,4 +115,36 @@ export interface DefaultJobQueueOptions {
      * @default cron => cron.every(2).hours()
      */
     cleanJobsSchedule?: ScheduledTaskConfig['schedule'];
+    /**
+     * @description
+     * Configures a rate limit for one or more job queues. When set, at most
+     * `max` jobs will be _started_ per sliding window of length `duration` for
+     * each matching queue. This is useful when a job handler interacts with an
+     * external system which imposes its own rate limit (e.g. a transactional
+     * email provider).
+     *
+     * A value of `undefined` (or a function which returns `undefined`) disables
+     * rate limiting for that queue, which is the default.
+     *
+     * The SQL strategy coordinates across horizontally-scaled workers by
+     * performing a count of recently-started jobs within the same transaction
+     * used to claim the next job. Because the count is not globally locked,
+     * a transient overshoot of up to `(numWorkers - 1)` jobs per window is
+     * possible under contention.
+     *
+     * @example
+     * ```ts
+     * DefaultJobQueuePlugin.init({
+     *   rateLimit: (queueName) => {
+     *     if (queueName === 'send-marketing-email') {
+     *       return { max: 60, duration: '1h' };
+     *     }
+     *     return undefined;
+     *   },
+     * })
+     * ```
+     *
+     * @since 3.7.0
+     */
+    rateLimit?: RateLimit | ((queueName: string) => RateLimit | undefined);
 }
