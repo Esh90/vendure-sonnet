@@ -9,10 +9,13 @@ import {
     JobData,
     Logger,
     PaginatedList,
+    parseDuration,
+    RateLimit,
 } from '@vendure/core';
 import Bull, {
     Job as BullJob,
     ConnectionOptions,
+    DelayedError,
     JobType,
     Processor,
     Queue,
@@ -55,11 +58,18 @@ export class BullMQJobQueueStrategy implements InspectableJobQueueStrategy {
     private connectionOptions: ConnectionOptions;
     private queue: Queue;
     /**
-     * Workers are grouped by their concurrency value.
-     * Key: concurrency number, Value: Worker instance.
-     * Multiple Vendure queues with the same concurrency share a single worker.
+     * Workers are keyed by `${queueName ?? '__shared__'}:${concurrency}`.
+     *
+     * - Queues without a `rateLimit` share a single default worker per concurrency
+     *   value, keyed as `__shared__:<concurrency>` — this matches the historical
+     *   behavior and avoids spinning up extra workers for existing setups.
+     * - Queues with a configured `rateLimit` get a dedicated worker keyed as
+     *   `<queueName>:<concurrency>`. That worker forwards BullMQ's native
+     *   `limiter` option, which coordinates across multiple Vendure worker
+     *   processes via Redis.
      */
-    private workers = new Map<number, Worker>();
+    private workers = new Map<string, Worker>();
+    private readonly SHARED_WORKER_KEY = '__shared__';
     private workerProcessor: Processor;
     private options: BullMQPluginOptions;
     private jobListIndexService: JobListIndexService;
@@ -292,27 +302,62 @@ export class BullMQJobQueueStrategy implements InspectableJobQueueStrategy {
         this.queueNameProcessFnMap.set(queueName, process);
 
         // Resolve concurrency: either per-queue via function or a single global value.
-        // Workers are stored in `this.workers` keyed by concurrency number, not queue name.
-        // All Vendure job types share a single BullMQ queue (`QUEUE_NAME`), so any worker can
-        // process any job type. This means multiple Vendure queues returning the same concurrency
-        // will share a worker, and the concurrency limit applies to total jobs processed by that
-        // worker—not strictly per Vendure queue.
         const concurrency =
             typeof this.options.concurrency === 'function'
                 ? this.options.concurrency(queueName)
                 : (this.options.concurrency ?? DEFAULT_CONCURRENCY);
 
-        if (!this.workers.has(concurrency)) {
-            const options: WorkerOptions = {
+        const rateLimit = this.resolveRateLimit(queueName);
+
+        // Non-rate-limited queues share the default worker keyed by concurrency.
+        // Rate-limited queues get a dedicated worker so BullMQ's native `limiter`
+        // option can be forwarded and coordinate across multiple Vendure worker
+        // processes via Redis without affecting other queues.
+        const workerKey = rateLimit
+            ? `${queueName}:${concurrency}`
+            : `${this.SHARED_WORKER_KEY}:${concurrency}`;
+
+        if (!this.workers.has(workerKey)) {
+            const baseOptions: WorkerOptions = {
                 concurrency,
                 ...this.options.workerOptions,
                 connection: this.redisConnection,
             };
-            const worker = new Worker(QUEUE_NAME, this.workerProcessor, options)
+
+            let processor: Processor = this.workerProcessor;
+            if (rateLimit) {
+                const durationMs = parseDuration(rateLimit.duration);
+                baseOptions.limiter = { max: rateLimit.max, duration: durationMs };
+                // The dedicated worker shares the Vendure-wide BullMQ queue, so it
+                // can receive jobs of any Vendure queue name. Jobs that do not
+                // belong to this rate-limited queue are deferred via
+                // `moveToDelayed` so the shared worker can pick them up — this
+                // ensures the rate limit only counts against jobs of the target
+                // queue name.
+                const targetQueueName = queueName;
+                processor = async (bullJob, token, signal) => {
+                    if (bullJob.name !== targetQueueName) {
+                        // Defer by the poll interval of a few ms so the job becomes
+                        // available again very quickly; another worker (the shared
+                        // one, or a different dedicated one) will pick it up.
+                        await bullJob.moveToDelayed(Date.now() + 50, token);
+                        throw new DelayedError();
+                    }
+                    return this.workerProcessor(bullJob, token, signal);
+                };
+            }
+
+            const worker = new Worker(QUEUE_NAME, processor, baseOptions)
                 .on('error', e => Logger.error(`BullMQ Worker error: ${e.message}`, loggerCtx, e.stack))
                 .on('closing', e => Logger.verbose(`BullMQ Worker closing: ${e}`, loggerCtx))
                 .on('closed', () => Logger.verbose('BullMQ Worker closed', loggerCtx))
                 .on('failed', (job: Bull.Job | undefined, error) => {
+                    // DelayedError is used internally to re-queue jobs picked up by
+                    // a rate-limited worker that don't belong to its target queue,
+                    // and is not an actual failure.
+                    if (error instanceof DelayedError || error?.name === 'DelayedError') {
+                        return;
+                    }
                     Logger.warn(
                         `Job ${job?.id ?? '(unknown id)'} [${job?.name ?? 'unknown name'}] failed (attempt ${
                             job?.attemptsMade ?? 'unknown'
@@ -326,7 +371,7 @@ export class BullMQJobQueueStrategy implements InspectableJobQueueStrategy {
                 .on('completed', (job: Bull.Job) => {
                     Logger.debug(`Job ${job?.id ?? 'unknown id'} [${job.name}] completed`, loggerCtx);
                 });
-            this.workers.set(concurrency, worker);
+            this.workers.set(workerKey, worker);
         }
 
         if (!this.cancellationSubscribed) {
@@ -334,6 +379,17 @@ export class BullMQJobQueueStrategy implements InspectableJobQueueStrategy {
             await this.cancellationSub.subscribe(this.CANCEL_JOB_CHANNEL);
             this.cancellationSub.on('message', this.subscribeToCancellationEvents);
         }
+    }
+
+    private resolveRateLimit(queueName: string): RateLimit | undefined {
+        const rateLimit = this.options.rateLimit;
+        if (!rateLimit) {
+            return undefined;
+        }
+        if (typeof rateLimit === 'function') {
+            return rateLimit(queueName);
+        }
+        return rateLimit;
     }
 
     private readonly subscribeToCancellationEvents = (channel: string, jobId: string) => {

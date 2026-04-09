@@ -1,4 +1,4 @@
-import { Job } from '@vendure/core';
+import { Job, RateLimit } from '@vendure/core';
 import { ConnectionOptions, Queue, QueueOptions, WorkerOptions } from 'bullmq';
 
 /**
@@ -144,6 +144,39 @@ export interface BullMQPluginOptions {
      * @since 3.2.0
      */
     setJobOptions?: (queueName: string, job: Job) => BullJobsOptions;
+    /**
+     * @description
+     * Configures a rate limit for one or more job queues. When set, at most
+     * `max` jobs will be started per sliding window of length `duration` for
+     * each matching queue. This is useful when a job handler interacts with an
+     * external system which imposes its own rate limit.
+     *
+     * A value of `undefined` (or a function which returns `undefined`) disables
+     * rate limiting for that queue, which is the default.
+     *
+     * **Implementation note:** For rate-limited queues, a dedicated BullMQ
+     * `Worker` is created with BullMQ's native [`limiter`](https://docs.bullmq.io/guide/rate-limiting)
+     * option forwarded, so the rate limit coordinates across multiple Vendure
+     * worker processes via Redis. Because all Vendure queues share a single
+     * BullMQ queue, the dedicated worker will defer any job whose name does
+     * not match the rate-limited queue (via `moveToDelayed`) so the shared
+     * worker can pick it up.
+     *
+     * @example
+     * ```ts
+     * BullMQJobQueuePlugin.init({
+     *   rateLimit: (queueName) => {
+     *     if (queueName === 'send-marketing-email') {
+     *       return { max: 60, duration: '1h' };
+     *     }
+     *     return undefined;
+     *   },
+     * })
+     * ```
+     *
+     * @since 3.7.0
+     */
+    rateLimit?: RateLimit | ((queueName: string) => RateLimit | undefined);
 }
 
 /**
