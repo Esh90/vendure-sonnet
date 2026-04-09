@@ -1,0 +1,44 @@
+---
+title: "LocalRateLimiter"
+generated: true
+---
+<GenerationInfo sourceFile="packages/core/src/job-queue/rate-limiter.ts" sourceLine="46" packageName="@vendure/core" />
+
+A simple sliding-window rate limiter used by the polling job queue strategies
+to enforce a per-queue rate limit within a single Vendure worker process.
+
+This limiter is intentionally local (in-memory) — the SQL strategy layers an
+additional cross-worker check on top to coordinate between horizontally-scaled
+workers.
+
+```ts title="Signature"
+class LocalRateLimiter {
+    constructor(max: number, durationMs: number)
+    check(now: number = Date.now()) => number;
+    record(now: number = Date.now()) => void;
+}
+```
+
+<div className="members-wrapper">
+
+### constructor
+
+<MemberInfo kind="method" type={`(max: number, durationMs: number) => LocalRateLimiter`}   />
+
+
+### check
+
+<MemberInfo kind="method" type={`(now: number = Date.now()) => number`}   />
+
+Returns `0` if a new job can be started immediately, otherwise returns the
+number of milliseconds the caller should wait before the next slot becomes
+available.
+### record
+
+<MemberInfo kind="method" type={`(now: number = Date.now()) => void`}   />
+
+Records that a job has been dispatched at the given timestamp. Callers
+should invoke this immediately after a successful `check()`.
+
+
+</div>

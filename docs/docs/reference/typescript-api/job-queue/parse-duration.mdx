@@ -1,0 +1,22 @@
+---
+title: "ParseDuration"
+generated: true
+---
+<GenerationInfo sourceFile="packages/core/src/job-queue/rate-limiter.ts" sourceLine="12" packageName="@vendure/core" />
+
+Parses a duration that is either a number (ms) or a shorthand string like
+`'500ms'`, `'30s'`, `'5m'`, `'1h'`, `'2d'`, and returns the equivalent in
+milliseconds.
+
+Throws an Error if the input is a string that does not match the expected
+format.
+
+```ts title="Signature"
+function parseDuration(d: number | string): number
+```
+Parameters
+
+### d
+
+<MemberInfo kind="parameter" type={`number | string`} />
+

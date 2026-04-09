@@ -2,7 +2,7 @@
 title: "PollingJobQueueStrategy"
 generated: true
 ---
-<GenerationInfo sourceFile="packages/core/src/job-queue/polling-job-queue-strategy.ts" sourceLine="263" packageName="@vendure/core" />
+<GenerationInfo sourceFile="packages/core/src/job-queue/polling-job-queue-strategy.ts" sourceLine="335" packageName="@vendure/core" />
 
 This class allows easier implementation of [JobQueueStrategy](/reference/typescript-api/job-queue/job-queue-strategy#jobqueuestrategy) in a polling style.
 Instead of providing [JobQueueStrategy](/reference/typescript-api/job-queue/job-queue-strategy#jobqueuestrategy) `start()` you should provide a `next` method.
@@ -17,6 +17,7 @@ class PollingJobQueueStrategy extends InjectableJobQueueStrategy {
     public setRetries: (queueName: string, job: Job) => number;
     public backOffStrategy?: BackoffStrategy;
     public gracefulShutdownTimeout: number;
+    public rateLimit?: RateLimit | ((queueName: string) => RateLimit | undefined);
     protected activeQueues = new QueueNameProcessStorage<ActiveQueue<any>>();
     constructor(config?: PollingJobQueueStrategyConfig)
     constructor(concurrency?: number, pollInterval?: number)
@@ -58,6 +59,11 @@ class PollingJobQueueStrategy extends InjectableJobQueueStrategy {
 ### gracefulShutdownTimeout
 
 <MemberInfo kind="property" type={`number`}   />
+
+
+### rateLimit
+
+<MemberInfo kind="property" type={`<a href='/reference/typescript-api/job-queue/types#ratelimit'>RateLimit</a> | ((queueName: string) => <a href='/reference/typescript-api/job-queue/types#ratelimit'>RateLimit</a> | undefined)`}   />
 
 
 ### activeQueues
