@@ -310,11 +310,10 @@ describe('Product resolver', () => {
             // A single quote in the languageCode breaks the SQL when interpolated
             // directly via a template literal. With parameterized queries, it is
             // safely bound as a value and the query executes normally.
-            const { product } = await shopClient.query(
-                getProductSimpleDocument,
-                { slug: 'laptop' },
-                { languageCode: "en' OR 1=1 --" },
-            );
+            const { product } = await shopClient.query<
+                Codegen.GetProductSimpleQuery,
+                Codegen.GetProductSimpleQueryVariables
+            >(GET_PRODUCT_SIMPLE, { slug: 'laptop' }, { languageCode: "en' OR 1=1 --" });
             expect(product).not.toBeNull();
         });
 
