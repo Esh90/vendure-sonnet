@@ -247,6 +247,11 @@ const manifestInput: DocsPackageManifestInput = {
                     file: file('docs/guides/developer-guide/security/index.mdx'),
                 },
                 {
+                    title: 'API Keys',
+                    slug: 'api-keys',
+                    file: file('docs/guides/developer-guide/api-keys/index.mdx'),
+                },
+                {
                     title: 'Strategies & Configurable Operations',
                     slug: 'strategies-configurable-operations',
                     file: file('docs/guides/developer-guide/strategies-configurable-operations/index.mdx'),
@@ -363,6 +368,11 @@ const manifestInput: DocsPackageManifestInput = {
                     slug: 'nest-devtools',
                     file: file('docs/guides/developer-guide/nest-devtools/index.mdx'),
                 },
+                {
+                    title: 'Telemetry',
+                    slug: 'telemetry',
+                    file: file('docs/guides/developer-guide/telemetry/index.mdx'),
+                },
             ],
         },
         {
@@ -439,6 +449,11 @@ const manifestInput: DocsPackageManifestInput = {
                     title: 'Extending Overview',
                     slug: 'extending-overview',
                     file: file('docs/guides/extending-the-dashboard/extending-overview/index.mdx'),
+                },
+                {
+                    title: 'Public API & Imports',
+                    slug: 'public-api',
+                    file: file('docs/guides/extending-the-dashboard/public-api/index.mdx'),
                 },
                 {
                     title: 'Creating Pages',
@@ -867,17 +882,6 @@ const manifestInput: DocsPackageManifestInput = {
                             ),
                         },
                         {
-                            title: 'ElasticsearchPlugin',
-                            slug: 'elasticsearch-plugin',
-                            file: file('docs/reference/core-plugins/elasticsearch-plugin/index.mdx'),
-                            children: createNestedNavigationFromFolder(
-                                folder('docs/reference/core-plugins/elasticsearch-plugin'),
-                                {
-                                    filter: (info: FileInfo) => info.filename !== 'index.mdx',
-                                },
-                            ),
-                        },
-                        {
                             title: 'EmailPlugin',
                             slug: 'email-plugin',
                             file: file('docs/reference/core-plugins/email-plugin/index.mdx'),
@@ -916,39 +920,6 @@ const manifestInput: DocsPackageManifestInput = {
                             file: file('docs/reference/core-plugins/job-queue-plugin/index.mdx'),
                             children: createNestedNavigationFromFolder(
                                 folder('docs/reference/core-plugins/job-queue-plugin'),
-                                {
-                                    filter: (info: FileInfo) => info.filename !== 'index.mdx',
-                                },
-                            ),
-                        },
-                        {
-                            title: 'PaymentsPlugin',
-                            slug: 'payments-plugin',
-                            file: file('docs/reference/core-plugins/payments-plugin/index.mdx'),
-                            children: createNestedNavigationFromFolder(
-                                folder('docs/reference/core-plugins/payments-plugin'),
-                                {
-                                    filter: (info: FileInfo) => info.filename !== 'index.mdx',
-                                },
-                            ),
-                        },
-                        {
-                            title: 'SentryPlugin',
-                            slug: 'sentry-plugin',
-                            file: file('docs/reference/core-plugins/sentry-plugin/index.mdx'),
-                            children: createNestedNavigationFromFolder(
-                                folder('docs/reference/core-plugins/sentry-plugin'),
-                                {
-                                    filter: (info: FileInfo) => info.filename !== 'index.mdx',
-                                },
-                            ),
-                        },
-                        {
-                            title: 'StellatePlugin',
-                            slug: 'stellate-plugin',
-                            file: file('docs/reference/core-plugins/stellate-plugin/index.mdx'),
-                            children: createNestedNavigationFromFolder(
-                                folder('docs/reference/core-plugins/stellate-plugin'),
                                 {
                                     filter: (info: FileInfo) => info.filename !== 'index.mdx',
                                 },
