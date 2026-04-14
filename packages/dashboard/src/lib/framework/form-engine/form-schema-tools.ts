@@ -12,7 +12,7 @@ import {
     StructCustomFieldConfig,
     StructField,
 } from '@/vdb/framework/form-engine/form-engine-types.js';
-import { z, ZodRawShape, ZodType, ZodTypeAny } from 'zod';
+import { z, ZodRawShape, ZodType, ZodTypeAny } from '@/vdb/lib/zod.js';
 
 function mapGraphQLCustomFieldToConfig(field: StructField) {
     const { __typename, ...rest } = field;
@@ -71,7 +71,7 @@ function mapGraphQLCustomFieldToConfig(field: StructField) {
 function parseDate(dateStr: string | undefined | null): Date | undefined {
     if (!dateStr) return undefined;
     const date = new Date(dateStr);
-    return isNaN(date.getTime()) ? undefined : date;
+    return Number.isNaN(date.getTime()) ? undefined : date;
 }
 
 /**

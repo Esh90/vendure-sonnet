@@ -7,7 +7,7 @@ import { useDebounce } from '@uidotdev/usehooks';
 
 import { addCustomFields } from '@/vdb/framework/document-introspection/add-custom-fields.js';
 import { includeOnlySelectedListFields } from '@/vdb/framework/document-introspection/include-only-selected-list-fields.js';
-import { BulkAction } from '@/vdb/framework/extension-api/types/index.js';
+import { BulkActionsInput } from '@/vdb/framework/extension-api/types/index.js';
 import { ResultOf } from '@/vdb/graphql/graphql.js';
 import { useExtendedListQuery } from '@/vdb/hooks/use-extended-list-query.js';
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
@@ -198,7 +198,7 @@ export interface PaginatedListDataTableProps<
     onColumnVisibilityChange?: (table: Table<any>, columnVisibility: VisibilityState) => void;
     facetedFilters?: FacetedFilterConfig<T>;
     rowActions?: RowAction<PaginatedListItemFields<T>>[];
-    bulkActions?: BulkAction[];
+    bulkActions?: BulkActionsInput;
     disableViewOptions?: boolean;
     transformData?: (data: PaginatedListItemFields<T>[]) => PaginatedListItemFields<T>[];
     setTableOptions?: (table: TableOptions<any>) => TableOptions<any>;
@@ -223,6 +223,13 @@ export interface PaginatedListDataTableProps<
      * When true, drag and drop will be disabled. This will only have an effect if the onReorder prop is also set
      */
     disableDragAndDrop?: boolean;
+    /**
+     * @description
+     * When false, the row selection checkbox column will not be included.
+     *
+     * @default true
+     */
+    includeSelectionColumn?: boolean;
 }
 
 export const PaginatedListDataTableKey = 'PaginatedListDataTable';
@@ -306,8 +313,8 @@ export const PaginatedListDataTableKey = 'PaginatedListDataTable';
  *                         const value = cell.getValue() as string;
  *                         const id = row.original.id;
  *                         return (
- *                             <Button asChild variant="ghost">
- *                                 <Link to={`/orders/${id}`}>{value}</Link>
+ *                             <Button variant="ghost" render={<Link to={`/orders/${id}`} />}>
+ *                                 {value}
  *                             </Button>
  *                         );
  *                     },
@@ -369,6 +376,7 @@ export function PaginatedListDataTable<
     registerRefresher,
     onReorder,
     disableDragAndDrop = false,
+    includeSelectionColumn,
 }: Readonly<PaginatedListDataTableProps<T, U, V, AC>>) {
     const [searchTerm, setSearchTerm] = React.useState<string>('');
     const debouncedSearchTerm = useDebounce(searchTerm, 500);
@@ -404,6 +412,7 @@ export function PaginatedListDataTable<
         deleteMutation,
         additionalColumns,
         defaultColumnOrder: getStandardizedDefaultColumnOrder(defaultColumnOrder),
+        includeSelectionColumn,
     });
     const columnVisibility = getColumnVisibility(columns, defaultVisibility, customFieldColumnNames);
     // Get the actual visible columns and only fetch those

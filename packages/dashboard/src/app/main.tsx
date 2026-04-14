@@ -9,12 +9,13 @@ import { useServerConfig } from '@/vdb/hooks/use-server-config.js';
 import { defaultLocale, dynamicActivate } from '@/vdb/providers/i18n-provider.js';
 import { AnyRoute, createRouter, RouterOptions, RouterProvider } from '@tanstack/react-router';
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import ReactDOM from 'react-dom/client';
 
 import { useDisplayLocale } from '@/vdb/hooks/use-display-locale.js';
 import { useUiLanguageLoader } from '@/vdb/hooks/use-ui-language-loader.js';
 import { useUserSettings } from '@/vdb/hooks/use-user-settings.js';
-import { DirectionProvider } from '@radix-ui/react-direction';
+import { DirectionProvider } from '@/vdb/components/ui/direction.js';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { AppProviders, queryClient } from './app-providers.js';
 import { setDocumentDirection } from './common/set-document-direction.js';
@@ -84,7 +85,7 @@ function InnerApp() {
 
     return (
         <>
-            <DirectionProvider dir={isRTL ? 'rtl' : 'ltr'}>
+            <DirectionProvider direction={isRTL ? 'rtl' : 'ltr'}>
                 {(hasSetCustomFieldsMap || auth.status === 'unauthenticated') && (
                     <RouterProvider router={router} context={{ auth, queryClient }} />
                 )}
@@ -116,7 +117,7 @@ function App() {
         extensionsLoaded && (
             <AppProviders>
                 <InnerApp />
-                <Toaster />
+                {createPortal(<Toaster />, document.body)}
             </AppProviders>
         )
     );

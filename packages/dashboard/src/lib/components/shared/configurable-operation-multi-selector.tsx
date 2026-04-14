@@ -184,11 +184,8 @@ export function ConfigurableOperationMultiSelector({
         ]);
     };
 
-    const onOperationValueChange = (
-        operation: ConfigurableOperationInputType,
-        newVal: ConfigurableOperationInputType,
-    ) => {
-        onChange(value.map(op => (op.code === operation.code ? newVal : op)));
+    const onOperationValueChange = (index: number, newVal: ConfigurableOperationInputType) => {
+        onChange(value.map((op, i) => (i === index ? newVal : op)));
     };
 
     const onOperationRemove = (index: number) => {
@@ -250,7 +247,7 @@ export function ConfigurableOperationMultiSelector({
                                 <ConfigurableOperationInput
                                     operationDefinition={operationDef}
                                     value={operation}
-                                    onChange={value => onOperationValueChange(operation, value)}
+                                    onChange={value => onOperationValueChange(index, value)}
                                     onRemove={() => onOperationRemove(index)}
                                     onValidityChange={isValid => updateOperationValidity(index, isValid)}
                                 />
@@ -262,13 +259,11 @@ export function ConfigurableOperationMultiSelector({
 
             <div className={hasOperations ? 'pt-2' : ''}>
                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="w-full sm:w-auto">
+                    <DropdownMenuTrigger render={<Button variant="outline" className="w-full sm:w-auto" />}>
                             <Plus className="h-4 w-4" />
                             <Trans>{buttonText}</Trans>
-                        </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className={showEnhancedDropdown ? 'w-80' : 'w-96'} align="start">
+                    <DropdownMenuContent className={showEnhancedDropdown ? 'w-80 max-h-[min(600px,50vh)] overflow-y-auto' : 'w-96 max-h-[min(600px,50vh)] overflow-y-auto'} align="start">
                         {showEnhancedDropdown && dropdownTitle && (
                             <div className="px-2 py-1.5 text-sm font-medium text-muted-foreground">
                                 {dropdownTitle}

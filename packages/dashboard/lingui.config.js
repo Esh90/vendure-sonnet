@@ -16,6 +16,7 @@ export default defineConfig({
         'cs',
         'fr',
         'ru',
+        'hu',
         'uk',
         'it',
         'fa',
@@ -25,8 +26,10 @@ export default defineConfig({
         'sv',
         'tr',
         'ja',
-        'bg'
+        'bg',
+        'nl'
     ],
+    orderBy: 'messageId',
     catalogs: [
         {
             path: '<rootDir>/src/i18n/locales/{locale}',
