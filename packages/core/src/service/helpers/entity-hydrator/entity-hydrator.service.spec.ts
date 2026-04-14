@@ -69,6 +69,36 @@ describe('EntityHydrator', () => {
         ]);
     });
 
+    it('stops traversing sibling array elements after finding a missing relation', () => {
+        let secondLineChecked = false;
+        const secondLine = new OrderLine();
+        Object.defineProperty(secondLine, 'productVariant', {
+            configurable: true,
+            get: () => {
+                secondLineChecked = true;
+                return new ProductVariant({
+                    translations: [
+                        new ProductVariantTranslation({
+                            languageCode: LanguageCode.en,
+                            name: 'Loaded variant',
+                        }),
+                    ],
+                });
+            },
+        });
+
+        const order = new Order({
+            lines: [new OrderLine(), secondLine],
+        });
+
+        expect(getMissingRelations(order, ['lines.productVariant.translations'])).toEqual([
+            'lines',
+            'lines.productVariant',
+            'lines.productVariant.translations',
+        ]);
+        expect(secondLineChecked).toBe(false);
+    });
+
     it('does not mark nested relations on empty loaded arrays as missing', () => {
         const order = new Order({
             lines: [],

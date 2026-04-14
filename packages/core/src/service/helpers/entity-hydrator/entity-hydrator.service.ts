@@ -228,7 +228,11 @@ export class EntityHydrator {
                 return;
             }
             for (const item of entity) {
+                const sizeBefore = missingRelations.size;
                 this.collectMissingRelationsForPath(item, parts, partIndex, traversedPath, missingRelations);
+                if (missingRelations.size > sizeBefore) {
+                    return;
+                }
             }
             return;
         }
