@@ -2374,59 +2374,49 @@ describe('Shop orders', () => {
 
         // https://github.com/vendurehq/vendure/issues/4566
         it('hydrates missing line variant translations when adding to an existing order', async () => {
-            await adminClient.query(CreateShippingMethodDocument, {
-                input: {
-                    code: 'hydrating-line-variant-translations-checker',
-                    translations: [
-                        {
-                            languageCode: LanguageCode.en,
-                            name: 'hydrating line variant translations checker',
-                            description: '',
-                        },
-                    ],
-                    fulfillmentHandler: manualFulfillmentHandler.code,
-                    checker: {
-                        code: hydratingLineVariantTranslationsShippingEligibilityChecker.code,
-                        arguments: [],
+            const input: CreateShippingMethodInput = {
+                code: 'hydrating-line-variant-translations-checker',
+                translations: [
+                    {
+                        languageCode: LanguageCode.en,
+                        name: 'hydrating line variant translations checker',
+                        description: '',
                     },
-                    calculator: {
-                        code: defaultShippingCalculator.code,
-                        arguments: [
-                            { name: 'rate', value: '1000' },
-                            { name: 'taxRate', value: '0' },
-                            { name: 'includesTax', value: 'auto' },
-                        ],
-                    },
+                ],
+                fulfillmentHandler: manualFulfillmentHandler.code,
+                checker: {
+                    code: hydratingLineVariantTranslationsShippingEligibilityChecker.code,
+                    arguments: [],
                 },
+                calculator: {
+                    code: defaultShippingCalculator.code,
+                    arguments: [
+                        { name: 'rate', value: '1000' },
+                        { name: 'taxRate', value: '0' },
+                        { name: 'includesTax', value: 'auto' },
+                    ],
+                },
+            };
+            await adminClient.query(createShippingMethodDocument, {
+                input,
             });
 
             await shopClient.asAnonymousUser();
-            const { addItemToOrder: firstAddItemToOrder } = await shopClient.query<
-                CodegenShop.AddItemToOrderMutation,
-                CodegenShop.AddItemToOrderMutationVariables
-            >(ADD_ITEM_TO_ORDER, {
+            const { addItemToOrder: firstAddItemToOrder } = await shopClient.query(addItemToOrderDocument, {
                 productVariantId: 'T_1',
                 quantity: 1,
             });
             orderResultGuard.assertSuccess(firstAddItemToOrder);
 
-            const { eligibleShippingMethods } = await shopClient.query<CodegenShop.GetShippingMethodsQuery>(
-                GET_ELIGIBLE_SHIPPING_METHODS,
-            );
-            const { setOrderShippingMethod } = await shopClient.query<
-                CodegenShop.SetShippingMethodMutation,
-                CodegenShop.SetShippingMethodMutationVariables
-            >(SET_SHIPPING_METHOD, {
+            const { eligibleShippingMethods } = await shopClient.query(getEligibleShippingMethodsDocument);
+            const { setOrderShippingMethod } = await shopClient.query(setShippingMethodDocument, {
                 id: eligibleShippingMethods.find(
                     method => method.code === 'hydrating-line-variant-translations-checker',
                 )!.id,
             });
             orderResultGuard.assertSuccess(setOrderShippingMethod);
 
-            const { addItemToOrder } = await shopClient.query<
-                CodegenShop.AddItemToOrderMutation,
-                CodegenShop.AddItemToOrderMutationVariables
-            >(ADD_ITEM_TO_ORDER, {
+            const { addItemToOrder } = await shopClient.query(addItemToOrderDocument, {
                 productVariantId: 'T_2',
                 quantity: 1,
             });
