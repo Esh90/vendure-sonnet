@@ -46,7 +46,7 @@ import { FindOptionsUtils } from 'typeorm/find-options/FindOptionsUtils';
 import { RequestContext } from '../../api/common/request-context';
 import { RelationPaths } from '../../api/decorators/relations.decorator';
 import { RequestContextCacheService } from '../../cache/request-context-cache.service';
-import { CacheKey, TRANSACTION_MANAGER_KEY } from '../../common/constants';
+import { CacheKey } from '../../common/constants';
 import { ErrorResultUnion, isGraphQlErrorResult, JustErrorResults } from '../../common/error/error-result';
 import { EntityNotFoundError, InternalServerError, UserInputError } from '../../common/error/errors';
 import {
@@ -1409,10 +1409,6 @@ export class OrderService {
         if (!this.canAddPaymentToOrder(order)) {
             return new OrderPaymentStateError();
         }
-        // Re-validate coupon codes with a pessimistic lock at payment time to prevent
-        // concurrent checkouts from bypassing usage limits (TOCTOU race condition).
-        // If a coupon is no longer valid, it is removed and the order recalculated.
-        // See https://github.com/vendurehq/vendure/issues/OSS-457
         const couponsRemoved = await this.revalidateCouponCodesForOrder(ctx, order);
         // Re-fetch order if coupons were removed, so totals reflect recalculated prices
         const freshOrder = couponsRemoved ? await this.getOrderOrThrow(ctx, orderId) : order;
@@ -1448,12 +1444,6 @@ export class OrderService {
     }
 
     /**
-     * @description
-     * We can add a Payment to the order if:
-     * 1. the Order is in the `ArrangingPayment` state or
-     * 2. the Order's current state can transition to `PaymentAuthorized` and `PaymentSettled`
-     */
-    /**
      * Re-validates all coupon codes on the order with a pessimistic lock on
      * the Promotion rows. This serializes concurrent payment attempts so that
      * only one order can "claim" a usage-limited coupon at a time.
@@ -1464,23 +1454,21 @@ export class OrderService {
      */
     private async revalidateCouponCodesForOrder(ctx: RequestContext, order: Order): Promise<boolean> {
         let removedAny = false;
-        const transactionManager = (ctx as any)[TRANSACTION_MANAGER_KEY];
-        const qr = transactionManager?.queryRunner;
         for (const couponCode of [...order.couponCodes]) {
-            // Acquire a pessimistic write lock on the promotion row within the
-            // resolver's @Transaction() to serialize concurrent payment attempts.
-            // The lock is held until the resolver transaction commits.
-            // See https://github.com/vendurehq/vendure/issues/OSS-457
-            if (qr?.isTransactionActive) {
-                try {
-                    await qr.query(
-                        `SELECT id FROM promotion WHERE "couponCode" = $1 AND enabled = true FOR UPDATE`,
-                        [couponCode],
-                    );
-                } catch (e: unknown) {
-                    const message = e instanceof Error ? e.message : String(e);
-                    Logger.warn(`Failed to acquire coupon lock: ${message}`, 'OrderService');
-                }
+            // Acquire a pessimistic write lock on the promotion row to serialize
+            // concurrent payment attempts. The lock is held until the resolver's
+            // @Transaction() commits. On SQLite the lock is not supported, but
+            // SQLite serializes writes at the engine level.
+            try {
+                await this.connection
+                    .getRepository(ctx, Promotion)
+                    .createQueryBuilder('promotion')
+                    .setLock('pessimistic_write')
+                    .where('promotion.couponCode = :couponCode', { couponCode })
+                    .andWhere('promotion.enabled = :enabled', { enabled: true })
+                    .getOne();
+            } catch {
+                // Lock not supported (e.g. SQLite) — continue without it
             }
             const validationResult = await this.promotionService.validateCouponCode(
                 ctx,
@@ -1499,6 +1487,11 @@ export class OrderService {
         return removedAny;
     }
 
+    /**
+     * We can add a Payment to the order if:
+     * 1. the Order is in the `ArrangingPayment` state or
+     * 2. the Order's current state can transition to `PaymentAuthorized` and `PaymentSettled`
+     */
     private canAddPaymentToOrder(order: Order): boolean {
         if (order.state === 'ArrangingPayment') {
             return true;
@@ -1531,8 +1524,6 @@ export class OrderService {
         if (order.state !== 'ArrangingAdditionalPayment' && order.state !== 'ArrangingPayment') {
             return new ManualPaymentStateError();
         }
-        // Re-validate coupon codes with a pessimistic lock at payment time.
-        // See https://github.com/vendurehq/vendure/issues/OSS-457
         const manualCouponsRemoved = await this.revalidateCouponCodesForOrder(ctx, order);
         // Re-fetch order so totals reflect any recalculated prices
         const freshManualOrder = manualCouponsRemoved

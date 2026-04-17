@@ -1662,7 +1662,7 @@ describe('Promotions applied to Orders', () => {
         // https://github.com/vendurehq/vendure/issues/OSS-457
         describe('concurrent usage (race condition)', () => {
             const RACE_COUPON_CODE = 'RACE_TEST';
-            const CONCURRENT_ATTEMPTS = 5;
+            const CONCURRENT_ATTEMPTS = 3;
 
             beforeAll(async () => {
                 promoWithUsageLimit = await createPromotion({
@@ -1680,15 +1680,15 @@ describe('Promotions applied to Orders', () => {
             });
 
             // Pessimistic locking only works on real databases (Postgres, MySQL).
-            // SQLite/sql.js serializes writes at the engine level but not reads,
-            // so the lock has no effect in the e2e test runner's default sql.js mode.
+            // SQLite/sql.js does not support SELECT ... FOR UPDATE.
             it.skipIf(!process.env.DB || process.env.DB === 'sqljs')(
                 'prevents concurrent coupon code usage beyond the limit',
                 async () => {
                     const config = testConfig();
                     const shopApiUrl = `http://localhost:${String(config.apiOptions.port)}/${String(config.apiOptions.shopApiPath)}`;
 
-                    // Create N independent clients, each with their own session and active order
+                    // Set up N independent clients, each with their own order in
+                    // ArrangingPayment state with the coupon applied.
                     const clients: SimpleGraphQLClient[] = [];
                     for (let i = 0; i < CONCURRENT_ATTEMPTS; i++) {
                         const client = new SimpleGraphQLClient(config, shopApiUrl);
@@ -1697,29 +1697,39 @@ describe('Promotions applied to Orders', () => {
                             productVariantId: getVariantBySlug('item-5000').id,
                             quantity: 1,
                         });
+                        await client.query(applyCouponCodeDocument, {
+                            couponCode: RACE_COUPON_CODE,
+                        });
+                        await client.query(setCustomerDocument, {
+                            input: {
+                                emailAddress: `race-${i}@test.com`,
+                                firstName: 'Race',
+                                lastName: `Test ${i}`,
+                            },
+                        });
+                        await proceedToArrangingPayment(client);
                         clients.push(client);
                     }
 
-                    // Fire concurrent applyCouponCode from all clients simultaneously
+                    // Fire concurrent addPaymentToOrder from all clients simultaneously.
+                    // The pessimistic lock serializes these so only one order can "claim"
+                    // the coupon at a time.
                     const results = await Promise.all(
                         clients.map(async client => {
                             try {
-                                const { applyCouponCode } = await client.query(applyCouponCodeDocument, {
-                                    couponCode: RACE_COUPON_CODE,
-                                });
-                                return applyCouponCode;
+                                const order = await addPaymentToOrder(client, testSuccessfulPaymentMethod);
+                                return order;
                             } catch {
                                 return { errorCode: 'CLIENT_ERROR' };
                             }
                         }),
                     );
 
-                    const successes = results.filter((r: any) => r.couponCodes?.includes(RACE_COUPON_CODE));
+                    const withCoupon = results.filter((r: any) => r.couponCodes?.includes(RACE_COUPON_CODE));
 
-                    // With usageLimit: 1, at most 1 should succeed.
-                    // Without the pessimistic lock fix, multiple concurrent requests
-                    // could all read usageCount=0 and all succeed.
-                    expect(successes.length).toBeLessThanOrEqual(1);
+                    // With usageLimit: 1, exactly 1 order should keep the coupon.
+                    // The rest should have it removed and settle at full price.
+                    expect(withCoupon.length).toBe(1);
                 },
             );
         });

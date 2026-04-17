@@ -364,7 +364,11 @@ export class PromotionService {
      * the usage limit via a TOCTOU race condition.
      * See https://github.com/vendurehq/vendure/issues/OSS-457
      */
-    async countPromotionUsages(ctx: RequestContext, promotionId: ID, excludeOrderId?: ID): Promise<number> {
+    private async countPromotionUsages(
+        ctx: RequestContext,
+        promotionId: ID,
+        excludeOrderId?: ID,
+    ): Promise<number> {
         const completedQb = this.connection
             .getRepository(ctx, Order)
             .createQueryBuilder('order')
