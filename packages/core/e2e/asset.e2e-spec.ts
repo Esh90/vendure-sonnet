@@ -26,7 +26,7 @@ describe('Asset resolver', () => {
     const { server, adminClient } = createTestEnvironment(
         mergeConfig(testConfig(), {
             assetOptions: {
-                permittedFileTypes: ['image/*', '.pdf', '.zip'],
+                permittedFileTypes: ['image/*', '.pdf', '.zip', '.md'],
             },
         }),
     );
@@ -368,12 +368,12 @@ describe('Asset resolver', () => {
             stream.push('test file content');
             stream.push(null);
 
-            const result = await assetService.createFromFileStream(stream, 'test-file.txt');
+            const result = await assetService.createFromFileStream(stream, 'test-file.md');
 
             expect(result).toBeDefined();
             expect('id' in result).toBe(true);
             if ('id' in result) {
-                expect(result.name).toBe('test-file.txt');
+                expect(result.name).toBe('test-file.md');
             }
         });
     });
