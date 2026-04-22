@@ -126,6 +126,7 @@ msgstr "{0} {entityName} silmek istediğinizden emin misiniz?"
 msgid "Global out of stock threshold"
 msgstr "Genel stok tükenmesi eşiği"
 
+#: src/lib/components/layout/app-topbar.tsx:210
 #: src/lib/components/layout/channel-switcher.tsx:194
 #: src/lib/components/layout/manage-languages-dialog.tsx:241
 msgid "Manage Languages"
@@ -181,6 +182,7 @@ msgstr "Satırı sil"
 msgid "Conditions"
 msgstr "Koşullar"
 
+#: src/lib/components/layout/app-topbar.tsx:131
 #: src/lib/components/layout/channel-switcher.tsx:99
 msgctxt "current channel"
 msgid "Current"
@@ -378,6 +380,7 @@ msgstr "Son 7 gün"
 msgid "Failed to create channel"
 msgstr "Kanal oluşturulamadı"
 
+#: src/lib/components/layout/app-topbar.tsx:367
 #: src/lib/components/layout/dev-mode-indicator.tsx:14
 #: src/lib/components/layout/nav-user.tsx:144
 msgid "Dev Mode"
@@ -841,6 +844,7 @@ msgstr "İade notu girin"
 msgid "Order line removed"
 msgstr "Sipariş satırı kaldırıldı"
 
+#: src/lib/components/layout/app-topbar.tsx:176
 #: src/lib/components/layout/channel-switcher.tsx:158
 msgid "Content:"
 msgstr "İçerik:"
@@ -865,6 +869,10 @@ msgstr "İlk sayfaya git"
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:168
 msgid "Failed to create product"
 msgstr "Ürün oluşturulamadı"
+
+#: src/lib/components/layout/app-topbar.tsx:552
+msgid "Administration"
+msgstr "Yönetim"
 
 #: src/app/routes/_authenticated/_orders/components/order-detail-shared.tsx:276
 #: src/app/routes/_authenticated/_orders/orders_.$id_.modify.tsx:233
@@ -1001,6 +1009,7 @@ msgstr "Tahsis edildi"
 #~ msgid "Add another option group"
 #~ msgstr "Başka bir seçenek grubu ekle"
 
+#: src/lib/components/layout/app-topbar.tsx:322
 #: src/lib/components/layout/nav-user.tsx:102
 msgid "Explore Platform & Cloud"
 msgstr "Обзор Platform & Cloud"
@@ -1658,6 +1667,7 @@ msgstr "Müşteri Grupları"
 
 #: src/app/routes/_authenticated/_system/scheduled-tasks.tsx:123
 #: src/app/routes/_authenticated/_tax-rates/tax-rates.tsx:58
+#: src/lib/components/layout/app-topbar.tsx:378
 #: src/lib/components/layout/nav-user.tsx:155
 msgid "Disabled"
 msgstr "Devre dışı"
@@ -1923,6 +1933,7 @@ msgstr "Özellik Değerleri"
 msgid "Successfully updated asset"
 msgstr "Varlık başarıyla güncellendi"
 
+#: src/lib/components/layout/app-topbar.tsx:341
 #: src/lib/components/layout/nav-user.tsx:118
 msgid "Theme"
 msgstr "Tema"
@@ -1942,6 +1953,7 @@ msgstr "API Keys"
 msgid "Select a language"
 msgstr "Bir dil seçin"
 
+#: src/lib/components/layout/app-topbar.tsx:387
 #: src/lib/components/layout/nav-user.tsx:164
 msgid "Log out"
 msgstr "Çıkış yap"
@@ -2689,6 +2701,7 @@ msgstr "{entityIdsLength} {entityType} için özellik değerleri başarıyla gü
 msgid "Failed to remove customer from group"
 msgstr "Müşteri gruptan kaldırılamadı"
 
+#: src/lib/components/layout/app-topbar.tsx:358
 #: src/lib/components/layout/nav-user.tsx:135
 msgctxt "theme"
 msgid "System"
@@ -2881,6 +2894,7 @@ msgstr "İçgörüler"
 msgid "Testing shipping method..."
 msgstr "Kargo yöntemi test ediliyor..."
 
+#: src/lib/components/layout/app-topbar.tsx:354
 #: src/lib/components/layout/nav-user.tsx:131
 msgctxt "theme"
 msgid "Dark"
@@ -3327,6 +3341,7 @@ msgstr "Ödemeyi tamamla"
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$id.tsx:216
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:343
 #: src/app/routes/_authenticated/_roles/roles_.$id.tsx:111
+#: src/lib/components/layout/app-topbar.tsx:165
 #: src/lib/components/layout/channel-switcher.tsx:146
 msgid "Channels"
 msgstr "Kanallar"
@@ -3820,6 +3835,7 @@ msgstr "Yönetici panosuna erişmek için oturum açın"
 msgid "False"
 msgstr "Yanlış"
 
+#: src/lib/components/layout/app-topbar.tsx:350
 #: src/lib/components/layout/nav-user.tsx:127
 msgctxt "theme"
 msgid "Light"
@@ -4150,6 +4166,7 @@ msgstr "Zamanlama Deseni"
 msgid "Payment failed"
 msgstr "Ödeme başarısız oldu"
 
+#: src/lib/components/layout/app-topbar.tsx:230
 #: src/lib/components/layout/channel-switcher.tsx:212
 msgid "Add channel"
 msgstr "Kanal ekle"
@@ -4577,6 +4594,7 @@ msgstr "İl / Bölge"
 #: src/app/routes/_authenticated/_tax-rates/tax-rates.tsx:55
 #: src/app/routes/_authenticated/_tax-rates/tax-rates.tsx:57
 #: src/app/routes/_authenticated/_zones/components/zone-countries-table.tsx:57
+#: src/lib/components/layout/app-topbar.tsx:375
 #: src/lib/components/layout/nav-user.tsx:152
 msgid "Enabled"
 msgstr "Etkin"
@@ -5148,6 +5166,7 @@ msgstr "Vergi kategorisi"
 
 #: src/app/routes/_authenticated/_profile/profile.tsx:31
 #: src/app/routes/_authenticated/_profile/profile.tsx:76
+#: src/lib/components/layout/app-topbar.tsx:328
 #: src/lib/components/layout/nav-user.tsx:108
 msgid "Profile"
 msgstr "Profil"
@@ -5246,6 +5265,7 @@ msgstr "Varyant eklenemedi. Ana ürünün etkin olduğundan emin olun."
 msgid "Metrics"
 msgstr "Metrikler"
 
+#: src/lib/components/layout/app-topbar.tsx:335
 #: src/lib/components/layout/nav-user.tsx:112
 msgid "Language"
 msgstr "Dil"
@@ -5314,7 +5334,7 @@ msgstr "Kullanılabilir işlem yok"
 msgid "Failed to update channel"
 msgstr "Kanal güncellenemedi"
 
-#: src/lib/components/shared/custom-fields-form.tsx:99
+#: src/lib/components/shared/custom-fields-form.tsx:100
 msgid "General"
 msgstr "Genel"
 
@@ -5667,6 +5687,7 @@ msgstr "Başlık 6"
 msgid "Added coupon codes"
 msgstr "Kupon kodları eklendi"
 
+#: src/lib/components/layout/app-topbar.tsx:198
 #: src/lib/components/layout/channel-switcher.tsx:180
 msgctxt "active language"
 msgid "Active"

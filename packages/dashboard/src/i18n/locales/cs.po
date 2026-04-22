@@ -126,6 +126,7 @@ msgstr "Opravdu chcete smazat {0} {entityName}?"
 msgid "Global out of stock threshold"
 msgstr "Globální práh vyprodání"
 
+#: src/lib/components/layout/app-topbar.tsx:210
 #: src/lib/components/layout/channel-switcher.tsx:194
 #: src/lib/components/layout/manage-languages-dialog.tsx:241
 msgid "Manage Languages"
@@ -181,6 +182,7 @@ msgstr "Smazat řádek"
 msgid "Conditions"
 msgstr "Podmínky"
 
+#: src/lib/components/layout/app-topbar.tsx:131
 #: src/lib/components/layout/channel-switcher.tsx:99
 msgctxt "current channel"
 msgid "Current"
@@ -378,6 +380,7 @@ msgstr "Posledních 7 dní"
 msgid "Failed to create channel"
 msgstr "Nepodařilo se vytvořit kanál"
 
+#: src/lib/components/layout/app-topbar.tsx:367
 #: src/lib/components/layout/dev-mode-indicator.tsx:14
 #: src/lib/components/layout/nav-user.tsx:144
 msgid "Dev Mode"
@@ -841,6 +844,7 @@ msgstr "Zadejte poznámku k refundu"
 msgid "Order line removed"
 msgstr "Řádek objednávky odebrán"
 
+#: src/lib/components/layout/app-topbar.tsx:176
 #: src/lib/components/layout/channel-switcher.tsx:158
 msgid "Content:"
 msgstr "Obsah:"
@@ -865,6 +869,10 @@ msgstr "Přejít na první stránku"
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:168
 msgid "Failed to create product"
 msgstr "Nepodařilo se vytvořit produkt"
+
+#: src/lib/components/layout/app-topbar.tsx:552
+msgid "Administration"
+msgstr "Administrace"
 
 #: src/app/routes/_authenticated/_orders/components/order-detail-shared.tsx:276
 #: src/app/routes/_authenticated/_orders/orders_.$id_.modify.tsx:233
@@ -1001,6 +1009,7 @@ msgstr "Alokováno"
 #~ msgid "Add another option group"
 #~ msgstr "Přidat další skupinu voleb"
 
+#: src/lib/components/layout/app-topbar.tsx:322
 #: src/lib/components/layout/nav-user.tsx:102
 msgid "Explore Platform & Cloud"
 msgstr "Prozkoumat Platform & Cloud"
@@ -1658,6 +1667,7 @@ msgstr "Skupiny zákazníků"
 
 #: src/app/routes/_authenticated/_system/scheduled-tasks.tsx:123
 #: src/app/routes/_authenticated/_tax-rates/tax-rates.tsx:58
+#: src/lib/components/layout/app-topbar.tsx:378
 #: src/lib/components/layout/nav-user.tsx:155
 msgid "Disabled"
 msgstr "Zakázáno"
@@ -1923,6 +1933,7 @@ msgstr "Hodnoty vlastností"
 msgid "Successfully updated asset"
 msgstr "Soubor úspěšně aktualizován"
 
+#: src/lib/components/layout/app-topbar.tsx:341
 #: src/lib/components/layout/nav-user.tsx:118
 msgid "Theme"
 msgstr "Téma"
@@ -1942,6 +1953,7 @@ msgstr "API Keys"
 msgid "Select a language"
 msgstr "Vyberte jazyk"
 
+#: src/lib/components/layout/app-topbar.tsx:387
 #: src/lib/components/layout/nav-user.tsx:164
 msgid "Log out"
 msgstr "Odhlásit se"
@@ -2689,6 +2701,7 @@ msgstr "Úspěšně aktualizovány hodnoty vlastností pro {entityIdsLength} {en
 msgid "Failed to remove customer from group"
 msgstr "Nepodařilo se odebrat zákazníka ze skupiny"
 
+#: src/lib/components/layout/app-topbar.tsx:358
 #: src/lib/components/layout/nav-user.tsx:135
 msgctxt "theme"
 msgid "System"
@@ -2881,6 +2894,7 @@ msgstr "Přehledy"
 msgid "Testing shipping method..."
 msgstr "Testování způsobu dopravy..."
 
+#: src/lib/components/layout/app-topbar.tsx:354
 #: src/lib/components/layout/nav-user.tsx:131
 msgctxt "theme"
 msgid "Dark"
@@ -3327,6 +3341,7 @@ msgstr "Vypořádat platbu"
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$id.tsx:216
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:343
 #: src/app/routes/_authenticated/_roles/roles_.$id.tsx:111
+#: src/lib/components/layout/app-topbar.tsx:165
 #: src/lib/components/layout/channel-switcher.tsx:146
 msgid "Channels"
 msgstr "Kanály"
@@ -3820,6 +3835,7 @@ msgstr "Přihlaste se pro přístup k administrátorskému panelu"
 msgid "False"
 msgstr "Nepravda"
 
+#: src/lib/components/layout/app-topbar.tsx:350
 #: src/lib/components/layout/nav-user.tsx:127
 msgctxt "theme"
 msgid "Light"
@@ -4150,6 +4166,7 @@ msgstr "Vzor plánu"
 msgid "Payment failed"
 msgstr "Platba selhala"
 
+#: src/lib/components/layout/app-topbar.tsx:230
 #: src/lib/components/layout/channel-switcher.tsx:212
 msgid "Add channel"
 msgstr "Přidat kanál"
@@ -4577,6 +4594,7 @@ msgstr "Stát / Kraj"
 #: src/app/routes/_authenticated/_tax-rates/tax-rates.tsx:55
 #: src/app/routes/_authenticated/_tax-rates/tax-rates.tsx:57
 #: src/app/routes/_authenticated/_zones/components/zone-countries-table.tsx:57
+#: src/lib/components/layout/app-topbar.tsx:375
 #: src/lib/components/layout/nav-user.tsx:152
 msgid "Enabled"
 msgstr "Povoleno"
@@ -5148,6 +5166,7 @@ msgstr "Daňová kategorie"
 
 #: src/app/routes/_authenticated/_profile/profile.tsx:31
 #: src/app/routes/_authenticated/_profile/profile.tsx:76
+#: src/lib/components/layout/app-topbar.tsx:328
 #: src/lib/components/layout/nav-user.tsx:108
 msgid "Profile"
 msgstr "Profil"
@@ -5246,6 +5265,7 @@ msgstr "Variantu nelze přidat. Ujistěte se, že nadřazený produkt je povolen
 msgid "Metrics"
 msgstr "Metriky"
 
+#: src/lib/components/layout/app-topbar.tsx:335
 #: src/lib/components/layout/nav-user.tsx:112
 msgid "Language"
 msgstr "Jazyk"
@@ -5314,7 +5334,7 @@ msgstr "Žádné akce k dispozici"
 msgid "Failed to update channel"
 msgstr "Nepodařilo se aktualizovat kanál"
 
-#: src/lib/components/shared/custom-fields-form.tsx:99
+#: src/lib/components/shared/custom-fields-form.tsx:100
 msgid "General"
 msgstr "Obecné"
 
@@ -5667,6 +5687,7 @@ msgstr "Nadpis 6"
 msgid "Added coupon codes"
 msgstr "Přidané kódy kupónů"
 
+#: src/lib/components/layout/app-topbar.tsx:198
 #: src/lib/components/layout/channel-switcher.tsx:180
 msgctxt "active language"
 msgid "Active"

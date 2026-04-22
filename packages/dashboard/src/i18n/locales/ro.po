@@ -126,6 +126,7 @@ msgstr "Ești sigur că vrei să ștergi {0} {entityName}?"
 msgid "Global out of stock threshold"
 msgstr "Prag global stoc epuizat"
 
+#: src/lib/components/layout/app-topbar.tsx:210
 #: src/lib/components/layout/channel-switcher.tsx:194
 #: src/lib/components/layout/manage-languages-dialog.tsx:241
 msgid "Manage Languages"
@@ -177,6 +178,7 @@ msgstr "Șterge rândul"
 msgid "Conditions"
 msgstr "Condiții"
 
+#: src/lib/components/layout/app-topbar.tsx:131
 #: src/lib/components/layout/channel-switcher.tsx:99
 msgctxt "current channel"
 msgid "Current"
@@ -354,6 +356,7 @@ msgstr "Ultimele 7 zile"
 msgid "Failed to create channel"
 msgstr "Nu s-a putut crea canalul"
 
+#: src/lib/components/layout/app-topbar.tsx:367
 #: src/lib/components/layout/dev-mode-indicator.tsx:14
 #: src/lib/components/layout/nav-user.tsx:144
 msgid "Dev Mode"
@@ -813,6 +816,7 @@ msgstr "Introdu notă rambursare"
 msgid "Order line removed"
 msgstr "Linie comandă eliminată"
 
+#: src/lib/components/layout/app-topbar.tsx:176
 #: src/lib/components/layout/channel-switcher.tsx:158
 msgid "Content:"
 msgstr "Conținut:"
@@ -837,6 +841,10 @@ msgstr "Mergi la prima pagină"
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:168
 msgid "Failed to create product"
 msgstr "Nu s-a putut crea produsul"
+
+#: src/lib/components/layout/app-topbar.tsx:552
+msgid "Administration"
+msgstr "Administrare"
 
 #: src/app/routes/_authenticated/_orders/components/order-detail-shared.tsx:276
 #: src/app/routes/_authenticated/_orders/orders_.$id_.modify.tsx:233
@@ -969,6 +977,7 @@ msgstr "ID tranzacție"
 msgid "Allocated"
 msgstr "Alocat"
 
+#: src/lib/components/layout/app-topbar.tsx:322
 #: src/lib/components/layout/nav-user.tsx:102
 msgid "Explore Platform & Cloud"
 msgstr "Explorează Platforma și Cloud"
@@ -1597,6 +1606,7 @@ msgstr "Grupuri de clienți"
 
 #: src/app/routes/_authenticated/_system/scheduled-tasks.tsx:123
 #: src/app/routes/_authenticated/_tax-rates/tax-rates.tsx:58
+#: src/lib/components/layout/app-topbar.tsx:378
 #: src/lib/components/layout/nav-user.tsx:155
 msgid "Disabled"
 msgstr "Dezactivat"
@@ -1856,6 +1866,7 @@ msgstr "Valori atribute"
 msgid "Successfully updated asset"
 msgstr "Resursa a fost actualizată cu succes"
 
+#: src/lib/components/layout/app-topbar.tsx:341
 #: src/lib/components/layout/nav-user.tsx:118
 msgid "Theme"
 msgstr "Temă"
@@ -1875,6 +1886,7 @@ msgstr "Chei API"
 msgid "Select a language"
 msgstr "Selectează o limbă"
 
+#: src/lib/components/layout/app-topbar.tsx:387
 #: src/lib/components/layout/nav-user.tsx:164
 msgid "Log out"
 msgstr "Deconectare"
@@ -2605,6 +2617,7 @@ msgstr "Valorile atributului au fost actualizate cu succes pentru {entityIdsLeng
 msgid "Failed to remove customer from group"
 msgstr "Nu s-a putut elimina clientul din grup"
 
+#: src/lib/components/layout/app-topbar.tsx:358
 #: src/lib/components/layout/nav-user.tsx:135
 msgctxt "theme"
 msgid "System"
@@ -2789,6 +2802,7 @@ msgstr "Perspective"
 msgid "Testing shipping method..."
 msgstr "Se testează metoda de livrare..."
 
+#: src/lib/components/layout/app-topbar.tsx:354
 #: src/lib/components/layout/nav-user.tsx:131
 msgctxt "theme"
 msgid "Dark"
@@ -3227,6 +3241,7 @@ msgstr "Finalizează plata"
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$id.tsx:216
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:343
 #: src/app/routes/_authenticated/_roles/roles_.$id.tsx:111
+#: src/lib/components/layout/app-topbar.tsx:165
 #: src/lib/components/layout/channel-switcher.tsx:146
 msgid "Channels"
 msgstr "Canale"
@@ -3697,6 +3712,7 @@ msgstr "Autentifică-te pentru a accesa panoul de administrare"
 msgid "False"
 msgstr "Fals"
 
+#: src/lib/components/layout/app-topbar.tsx:350
 #: src/lib/components/layout/nav-user.tsx:127
 msgctxt "theme"
 msgid "Light"
@@ -4014,6 +4030,7 @@ msgstr "Model de planificare"
 msgid "Payment failed"
 msgstr "Plată eșuată"
 
+#: src/lib/components/layout/app-topbar.tsx:230
 #: src/lib/components/layout/channel-switcher.tsx:212
 msgid "Add channel"
 msgstr "Adaugă canal"
@@ -4421,6 +4438,7 @@ msgstr "Județ / Provincie"
 #: src/app/routes/_authenticated/_tax-rates/tax-rates.tsx:55
 #: src/app/routes/_authenticated/_tax-rates/tax-rates.tsx:57
 #: src/app/routes/_authenticated/_zones/components/zone-countries-table.tsx:57
+#: src/lib/components/layout/app-topbar.tsx:375
 #: src/lib/components/layout/nav-user.tsx:152
 msgid "Enabled"
 msgstr "Activat"
@@ -4960,6 +4978,7 @@ msgstr "Categorie de taxă"
 
 #: src/app/routes/_authenticated/_profile/profile.tsx:31
 #: src/app/routes/_authenticated/_profile/profile.tsx:76
+#: src/lib/components/layout/app-topbar.tsx:328
 #: src/lib/components/layout/nav-user.tsx:108
 msgid "Profile"
 msgstr "Profil"
@@ -5054,6 +5073,7 @@ msgstr "Varianta nu a putut fi adăugată. Asigurați-vă că produsul părinte 
 msgid "Metrics"
 msgstr "Metrici"
 
+#: src/lib/components/layout/app-topbar.tsx:335
 #: src/lib/components/layout/nav-user.tsx:112
 msgid "Language"
 msgstr "Limbă"
@@ -5122,7 +5142,7 @@ msgstr "Nu sunt acțiuni disponibile"
 msgid "Failed to update channel"
 msgstr "Nu s-a putut actualiza canalul"
 
-#: src/lib/components/shared/custom-fields-form.tsx:99
+#: src/lib/components/shared/custom-fields-form.tsx:100
 msgid "General"
 msgstr "General"
 
@@ -5459,6 +5479,7 @@ msgstr "Heading 6"
 msgid "Added coupon codes"
 msgstr "Coduri cupon adăugate"
 
+#: src/lib/components/layout/app-topbar.tsx:198
 #: src/lib/components/layout/channel-switcher.tsx:180
 msgctxt "active language"
 msgid "Active"

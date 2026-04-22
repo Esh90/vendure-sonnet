@@ -126,6 +126,7 @@ msgstr "האם אתה בטוח שברצונך למחוק {0} {entityName}?"
 msgid "Global out of stock threshold"
 msgstr "סף גלובלי של אזילת מלאי"
 
+#: src/lib/components/layout/app-topbar.tsx:210
 #: src/lib/components/layout/channel-switcher.tsx:194
 #: src/lib/components/layout/manage-languages-dialog.tsx:241
 msgid "Manage Languages"
@@ -181,6 +182,7 @@ msgstr "מחק שורה"
 msgid "Conditions"
 msgstr "תנאים"
 
+#: src/lib/components/layout/app-topbar.tsx:131
 #: src/lib/components/layout/channel-switcher.tsx:99
 msgctxt "current channel"
 msgid "Current"
@@ -378,6 +380,7 @@ msgstr "7 הימים האחרונים"
 msgid "Failed to create channel"
 msgstr "יצירת הערוץ נכשלה"
 
+#: src/lib/components/layout/app-topbar.tsx:367
 #: src/lib/components/layout/dev-mode-indicator.tsx:14
 #: src/lib/components/layout/nav-user.tsx:144
 msgid "Dev Mode"
@@ -841,6 +844,7 @@ msgstr "הזן הערת החזר"
 msgid "Order line removed"
 msgstr "שורת ההזמנה הוסרה"
 
+#: src/lib/components/layout/app-topbar.tsx:176
 #: src/lib/components/layout/channel-switcher.tsx:158
 msgid "Content:"
 msgstr "תוכן:"
@@ -865,6 +869,10 @@ msgstr "עבור לעמוד הראשון"
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:168
 msgid "Failed to create product"
 msgstr "יצירת המוצר נכשלה"
+
+#: src/lib/components/layout/app-topbar.tsx:552
+msgid "Administration"
+msgstr "ניהול"
 
 #: src/app/routes/_authenticated/_orders/components/order-detail-shared.tsx:276
 #: src/app/routes/_authenticated/_orders/orders_.$id_.modify.tsx:233
@@ -1001,6 +1009,7 @@ msgstr "מוקצה"
 #~ msgid "Add another option group"
 #~ msgstr "הוסף קבוצת אפשרויות נוספת"
 
+#: src/lib/components/layout/app-topbar.tsx:322
 #: src/lib/components/layout/nav-user.tsx:102
 msgid "Explore Platform & Cloud"
 msgstr "חקור את הפלטפורמה והענן"
@@ -1658,6 +1667,7 @@ msgstr "קבוצות לקוחות"
 
 #: src/app/routes/_authenticated/_system/scheduled-tasks.tsx:123
 #: src/app/routes/_authenticated/_tax-rates/tax-rates.tsx:58
+#: src/lib/components/layout/app-topbar.tsx:378
 #: src/lib/components/layout/nav-user.tsx:155
 msgid "Disabled"
 msgstr "מושבת"
@@ -1923,6 +1933,7 @@ msgstr "ערכי מאפיינים"
 msgid "Successfully updated asset"
 msgstr "הקובץ עודכן בהצלחה"
 
+#: src/lib/components/layout/app-topbar.tsx:341
 #: src/lib/components/layout/nav-user.tsx:118
 msgid "Theme"
 msgstr "ערכת נושא"
@@ -1942,6 +1953,7 @@ msgstr "מפתחות API"
 msgid "Select a language"
 msgstr "בחר שפה"
 
+#: src/lib/components/layout/app-topbar.tsx:387
 #: src/lib/components/layout/nav-user.tsx:164
 msgid "Log out"
 msgstr "התנתק"
@@ -2689,6 +2701,7 @@ msgstr "ערכי המאפיינים עבור {entityIdsLength} {entityType} עו
 msgid "Failed to remove customer from group"
 msgstr "הסרת הלקוח מהקבוצה נכשלה"
 
+#: src/lib/components/layout/app-topbar.tsx:358
 #: src/lib/components/layout/nav-user.tsx:135
 msgctxt "theme"
 msgid "System"
@@ -2881,6 +2894,7 @@ msgstr "תובנות"
 msgid "Testing shipping method..."
 msgstr "בודק שיטת משלוח..."
 
+#: src/lib/components/layout/app-topbar.tsx:354
 #: src/lib/components/layout/nav-user.tsx:131
 msgctxt "theme"
 msgid "Dark"
@@ -3327,6 +3341,7 @@ msgstr "סלק תשלום"
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$id.tsx:216
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:343
 #: src/app/routes/_authenticated/_roles/roles_.$id.tsx:111
+#: src/lib/components/layout/app-topbar.tsx:165
 #: src/lib/components/layout/channel-switcher.tsx:146
 msgid "Channels"
 msgstr "ערוצים"
@@ -3820,6 +3835,7 @@ msgstr "התחבר כדי לגשת ללוח הבקרה של המנהל"
 msgid "False"
 msgstr "שקר"
 
+#: src/lib/components/layout/app-topbar.tsx:350
 #: src/lib/components/layout/nav-user.tsx:127
 msgctxt "theme"
 msgid "Light"
@@ -4150,6 +4166,7 @@ msgstr "תבנית לוח זמנים"
 msgid "Payment failed"
 msgstr "התשלום נכשל"
 
+#: src/lib/components/layout/app-topbar.tsx:230
 #: src/lib/components/layout/channel-switcher.tsx:212
 msgid "Add channel"
 msgstr "הוסף ערוץ"
@@ -4577,6 +4594,7 @@ msgstr "מדינה / מחוז"
 #: src/app/routes/_authenticated/_tax-rates/tax-rates.tsx:55
 #: src/app/routes/_authenticated/_tax-rates/tax-rates.tsx:57
 #: src/app/routes/_authenticated/_zones/components/zone-countries-table.tsx:57
+#: src/lib/components/layout/app-topbar.tsx:375
 #: src/lib/components/layout/nav-user.tsx:152
 msgid "Enabled"
 msgstr "מופעל"
@@ -5148,6 +5166,7 @@ msgstr "קטגוריית מס"
 
 #: src/app/routes/_authenticated/_profile/profile.tsx:31
 #: src/app/routes/_authenticated/_profile/profile.tsx:76
+#: src/lib/components/layout/app-topbar.tsx:328
 #: src/lib/components/layout/nav-user.tsx:108
 msgid "Profile"
 msgstr "פרופיל"
@@ -5246,6 +5265,7 @@ msgstr "לא ניתן להוסיף את הגרסה. ודא שהמוצר הראש
 msgid "Metrics"
 msgstr "מדדים"
 
+#: src/lib/components/layout/app-topbar.tsx:335
 #: src/lib/components/layout/nav-user.tsx:112
 msgid "Language"
 msgstr "שפה"
@@ -5314,7 +5334,7 @@ msgstr "אין פעולות זמינות"
 msgid "Failed to update channel"
 msgstr "עדכון הערוץ נכשל"
 
-#: src/lib/components/shared/custom-fields-form.tsx:99
+#: src/lib/components/shared/custom-fields-form.tsx:100
 msgid "General"
 msgstr "כללי"
 
@@ -5667,6 +5687,7 @@ msgstr "כותרת 6"
 msgid "Added coupon codes"
 msgstr "קודי קופון שנוספו"
 
+#: src/lib/components/layout/app-topbar.tsx:198
 #: src/lib/components/layout/channel-switcher.tsx:180
 msgctxt "active language"
 msgid "Active"

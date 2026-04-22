@@ -126,6 +126,7 @@ msgstr "¿Está seguro de que desea eliminar {0} {entityName}?"
 msgid "Global out of stock threshold"
 msgstr "Umbral global de agotamiento"
 
+#: src/lib/components/layout/app-topbar.tsx:210
 #: src/lib/components/layout/channel-switcher.tsx:194
 #: src/lib/components/layout/manage-languages-dialog.tsx:241
 msgid "Manage Languages"
@@ -181,6 +182,7 @@ msgstr "Eliminar fila"
 msgid "Conditions"
 msgstr "Condiciones"
 
+#: src/lib/components/layout/app-topbar.tsx:131
 #: src/lib/components/layout/channel-switcher.tsx:99
 msgctxt "current channel"
 msgid "Current"
@@ -378,6 +380,7 @@ msgstr "Últimos 7 días"
 msgid "Failed to create channel"
 msgstr "Error al crear canal"
 
+#: src/lib/components/layout/app-topbar.tsx:367
 #: src/lib/components/layout/dev-mode-indicator.tsx:14
 #: src/lib/components/layout/nav-user.tsx:144
 msgid "Dev Mode"
@@ -841,6 +844,7 @@ msgstr "Ingrese nota de reembolso"
 msgid "Order line removed"
 msgstr "Línea de pedido eliminada"
 
+#: src/lib/components/layout/app-topbar.tsx:176
 #: src/lib/components/layout/channel-switcher.tsx:158
 msgid "Content:"
 msgstr "Contenido:"
@@ -865,6 +869,10 @@ msgstr "Ir a la primera página"
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:168
 msgid "Failed to create product"
 msgstr "Error al crear producto"
+
+#: src/lib/components/layout/app-topbar.tsx:552
+msgid "Administration"
+msgstr "Administración"
 
 #: src/app/routes/_authenticated/_orders/components/order-detail-shared.tsx:276
 #: src/app/routes/_authenticated/_orders/orders_.$id_.modify.tsx:233
@@ -1001,6 +1009,7 @@ msgstr "Asignado"
 #~ msgid "Add another option group"
 #~ msgstr "Agregar otro grupo de opciones"
 
+#: src/lib/components/layout/app-topbar.tsx:322
 #: src/lib/components/layout/nav-user.tsx:102
 msgid "Explore Platform & Cloud"
 msgstr "Explorar Platform & Cloud"
@@ -1658,6 +1667,7 @@ msgstr "Grupos de clientes"
 
 #: src/app/routes/_authenticated/_system/scheduled-tasks.tsx:123
 #: src/app/routes/_authenticated/_tax-rates/tax-rates.tsx:58
+#: src/lib/components/layout/app-topbar.tsx:378
 #: src/lib/components/layout/nav-user.tsx:155
 msgid "Disabled"
 msgstr "Deshabilitado"
@@ -1923,6 +1933,7 @@ msgstr "Valores de Faceta"
 msgid "Successfully updated asset"
 msgstr "Recurso actualizado exitosamente"
 
+#: src/lib/components/layout/app-topbar.tsx:341
 #: src/lib/components/layout/nav-user.tsx:118
 msgid "Theme"
 msgstr "Tema"
@@ -1942,6 +1953,7 @@ msgstr "API Keys"
 msgid "Select a language"
 msgstr "Seleccione un idioma"
 
+#: src/lib/components/layout/app-topbar.tsx:387
 #: src/lib/components/layout/nav-user.tsx:164
 msgid "Log out"
 msgstr "Cerrar sesión"
@@ -2689,6 +2701,7 @@ msgstr "Valores de faceta actualizados exitosamente para {entityIdsLength} {enti
 msgid "Failed to remove customer from group"
 msgstr "Error al quitar cliente del grupo"
 
+#: src/lib/components/layout/app-topbar.tsx:358
 #: src/lib/components/layout/nav-user.tsx:135
 msgctxt "theme"
 msgid "System"
@@ -2881,6 +2894,7 @@ msgstr "Perspectivas"
 msgid "Testing shipping method..."
 msgstr "Probando método de envío..."
 
+#: src/lib/components/layout/app-topbar.tsx:354
 #: src/lib/components/layout/nav-user.tsx:131
 msgctxt "theme"
 msgid "Dark"
@@ -3327,6 +3341,7 @@ msgstr "Liquidar pago"
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$id.tsx:216
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:343
 #: src/app/routes/_authenticated/_roles/roles_.$id.tsx:111
+#: src/lib/components/layout/app-topbar.tsx:165
 #: src/lib/components/layout/channel-switcher.tsx:146
 msgid "Channels"
 msgstr "Canales"
@@ -3820,6 +3835,7 @@ msgstr "Inicia sesión para acceder al panel de administración"
 msgid "False"
 msgstr "Falso"
 
+#: src/lib/components/layout/app-topbar.tsx:350
 #: src/lib/components/layout/nav-user.tsx:127
 msgctxt "theme"
 msgid "Light"
@@ -4150,6 +4166,7 @@ msgstr "Patrón de programación"
 msgid "Payment failed"
 msgstr "Pago falló"
 
+#: src/lib/components/layout/app-topbar.tsx:230
 #: src/lib/components/layout/channel-switcher.tsx:212
 msgid "Add channel"
 msgstr "Añadir canal"
@@ -4577,6 +4594,7 @@ msgstr "Estado / Provincia"
 #: src/app/routes/_authenticated/_tax-rates/tax-rates.tsx:55
 #: src/app/routes/_authenticated/_tax-rates/tax-rates.tsx:57
 #: src/app/routes/_authenticated/_zones/components/zone-countries-table.tsx:57
+#: src/lib/components/layout/app-topbar.tsx:375
 #: src/lib/components/layout/nav-user.tsx:152
 msgid "Enabled"
 msgstr "Habilitado"
@@ -5148,6 +5166,7 @@ msgstr "Categoría de impuesto"
 
 #: src/app/routes/_authenticated/_profile/profile.tsx:31
 #: src/app/routes/_authenticated/_profile/profile.tsx:76
+#: src/lib/components/layout/app-topbar.tsx:328
 #: src/lib/components/layout/nav-user.tsx:108
 msgid "Profile"
 msgstr "Perfil"
@@ -5246,6 +5265,7 @@ msgstr "No se pudo añadir la variante. Asegúrese de que el producto principal 
 msgid "Metrics"
 msgstr "Métricas"
 
+#: src/lib/components/layout/app-topbar.tsx:335
 #: src/lib/components/layout/nav-user.tsx:112
 msgid "Language"
 msgstr "Idioma"
@@ -5314,7 +5334,7 @@ msgstr "Sin acciones disponibles"
 msgid "Failed to update channel"
 msgstr "Error al actualizar canal"
 
-#: src/lib/components/shared/custom-fields-form.tsx:99
+#: src/lib/components/shared/custom-fields-form.tsx:100
 msgid "General"
 msgstr "General"
 
@@ -5667,6 +5687,7 @@ msgstr "Encabezado 6"
 msgid "Added coupon codes"
 msgstr "Códigos de cupón agregados"
 
+#: src/lib/components/layout/app-topbar.tsx:198
 #: src/lib/components/layout/channel-switcher.tsx:180
 msgctxt "active language"
 msgid "Active"

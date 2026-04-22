@@ -126,6 +126,7 @@ msgstr "Weet u zeker dat u {0} {entityName} wilt verwijderen?"
 msgid "Global out of stock threshold"
 msgstr "Globale uitverkocht-drempelwaarde"
 
+#: src/lib/components/layout/app-topbar.tsx:210
 #: src/lib/components/layout/channel-switcher.tsx:194
 #: src/lib/components/layout/manage-languages-dialog.tsx:241
 msgid "Manage Languages"
@@ -181,6 +182,7 @@ msgstr "Rij verwijderen"
 msgid "Conditions"
 msgstr "Voorwaarden"
 
+#: src/lib/components/layout/app-topbar.tsx:131
 #: src/lib/components/layout/channel-switcher.tsx:99
 msgctxt "current channel"
 msgid "Current"
@@ -378,6 +380,7 @@ msgstr "Laatste 7 dagen"
 msgid "Failed to create channel"
 msgstr "Kanaal aanmaken mislukt"
 
+#: src/lib/components/layout/app-topbar.tsx:367
 #: src/lib/components/layout/dev-mode-indicator.tsx:14
 #: src/lib/components/layout/nav-user.tsx:144
 msgid "Dev Mode"
@@ -841,6 +844,7 @@ msgstr "Voer terugbetalingsnotitie in"
 msgid "Order line removed"
 msgstr "Bestelregel verwijderd"
 
+#: src/lib/components/layout/app-topbar.tsx:176
 #: src/lib/components/layout/channel-switcher.tsx:158
 msgid "Content:"
 msgstr "Inhoud:"
@@ -869,6 +873,10 @@ msgstr "Ga naar eerste pagina"
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:168
 msgid "Failed to create product"
 msgstr "Product aanmaken mislukt"
+
+#: src/lib/components/layout/app-topbar.tsx:552
+msgid "Administration"
+msgstr "Administratie"
 
 #: src/app/routes/_authenticated/_orders/components/order-detail-shared.tsx:276
 #: src/app/routes/_authenticated/_orders/orders_.$id_.modify.tsx:233
@@ -1005,6 +1013,7 @@ msgstr "Toegewezen"
 #~ msgid "Add another option group"
 #~ msgstr "Voeg nog een optiegroep toe"
 
+#: src/lib/components/layout/app-topbar.tsx:322
 #: src/lib/components/layout/nav-user.tsx:102
 msgid "Explore Platform & Cloud"
 msgstr "Platform en Cloud verkennen"
@@ -1662,6 +1671,7 @@ msgstr "Klantengroepen"
 
 #: src/app/routes/_authenticated/_system/scheduled-tasks.tsx:123
 #: src/app/routes/_authenticated/_tax-rates/tax-rates.tsx:58
+#: src/lib/components/layout/app-topbar.tsx:378
 #: src/lib/components/layout/nav-user.tsx:155
 msgid "Disabled"
 msgstr "Uitgeschakeld"
@@ -1921,6 +1931,7 @@ msgstr "Facetwaarden"
 msgid "Successfully updated asset"
 msgstr "Bestand succesvol bijgewerkt"
 
+#: src/lib/components/layout/app-topbar.tsx:341
 #: src/lib/components/layout/nav-user.tsx:118
 msgid "Theme"
 msgstr "Thema"
@@ -1940,6 +1951,7 @@ msgstr "API Keys"
 msgid "Select a language"
 msgstr "Selecteer een taal"
 
+#: src/lib/components/layout/app-topbar.tsx:387
 #: src/lib/components/layout/nav-user.tsx:164
 msgid "Log out"
 msgstr "Uitloggen"
@@ -2683,6 +2695,7 @@ msgstr "Facetwaarden succesvol bijgewerkt voor {entityIdsLength} {entityType}"
 msgid "Failed to remove customer from group"
 msgstr "Klant uit groep verwijderen mislukt"
 
+#: src/lib/components/layout/app-topbar.tsx:358
 #: src/lib/components/layout/nav-user.tsx:135
 msgctxt "theme"
 msgid "System"
@@ -2875,6 +2888,7 @@ msgstr "Inzichten"
 msgid "Testing shipping method..."
 msgstr "Verzendmethode testen..."
 
+#: src/lib/components/layout/app-topbar.tsx:354
 #: src/lib/components/layout/nav-user.tsx:131
 msgctxt "theme"
 msgid "Dark"
@@ -3321,6 +3335,7 @@ msgstr "Betaling afhandelen"
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$id.tsx:216
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:343
 #: src/app/routes/_authenticated/_roles/roles_.$id.tsx:111
+#: src/lib/components/layout/app-topbar.tsx:165
 #: src/lib/components/layout/channel-switcher.tsx:146
 msgid "Channels"
 msgstr "Kanalen"
@@ -3811,6 +3826,7 @@ msgstr "Log in om toegang te krijgen tot het beheerdersdashboard"
 msgid "False"
 msgstr "Onwaar"
 
+#: src/lib/components/layout/app-topbar.tsx:350
 #: src/lib/components/layout/nav-user.tsx:127
 msgctxt "theme"
 msgid "Light"
@@ -4141,6 +4157,7 @@ msgstr "Planningspatroon"
 msgid "Payment failed"
 msgstr "Betaling mislukt"
 
+#: src/lib/components/layout/app-topbar.tsx:230
 #: src/lib/components/layout/channel-switcher.tsx:212
 msgid "Add channel"
 msgstr "Kanaal toevoegen"
@@ -4572,6 +4589,7 @@ msgstr "Staat / Provincie"
 #: src/app/routes/_authenticated/_tax-rates/tax-rates.tsx:55
 #: src/app/routes/_authenticated/_tax-rates/tax-rates.tsx:57
 #: src/app/routes/_authenticated/_zones/components/zone-countries-table.tsx:57
+#: src/lib/components/layout/app-topbar.tsx:375
 #: src/lib/components/layout/nav-user.tsx:152
 msgid "Enabled"
 msgstr "Ingeschakeld"
@@ -5143,6 +5161,7 @@ msgstr "Belastingcategorie"
 
 #: src/app/routes/_authenticated/_profile/profile.tsx:31
 #: src/app/routes/_authenticated/_profile/profile.tsx:76
+#: src/lib/components/layout/app-topbar.tsx:328
 #: src/lib/components/layout/nav-user.tsx:108
 msgid "Profile"
 msgstr "Profiel"
@@ -5241,6 +5260,7 @@ msgstr "De variant kon niet worden toegevoegd. Controleer of het hoofdproduct is
 msgid "Metrics"
 msgstr "Statistieken"
 
+#: src/lib/components/layout/app-topbar.tsx:335
 #: src/lib/components/layout/nav-user.tsx:112
 msgid "Language"
 msgstr "Taal"
@@ -5309,7 +5329,7 @@ msgstr "Geen acties beschikbaar"
 msgid "Failed to update channel"
 msgstr "Kanaal bijwerken mislukt"
 
-#: src/lib/components/shared/custom-fields-form.tsx:99
+#: src/lib/components/shared/custom-fields-form.tsx:100
 msgid "General"
 msgstr "Algemeen"
 
@@ -5662,6 +5682,7 @@ msgstr "Kop 6"
 msgid "Added coupon codes"
 msgstr "Couponcodes toegevoegd"
 
+#: src/lib/components/layout/app-topbar.tsx:198
 #: src/lib/components/layout/channel-switcher.tsx:180
 msgctxt "active language"
 msgid "Active"
