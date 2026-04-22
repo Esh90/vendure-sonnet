@@ -133,6 +133,8 @@ export interface DashboardExtension {
     /**
      * @description
      * Allows you to add custom providers in different locations.
+     *
+     * @since 3.7.0
      */
     customProviders?: DashboardCustomProviderDefinition[];
 }

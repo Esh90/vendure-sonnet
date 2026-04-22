@@ -3,24 +3,46 @@ import { ComponentType, createElement, ReactNode, useMemo } from 'react';
 
 import { useDashboardExtensions } from './use-dashboard-extensions.js';
 
+/**
+ * @description
+ * Allows you to define custom React providers that wrap selected parts of the dashboard UI.
+ * This is useful for cross-cutting concerns such as custom context, error boundaries,
+ * feature flags, telemetry, or theming.
+ *
+ * Providers can be mounted at either the application root (`'app'`) or the authenticated
+ * layout main content area (`'layout'`, i.e. the `<Outlet />` subtree only; sidebar and
+ * header are outside this wrapper).
+ *
+ * @docsCategory extensions-api
+ * @docsPage Custom Providers
+ * @since 3.7.0
+ */
 export type DashboardCustomProviderDefinition = {
     /**
-     * Unique identifier for this custom provider.
+     * @description
+     * A unique identifier for this custom provider.
      */
     id: string;
     /**
-     * React component that will be rendered by this provider.
+     * @description
+     * The React provider component to render. It receives `children` and should
+     * return a wrapped subtree.
      */
     component: ComponentType<{ children: ReactNode }>;
     /**
-     * Optional. Controls the priority or rendering order of this provider
-     * relative to others. Lower numbers appear before higher numbers.
+     * @description
+     * Optional. Controls render order relative to other providers at the same location.
+     * Lower numbers render first (outermost), higher numbers render later (innermost).
      */
     order?: number;
     /**
-     * Determines where the custom provider will be applied in the dashboard hierarchy.
-     * - 'app': Applies the provider at the application (root) level.
-     * - 'layout': Applies the provider at the layout level.
+     * @description
+     * Determines where this provider is mounted in the dashboard hierarchy.
+     *
+     * - `'app'`: Wraps the entire dashboard application at the root level.
+     * - `'layout'`: Wraps the main content area of the authenticated layout (the `<Outlet />` subtree).
+     *
+     * The sidebar and header are outside this wrapper.
      *
      * Optional. Defaults to 'app' if not specified.
      */

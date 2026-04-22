@@ -44,7 +44,7 @@ export default defineDashboardExtension({
 Each provider can target one of two places:
 
 - **`location: 'app'`**: wraps the whole application (the highest level available to extensions).
-- **`location: 'layout'`**: wraps the layout subtree (useful if you only want to target authenticated/dashboard).
+- **`location: 'layout'`**: wraps the main content area of the authenticated layout (the `<Outlet />` subtree). The sidebar and header are outside this wrapper.
 
 If `location` is omitted, it defaults to `'app'`.
 
