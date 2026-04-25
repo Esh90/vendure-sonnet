@@ -45,6 +45,17 @@ export function getViewOptionDefaults(
     return globalRegistry.get('viewOptionDefaultsRegistry').get(key) || {};
 }
 
+/**
+ * Registers default view options for a data table identified by `pageId`/`blockId`.
+ *
+ * When called multiple times for the same target (e.g. by several plugins),
+ * the registered defaults are merged as follows:
+ *
+ * - `columnVisibility`: shallow-merged. For a given column, the value supplied
+ *   by the **last** plugin to register wins.
+ * - `columnOrder`: appended in registration order. Earlier-registered entries
+ *   appear first; duplicates are not removed at registration time.
+ */
 export function addViewOptionDefaults(
     pageId: string,
     blockId: string | undefined,

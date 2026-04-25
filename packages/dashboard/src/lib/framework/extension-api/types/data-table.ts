@@ -168,7 +168,13 @@ export interface DashboardDataTableExtensionDefinition {
     displayComponents?: DashboardDataTableDisplayComponent[];
     /**
      * @description
-     * Data table view option defaults.
+     * Initial column visibility and order for this data table. These are
+     * applied as defaults before the user has interacted with the column
+     * settings — once a user customizes their view, their saved preferences
+     * take precedence over these values.
+     *
+     * Use this to surface a custom field as a visible column out of the box,
+     * or to hide a column from a list view by default.
      */
     viewOptionDefaults?: DashboardDataTableViewOptionDefaults;
 }

@@ -123,7 +123,7 @@ export function ProductVariantsTable({
             onFilterChange={(_, filters) => {
                 setFilters(filters);
             }}
-            onColumnVisibilityChange={(_, columnVisibility: any) => {
+            onColumnVisibilityChange={(_, columnVisibility) => {
                 if (pageId) {
                     setTableSettings(pageId, 'columnVisibility', columnVisibility);
                 }

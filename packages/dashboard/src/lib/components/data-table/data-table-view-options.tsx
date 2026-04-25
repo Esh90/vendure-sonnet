@@ -23,6 +23,8 @@ import { usePage } from '@/vdb/hooks/use-page.js';
 import { useUserSettings } from '@/vdb/hooks/use-user-settings.js';
 import { Trans } from '@lingui/react/macro';
 
+import { pinnedLeadingColumns } from './data-table-utils.js';
+
 interface DataTableViewOptionsProps<TData> {
     table: Table<TData>;
 }
@@ -109,7 +111,11 @@ export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps
                                 strategy={verticalListSortingStrategy}
                             >
                                 {columns.map(column => (
-                                    <SortableItem key={column.id} id={column.id} disableSort={['id', 'createdAt', 'updatedAt'].includes(column.id)}>
+                                    <SortableItem
+                                        key={column.id}
+                                        id={column.id}
+                                        disableSort={pinnedLeadingColumns.includes(column.id)}
+                                    >
                                         <DropdownMenuCheckboxItem
                                             className="capitalize"
                                             checked={column.getIsVisible()}

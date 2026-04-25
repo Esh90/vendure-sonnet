@@ -4,7 +4,7 @@ import { Button } from '@/vdb/components/ui/button.js';
 import { graphql } from '@/vdb/graphql/graphql.js';
 import { Trans } from '@lingui/react/macro';
 import { Link } from '@tanstack/react-router';
-import { ColumnFiltersState, SortingState, VisibilityState } from '@tanstack/react-table';
+import { ColumnFiltersState, SortingState } from '@tanstack/react-table';
 import { PlusIcon } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { deleteProductOptionDocument } from '../product-option-groups.graphql.js';
@@ -62,7 +62,7 @@ export function ProductOptionsTable({
                 onSortChange={(_, sorting) => {
                     setSorting(sorting);
                 }}
-                onColumnVisibilityChange={(_, columnVisibility: any) => {
+                onColumnVisibilityChange={(_, columnVisibility) => {
                     if (pageId) {
                         setTableSettings(pageId, 'columnVisibility', columnVisibility);
                     }
