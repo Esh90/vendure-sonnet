@@ -43,7 +43,7 @@ export function getColumnVisibility(
 export const pinnedLeadingColumns: string[] = ['id', 'createdAt', 'updatedAt'];
 
 /**
- * Ensures that the default column order always starts with `id`, `createdAt`, `deletedAt`
+ * Ensures that the default column order always starts with pinned leading columns
  */
 export function getStandardizedDefaultColumnOrder<T extends string | number | symbol>(
     defaultColumnOrder?: T[],
