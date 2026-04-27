@@ -43,9 +43,9 @@ msgstr "商品選項"
 msgid "New Tax Rate"
 msgstr "新增稅率"
 
-#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:144
+#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:150
 msgid "Assign an existing option group or create a new one"
-msgstr ""
+msgstr "指派現有選項群組或建立新的選項群組"
 
 #: src/app/routes/_authenticated/_roles/roles_.$id.tsx:33
 #: src/app/routes/_authenticated/_roles/roles_.$id.tsx:77
@@ -84,7 +84,7 @@ msgstr "全部切換"
 
 #: src/app/routes/_authenticated/_system/settings-store.tsx:123
 msgid "Edit JSON value"
-msgstr ""
+msgstr "編輯 JSON 值"
 
 #: src/app/routes/_authenticated/_customers/components/customer-history/default-customer-history-components.tsx:17
 msgid "Using external authentication strategy: {strategy}"
@@ -159,7 +159,7 @@ msgstr "輸入自訂原因..."
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:744
 msgid "Type"
-msgstr ""
+msgstr "類型"
 
 #. placeholder {0}: entityName.toLowerCase()
 #. placeholder {0}: group.name
@@ -203,9 +203,13 @@ msgid "Draft order completed"
 msgstr "草稿訂單已完成"
 
 #. placeholder {0}: currentInterval?.label
-#: src/app/routes/_authenticated/_system/job-queue.tsx:258
+#: src/app/routes/_authenticated/_system/job-queue.tsx:287
 msgid "Auto refresh: {0}"
 msgstr "自動重新整理：{0}"
+
+#: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:34
+msgid "Successfully cancelled {fulfilled} job"
+msgstr ""
 
 #: src/app/routes/_authenticated/_system/healthchecks.tsx:43
 #~ msgid "Health checks"
@@ -239,7 +243,7 @@ msgstr "SKU:"
 
 #: src/app/routes/_authenticated/_orders/components/add-manual-payment-dialog.tsx:121
 msgid "Add payment"
-msgstr ""
+msgstr "新增付款"
 
 #: src/app/routes/_authenticated/_shipping-methods/components/test-single-shipping-method-sheet.tsx:40
 msgid "Test this shipping method by simulating an order to see if it's eligible and what the shipping cost would be."
@@ -272,7 +276,7 @@ msgstr "訂單"
 
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:187
 msgid "Select roles"
-msgstr ""
+msgstr "選擇角色"
 
 #: src/app/routes/_authenticated/_roles/roles_.$id.tsx:62
 msgid "Successfully created role"
@@ -292,7 +296,7 @@ msgstr "建立管理員失敗"
 
 #: src/app/routes/_authenticated/_system/settings-store.tsx:327
 msgid "No"
-msgstr ""
+msgstr "否"
 
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:128
 msgid "Successfully updated product variant"
@@ -302,7 +306,7 @@ msgstr "已成功更新商品變體"
 msgid "Failed to delete {failed} {entityName}: {allErrors}"
 msgstr "刪除 {failed} {entityName} 失敗：{allErrors}"
 
-#: src/app/routes/_authenticated/_products/products_.$id.tsx:99
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:160
 msgid "Successfully updated product"
 msgstr "已成功更新商品"
 
@@ -336,13 +340,14 @@ msgstr "自訂欄位已變更"
 msgid "Successfully created stock location"
 msgstr "已成功建立庫存位置"
 
-#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:102
+#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:109
 #: src/app/routes/_authenticated/_orders/hooks/use-refund-order.ts:303
-#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:76
-#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:118
+#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:78
+#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:120
 #: src/app/routes/_authenticated/_products/components/add-product-variant-dialog.tsx:166
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:151
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:180
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:112
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:204
 msgid "Unknown error"
 msgstr "未知錯誤"
 
@@ -394,9 +399,9 @@ msgstr "退回庫存"
 msgid "Visibility"
 msgstr "可見性"
 
-#: src/app/routes/_authenticated/_products/products_.$id.tsx:191
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:288
 msgid "Product variants"
-msgstr ""
+msgstr "產品變體"
 
 #: src/app/routes/_authenticated/_customer-groups/customer-groups_.$id.tsx:36
 #: src/app/routes/_authenticated/_customer-groups/customer-groups_.$id.tsx:85
@@ -415,11 +420,15 @@ msgstr "重新命名"
 
 #: src/lib/components/layout/language-dialog.tsx:52
 msgid "Choose your preferred display language and locale settings"
-msgstr ""
+msgstr "選擇您偏好的顯示語言和地區設定"
+
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:89
+#~ msgid "← Back"
+#~ msgstr ""
 
 #: src/app/routes/_authenticated/_option-groups/components/option-group-bulk-actions.tsx:87
 msgid "Successfully removed {successCount} option groups from channel"
-msgstr ""
+msgstr "已成功從頻道中移除 {successCount} 個選項群組"
 
 #: src/app/routes/_authenticated/_shipping-methods/components/test-single-method-result.tsx:76
 msgid "Shipping method is not eligible for this order"
@@ -438,6 +447,12 @@ msgstr "地址已成功刪除"
 msgid "Tax rate"
 msgstr "稅率"
 
+#. placeholder {0}: import { DataTableBulkActionItem } from '@/vdb/components/data-table/data-table-bulk-action-item.js'; import { BulkActionComponent } from '@/vdb/framework/extension-api/types/data-table.js'; import { api } from '@/vdb/graphql/api.js'; import { usePaginatedList } from '@/vdb/hooks/use-paginated-list.js'; import { plural } from '@lingui/core/macro'; import { Plural, useLingui } from '@lingui/react/macro'; import { useMutation } from '@tanstack/react-query'; import { Ban } from 'lucide-react'; import { toast } from 'sonner'; import { cancelJobDocument } from '../job-queue.graphql.js'; export const CancelJobsBulkAction: BulkActionComponent<any> = ({ selection, table }) => { const { refetchPaginatedList } = usePaginatedList(); const { t } = useLingui(); const cancellableJobs = selection.filter(job => job.state === 'RUNNING' || job.state === 'PENDING'); const cancellableCount = cancellableJobs.length; const { mutate, isPending } = useMutation({ mutationFn: async () => { const results = await Promise.allSettled( cancellableJobs.map(job => api.mutate(cancelJobDocument, { jobId: job.id })), ); const fulfilled = results.filter(r => r.status === 'fulfilled').length; const rejected = results.filter(r => r.status === 'rejected').length; return { fulfilled, rejected }; }, onSuccess: ({ fulfilled, rejected }) => { if (fulfilled > 0) { toast.success( plural(fulfilled, { one: t`Successfully cancelled ${fulfilled} job`, other: t`Successfully cancelled ${fulfilled} jobs`, }), ); } if (rejected > 0) { toast.error( plural(rejected, { one: t`Failed to cancel ${rejected} job`, other: t`Failed to cancel ${rejected} jobs`, }), ); } refetchPaginatedList(); table.resetRowSelection(); }, }); if (cancellableCount === 0) { return null; } return ( <DataTableBulkActionItem requiresPermission={['DeleteSettings', 'DeleteSystem']} onClick={() => mutate()} disabled={isPending} label={ <Plural value={cancellableCount} one={`Cancel ${cancellableCount} job`} other={`Cancel ${cancellableCount} jobs`} /> } confirmationText={ <Plural value={cancellableCount} one={`Are you sure you want to cancel ${cancellableCount} job? This action cannot be undone.`} other={`Are you sure you want to cancel ${cancellableCount} jobs? This action cannot be undone.`} /> } icon={Ban} className="text-destructive" /> ); }; 
+#. placeholder {1}: import { DataTableBulkActionItem } from '@/vdb/components/data-table/data-table-bulk-action-item.js'; import { BulkActionComponent } from '@/vdb/framework/extension-api/types/data-table.js'; import { api } from '@/vdb/graphql/api.js'; import { usePaginatedList } from '@/vdb/hooks/use-paginated-list.js'; import { plural } from '@lingui/core/macro'; import { Plural, useLingui } from '@lingui/react/macro'; import { useMutation } from '@tanstack/react-query'; import { Ban } from 'lucide-react'; import { toast } from 'sonner'; import { cancelJobDocument } from '../job-queue.graphql.js'; export const CancelJobsBulkAction: BulkActionComponent<any> = ({ selection, table }) => { const { refetchPaginatedList } = usePaginatedList(); const { t } = useLingui(); const cancellableJobs = selection.filter(job => job.state === 'RUNNING' || job.state === 'PENDING'); const cancellableCount = cancellableJobs.length; const { mutate, isPending } = useMutation({ mutationFn: async () => { const results = await Promise.allSettled( cancellableJobs.map(job => api.mutate(cancelJobDocument, { jobId: job.id })), ); const fulfilled = results.filter(r => r.status === 'fulfilled').length; const rejected = results.filter(r => r.status === 'rejected').length; return { fulfilled, rejected }; }, onSuccess: ({ fulfilled, rejected }) => { if (fulfilled > 0) { toast.success( plural(fulfilled, { one: t`Successfully cancelled ${fulfilled} job`, other: t`Successfully cancelled ${fulfilled} jobs`, }), ); } if (rejected > 0) { toast.error( plural(rejected, { one: t`Failed to cancel ${rejected} job`, other: t`Failed to cancel ${rejected} jobs`, }), ); } refetchPaginatedList(); table.resetRowSelection(); }, }); if (cancellableCount === 0) { return null; } return ( <DataTableBulkActionItem requiresPermission={['DeleteSettings', 'DeleteSystem']} onClick={() => mutate()} disabled={isPending} label={ <Plural value={cancellableCount} one={`Cancel ${cancellableCount} job`} other={`Cancel ${cancellableCount} jobs`} /> } confirmationText={ <Plural value={cancellableCount} one={`Are you sure you want to cancel ${cancellableCount} job? This action cannot be undone.`} other={`Are you sure you want to cancel ${cancellableCount} jobs? This action cannot be undone.`} /> } icon={Ban} className="text-destructive" /> ); }; 
+#: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:33
+msgid "{fulfilled, plural, one {{0}} other {{1}}}"
+msgstr ""
+
 #: src/app/routes/_authenticated/_orders/components/draft-order-status.tsx:34
 msgid "Order draft isn't ready to be completed"
 msgstr "訂單草稿尚未準備就緒"
@@ -447,7 +462,7 @@ msgstr "訂單草稿尚未準備就緒"
 msgid "New collection"
 msgstr "新增集合"
 
-#: src/app/routes/_authenticated/index.tsx:175
+#: src/app/routes/_authenticated/index.tsx:184
 msgid "Insights"
 msgstr "洞察"
 
@@ -500,7 +515,7 @@ msgstr "移除連結"
 
 #: src/app/routes/_authenticated/_system/settings-store.tsx:123
 msgid "This field is readonly"
-msgstr ""
+msgstr "此欄位為唯讀"
 
 #: src/lib/framework/dashboard-widget/metrics-widget/index.tsx:32
 #: src/lib/framework/dashboard-widget/metrics-widget/index.tsx:80
@@ -528,9 +543,9 @@ msgstr "搜尋付款方式..."
 msgid "Shipping address unset for order"
 msgstr "訂單已取消配送地址"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:293
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:332
 msgid "Create {enabledCount} variants"
-msgstr ""
+msgstr "建立 {enabledCount} 個變體"
 
 #. placeholder {0}: entry.data.paymentId
 #. placeholder {1}: entry.data.to
@@ -590,7 +605,7 @@ msgstr "角色"
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:395
 msgid "Grid view"
-msgstr ""
+msgstr "網格檢視"
 
 #: src/app/routes/_authenticated/_customers/components/customer-address-card.tsx:48
 msgid "Failed to delete address"
@@ -618,7 +633,7 @@ msgstr "登入"
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:398
 msgid "List view"
-msgstr ""
+msgstr "清單檢視"
 
 #: src/app/routes/_authenticated/_shipping-methods/components/test-order-builder.tsx:164
 msgid "Test Order"
@@ -628,9 +643,9 @@ msgstr "測試訂單"
 msgid "Select a customer to continue"
 msgstr "選擇客戶以繼續"
 
-#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:71
+#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:73
 msgid "Successfully assigned option group"
-msgstr ""
+msgstr "選項群組指派成功"
 
 #: src/app/routes/_authenticated/_shipping-methods/components/shipping-method-test-result-wrapper.tsx:30
 msgid "Run Test"
@@ -706,9 +721,9 @@ msgstr "下單時間"
 
 #: src/app/routes/_authenticated/_api-keys/components/rotate-api-key-button.tsx:53
 msgid "Rotating this key will immediately invalidate the current key. Any integrations using it will stop working until updated with the new key."
-msgstr ""
+msgstr "輪換此金鑰將立即使目前的金鑰失效。所有使用該金鑰的整合將停止運作，直到更新為新金鑰。"
 
-#: src/app/routes/_authenticated/_system/job-queue.tsx:136
+#: src/app/routes/_authenticated/_system/job-queue.tsx:163
 msgid "The data that has been passed to the job"
 msgstr "傳遞給工作的資料"
 
@@ -769,7 +784,7 @@ msgstr "輸入此退款結算的交易 ID"
 
 #: src/app/routes/_authenticated/_api-keys/components/api-key-secret-dialog.tsx:67
 msgid "Your API Key"
-msgstr ""
+msgstr "您的 API Key"
 
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:310
 msgid "Are you sure you want to delete this draft order?"
@@ -787,7 +802,7 @@ msgstr "找到 {0} 個符合條件的配送方式"
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:746
 msgid "Dimensions"
-msgstr ""
+msgstr "尺寸"
 
 #: src/lib/components/ui/password-input.tsx:20
 msgid "Show password"
@@ -818,7 +833,7 @@ msgstr "動作"
 msgid "Discounts"
 msgstr "折扣"
 
-#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:304
+#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:307
 msgid "Enter refund note"
 msgstr "輸入退款備註"
 
@@ -832,9 +847,9 @@ msgstr "內容:"
 
 #: src/app/routes/_authenticated/_system/settings-store.tsx:260
 msgid "Key"
-msgstr ""
+msgstr "金鑰"
 
-#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:355
+#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:360
 #: src/lib/components/shared/navigation-confirmation.tsx:58
 msgid "Confirm"
 msgstr "確認"
@@ -847,7 +862,7 @@ msgstr "建立集合失敗"
 msgid "Go to first page"
 msgstr "前往第一頁"
 
-#: src/app/routes/_authenticated/_products/products_.$id.tsx:107
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:168
 msgid "Failed to create product"
 msgstr "建立商品失敗"
 
@@ -870,6 +885,10 @@ msgstr "訂單已設定配送地址"
 #: src/app/routes/_authenticated/_assets/assets_.$id.tsx:173
 msgid "Focal Point"
 msgstr "焦點"
+
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:99
+msgid "Single variant, no options"
+msgstr "單一變體，無選項"
 
 #: src/app/routes/_authenticated/_orders/components/use-transition-order-to-state.tsx:107
 msgid "Select the next state for the order"
@@ -944,7 +963,7 @@ msgstr "配送地址已變更"
 
 #: src/app/routes/_authenticated/_option-groups/components/option-group-products-block.tsx:63
 msgid "No products found"
-msgstr ""
+msgstr "找不到產品"
 
 #: src/lib/components/shared/rich-text-editor/table-edit-icons.tsx:193
 msgid "Add row before"
@@ -984,9 +1003,9 @@ msgstr "已配置"
 
 #: src/lib/components/layout/nav-user.tsx:102
 msgid "Explore Platform & Cloud"
-msgstr ""
+msgstr "探索 Platform & Cloud"
 
-#: src/app/routes/_authenticated/_system/job-queue.tsx:86
+#: src/app/routes/_authenticated/_system/job-queue.tsx:115
 msgid "Every 5 seconds"
 msgstr "每 5 秒"
 
@@ -998,7 +1017,7 @@ msgstr "已成功建立集合"
 #: src/app/routes/_authenticated/_orders/components/shipping-method-selector.tsx:49
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:298
 #: src/app/routes/_authenticated/_products/components/add-product-variant-dialog.tsx:298
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:192
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:208
 #: src/lib/components/layout/language-dialog.tsx:136
 msgid "Price"
 msgstr "價格"
@@ -1011,7 +1030,7 @@ msgstr "草稿訂單"
 #: src/app/routes/_authenticated/_system/settings-store.tsx:281
 #: src/app/routes/_authenticated/_system/settings-store.tsx:314
 msgid "Scope"
-msgstr ""
+msgstr "範圍"
 
 #: src/app/routes/_authenticated/_shipping-methods/components/test-single-method-result.tsx:58
 msgid "Shipping method is eligible for this order"
@@ -1030,13 +1049,13 @@ msgstr "已從群組中移除"
 msgid "Width"
 msgstr "寬度"
 
-#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:331
+#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:334
 msgid "No payment or refund required"
 msgstr "不需要付款或退款"
 
 #: src/app/routes/_authenticated/_api-keys/components/api-key-secret-dialog.tsx:108
 msgid "Download as .env file"
-msgstr ""
+msgstr "下載為 .env 檔案"
 
 #: src/app/routes/_authenticated/_promotions/promotions_.$id.tsx:154
 msgid "When enabled, a promotion is available in the shop"
@@ -1058,12 +1077,12 @@ msgstr "更新促銷失敗"
 #: src/lib/components/shared/asset/asset-gallery.tsx:368
 #: src/lib/components/shared/asset/asset-gallery.tsx:380
 msgid "Images"
-msgstr ""
+msgstr "圖片"
 
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:158
 msgid "API Keys"
-msgstr ""
+msgstr "API Keys"
 
 #: src/app/routes/_authenticated/_products/components/product-option-select.tsx:64
 msgid "Search {name}..."
@@ -1077,8 +1096,8 @@ msgstr "編輯資源"
 msgid "Cancel payment"
 msgstr "取消付款"
 
-#: src/app/routes/_authenticated/_system/job-queue.tsx:48
-#: src/app/routes/_authenticated/_system/job-queue.tsx:118
+#: src/app/routes/_authenticated/_system/job-queue.tsx:77
+#: src/app/routes/_authenticated/_system/job-queue.tsx:147
 msgid "Job Queue"
 msgstr "工作佇列"
 
@@ -1115,16 +1134,16 @@ msgstr "找不到結果"
 msgid "Set a shipping address and select a shipping method"
 msgstr "設定收貨地址並選擇配送方式"
 
-#: src/app/routes/_authenticated/_system/job-queue.tsx:85
+#: src/app/routes/_authenticated/_system/job-queue.tsx:114
 msgid "Off"
 msgstr "關閉"
 
 #: src/app/routes/_authenticated/_system/settings-store.tsx:37
 #: src/app/routes/_authenticated/_system/settings-store.tsx:304
 msgid "Settings Store"
-msgstr ""
+msgstr "設定商店"
 
-#: src/app/routes/_authenticated/_system/job-queue.tsx:234
+#: src/app/routes/_authenticated/_system/job-queue.tsx:257
 msgid "Queue"
 msgstr "佇列"
 
@@ -1137,7 +1156,7 @@ msgstr "新增稅率"
 msgid "Payment transitioned"
 msgstr "付款已轉換"
 
-#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:287
+#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:290
 msgid "Remaining:"
 msgstr "剩餘："
 
@@ -1149,11 +1168,11 @@ msgstr "找不到代碼為「{duplicatorCode}」的 {entityName} 複製器"
 msgid "Prices include tax for default tax zone"
 msgstr "價格包含預設稅務區域的稅金"
 
-#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:273
+#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:276
 msgid "Total refund:"
 msgstr "退款總計："
 
-#: src/app/routes/_authenticated/_system/job-queue.tsx:153
+#: src/app/routes/_authenticated/_system/job-queue.tsx:180
 #: src/app/routes/_authenticated/_system/scheduled-tasks.tsx:176
 msgid "View job result"
 msgstr "檢視工作結果"
@@ -1169,15 +1188,15 @@ msgstr "未選取項目"
 #. placeholder {0}: selected.length
 #: src/lib/components/shared/asset/asset-gallery.tsx:469
 msgid ", {0} selected"
-msgstr ""
+msgstr "，已選取 {0} 項"
 
 #: src/lib/components/shared/country-selector.tsx:86
 msgid "No countries found"
 msgstr "找不到國家"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:147
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:176
 msgid "Successfully created variants"
-msgstr ""
+msgstr "變體建立成功"
 
 #: src/lib/components/data-input/slug-input.tsx:280
 #: src/lib/components/data-input/slug-input.tsx:282
@@ -1214,9 +1233,9 @@ msgstr "使用全域缺貨臨界值"
 msgid "Payment state updated successfully"
 msgstr "付款狀態已成功更新"
 
-#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:155
+#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:161
 msgid "Create new"
-msgstr ""
+msgstr "新建"
 
 #: src/app/routes/_authenticated/_orders/components/refund-order-dialog.tsx:249
 msgid "Refund total"
@@ -1229,10 +1248,14 @@ msgstr "地址已刪除"
 
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:195
 msgid "Only roles assigned to your account are available."
+msgstr "僅您帳戶已指派的角色可用。"
+
+#: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:63
+msgid "{cancellableCount, plural, one {Cancel {cancellableCount} job} other {Cancel {cancellableCount} jobs}}"
 msgstr ""
 
 #: src/lib/components/data-input/product-multi-selector-input.tsx:399
-#: src/lib/components/shared/configurable-operation-multi-selector.tsx:267
+#: src/lib/components/shared/configurable-operation-multi-selector.tsx:264
 #: src/lib/components/shared/configurable-operation-selector.tsx:139
 msgid "{buttonText}"
 msgstr "{buttonText}"
@@ -1247,7 +1270,7 @@ msgstr "項目已新增至訂單"
 
 #: src/app/routes/_authenticated/_products/components/shared-option-group-warning.tsx:13
 msgid "{productCount, plural, one {This option group is used by one other product. Changes will affect it too.} other {This option group is shared across # products. Changes will affect all of them.}}"
-msgstr ""
+msgstr "{productCount, plural, one {此選項群組被另一個產品使用。變更也會影響該產品。} other {此選項群組在 # 個產品中共用。變更將影響所有產品。}}"
 
 #: src/lib/components/data-table/views-sheet.tsx:125
 msgid "My Saved Views"
@@ -1265,7 +1288,7 @@ msgstr "建立賣家失敗"
 #. placeholder {0}: entityName.toLowerCase()
 #: src/app/common/duplicate-entity-dialog.tsx:87
 msgid "Configure duplication settings for {0}s"
-msgstr ""
+msgstr "設定{0}的複製設定"
 
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:203
 #: src/app/routes/_authenticated/_orders/orders_.$id_.modify.tsx:245
@@ -1274,7 +1297,7 @@ msgstr "地址"
 
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:143
 msgid "Add a new option value to the {groupName} option group"
-msgstr ""
+msgstr "向 {groupName} 選項群組新增選項值"
 
 #. placeholder {0}: entry.data.modificationId
 #: src/app/routes/_authenticated/_orders/components/order-history/default-order-history-components.tsx:76
@@ -1290,7 +1313,7 @@ msgid "Channel Languages"
 msgstr "通路語言"
 
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$id.tsx:137
-#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:117
+#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:119
 msgid "Failed to create option group"
 msgstr "建立選項群組失敗"
 
@@ -1364,7 +1387,7 @@ msgstr "之前"
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:745
 msgid "Size"
-msgstr ""
+msgstr "大小"
 
 #. placeholder {0}: formatLanguageName(contentLanguage)
 #: src/lib/components/shared/translatable-form-field.tsx:68
@@ -1514,7 +1537,7 @@ msgstr "前往最後一頁"
 #: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:418
 #: src/app/routes/_authenticated/_orders/components/add-manual-payment-dialog.tsx:168
 #: src/app/routes/_authenticated/_orders/components/fulfill-order-dialog.tsx:310
-#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:347
+#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:352
 #: src/app/routes/_authenticated/_orders/components/refund-order-dialog.tsx:358
 #: src/app/routes/_authenticated/_orders/components/settle-refund-dialog.tsx:71
 #: src/app/routes/_authenticated/_products/components/assign-facet-values-dialog.tsx:270
@@ -1541,7 +1564,7 @@ msgstr "取消"
 msgid "Successfully created product variant"
 msgstr "已成功建立商品變體"
 
-#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:229
+#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:236
 msgid "Refund from this method"
 msgstr "從此方式退款"
 
@@ -1579,7 +1602,7 @@ msgstr "集合"
 
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:453
 msgid "Delete variant"
-msgstr ""
+msgstr "刪除變體"
 
 #: src/app/routes/_authenticated/_orders/components/order-modification-summary.tsx:249
 msgid "No modifications made"
@@ -1619,7 +1642,7 @@ msgid "Private collections are not visible in the shop"
 msgstr "私人集合在商店中不可見"
 
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:236
-#: src/app/routes/_authenticated/_products/products_.$id.tsx:132
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:229
 msgid "When enabled, a product is available in the shop"
 msgstr "啟用後，商品在商店中可用"
 
@@ -1652,7 +1675,7 @@ msgstr "預設配送地址"
 msgid "{operator}"
 msgstr "{operator}"
 
-#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:170
+#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:177
 msgid "Refund required"
 msgstr "需要退款"
 
@@ -1679,6 +1702,10 @@ msgstr "無屬性值"
 msgid "A reason for the refund is required"
 msgstr "需要提供退款原因"
 
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:194
+msgid "Could not remove option group"
+msgstr "無法移除選項群組"
+
 #: src/app/routes/_authenticated/_tax-categories/tax-categories_.$id.tsx:77
 msgid "Failed to update tax category"
 msgstr "更新稅務類別失敗"
@@ -1704,7 +1731,7 @@ msgstr "退款已成功完成"
 #: src/app/routes/_authenticated/_payment-methods/payment-methods_.$id.tsx:138
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:226
 #: src/app/routes/_authenticated/_products/components/assign-facet-values-dialog.tsx:276
-#: src/app/routes/_authenticated/_products/products_.$id.tsx:122
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:219
 #: src/app/routes/_authenticated/_profile/profile.tsx:84
 #: src/app/routes/_authenticated/_promotions/promotions_.$id.tsx:144
 #: src/app/routes/_authenticated/_roles/roles_.$id.tsx:84
@@ -1801,6 +1828,10 @@ msgstr "欄設定"
 msgid "Code"
 msgstr "代碼"
 
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:203
+msgid "Failed to remove option groups"
+msgstr "移除選項群組失敗"
+
 #: src/app/routes/_authenticated/_orders/components/order-history/order-history-utils.tsx:97
 msgid "Order delivered"
 msgstr "訂單已送達"
@@ -1817,9 +1848,9 @@ msgstr "從此通路的全域可用語言中選取"
 msgid "Are you sure you want to delete this address?"
 msgstr "確定要刪除此地址嗎？"
 
-#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:75
+#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:77
 msgid "Failed to assign option group"
-msgstr ""
+msgstr "指派選項群組失敗"
 
 #: src/app/routes/_authenticated/_assets/assets_.$id.tsx:89
 msgid "Failed to update asset"
@@ -1873,7 +1904,7 @@ msgstr "退還運費"
 #: src/app/routes/_authenticated/_system/settings-store.tsx:293
 #: src/app/routes/_authenticated/_system/settings-store.tsx:324
 msgid "Readonly"
-msgstr ""
+msgstr "唯讀"
 
 #: src/lib/components/data-table/views-sheet.tsx:100
 msgid "Failed to duplicate global view"
@@ -1884,7 +1915,7 @@ msgid "Test Shipping Method"
 msgstr "測試配送方式"
 
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:465
-#: src/app/routes/_authenticated/_products/products_.$id.tsx:235
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:333
 msgid "Facet Values"
 msgstr "屬性值"
 
@@ -1905,7 +1936,7 @@ msgstr "{0} 位客戶"
 #: src/app/routes/_authenticated/_api-keys/api-keys.tsx:14
 #: src/app/routes/_authenticated/_api-keys/api-keys.tsx:25
 msgid "API Keys"
-msgstr ""
+msgstr "API Keys"
 
 #: src/lib/components/shared/language-selector.tsx:52
 msgid "Select a language"
@@ -2270,7 +2301,7 @@ msgstr "集合移動成功"
 msgid "Registered"
 msgstr "已註冊"
 
-#: src/app/routes/_authenticated/_system/job-queue.tsx:208
+#: src/app/routes/_authenticated/_system/job-queue.tsx:231
 msgid "Cancel Job"
 msgstr "取消工作"
 
@@ -2287,6 +2318,10 @@ msgstr "第 {0} 頁，共 {1} 頁"
 #: src/app/routes/_authenticated/_tax-rates/tax-rates_.$id.tsx:119
 msgid "Rate"
 msgstr "費率"
+
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:114
+msgid "Size, colour, etc."
+msgstr "大小、顏色等"
 
 #: src/lib/components/shared/facet-value-selector.tsx:155
 #: src/lib/components/shared/facet-value-selector.tsx:172
@@ -2334,9 +2369,9 @@ msgstr "儲存檢視"
 msgid "{0} selected"
 msgstr "已選取 {0} 個"
 
-#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:233
+#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:239
 msgid "Search option groups..."
-msgstr ""
+msgstr "搜尋選項群組..."
 
 #: src/app/routes/_authenticated/_orders/orders_.$id_.modify.tsx:168
 msgid "Modify order"
@@ -2363,7 +2398,7 @@ msgstr "訂單已設定客戶"
 msgid "Facets"
 msgstr "屬性"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:195
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:211
 msgid "Stock on Hand"
 msgstr "現有庫存"
 
@@ -2384,15 +2419,15 @@ msgstr "新增區域"
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:136
 #: src/app/routes/_authenticated/_api-keys/api-keys.tsx:79
 msgid "New API Key"
-msgstr ""
+msgstr "新建 API Key"
 
 #: src/lib/components/shared/rich-text-editor/table-edit-icons.tsx:164
 msgid "Delete column"
 msgstr "刪除欄"
 
-#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:151
+#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:157
 msgid "Assign existing"
-msgstr ""
+msgstr "指派現有"
 
 #: src/lib/components/data-table/human-readable-operator.tsx:34
 msgid "is null"
@@ -2412,7 +2447,7 @@ msgstr "預設通路"
 
 #: src/lib/components/shared/rich-text-editor/image-dialog.tsx:109
 msgid "Insert a new image with source, title, and dimensions"
-msgstr ""
+msgstr "插入帶有來源、標題和尺寸的新圖片"
 
 #: src/app/routes/_authenticated/_facets/facets_.$facetId.values_.$id.tsx:93
 msgid "Failed to create facet value"
@@ -2467,7 +2502,7 @@ msgstr "已成功建立通路"
 msgid "Successfully updated customer"
 msgstr "已成功更新客戶"
 
-#: src/app/routes/_authenticated/_system/job-queue.tsx:139
+#: src/app/routes/_authenticated/_system/job-queue.tsx:166
 msgid "View data"
 msgstr "檢視資料"
 
@@ -2485,7 +2520,7 @@ msgstr "更多檢視"
 
 #: src/lib/components/shared/rich-text-editor/image-dialog.tsx:109
 msgid "Edit the selected image properties"
-msgstr ""
+msgstr "編輯所選圖片的屬性"
 
 #: src/lib/components/data-table/views-sheet.tsx:49
 msgid "Applied view \"{viewName}\""
@@ -2516,9 +2551,13 @@ msgstr "重新計算運費"
 #: src/app/routes/_authenticated/_assets/assets.tsx:40
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:225
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:482
-#: src/app/routes/_authenticated/_products/products_.$id.tsx:268
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:366
 msgid "Assets"
 msgstr "資源"
+
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:307
+msgid "This will remove all option groups from this product and return to the variant setup choice."
+msgstr "這將移除此產品的所有選項群組並返回變體設定選擇。"
 
 #: src/app/routes/_authenticated/_orders/components/order-detail-shared.tsx:299
 #: src/app/routes/_authenticated/_orders/orders_.$id_.modify.tsx:277
@@ -2535,7 +2574,7 @@ msgstr "新增屬性值"
 msgid "Please select a target collection"
 msgstr "請選取目標集合"
 
-#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:152
+#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:159
 msgid "Review the changes before applying them to the order."
 msgstr "在將變更套用到訂單之前，請先檢閱變更。"
 
@@ -2556,13 +2595,13 @@ msgstr "折扣"
 #: src/lib/components/shared/asset/asset-gallery.tsx:367
 #: src/lib/components/shared/asset/asset-gallery.tsx:379
 msgid "All types"
-msgstr ""
+msgstr "所有類型"
 
 #: src/app/routes/_authenticated/_orders/components/draft-order-status.tsx:29
 msgid "Only draft orders can be completed"
 msgstr "只有草稿訂單可以完成"
 
-#: src/app/routes/_authenticated/_products/products_.$id.tsx:107
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:168
 msgid "Failed to update product"
 msgstr "更新商品失敗"
 
@@ -2613,7 +2652,7 @@ msgid "Successfully created administrator"
 msgstr "成功建立管理員"
 
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$id.tsx:198
-#: src/app/routes/_authenticated/_products/products_.$id.tsx:217
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:315
 msgid "Product Options"
 msgstr "商品選項"
 
@@ -2621,7 +2660,7 @@ msgstr "商品選項"
 msgid "Select country"
 msgstr "選取國家"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:291
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:330
 msgid "Creating..."
 msgstr "正在建立..."
 
@@ -2693,8 +2732,8 @@ msgstr "刪除全域檢視"
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$id.tsx:160
 #: src/app/routes/_authenticated/_payment-methods/payment-methods_.$id.tsx:138
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:226
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:180
-#: src/app/routes/_authenticated/_products/products_.$id.tsx:122
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:196
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:219
 #: src/app/routes/_authenticated/_promotions/promotions_.$id.tsx:144
 #: src/app/routes/_authenticated/_roles/roles_.$id.tsx:84
 #: src/app/routes/_authenticated/_sellers/sellers_.$id.tsx:78
@@ -2706,7 +2745,7 @@ msgstr "刪除全域檢視"
 msgid "Create"
 msgstr "建立"
 
-#: src/app/routes/_authenticated/_system/job-queue.tsx:88
+#: src/app/routes/_authenticated/_system/job-queue.tsx:117
 msgid "Every 30 seconds"
 msgstr "每 30 秒"
 
@@ -2779,7 +2818,7 @@ msgstr "連結 href"
 
 #: src/lib/utils/get-locale-fallback-placeholder.ts:31
 msgid "Fallback: {value}"
-msgstr ""
+msgstr "備援值: {value}"
 
 #: src/app/routes/_authenticated/_orders/components/order-detail-shared.tsx:260
 #: src/app/routes/_authenticated/_orders/components/order-history/order-history-container.tsx:30
@@ -2806,6 +2845,8 @@ msgstr "全域檢視已成功重新命名"
 msgid "No tags selected"
 msgstr "未選取標籤"
 
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:310
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:319
 #: src/lib/components/data-table/data-table-facet-value-faceted-filter.tsx:205
 msgid "Back"
 msgstr "返回"
@@ -2916,6 +2957,7 @@ msgid "Track"
 msgstr "追蹤"
 
 #: src/app/routes/_authenticated/_products/components/add-product-variant-dialog.tsx:322
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:331
 msgid "Create variant"
 msgstr "建立變體"
 
@@ -2923,7 +2965,7 @@ msgstr "建立變體"
 msgid "Facet values for {facetName}"
 msgstr "{facetName} 的屬性值"
 
-#: src/app/routes/_authenticated/index.tsx:190
+#: src/app/routes/_authenticated/index.tsx:199
 msgid "Save Layout"
 msgstr "儲存佈局"
 
@@ -2955,7 +2997,7 @@ msgstr "選項值名稱"
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:214
 #: src/app/routes/_authenticated/_api-keys/api-keys.tsx:46
 msgid "Last used"
-msgstr ""
+msgstr "最後使用時間"
 
 #: src/app/routes/_authenticated/_tax-categories/tax-categories_.$id.tsx:112
 msgid "Is default tax category"
@@ -2975,7 +3017,7 @@ msgstr "州/省"
 
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$id.tsx:138
 msgid "Failed to update option group"
-msgstr ""
+msgstr "更新選項群組失敗"
 
 #: src/app/routes/_authenticated/_channels/channels_.$id.tsx:183
 msgid "Channel defaults"
@@ -2987,13 +3029,17 @@ msgstr "建立稅務類別失敗"
 
 #: src/lib/components/data-table/data-table-filter-dialog.tsx:55
 msgid "Set filter criteria for the {columnId} column"
-msgstr ""
+msgstr "設定 {columnId} 欄的篩選條件"
 
 #: src/app/routes/_authenticated/_shipping-methods/components/test-address-form.tsx:217
 #: src/app/routes/_authenticated/_zones/components/zone-countries-table.tsx:53
 #: src/lib/components/shared/customer-address-form.tsx:173
 msgid "Country"
 msgstr "國家"
+
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:97
+msgid "Simple product"
+msgstr "簡單產品"
 
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:137
@@ -3002,7 +3048,7 @@ msgstr "工作佇列"
 
 #: src/app/routes/_authenticated/_api-keys/components/api-key-secret-dialog.tsx:53
 msgid "Please confirm you have saved the API key before closing."
-msgstr ""
+msgstr "請在關閉前確認您已儲存 API Key。"
 
 #: src/lib/components/data-table/use-generated-columns.tsx:411
 msgid "Confirm deletion"
@@ -3034,7 +3080,7 @@ msgstr "開始"
 
 #: src/app/routes/_authenticated/_api-keys/components/rotate-api-key-button.tsx:35
 msgid "Failed to rotate API key"
-msgstr ""
+msgstr "輪換 API Key 失敗"
 
 #: src/lib/components/data-table/human-readable-operator.tsx:36
 msgid "in"
@@ -3044,6 +3090,10 @@ msgstr "在"
 #: src/lib/components/shared/role-selector.tsx:53
 msgid "Search roles..."
 msgstr "搜尋角色..."
+
+#: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:35
+msgid "Successfully cancelled {fulfilled} jobs"
+msgstr ""
 
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:69
 #: src/app/routes/_authenticated/_product-variants/product-variants.tsx:19
@@ -3062,7 +3112,7 @@ msgstr "處理中..."
 #. placeholder {0}: totalItems === 1 ? 'asset' : 'assets'
 #: src/lib/components/shared/asset/asset-gallery.tsx:465
 msgid "{totalItems} {0} found"
-msgstr ""
+msgstr "找到 {totalItems} 個{0}"
 
 #: src/lib/components/date-range-picker.tsx:126
 msgid "Select date range"
@@ -3076,7 +3126,7 @@ msgstr "商品"
 
 #: src/app/routes/_authenticated/_api-keys/components/rotate-api-key-button.tsx:51
 msgid "Rotate API Key"
-msgstr ""
+msgstr "輪換 API Key"
 
 #: src/app/routes/_authenticated/_tax-rates/tax-rates.tsx:62
 msgid "Category"
@@ -3211,10 +3261,10 @@ msgstr "選取一個地址"
 
 #: src/app/routes/_authenticated/_system/settings-store.tsx:326
 msgid "Yes"
-msgstr ""
+msgstr "是"
 
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:175
-#: src/app/routes/_authenticated/_products/products_.$id.tsx:149
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:246
 msgid "Slug"
 msgstr "Slug"
 
@@ -3235,7 +3285,7 @@ msgid "Update the note content or visibility"
 msgstr "更新備註內容或可見性"
 
 #. js-lingui-explicit-id
-#: src/lib/framework/defaults.ts:271
+#: src/lib/framework/defaults.ts:272
 msgid "Latest Orders Widget"
 msgstr "最新訂單小工具"
 
@@ -3275,7 +3325,7 @@ msgstr "完成付款"
 #: src/app/routes/_authenticated/_channels/channels.tsx:15
 #: src/app/routes/_authenticated/_channels/channels.tsx:23
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$id.tsx:216
-#: src/app/routes/_authenticated/_products/products_.$id.tsx:245
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:343
 #: src/app/routes/_authenticated/_roles/roles_.$id.tsx:111
 #: src/lib/components/layout/channel-switcher.tsx:146
 msgid "Channels"
@@ -3287,7 +3337,7 @@ msgstr "運費已退款"
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:376
 msgid "Asset type"
-msgstr ""
+msgstr "資源類型"
 
 #: src/app/routes/_authenticated/_stock-locations/stock-locations.tsx:58
 msgid "New Stock Location"
@@ -3301,8 +3351,8 @@ msgstr "失敗前已退還 {successfulRefundCount} 筆付款。請查看訂單�
 msgid "Select item"
 msgstr "選取項目"
 
-#: src/app/routes/_authenticated/_products/products_.$id.tsx:55
-#: src/app/routes/_authenticated/_products/products_.$id.tsx:115
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:57
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:212
 msgid "New product"
 msgstr "新增商品"
 
@@ -3330,7 +3380,7 @@ msgstr "更新履行狀態失敗"
 
 #: src/app/routes/_authenticated/_products/components/add-product-variant-dialog.tsx:233
 msgid "Create a new product variant with options, pricing, and stock"
-msgstr ""
+msgstr "建立包含選項、定價和庫存的新產品變體"
 
 #: src/app/routes/_authenticated/_facets/facets_.$id.tsx:109
 msgid "Private facets are not visible in the shop"
@@ -3347,9 +3397,9 @@ msgstr "選取一個稅務類別"
 msgid "Not Running"
 msgstr "未執行"
 
-#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:261
+#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:267
 msgid "Assigned"
-msgstr ""
+msgstr "已指派"
 
 #: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:75
 msgid "Heading 1"
@@ -3412,7 +3462,7 @@ msgstr "搜尋貨幣..."
 
 #: src/lib/components/shared/remove-from-channel-bulk-action.tsx:82
 msgid "Remove from channel"
-msgstr ""
+msgstr "從頻道中移除"
 
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:169
 #: src/lib/components/shared/rich-text-editor/image-dialog.tsx:157
@@ -3462,6 +3512,12 @@ msgstr "無帳單地址"
 msgid "Facet"
 msgstr "屬性"
 
+#. placeholder {0}: import { DataTableBulkActionItem } from '@/vdb/components/data-table/data-table-bulk-action-item.js'; import { BulkActionComponent } from '@/vdb/framework/extension-api/types/data-table.js'; import { api } from '@/vdb/graphql/api.js'; import { usePaginatedList } from '@/vdb/hooks/use-paginated-list.js'; import { plural } from '@lingui/core/macro'; import { Plural, useLingui } from '@lingui/react/macro'; import { useMutation } from '@tanstack/react-query'; import { Ban } from 'lucide-react'; import { toast } from 'sonner'; import { cancelJobDocument } from '../job-queue.graphql.js'; export const CancelJobsBulkAction: BulkActionComponent<any> = ({ selection, table }) => { const { refetchPaginatedList } = usePaginatedList(); const { t } = useLingui(); const cancellableJobs = selection.filter(job => job.state === 'RUNNING' || job.state === 'PENDING'); const cancellableCount = cancellableJobs.length; const { mutate, isPending } = useMutation({ mutationFn: async () => { const results = await Promise.allSettled( cancellableJobs.map(job => api.mutate(cancelJobDocument, { jobId: job.id })), ); const fulfilled = results.filter(r => r.status === 'fulfilled').length; const rejected = results.filter(r => r.status === 'rejected').length; return { fulfilled, rejected }; }, onSuccess: ({ fulfilled, rejected }) => { if (fulfilled > 0) { toast.success( plural(fulfilled, { one: t`Successfully cancelled ${fulfilled} job`, other: t`Successfully cancelled ${fulfilled} jobs`, }), ); } if (rejected > 0) { toast.error( plural(rejected, { one: t`Failed to cancel ${rejected} job`, other: t`Failed to cancel ${rejected} jobs`, }), ); } refetchPaginatedList(); table.resetRowSelection(); }, }); if (cancellableCount === 0) { return null; } return ( <DataTableBulkActionItem requiresPermission={['DeleteSettings', 'DeleteSystem']} onClick={() => mutate()} disabled={isPending} label={ <Plural value={cancellableCount} one={`Cancel ${cancellableCount} job`} other={`Cancel ${cancellableCount} jobs`} /> } confirmationText={ <Plural value={cancellableCount} one={`Are you sure you want to cancel ${cancellableCount} job? This action cannot be undone.`} other={`Are you sure you want to cancel ${cancellableCount} jobs? This action cannot be undone.`} /> } icon={Ban} className="text-destructive" /> ); }; 
+#. placeholder {1}: import { DataTableBulkActionItem } from '@/vdb/components/data-table/data-table-bulk-action-item.js'; import { BulkActionComponent } from '@/vdb/framework/extension-api/types/data-table.js'; import { api } from '@/vdb/graphql/api.js'; import { usePaginatedList } from '@/vdb/hooks/use-paginated-list.js'; import { plural } from '@lingui/core/macro'; import { Plural, useLingui } from '@lingui/react/macro'; import { useMutation } from '@tanstack/react-query'; import { Ban } from 'lucide-react'; import { toast } from 'sonner'; import { cancelJobDocument } from '../job-queue.graphql.js'; export const CancelJobsBulkAction: BulkActionComponent<any> = ({ selection, table }) => { const { refetchPaginatedList } = usePaginatedList(); const { t } = useLingui(); const cancellableJobs = selection.filter(job => job.state === 'RUNNING' || job.state === 'PENDING'); const cancellableCount = cancellableJobs.length; const { mutate, isPending } = useMutation({ mutationFn: async () => { const results = await Promise.allSettled( cancellableJobs.map(job => api.mutate(cancelJobDocument, { jobId: job.id })), ); const fulfilled = results.filter(r => r.status === 'fulfilled').length; const rejected = results.filter(r => r.status === 'rejected').length; return { fulfilled, rejected }; }, onSuccess: ({ fulfilled, rejected }) => { if (fulfilled > 0) { toast.success( plural(fulfilled, { one: t`Successfully cancelled ${fulfilled} job`, other: t`Successfully cancelled ${fulfilled} jobs`, }), ); } if (rejected > 0) { toast.error( plural(rejected, { one: t`Failed to cancel ${rejected} job`, other: t`Failed to cancel ${rejected} jobs`, }), ); } refetchPaginatedList(); table.resetRowSelection(); }, }); if (cancellableCount === 0) { return null; } return ( <DataTableBulkActionItem requiresPermission={['DeleteSettings', 'DeleteSystem']} onClick={() => mutate()} disabled={isPending} label={ <Plural value={cancellableCount} one={`Cancel ${cancellableCount} job`} other={`Cancel ${cancellableCount} jobs`} /> } confirmationText={ <Plural value={cancellableCount} one={`Are you sure you want to cancel ${cancellableCount} job? This action cannot be undone.`} other={`Are you sure you want to cancel ${cancellableCount} jobs? This action cannot be undone.`} /> } icon={Ban} className="text-destructive" /> ); }; 
+#: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:41
+msgid "{rejected, plural, one {{0}} other {{1}}}"
+msgstr ""
+
 #: src/lib/components/shared/assigned-channels.tsx:58
 msgid "Cannot remove from active channel"
 msgstr "無法從活動頻道中移除"
@@ -3494,7 +3550,7 @@ msgstr "建立客戶群組失敗"
 msgid "Failed to create role"
 msgstr "建立角色失敗"
 
-#: src/app/routes/_authenticated/_products/products_.$id.tsx:143
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:240
 msgid "Product name"
 msgstr "商品名稱"
 
@@ -3508,7 +3564,7 @@ msgstr "履行狀態已成功更新"
 #: src/app/routes/_authenticated/_option-groups/option-groups.tsx:38
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:64
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:66
-#: src/app/routes/_authenticated/_products/products_.$id.tsx:54
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:56
 #: src/app/routes/_authenticated/_products/products.tsx:24
 #: src/app/routes/_authenticated/_products/products.tsx:47
 msgid "Products"
@@ -3520,14 +3576,14 @@ msgid "Address created"
 msgstr "地址已建立"
 
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:196
-msgid "Add an option group to get started with variants."
-msgstr ""
+#~ msgid "Add an option group to get started with variants."
+#~ msgstr ""
 
 #: src/app/routes/_authenticated/_api-keys/components/rotate-api-key-button.tsx:32
 msgid "API key rotated successfully"
-msgstr ""
+msgstr "API Key 輪換成功"
 
-#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:136
+#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:141
 msgid "Add option group"
 msgstr "新增選項群組"
 
@@ -3540,7 +3596,7 @@ msgstr "退款 {0}"
 msgid "Enter slug manually"
 msgstr "手動輸入 slug"
 
-#: src/app/routes/_authenticated/index.tsx:221
+#: src/app/routes/_authenticated/index.tsx:230
 msgid "No widgets available"
 msgstr "無可用小工具"
 
@@ -3560,7 +3616,7 @@ msgstr "全域檢視已成功複製"
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:210
 #: src/app/routes/_authenticated/_api-keys/api-keys.tsx:66
 msgid "Created by"
-msgstr ""
+msgstr "建立者"
 
 #: src/app/routes/_authenticated/_product-variants/components/add-currency-dropdown.tsx:35
 msgid "Add a price in another currency"
@@ -3663,9 +3719,9 @@ msgstr "新增項目"
 
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:108
 msgid "Successfully created API key"
-msgstr ""
+msgstr "API Key 建立成功"
 
-#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:158
+#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:165
 msgid "Loading preview…"
 msgstr "正在載入預覽..."
 
@@ -3685,7 +3741,7 @@ msgstr "移除選項群組"
 #: src/app/routes/_authenticated/_orders/components/add-surcharge-form.tsx:76
 #: src/app/routes/_authenticated/_orders/components/order-tax-summary.tsx:14
 #: src/app/routes/_authenticated/_payment-methods/payment-methods_.$id.tsx:171
-#: src/app/routes/_authenticated/_products/products_.$id.tsx:165
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:262
 #: src/app/routes/_authenticated/_promotions/promotions_.$id.tsx:174
 #: src/app/routes/_authenticated/_roles/roles_.$id.tsx:94
 #: src/app/routes/_authenticated/_shipping-methods/shipping-methods_.$id.tsx:162
@@ -3709,7 +3765,7 @@ msgstr "街道地址 2"
 msgid "Global view deleted successfully"
 msgstr "全域檢視已成功刪除"
 
-#: src/app/routes/_authenticated/index.tsx:190
+#: src/app/routes/_authenticated/index.tsx:199
 msgid "Edit Layout"
 msgstr "編輯佈局"
 
@@ -3793,7 +3849,7 @@ msgstr "不包含"
 
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$groupId.options_.$id.tsx:186
 msgid "Option Group"
-msgstr ""
+msgstr "選項群組"
 
 #: src/app/routes/_authenticated/_customers/components/customer-address-card.tsx:132
 msgid "Edit the address details below."
@@ -3820,6 +3876,10 @@ msgstr "您的訂單摘要"
 msgid "Upload"
 msgstr "上傳"
 
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:112
+msgid "Product with options"
+msgstr "帶選項的產品"
+
 #. placeholder {0}: filteredTags.length
 #: src/app/routes/_authenticated/_assets/components/asset-tag-filter.tsx:165
 msgid "Showing all {0} results"
@@ -3829,7 +3889,7 @@ msgstr "顯示所有 {0} 個結果"
 #: src/app/routes/_authenticated/_api-keys/api-keys.tsx:60
 #: src/app/routes/_authenticated/_api-keys/components/api-key-secret-dialog.tsx:95
 msgid "Lookup ID"
-msgstr ""
+msgstr "查詢 ID"
 
 #. placeholder {0}: list.totalItems - 3
 #: src/app/routes/_authenticated/_facets/facets.tsx:65
@@ -3839,7 +3899,7 @@ msgstr "+ {0} 個更多"
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:45
 msgid "Option Groups"
-msgstr ""
+msgstr "選項群組"
 
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:392
 msgid "Custom fields"
@@ -3847,7 +3907,7 @@ msgstr "自訂欄位"
 
 #: src/app/routes/_authenticated/_orders/components/order-process-dialog.tsx:85
 msgid "All possible order states and their transitions. The current state is highlighted."
-msgstr ""
+msgstr "所有可能的訂單狀態及其轉換。目前狀態已醒目標示。"
 
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:82
@@ -3855,7 +3915,7 @@ msgid "Orders"
 msgstr "訂單"
 
 #. js-lingui-explicit-id
-#: src/lib/framework/defaults.ts:278
+#: src/lib/framework/defaults.ts:280
 msgid "Orders Summary Widget"
 msgstr "訂單摘要小工具"
 
@@ -4048,7 +4108,7 @@ msgstr "庫存水準"
 
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:121
 msgid "Failed to update API key"
-msgstr ""
+msgstr "更新 API Key 失敗"
 
 #: src/lib/framework/dashboard-widget/base-widget.tsx:76
 msgid "{title}"
@@ -4066,13 +4126,13 @@ msgstr "重新命名全域檢視失敗"
 
 #: src/lib/components/shared/rich-text-editor/link-dialog.tsx:87
 msgid "Insert a new hyperlink with URL and target options"
-msgstr ""
+msgstr "插入帶有 URL 和目標選項的新超連結"
 
 #: src/lib/components/shared/rich-text-editor/image-dialog.tsx:194
 msgid "Height"
 msgstr "高度"
 
-#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:173
+#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:180
 msgid "A refund of {formattedDiff} is required. Select payment amounts and enter a note to proceed."
 msgstr "需要退款 {formattedDiff}。選取付款金額並輸入備註以繼續。"
 
@@ -4112,7 +4172,7 @@ msgstr "可用語言"
 
 #: src/lib/components/data-table/data-table-bulk-actions.tsx:119
 msgid "Reset selection"
-msgstr ""
+msgstr "重設選取"
 
 #: src/app/routes/_authenticated/_orders/components/order-address.tsx:30
 msgid "No address"
@@ -4157,9 +4217,9 @@ msgstr "舊電子郵件："
 msgid "Save a view as \"Global\" to make it available to all users."
 msgstr "將檢視儲存為「全域」以使其對所有使用者可用。"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:150
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:179
 msgid "Failed to create variants"
-msgstr ""
+msgstr "建立變體失敗"
 
 #: src/app/routes/_authenticated/_global-settings/global-settings.tsx:133
 msgid "Sets the stock level at which this a variant is considered to be out of stock. Using a negative value enables backorder support. Can be overridden by product variants."
@@ -4168,7 +4228,7 @@ msgstr "設定將此變體視為缺貨的庫存水準。使用負值可啟用延
 #: src/app/routes/_authenticated/_api-keys/components/rotate-api-key-button.tsx:45
 #: src/app/routes/_authenticated/_api-keys/components/rotate-api-key-button.tsx:68
 msgid "Rotate Key"
-msgstr ""
+msgstr "輪換金鑰"
 
 #: src/app/routes/_authenticated/_products/components/create-product-variants-dialog.tsx:132
 #~ msgid "Failed to create product variants"
@@ -4205,7 +4265,7 @@ msgstr "地區"
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:438
 msgid "Drop files here to upload"
-msgstr ""
+msgstr "將檔案拖放到此處上傳"
 
 #: src/app/routes/_authenticated/_customers/components/customer-status-badge.tsx:18
 msgid "Verified"
@@ -4215,7 +4275,7 @@ msgstr "已驗證"
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$id.tsx:82
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$id.tsx:149
 msgid "New option group"
-msgstr ""
+msgstr "新建選項群組"
 
 #: src/app/routes/_authenticated/_system/healthchecks.tsx:58
 #~ msgid "Last updated {0}"
@@ -4231,7 +4291,7 @@ msgstr "更新角色失敗"
 
 #: src/app/routes/_authenticated/_api-keys/components/api-key-secret-dialog.tsx:77
 msgid "This is the only time the full API key will be displayed. Copy or download it now — it cannot be retrieved later."
-msgstr ""
+msgstr "完整的 API Key 僅此一次顯示。請立即複製或下載，之後將無法再次取得。"
 
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:104
 msgid "Successfully updated collection"
@@ -4417,7 +4477,7 @@ msgstr "重建搜尋索引"
 msgid "Running"
 msgstr "正在執行"
 
-#: src/app/routes/_authenticated/_system/job-queue.tsx:89
+#: src/app/routes/_authenticated/_system/job-queue.tsx:118
 msgid "Every 60 seconds"
 msgstr "每 60 秒"
 
@@ -4446,7 +4506,7 @@ msgstr "對表格套用篩選器，然後按一下「儲存檢視」開始。"
 msgid "Roles"
 msgstr "角色"
 
-#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:319
+#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:322
 msgid "Additional payment required"
 msgstr "需要額外付款"
 
@@ -4474,7 +4534,7 @@ msgstr "{customerGroupName} 的客戶群組成員"
 #: src/app/routes/_authenticated/_orders/components/fulfillment-details.tsx:118
 #: src/app/routes/_authenticated/_orders/components/payment-details.tsx:217
 #: src/app/routes/_authenticated/_orders/orders.tsx:101
-#: src/app/routes/_authenticated/_system/job-queue.tsx:245
+#: src/app/routes/_authenticated/_system/job-queue.tsx:268
 msgid "State"
 msgstr "州/省"
 
@@ -4509,7 +4569,7 @@ msgstr "州/省"
 #: src/app/routes/_authenticated/_payment-methods/payment-methods_.$id.tsx:147
 #: src/app/routes/_authenticated/_payment-methods/payment-methods.tsx:42
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:235
-#: src/app/routes/_authenticated/_products/products_.$id.tsx:131
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:228
 #: src/app/routes/_authenticated/_promotions/promotions_.$id.tsx:153
 #: src/app/routes/_authenticated/_system/scheduled-tasks.tsx:115
 #: src/app/routes/_authenticated/_system/scheduled-tasks.tsx:119
@@ -4523,7 +4583,7 @@ msgstr "已啟用"
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:476
 msgid "Items per page"
-msgstr ""
+msgstr "每頁筆數"
 
 #: src/app/routes/_authenticated/_zones/zones.tsx:39
 msgid "Edit members"
@@ -4555,7 +4615,7 @@ msgstr "預覽變更"
 
 #: src/lib/components/shared/assigned-channels.tsx:52
 msgid "Failed to remove {entityType} from channel"
-msgstr ""
+msgstr "從頻道中移除 {entityType} 失敗"
 
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:191
 msgid "Variant deleted successfully"
@@ -4563,7 +4623,7 @@ msgstr "變體已成功刪除"
 
 #: src/lib/components/shared/rich-text-editor/link-dialog.tsx:87
 msgid "Edit the selected link properties"
-msgstr ""
+msgstr "編輯所選連結的屬性"
 
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:75
@@ -4604,7 +4664,7 @@ msgstr "設定"
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:151
 msgid "Settings Store"
-msgstr ""
+msgstr "設定商店"
 
 #: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:77
 msgid "Heading 3"
@@ -4700,15 +4760,19 @@ msgstr "前往上一頁"
 msgid "Contents"
 msgstr "內容"
 
+#: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:43
+msgid "Failed to cancel {rejected} jobs"
+msgstr ""
+
 #: src/lib/components/data-table/views-sheet.tsx:110
 msgid "Failed to convert global view to personal view"
 msgstr "將全域檢視轉換為個人檢視失敗"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:163
-msgid "The assigned option groups have no options yet. Add options to your option groups before generating variants."
-msgstr ""
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:185
+#~ msgid "The assigned option groups have no options yet. Add options to your option groups before generating variants."
+#~ msgstr ""
 
-#: src/app/routes/_authenticated/_system/job-queue.tsx:155
+#: src/app/routes/_authenticated/_system/job-queue.tsx:182
 #: src/app/routes/_authenticated/_system/scheduled-tasks.tsx:177
 msgid "The result of the job"
 msgstr "工作的結果"
@@ -4735,6 +4799,10 @@ msgstr "移除"
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:111
 msgid "Failed to update customer"
 msgstr "更新客戶失敗"
+
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:306
+msgid "Remove option groups?"
+msgstr "移除選項群組？"
 
 #: src/app/routes/_authenticated/_collections/components/collection-contents-preview-table.tsx:91
 msgid "This is a preview of the collection contents based on the current filter settings. Once you save the collection, the contents will be updated to reflect the new filter settings."
@@ -4769,7 +4837,7 @@ msgstr "儲存"
 #~ msgid "{selectedRowCount} of {0} row(s) selected."
 #~ msgstr "已選取 {0} 列中的 {selectedRowCount} 列。"
 
-#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:149
+#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:156
 msgid "Preview order modifications"
 msgstr "預覽訂單修改"
 
@@ -4836,7 +4904,7 @@ msgstr "權杖"
 msgid "Fulfilling..."
 msgstr "正在履行..."
 
-#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:141
+#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:147
 msgid "Add option group to product"
 msgstr "將選項群組新增至商品"
 
@@ -4859,13 +4927,13 @@ msgstr "建立稅率失敗"
 
 #: src/app/routes/_authenticated/_api-keys/components/api-key-secret-dialog.tsx:118
 msgid "I have saved this API key"
-msgstr ""
+msgstr "我已儲存此 API Key"
 
 #: src/lib/components/layout/manage-languages-dialog.tsx:244
 msgid "Configure available languages for your store and channels"
 msgstr "為您的商店和通路設定可用語言"
 
-#: src/app/routes/_authenticated/_products/products_.$id.tsx:99
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:160
 msgid "Successfully created product"
 msgstr "已成功建立商品"
 
@@ -4884,13 +4952,13 @@ msgstr "編輯備註"
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:628
 msgid "No assets found. Try adjusting your filters."
-msgstr ""
+msgstr "找不到資源。請嘗試調整篩選條件。"
 
 #: src/app/routes/_authenticated/_products/components/option-groups-editor.tsx:161
 msgid "Add Option"
 msgstr "新增選項"
 
-#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:184
+#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:190
 msgid "Save option group"
 msgstr "儲存選項群組"
 
@@ -4935,18 +5003,18 @@ msgstr "狀態"
 #: src/lib/components/shared/asset/asset-gallery.tsx:370
 #: src/lib/components/shared/asset/asset-gallery.tsx:382
 msgid "Binary"
-msgstr ""
+msgstr "二進位"
 
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$id.tsx:127
 msgid "Successfully updated option group"
-msgstr ""
+msgstr "選項群組更新成功"
 
 #: src/app/routes/_authenticated/_shipping-methods/shipping-methods_.$id.tsx:43
 #: src/app/routes/_authenticated/_shipping-methods/shipping-methods_.$id.tsx:117
 msgid "New shipping method"
 msgstr "新增配送方式"
 
-#: src/app/routes/_authenticated/_system/job-queue.tsx:87
+#: src/app/routes/_authenticated/_system/job-queue.tsx:116
 msgid "Every 10 seconds"
 msgstr "每 10 秒"
 
@@ -4975,7 +5043,7 @@ msgstr "選項群組已移除"
 msgid "Transition to selected state"
 msgstr "轉換到選定狀態"
 
-#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:322
+#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:325
 msgid "An additional payment of {formattedDiff} will be required."
 msgstr "需要額外付款 {formattedDiff}。"
 
@@ -4996,7 +5064,7 @@ msgid "Visible to customer"
 msgstr "客戶可見"
 
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$id.tsx:126
-#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:113
+#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:115
 msgid "Successfully created option group"
 msgstr "已成功建立選項群組"
 
@@ -5038,9 +5106,9 @@ msgstr "名字"
 msgid "contains"
 msgstr "包含"
 
-#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:239
+#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:245
 msgid "No option groups found"
-msgstr ""
+msgstr "找不到選項群組"
 
 #: src/lib/components/data-input/product-multi-selector-input.tsx:91
 msgid "No items found"
@@ -5057,7 +5125,7 @@ msgstr "已履行的項目 ({0})"
 
 #: src/app/routes/_authenticated/_system/settings-store.tsx:236
 msgid "Value updated"
-msgstr ""
+msgstr "值已更新"
 
 #: src/app/routes/_authenticated/_customers/components/customer-status-badge.tsx:28
 msgid "Unverified"
@@ -5115,7 +5183,7 @@ msgstr "客戶群組"
 
 #: src/lib/components/shared/assigned-channels.tsx:48
 msgid "Successfully removed {entityType} from channel"
-msgstr ""
+msgstr "已成功從頻道中移除 {entityType}"
 
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$groupId.options_.$id.tsx:81
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$groupId.options_.$id.tsx:90
@@ -5138,6 +5206,10 @@ msgstr "目前屬性值"
 
 #: src/app/routes/_authenticated/_option-groups/components/option-group-products-block.tsx:80
 msgid "Page {page} of {totalPages}"
+msgstr "第 {page} 頁，共 {totalPages} 頁"
+
+#: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:42
+msgid "Failed to cancel {rejected} job"
 msgstr ""
 
 #: src/lib/components/date-range-picker.tsx:79
@@ -5156,7 +5228,7 @@ msgstr "移除項目"
 #: src/lib/components/shared/asset/asset-gallery.tsx:369
 #: src/lib/components/shared/asset/asset-gallery.tsx:381
 msgid "Video"
-msgstr ""
+msgstr "影片"
 
 #: src/lib/components/data-table/human-readable-operator.tsx:48
 msgid "less than"
@@ -5265,7 +5337,7 @@ msgstr "已成功建立區域"
 
 #: src/app/routes/_authenticated/_system/settings-store.tsx:268
 msgid "Value"
-msgstr ""
+msgstr "值"
 
 #: src/app/routes/_authenticated/_orders/components/order-history/order-history-utils.tsx:105
 msgid "Customer updated"
@@ -5302,9 +5374,13 @@ msgstr "找不到標籤"
 msgid "Default currency"
 msgstr "預設貨幣"
 
-#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:334
+#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:337
 msgid "No payment or refund is required for these changes."
 msgstr "這些變更不需要付款或退款。"
+
+#: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:70
+msgid "{cancellableCount, plural, one {Are you sure you want to cancel {cancellableCount} job? This action cannot be undone.} other {Are you sure you want to cancel {cancellableCount} jobs? This action cannot be undone.}}"
+msgstr ""
 
 #: src/lib/framework/dashboard-widget/orders-summary/index.tsx:100
 msgid "Total Revenue"
@@ -5324,7 +5400,7 @@ msgstr "中等日期"
 
 #: src/app/routes/_authenticated/_system/settings-store.tsx:169
 msgid "Invalid number"
-msgstr ""
+msgstr "無效數字"
 
 #: src/lib/components/data-table/views-sheet.tsx:152
 msgid "You haven't saved any views yet."
@@ -5336,7 +5412,7 @@ msgstr "確定要刪除此檢視嗎？此動作無法復原。"
 
 #: src/app/routes/_authenticated/_orders/components/order-process-dialog.tsx:73
 msgid "View order process"
-msgstr ""
+msgstr "檢視訂單流程"
 
 #: src/lib/components/data-table/views-sheet.tsx:100
 msgid "Failed to duplicate view"
@@ -5382,9 +5458,9 @@ msgstr "計算機"
 
 #: src/app/routes/_authenticated/_option-groups/components/option-group-bulk-actions.tsx:78
 msgid "Failed to remove option group from channel: {message}"
-msgstr ""
+msgstr "從頻道中移除選項群組失敗: {message}"
 
-#: src/app/routes/_authenticated/_system/job-queue.tsx:134
+#: src/app/routes/_authenticated/_system/job-queue.tsx:161
 msgid "View job data"
 msgstr "檢視工作資料"
 
@@ -5402,7 +5478,7 @@ msgstr "訂單摘要"
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:349
 msgid "Search assets..."
-msgstr ""
+msgstr "搜尋資源..."
 
 #: src/app/routes/_authenticated/_facets/facets.tsx:114
 msgid "New Facet"
@@ -5489,7 +5565,7 @@ msgstr "設定將此變體視為缺貨的庫存水準。使用負值可啟用延
 msgid "Saving..."
 msgstr "正在儲存..."
 
-#: src/app/routes/_authenticated/_system/job-queue.tsx:158
+#: src/app/routes/_authenticated/_system/job-queue.tsx:185
 #: src/app/routes/_authenticated/_system/scheduled-tasks.tsx:180
 msgid "View result"
 msgstr "檢視結果"
@@ -5535,7 +5611,7 @@ msgstr "向 {groupName} 新增選項值"
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:271
 #: src/app/routes/_authenticated/_products/components/add-product-variant-dialog.tsx:292
 #: src/app/routes/_authenticated/_products/components/assign-facet-values-dialog.tsx:195
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:189
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:205
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:351
 msgid "SKU"
 msgstr "SKU"
@@ -5556,7 +5632,7 @@ msgstr "新電子郵件："
 msgid "Failed to update payment method"
 msgstr "更新付款方式失敗"
 
-#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:235
+#: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:242
 msgid "Available:"
 msgstr "可用："
 
@@ -5611,7 +5687,7 @@ msgstr "退款已完成"
 
 #: src/app/routes/_authenticated/_api-keys/components/api-key-secret-dialog.tsx:85
 msgid "API Key"
-msgstr ""
+msgstr "API Key"
 
 #: src/app/common/duplicate-bulk-action.tsx:97
 msgid "Successfully duplicated {count} {entityName}"
@@ -5619,9 +5695,9 @@ msgstr "已成功複製 {count} {entityName}"
 
 #: src/app/routes/_authenticated/_option-groups/option-groups.tsx:71
 msgid "New Option Group"
-msgstr ""
+msgstr "新建選項群組"
 
-#: src/app/routes/_authenticated/_system/job-queue.tsx:164
+#: src/app/routes/_authenticated/_system/job-queue.tsx:191
 #: src/app/routes/_authenticated/_system/scheduled-tasks.tsx:186
 msgid "No result yet"
 msgstr "尚無結果"
@@ -5632,7 +5708,7 @@ msgstr "付款已完成"
 
 #: src/lib/components/data-table/data-table-active-filters-popover.tsx:27
 msgid "Active filters"
-msgstr ""
+msgstr "使用中的篩選條件"
 
 #: src/app/routes/_authenticated/_assets/components/asset-tag-filter.tsx:178
 #: src/lib/components/data-table/data-table-active-filters-popover.tsx:54
@@ -5646,7 +5722,7 @@ msgstr "大於"
 
 #: src/app/routes/_authenticated/_api-keys/components/api-key-secret-dialog.tsx:125
 msgid "Close"
-msgstr ""
+msgstr "關閉"
 
 #: src/app/routes/_authenticated/_orders/components/add-manual-payment-dialog.tsx:127
 msgid "Add payment to order"
@@ -5654,7 +5730,7 @@ msgstr "向訂單新增付款"
 
 #: src/app/routes/_authenticated/_assets/components/asset-tag-filter.tsx:122
 #: src/app/routes/_authenticated/_option-groups/components/option-group-products-block.tsx:59
-#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:239
+#: src/app/routes/_authenticated/_products/components/add-option-group-dialog.tsx:245
 #: src/lib/components/data-input/product-multi-selector-input.tsx:83
 #: src/lib/components/data-input/relation-selector.tsx:427
 #: src/lib/components/shared/country-selector.tsx:86
@@ -5694,11 +5770,11 @@ msgstr "缺貨臨界值"
 
 #: src/app/routes/_authenticated/_system/settings-store.tsx:239
 msgid "Failed to update value"
-msgstr ""
+msgstr "更新值失敗"
 
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:121
 msgid "Failed to create API key"
-msgstr ""
+msgstr "建立 API Key 失敗"
 
 #: src/app/routes/_authenticated/_orders/components/payment-details.tsx:264
 #: src/app/routes/_authenticated/_orders/components/settle-refund-dialog.tsx:49
@@ -5716,7 +5792,7 @@ msgid "Failed to add customer to group"
 msgstr "將客戶新增至群組失敗"
 
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:275
-#: src/app/routes/_authenticated/_products/products_.$id.tsx:182
+#: src/app/routes/_authenticated/_products/products_.$id.tsx:279
 msgid "Manage variants"
 msgstr "管理變體"
 
@@ -5735,7 +5811,7 @@ msgstr "區域"
 
 #: src/lib/components/shared/seller-selector.tsx:37
 msgid "Search sellers..."
-msgstr ""
+msgstr "搜尋賣家..."
 
 #: src/app/routes/_authenticated/_promotions/promotions_.$id.tsx:104
 msgid "Successfully created promotion"
@@ -5747,7 +5823,7 @@ msgstr "選項"
 
 #: src/app/routes/_authenticated/_orders/components/order-process-dialog.tsx:82
 msgid "Order process"
-msgstr ""
+msgstr "訂單流程"
 
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:194
 msgid "Phone number"
@@ -5758,7 +5834,7 @@ msgstr "電話號碼"
 msgid "Private"
 msgstr "私人"
 
-#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:185
+#: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:201
 msgid "Variant"
 msgstr "變體"
 
@@ -5768,7 +5844,7 @@ msgstr "已成功更新全域設定"
 
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:115
 msgid "Successfully updated API key"
-msgstr ""
+msgstr "API Key 更新成功"
 
 #: src/lib/components/layout/manage-languages-dialog.tsx:294
 msgid "These languages will be available for all channels to use"

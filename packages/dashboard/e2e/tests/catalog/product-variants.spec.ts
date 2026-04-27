@@ -39,11 +39,10 @@ test.describe('product variant generation', () => {
             timeout: 10_000,
         });
 
-        // The empty state card should have an inline "Add option group" button
-        await expect(page.getByRole('button', { name: 'Add option group' })).toBeVisible();
-
-        // Click the "Add option group" button
-        await page.getByRole('button', { name: 'Add option group' }).click();
+        // The variant choice cards should be visible — click "Product with options"
+        // to open the Add Option Group dialog
+        await expect(page.getByRole('button', { name: /Product with options/i })).toBeVisible();
+        await page.getByRole('button', { name: /Product with options/i }).click();
 
         // The dialog should open with "Assign existing" and "Create new" tabs
         await expect(page.getByRole('dialog')).toBeVisible();
@@ -102,50 +101,59 @@ test.describe('product variant generation', () => {
         await expect(skuInputs).toHaveCount(3);
     });
 
-    test('should generate variants by filling in the form and submitting', async ({ page }) => {
+    // #4608 — unchecked variant rows should not trigger validation errors
+    test('should not validate unchecked variant rows', async ({ page }) => {
         await page.goto(`/products/${productId}`);
         await expect(page.getByRole('heading', { name: 'E2E Variant Test Product' })).toBeVisible({
             timeout: 10_000,
         });
 
-        // Fill in SKU and stock for each variant row
+        const table = page.locator('table');
+        const rows = table.locator('tbody tr');
+
+        // Uncheck Large (row 2), leave Small (row 0) and Medium (row 1) checked
+        await rows.nth(2).getByRole('checkbox').click();
+
+        // Fill in only the checked rows (Small and Medium), leave Large empty
         const skuInputs = page.getByTestId('variant-sku-input');
         await skuInputs.nth(0).fill('EVTP-SM');
         await skuInputs.nth(1).fill('EVTP-MD');
-        await skuInputs.nth(2).fill('EVTP-LG');
-
         const stockInputs = page.getByTestId('variant-stock-input');
         await stockInputs.nth(0).fill('10');
         await stockInputs.nth(1).fill('10');
-        await stockInputs.nth(2).fill('10');
 
-        // Click "Create 3 variants"
-        await page.getByRole('button', { name: /Create 3 variants/i }).click();
+        // Button should say "Create 2 variants"
+        await expect(page.getByRole('button', { name: /Create 2 variants/i })).toBeVisible();
 
-        // Wait for success toast
+        // Click Create — should NOT show validation errors on the unchecked Large row
+        await page.getByRole('button', { name: /Create 2 variants/i }).click();
+
+        // Wait for success toast — proves form submitted without validation blocking it
         await expect(
             page
                 .locator('[data-sonner-toast]')
                 .filter({ hasText: /created/i })
                 .first(),
         ).toBeVisible({ timeout: 10_000 });
+
+        // Verify no validation errors appeared on the unchecked row (role="alert" is the ARIA role for field errors)
+        await expect(rows.nth(2).getByRole('alert')).toHaveCount(0);
     });
 
-    test('should show variants in the product variants table after generation', async ({ page }) => {
+    test('should show only the created variants in the product variants table', async ({ page }) => {
         await page.goto(`/products/${productId}`);
         await expect(page.getByRole('heading', { name: 'E2E Variant Test Product' })).toBeVisible({
             timeout: 10_000,
         });
 
-        // The variants table should now show the generated variants (may need scrolling)
-        // Variant names follow the pattern: "ProductName OptionName"
+        // Only Small and Medium were created (Large was unchecked)
         const variantLink = page.getByRole('button', { name: /E2E Variant Test Product Small/i });
         await variantLink.scrollIntoViewIfNeeded();
         await expect(variantLink).toBeVisible({ timeout: 10_000 });
-
-        // Verify multiple variants exist
         await expect(page.getByRole('button', { name: /E2E Variant Test Product Medium/i })).toBeVisible();
-        await expect(page.getByRole('button', { name: /E2E Variant Test Product Large/i })).toBeVisible();
+
+        // Large should NOT exist as a variant
+        await expect(page.getByRole('button', { name: /E2E Variant Test Product Large/i })).toHaveCount(0);
 
         // The "Manage variants" link should be visible
         const manageLink = page.getByRole('button', { name: /Manage variants/i });
@@ -326,5 +334,45 @@ test.describe('manage product variants', () => {
             id: uniqueOptionId,
         });
         await page.close();
+    });
+});
+
+// Regression: the edit icon on the variant detail Options badge should navigate
+// to the option group detail page, not a broken route.
+test.describe('variant option group edit link', () => {
+    test('should navigate to option group detail when clicking edit icon on variant page', async ({
+        page,
+    }) => {
+        // Navigate to product variants list and click a Laptop variant (seed data, has options)
+        await page.goto('/product-variants');
+        await expect(page.getByRole('heading', { name: 'Product Variants' })).toBeVisible({
+            timeout: 10_000,
+        });
+
+        // Click a variant that has options (Laptop variants have screen size + RAM)
+        await page
+            .locator('table')
+            .getByRole('button', { name: /Laptop/ })
+            .first()
+            .click();
+        await expect(page).toHaveURL(/\/product-variants\/[^/]+$/);
+
+        // The Options block should be visible with edit icons
+        const optionsBlock = page.getByRole('main');
+        await expect(optionsBlock.getByText('Options', { exact: true })).toBeVisible({
+            timeout: 10_000,
+        });
+
+        // Click the edit link (pencil icon) on the first option badge, capturing its group name
+        const firstBadge = optionsBlock.locator('[data-slot="badge"]').first();
+        const badgeText = await firstBadge.innerText();
+        const groupName = badgeText.split(':')[0].trim();
+        await firstBadge.getByRole('link').click();
+
+        // Should navigate to the option group detail page with the correct group
+        await expect(page).toHaveURL(/\/option-groups\/[^/]+$/);
+        await expect(page.getByRole('heading', { level: 1 })).toContainText(groupName, {
+            timeout: 10_000,
+        });
     });
 });
