@@ -1450,7 +1450,20 @@ export class OrderService {
      * If a coupon is no longer valid (e.g. usage limit reached), it is removed
      * from the order and the order totals are recalculated.
      * Returns true if any coupons were removed, false otherwise.
-     * See https://github.com/vendurehq/vendure/issues/OSS-457
+     *
+     * Note on selection semantics: contention resolves "last-wins" rather
+     * than "first-wins". For N orders in `ArrangingPayment` sharing a
+     * `usageLimit: 1` coupon, the first order to acquire the lock observes
+     * N-1 other orders associated with the promotion (because
+     * `countPromotionUsages` joins through `order.promotions` and counts
+     * `ArrangingPayment` orders) and therefore fails validation — its coupon
+     * is stripped and totals recalculated. Each subsequent lock holder sees
+     * one fewer associated order, and the final lock holder sees zero and
+     * succeeds. Net effect is exactly one winner, but it is whichever order
+     * acquires the lock last. This is intentional: do not "fix" it into
+     * first-wins without re-deriving the count semantics.
+     *
+     * See https://linear.app/vendure/issue/OSS-457
      */
     private async revalidateCouponCodesForOrder(ctx: RequestContext, order: Order): Promise<boolean> {
         let removedAny = false;
