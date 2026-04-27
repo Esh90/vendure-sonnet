@@ -1,0 +1,25 @@
+name: 'Setup Vendure (Bun)'
+description: 'Setup Node, install Bun, and install dependencies via bun'
+inputs:
+    node-version:
+        description: 'Node.js version'
+        required: false
+        default: '22.x'
+    bun-version:
+        description: 'Bun version'
+        required: false
+        # Pinned to match the version validated locally during the migration
+        # exploration (see #4674). Bump explicitly when re-validating.
+        default: '1.3.10'
+runs:
+    using: 'composite'
+    steps:
+        - uses: actions/setup-node@v4
+          with:
+              node-version: ${{ inputs.node-version }}
+        - uses: oven-sh/setup-bun@v2
+          with:
+              bun-version: ${{ inputs.bun-version }}
+        - name: Install dependencies
+          shell: bash
+          run: bun install --frozen-lockfile
