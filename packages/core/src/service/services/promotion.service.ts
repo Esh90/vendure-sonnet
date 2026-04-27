@@ -267,7 +267,12 @@ export class PromotionService {
             return new CouponCodeExpiredError({ couponCode });
         }
         if (customerId && promotion.perCustomerUsageLimit != null) {
-            const usageCount = await this.countPromotionUsagesForCustomer(ctx, promotion.id, customerId);
+            const usageCount = await this.countPromotionUsagesForCustomer(
+                ctx,
+                promotion.id,
+                customerId,
+                excludeOrderId,
+            );
             if (promotion.perCustomerUsageLimit <= usageCount) {
                 return new CouponCodeLimitError({ couponCode, limit: promotion.perCustomerUsageLimit });
             }
@@ -425,15 +430,42 @@ export class PromotionService {
         return new Map(results.map(r => [r.promotionId.toString(), Number(r.usageCount)]));
     }
 
+    /**
+     * Counts the number of times a promotion has been used by the given
+     * customer, including orders currently in the `ArrangingPayment` state
+     * (excluding the given order). Mirrors `countPromotionUsages` so that
+     * `perCustomerUsageLimit` is enforced under the same TOCTOU-safe
+     * semantics as `usageLimit`.
+     */
     private async countPromotionUsagesForCustomer(
         ctx: RequestContext,
         promotionId: ID,
         customerId: ID,
+        excludeOrderId?: ID,
     ): Promise<number> {
-        return this.placedOrdersWithPromotionQb(ctx)
+        const completedQb = this.placedOrdersWithPromotionQb(ctx)
             .andWhere('promotion.id = :promotionId', { promotionId })
-            .andWhere('order.customer = :customerId', { customerId })
-            .getCount();
+            .andWhere('order.customer = :customerId', { customerId });
+
+        const pendingPaymentQb = this.connection
+            .getRepository(ctx, Order)
+            .createQueryBuilder('order')
+            .innerJoin('order.promotions', 'promotion')
+            .where('promotion.id = :promotionId', { promotionId })
+            .andWhere('order.state = :state', { state: 'ArrangingPayment' as OrderState })
+            .andWhere('order.type != :type', { type: OrderType.Seller })
+            .andWhere('order.customer = :customerId', { customerId });
+
+        if (excludeOrderId) {
+            completedQb.andWhere('order.id != :excludeOrderId', { excludeOrderId });
+            pendingPaymentQb.andWhere('order.id != :excludeOrderId', { excludeOrderId });
+        }
+
+        const [completedCount, pendingCount] = await Promise.all([
+            completedQb.getCount(),
+            pendingPaymentQb.getCount(),
+        ]);
+        return completedCount + pendingCount;
     }
 
     /**
@@ -448,10 +480,9 @@ export class PromotionService {
         promotionId: ID,
         excludeOrderId?: ID,
     ): Promise<number> {
-        const completedQb = this.placedOrdersWithPromotionQb(ctx).andWhere(
-            'promotion.id = :promotionId',
-            { promotionId },
-        );
+        const completedQb = this.placedOrdersWithPromotionQb(ctx).andWhere('promotion.id = :promotionId', {
+            promotionId,
+        });
 
         const pendingPaymentQb = this.connection
             .getRepository(ctx, Order)
