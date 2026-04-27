@@ -218,10 +218,13 @@ export class ProductService {
             .setParameters(translationQb.getParameters())
             .select('product.id', 'id')
             .addSelect(
-                // eslint-disable-next-line max-len
-                `CASE translation.languageCode WHEN '${ctx.languageCode}' THEN 2 WHEN '${ctx.channel.defaultLanguageCode}' THEN 1 ELSE 0 END`,
+                `CASE translation.languageCode WHEN :userLang THEN 2 WHEN :defaultLang THEN 1 ELSE 0 END`,
                 'sort_order',
             )
+            .setParameters({
+                userLang: ctx.languageCode,
+                defaultLang: ctx.channel.defaultLanguageCode,
+            })
             .orderBy('sort_order', 'DESC');
         // We use getRawOne here to simply get the ID as efficiently as possible,
         // which we then pass to the regular findOne() method which will handle
@@ -328,7 +331,13 @@ export class ProductService {
         const productsWithVariants = await this.connection.getRepository(ctx, Product).find({
             where: { id: In(input.productIds) },
             relations: ['variants', 'assets', 'optionGroups', 'optionGroups.options'],
+            relationLoadStrategy: 'query',
+            loadEagerRelations: false,
         });
+        const productIds = unique(productsWithVariants.map(p => p.id));
+        await Promise.all(
+            productIds.map(id => this.channelService.assignToChannels(ctx, Product, id, [input.channelId])),
+        );
         await this.productVariantService.assignProductVariantsToChannel(ctx, {
             productVariantIds: ([] as ID[]).concat(
                 ...productsWithVariants.map(p => p.variants.map(v => v.id)),
@@ -372,6 +381,8 @@ export class ProductService {
         const productsWithVariants = await this.connection.getRepository(ctx, Product).find({
             where: { id: In(input.productIds) },
             relations: ['variants', 'optionGroups', 'optionGroups.options'],
+            relationLoadStrategy: 'query',
+            loadEagerRelations: false,
         });
         await this.productVariantService.removeProductVariantsFromChannel(ctx, {
             productVariantIds: ([] as ID[]).concat(
@@ -409,6 +420,10 @@ export class ProductService {
                 );
             }
         }
+        const productIds = unique(productsWithVariants.map(p => p.id));
+        await Promise.all(
+            productIds.map(id => this.channelService.removeFromChannels(ctx, Product, id, [input.channelId])),
+        );
         const products = await this.connection
             .getRepository(ctx, Product)
             .find({ where: { id: In(input.productIds) } });
