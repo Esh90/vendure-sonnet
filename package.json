@@ -79,6 +79,11 @@
   "resolutions": {
     "@apollo/server": "^5.0.0"
   },
+  "trustedDependencies": [
+    "husky",
+    "better-sqlite3",
+    "puppeteer"
+  ],
   "workspaces": {
     "packages": [
       "packages/*"
