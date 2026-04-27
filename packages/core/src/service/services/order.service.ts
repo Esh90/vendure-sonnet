@@ -40,7 +40,7 @@ import {
 import { omit } from '@vendure/common/lib/omit';
 import { ID, PaginatedList } from '@vendure/common/lib/shared-types';
 import { summate } from '@vendure/common/lib/shared-utils';
-import { In, IsNull } from 'typeorm';
+import { In, IsNull, LockNotSupportedOnGivenDriverError } from 'typeorm';
 import { FindOptionsUtils } from 'typeorm/find-options/FindOptionsUtils';
 
 import { RequestContext } from '../../api/common/request-context';
@@ -1455,20 +1455,39 @@ export class OrderService {
     private async revalidateCouponCodesForOrder(ctx: RequestContext, order: Order): Promise<boolean> {
         let removedAny = false;
         for (const couponCode of [...order.couponCodes]) {
-            // Acquire a pessimistic write lock on the promotion row to serialize
-            // concurrent payment attempts. The lock is held until the resolver's
-            // @Transaction() commits. On SQLite the lock is not supported, but
-            // SQLite serializes writes at the engine level.
-            try {
-                await this.connection
-                    .getRepository(ctx, Promotion)
-                    .createQueryBuilder('promotion')
-                    .setLock('pessimistic_write')
-                    .where('promotion.couponCode = :couponCode', { couponCode })
-                    .andWhere('promotion.enabled = :enabled', { enabled: true })
-                    .getOne();
-            } catch {
-                // Lock not supported (e.g. SQLite) — continue without it
+            // Resolve the promotion in the current channel before locking so
+            // that the lock query can target the promotion's primary key. PK
+            // lookups always hit an index, take a single-row lock on every
+            // supported DB, and avoid the gap-locking behaviour MySQL/MariaDB
+            // would otherwise exhibit when filtering by `couponCode` (which
+            // has no dedicated index).
+            const promotion = await this.connection.getRepository(ctx, Promotion).findOne({
+                where: {
+                    couponCode,
+                    enabled: true,
+                    deletedAt: IsNull(),
+                    channels: { id: ctx.channelId },
+                },
+            });
+            if (promotion) {
+                // Acquire a pessimistic write lock on the promotion row to
+                // serialize concurrent payment attempts. The lock is held
+                // until the resolver's @Transaction() commits. On SQLite the
+                // lock is not supported; SQLite serializes writes at the
+                // engine level instead.
+                try {
+                    await this.connection
+                        .getRepository(ctx, Promotion)
+                        .createQueryBuilder('promotion')
+                        .setLock('pessimistic_write')
+                        .where('promotion.id = :id', { id: promotion.id })
+                        .getOne();
+                } catch (e) {
+                    if (!(e instanceof LockNotSupportedOnGivenDriverError)) {
+                        throw e;
+                    }
+                    // Lock not supported (e.g. SQLite) — continue without it
+                }
             }
             const validationResult = await this.promotionService.validateCouponCode(
                 ctx,
