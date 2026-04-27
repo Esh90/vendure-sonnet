@@ -104,7 +104,6 @@
         "pg": "^8.13.1",
         "rimraf": "^5.0.5",
         "sql.js": "1.13.0",
-        "sqlite3": "^5.1.7",
         "typescript": "5.8.2"
     },
     "peerDependencies": {
