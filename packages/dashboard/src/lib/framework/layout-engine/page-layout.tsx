@@ -277,14 +277,18 @@ export function PageLayout({ children, className }: Readonly<PageLayoutProps>) {
 
                     const ExtensionBlock =
                         extensionBlock.component && extensionBlockShouldRender ? (
-                            <BlockComponent
+                            <PermissionGuard
                                 key={extensionBlock.id}
-                                column={extensionBlock.location.column}
-                                blockId={extensionBlock.id}
-                                title={extensionBlock.title}
+                                requires={extensionBlock.requiresPermission ?? []}
                             >
-                                {<extensionBlock.component context={page} />}
-                            </BlockComponent>
+                                <BlockComponent
+                                    column={extensionBlock.location.column}
+                                    blockId={extensionBlock.id}
+                                    title={extensionBlock.title}
+                                >
+                                    {<extensionBlock.component context={page} />}
+                                </BlockComponent>
+                            </PermissionGuard>
                         ) : undefined;
 
                     if (extensionBlockShouldRender && ExtensionBlock) {
