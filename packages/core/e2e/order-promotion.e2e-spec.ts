@@ -1659,7 +1659,7 @@ describe('Promotions applied to Orders', () => {
             });
         });
 
-        // https://linear.app/vendure/issue/OSS-457
+        // https://github.com/vendurehq/vendure/pull/4660
         describe('concurrent usage (race condition)', () => {
             const RACE_COUPON_CODE = 'RACE_TEST';
             const CONCURRENT_ATTEMPTS = 3;

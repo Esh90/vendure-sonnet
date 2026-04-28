@@ -473,7 +473,7 @@ export class PromotionService {
      * currently in the ArrangingPayment state (excluding the given order).
      * The ArrangingPayment count prevents concurrent checkouts from bypassing
      * the usage limit via a TOCTOU race condition.
-     * See https://github.com/vendurehq/vendure/issues/OSS-457
+     * See https://github.com/vendurehq/vendure/pull/4660
      */
     private async countPromotionUsages(
         ctx: RequestContext,

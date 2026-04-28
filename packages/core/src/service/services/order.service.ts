@@ -1483,7 +1483,7 @@ export class OrderService {
      * Do not "fix" the resolution into first-wins without re-deriving the
      * count semantics from scratch.
      *
-     * See https://linear.app/vendure/issue/OSS-457
+     * See https://github.com/vendurehq/vendure/pull/4660
      */
     private async revalidateCouponCodesForOrder(ctx: RequestContext, order: Order): Promise<boolean> {
         let removedAny = false;
