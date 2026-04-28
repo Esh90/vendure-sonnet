@@ -51,7 +51,6 @@
     "devDependencies": {
         "@vendure/core": "3.6.2",
         "@vendure/testing": "3.6.2",
-        "better-sqlite3": "^11.6.0",
         "cross-env": "^7.0.3",
         "typescript": "5.8.2"
     }
