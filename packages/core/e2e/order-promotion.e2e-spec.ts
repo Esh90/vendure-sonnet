@@ -1730,14 +1730,19 @@ describe('Promotions applied to Orders', () => {
                     const withCoupon = results.filter(r => r.couponCodes.includes(RACE_COUPON_CODE));
                     const withoutCoupon = results.filter(r => !r.couponCodes.includes(RACE_COUPON_CODE));
 
-                    // With usageLimit: 1, exactly one order keeps the coupon (free order),
-                    // and the others have it stripped and settle at full price (6000).
+                    // With usageLimit: 1, exactly one order keeps the coupon and the
+                    // others have it stripped. The freeOrderAction (orderPercentageDiscount
+                    // at 100%) discounts the line subtotal but not shipping, so we compare
+                    // relatively rather than asserting absolute totals: every stripped
+                    // order should settle at the same full price, and the winning order's
+                    // discount should equal the line subtotal (6000 incl. tax).
                     expect(withCoupon.length).toBe(1);
                     expect(withoutCoupon.length).toBe(CONCURRENT_ATTEMPTS - 1);
-                    expect(withCoupon[0].totalWithTax).toBe(0);
+                    const fullPrice = withoutCoupon[0].totalWithTax;
                     for (const result of withoutCoupon) {
-                        expect(result.totalWithTax).toBe(6000);
+                        expect(result.totalWithTax).toBe(fullPrice);
                     }
+                    expect(fullPrice - withCoupon[0].totalWithTax).toBe(6000);
                 },
             );
         });
