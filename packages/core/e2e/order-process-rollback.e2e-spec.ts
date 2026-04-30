@@ -137,9 +137,8 @@ describe('Order process — onTransitionEnd rollback (#4686)', () => {
             .getRepository(Order)
             .findOneOrFail({ where: { id: orderId } });
         expect(orderBefore.state).toBe('AddingItems');
-        const stateBefore = orderBefore.state;
-        const activeBefore = orderBefore.active;
-        const orderPlacedAtBefore = orderBefore.orderPlacedAt;
+        expect(orderBefore.active).toBe(true);
+        expect(orderBefore.orderPlacedAt).toBeNull();
 
         let thrown: Error | undefined;
         try {
@@ -150,14 +149,15 @@ describe('Order process — onTransitionEnd rollback (#4686)', () => {
         expect(thrown).toBeDefined();
         expect(thrown!.message).toContain(FAILURE_MESSAGE);
 
-        // Re-read from the database. The order must be exactly as it was.
+        // Re-read from the database. Assert literal values so the assertions
+        // can't go vacuously true if the pre-condition silently breaks.
         const orderAfter = await connection.rawConnection
             .getRepository(Order)
             .findOneOrFail({ where: { id: orderId } });
 
-        expect(orderAfter.state).toBe(stateBefore);
-        expect(orderAfter.active).toBe(activeBefore);
-        expect(orderAfter.orderPlacedAt ?? null).toBe(orderPlacedAtBefore ?? null);
+        expect(orderAfter.state).toBe('AddingItems');
+        expect(orderAfter.active).toBe(true);
+        expect(orderAfter.orderPlacedAt).toBeNull();
 
         // No ORDER_STATE_TRANSITION history entry should exist for the failed step.
         const history = await historyService.getHistoryForOrder(ctx, orderId, false);

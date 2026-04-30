@@ -129,9 +129,14 @@ export class PaymentService {
             paymentMethod,
         );
         const initialState = 'Created';
-        // Wrapped in withTransaction so the payment create, state transition, save,
-        // relation add and onTransitionEnd hooks all commit or roll back together.
-        // #4686.
+        // The DB-write sequence below (payment create, state transition, save, relation
+        // add, onTransitionEnd hooks) is wrapped in withTransaction so it commits or
+        // rolls back atomically — this is what fixes #4686 for this method. Note that
+        // handler.createPayment above is intentionally outside the transaction (it is
+        // a network call to a third-party gateway) and is NOT covered by this wrap.
+        // If the gateway succeeds and a subsequent DB write fails, the resulting
+        // orphaned charge must be reconciled at a higher level. Likewise, the `order`
+        // entity was loaded by the caller outside this transaction.
         return this.connection.withTransaction(ctx, async txCtx => {
             const payment = await this.connection
                 .getRepository(txCtx, Payment)
@@ -418,28 +423,46 @@ export class PaymentService {
                 .of(refund)
                 .add(refundLines);
             if (createRefundResult) {
-                let finalize: () => Promise<any>;
                 const fromState = refund.state;
-                try {
-                    const result = await this.refundStateMachine.transition(
-                        ctx,
-                        order,
-                        refund,
-                        createRefundResult.state,
+                // Each iteration's state transition is wrapped in withTransaction so
+                // the save, onTransitionEnd hooks and event publish commit or roll
+                // back together — same atomicity guarantee as the dedicated
+                // transition methods. The surrounding loop is intentionally NOT
+                // wrapped: refunds created in earlier iterations remain committed
+                // if a later iteration fails. #4686.
+                const transitionError = await this.connection.withTransaction(ctx, async txCtx => {
+                    let finalize: () => Promise<any>;
+                    try {
+                        const result = await this.refundStateMachine.transition(
+                            txCtx,
+                            order,
+                            refund,
+                            createRefundResult.state,
+                        );
+                        finalize = result.finalize;
+                    } catch (e: any) {
+                        return new RefundStateTransitionError({
+                            transitionError: e.message,
+                            fromState,
+                            toState: createRefundResult.state,
+                        });
+                    }
+                    await this.connection.getRepository(txCtx, Refund).save(refund, { reload: false });
+                    await finalize();
+                    await this.eventBus.publish(
+                        new RefundStateTransitionEvent(
+                            fromState,
+                            createRefundResult.state,
+                            txCtx,
+                            refund,
+                            order,
+                        ),
                     );
-                    finalize = result.finalize;
-                } catch (e: any) {
-                    return new RefundStateTransitionError({
-                        transitionError: e.message,
-                        fromState,
-                        toState: createRefundResult.state,
-                    });
+                    return undefined;
+                });
+                if (transitionError) {
+                    return transitionError;
                 }
-                await this.connection.getRepository(ctx, Refund).save(refund, { reload: false });
-                await finalize();
-                await this.eventBus.publish(
-                    new RefundStateTransitionEvent(fromState, createRefundResult.state, ctx, refund, order),
-                );
             }
             if (primaryRefund == null) {
                 primaryRefund = refund;
