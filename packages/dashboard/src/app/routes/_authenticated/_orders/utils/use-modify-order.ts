@@ -37,6 +37,7 @@ export interface UseModifyOrderReturn {
     updateBillingAddress: (address: AddressFragment) => void;
     addSurcharge: (surcharge: SurchargeInput) => void;
     setNote: (note: string) => void;
+    setRecalculateShipping: (recalculate: boolean) => void;
     hasModifications: boolean;
 }
 
@@ -148,7 +149,9 @@ export function useModifyOrder(order: Order | null | undefined): UseModifyOrderR
                 setModifyOrderInput(prev => ({
                     ...prev,
                     addItems: (prev.addItems ?? []).map(item =>
-                        item.productVariantId === productVariantId ? { ...item, quantity } : item,
+                        item.productVariantId === productVariantId
+                            ? { ...item, quantity, customFields }
+                            : item,
                     ),
                 }));
             } else {
@@ -162,7 +165,7 @@ export function useModifyOrder(order: Order | null | undefined): UseModifyOrderR
 
                 setModifyOrderInput(prev => {
                     const originalLine = order?.lines.find(l => l.id === lineId);
-                    const isBackToOriginal = originalLine && originalLine.quantity === quantity;
+                    const isBackToOriginal = originalLine?.quantity === quantity;
 
                     const originalCustomFields = (originalLine as any)?.customFields;
                     const customFieldsChanged =
@@ -304,6 +307,17 @@ export function useModifyOrder(order: Order | null | undefined): UseModifyOrderR
         }));
     }, []);
 
+    // Set recalculate shipping
+    const setRecalculateShipping = useCallback((recalculate: boolean) => {
+        setModifyOrderInput(prev => ({
+            ...prev,
+            options: {
+                ...prev.options,
+                recalculateShipping: recalculate,
+            },
+        }));
+    }, []);
+
     // Check if there are modifications
     const hasModifications = useMemo(() => {
         return (
@@ -330,6 +344,7 @@ export function useModifyOrder(order: Order | null | undefined): UseModifyOrderR
         updateBillingAddress,
         addSurcharge,
         setNote,
+        setRecalculateShipping,
         hasModifications,
     };
 }

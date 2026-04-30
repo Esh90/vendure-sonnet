@@ -58,7 +58,9 @@ export function transformRelationFields<E extends Record<string, any>>(fields: F
             const propertyAccessorKey = customField.name.replace(/Ids$/, '');
             const relationValue = entity.customFields[propertyAccessorKey];
 
-            if (Array.isArray(relationValue)) {
+            if (relationValue === null) {
+                processedEntity.customFields[relationField] = null;
+            } else if (Array.isArray(relationValue)) {
                 processedEntity.customFields[relationField] = relationValue.map((v: { id: string }) => v.id);
             }
             delete processedEntity.customFields[propertyAccessorKey];
@@ -66,7 +68,7 @@ export function transformRelationFields<E extends Record<string, any>>(fields: F
             // For single fields, the accessor is the field name without the "Id" suffix
             const propertyAccessorKey = customField.name.replace(/Id$/, '');
             const relationValue = entity.customFields[propertyAccessorKey];
-            processedEntity.customFields[relationField] = relationValue?.id;
+            processedEntity.customFields[relationField] = relationValue === null ? null : relationValue?.id;
             delete processedEntity.customFields[propertyAccessorKey];
         }
     }
@@ -397,6 +399,17 @@ export function isListField(input?: ConfigurableFieldDef): boolean {
  */
 export function isReadonlyField(input?: ConfigurableFieldDef): boolean {
     return input && isCustomFieldConfig(input) ? Boolean(input.readonly) : false;
+}
+
+/**
+ * Determines if a field should be disabled based on the `disabled` prop from
+ * react-hook-form's Controller and the field's own readonly configuration.
+ *
+ * This centralises the disabled check so that every input component handles
+ * both sources of disabled state consistently.
+ */
+export function isFieldDisabled(disabled?: boolean, fieldDef?: ConfigurableFieldDef): boolean {
+    return Boolean(disabled) || isReadonlyField(fieldDef);
 }
 
 /**
