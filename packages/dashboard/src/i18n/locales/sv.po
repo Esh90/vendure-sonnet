@@ -104,7 +104,7 @@ msgstr "Rubrik 5"
 msgid "Failed to add payment"
 msgstr "Misslyckades att lägga till betalning"
 
-#: src/lib/framework/layout-engine/page-layout.tsx:663
+#: src/lib/framework/layout-engine/page-layout.tsx:718
 msgid "Updated"
 msgstr "Uppdaterad"
 
@@ -1498,7 +1498,7 @@ msgstr "Adress uppdaterad"
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:226
 #: src/app/routes/_authenticated/_orders/components/fulfillment-details.tsx:124
 #: src/lib/components/shared/asset/asset-gallery.tsx:747
-#: src/lib/framework/layout-engine/page-layout.tsx:650
+#: src/lib/framework/layout-engine/page-layout.tsx:705
 msgid "Created"
 msgstr "Skapad"
 
@@ -3988,7 +3988,7 @@ msgstr "Skickad"
 #~ msgid "Monitored Resources"
 #~ msgstr "Övervakade resurser"
 
-#: src/lib/framework/layout-engine/page-layout.tsx:622
+#: src/lib/framework/layout-engine/page-layout.tsx:677
 msgid "Entity Information"
 msgstr "Entitetsinformation"
 
@@ -5314,7 +5314,7 @@ msgstr "Inga åtgärder tillgängliga"
 msgid "Failed to update channel"
 msgstr "Misslyckades att uppdatera kanal"
 
-#: src/lib/components/shared/custom-fields-form.tsx:99
+#: src/lib/components/shared/custom-fields-form.tsx:101
 msgid "General"
 msgstr "Allmänt"
 
@@ -5849,4 +5849,3 @@ msgstr "API-nyckel uppdaterad"
 #: src/lib/components/layout/manage-languages-dialog.tsx:294
 msgid "These languages will be available for all channels to use"
 msgstr "Dessa språk kommer vara tillgängliga för alla kanaler att använda"
-
