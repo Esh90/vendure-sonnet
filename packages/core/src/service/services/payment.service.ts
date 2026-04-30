@@ -19,11 +19,11 @@ import { Logger } from '../../config/logger/vendure-logger';
 import { PaymentMethodHandler } from '../../config/payment/payment-method-handler';
 import { TransactionalConnection } from '../../connection/transactional-connection';
 import { Fulfillment } from '../../entity/fulfillment/fulfillment.entity';
-import { RefundLine } from '../../entity/order-line-reference/refund-line.entity';
-import { OrderLine } from '../../entity/order-line/order-line.entity';
 import { Order } from '../../entity/order/order.entity';
-import { PaymentMethod } from '../../entity/payment-method/payment-method.entity';
+import { OrderLine } from '../../entity/order-line/order-line.entity';
+import { RefundLine } from '../../entity/order-line-reference/refund-line.entity';
 import { Payment } from '../../entity/payment/payment.entity';
+import { PaymentMethod } from '../../entity/payment-method/payment-method.entity';
 import { Refund } from '../../entity/refund/refund.entity';
 import { EventBus } from '../../event-bus/event-bus';
 import { PaymentStateTransitionEvent } from '../../event-bus/events/payment-state-transition-event';
@@ -129,22 +129,32 @@ export class PaymentService {
             paymentMethod,
         );
         const initialState = 'Created';
-        const payment = await this.connection
-            .getRepository(ctx, Payment)
-            .save(new Payment({ ...result, method, state: initialState }));
-        const { finalize } = await this.paymentStateMachine.transition(ctx, order, payment, result.state);
-        await this.connection.getRepository(ctx, Payment).save(payment, { reload: false });
-        await this.connection
-            .getRepository(ctx, Order)
-            .createQueryBuilder()
-            .relation('payments')
-            .of(order)
-            .add(payment);
-        await this.eventBus.publish(
-            new PaymentStateTransitionEvent(initialState, result.state, ctx, payment, order),
-        );
-        await finalize();
-        return payment;
+        // Wrapped in withTransaction so the payment create, state transition, save,
+        // relation add and onTransitionEnd hooks all commit or roll back together.
+        // #4686.
+        return this.connection.withTransaction(ctx, async txCtx => {
+            const payment = await this.connection
+                .getRepository(txCtx, Payment)
+                .save(new Payment({ ...result, method, state: initialState }));
+            const { finalize } = await this.paymentStateMachine.transition(
+                txCtx,
+                order,
+                payment,
+                result.state,
+            );
+            await this.connection.getRepository(txCtx, Payment).save(payment, { reload: false });
+            await this.connection
+                .getRepository(txCtx, Order)
+                .createQueryBuilder()
+                .relation('payments')
+                .of(order)
+                .add(payment);
+            await this.eventBus.publish(
+                new PaymentStateTransitionEvent(initialState, result.state, txCtx, payment, order),
+            );
+            await finalize();
+            return payment;
+        });
     }
 
     /**
@@ -220,20 +230,30 @@ export class PaymentService {
             await this.connection.getRepository(ctx, Payment).save(payment, { reload: false });
             return payment;
         }
-        let finalize: () => Promise<any>;
-        try {
-            const result = await this.paymentStateMachine.transition(ctx, payment.order, payment, toState);
-            finalize = result.finalize;
-        } catch (e: any) {
-            const transitionError = ctx.translate(e.message, { fromState, toState });
-            return new PaymentStateTransitionError({ transitionError, fromState, toState });
-        }
-        await this.connection.getRepository(ctx, Payment).save(payment, { reload: false });
-        await this.eventBus.publish(
-            new PaymentStateTransitionEvent(fromState, toState, ctx, payment, payment.order),
-        );
-        await finalize();
-        return payment;
+        // Wrapped in withTransaction so the state save and onTransitionEnd hooks
+        // are atomic — see the equivalent comment on OrderService.transitionToState.
+        // #4686.
+        return this.connection.withTransaction(ctx, async txCtx => {
+            let finalize: () => Promise<any>;
+            try {
+                const result = await this.paymentStateMachine.transition(
+                    txCtx,
+                    payment.order,
+                    payment,
+                    toState,
+                );
+                finalize = result.finalize;
+            } catch (e: any) {
+                const transitionError = txCtx.translate(e.message, { fromState, toState });
+                return new PaymentStateTransitionError({ transitionError, fromState, toState });
+            }
+            await this.connection.getRepository(txCtx, Payment).save(payment, { reload: false });
+            await this.eventBus.publish(
+                new PaymentStateTransitionEvent(fromState, toState, txCtx, payment, payment.order),
+            );
+            await finalize();
+            return payment;
+        });
     }
 
     /**
@@ -247,29 +267,39 @@ export class PaymentService {
     async createManualPayment(ctx: RequestContext, order: Order, amount: number, input: ManualPaymentInput) {
         const initialState = 'Created';
         const endState = 'Settled';
-        const payment = await this.connection.getRepository(ctx, Payment).save(
-            new Payment({
-                amount,
+        // Wrapped in withTransaction so the payment create, state transition, save,
+        // relation add and onTransitionEnd hooks all commit or roll back together.
+        // #4686.
+        return this.connection.withTransaction(ctx, async txCtx => {
+            const payment = await this.connection.getRepository(txCtx, Payment).save(
+                new Payment({
+                    amount,
+                    order,
+                    transactionId: input.transactionId,
+                    metadata: input.metadata,
+                    method: input.method,
+                    state: initialState,
+                }),
+            );
+            const { finalize } = await this.paymentStateMachine.transition(
+                txCtx,
                 order,
-                transactionId: input.transactionId,
-                metadata: input.metadata,
-                method: input.method,
-                state: initialState,
-            }),
-        );
-        const { finalize } = await this.paymentStateMachine.transition(ctx, order, payment, endState);
-        await this.connection.getRepository(ctx, Payment).save(payment, { reload: false });
-        await this.connection
-            .getRepository(ctx, Order)
-            .createQueryBuilder()
-            .relation('payments')
-            .of(order)
-            .add(payment);
-        await this.eventBus.publish(
-            new PaymentStateTransitionEvent(initialState, endState, ctx, payment, order),
-        );
-        await finalize();
-        return payment;
+                payment,
+                endState,
+            );
+            await this.connection.getRepository(txCtx, Payment).save(payment, { reload: false });
+            await this.connection
+                .getRepository(txCtx, Order)
+                .createQueryBuilder()
+                .relation('payments')
+                .of(order)
+                .add(payment);
+            await this.eventBus.publish(
+                new PaymentStateTransitionEvent(initialState, endState, txCtx, payment, order),
+            );
+            await finalize();
+            return payment;
+        });
     }
 
     /**
