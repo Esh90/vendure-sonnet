@@ -29,6 +29,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { parsePOFile } from './locale-profiles.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -37,35 +39,6 @@ const OUT_DIR = path.resolve(__dirname, 'spot-check-out');
 const STATE_FILE = path.join(OUT_DIR, '.coverage-state.json');
 
 const EXCLUDE = new Set(['en', 'sv']);
-
-function parsePOFile(filePath) {
-    const content = fs.readFileSync(filePath, 'utf-8');
-    const lines = content.split('\n');
-    const entries = [];
-    let i = 0;
-    while (i < lines.length) {
-        while (i < lines.length && !lines[i].startsWith('msgid ')) i++;
-        if (i >= lines.length) break;
-        const startLine = i + 1;
-        let msgid = unquote(lines[i].slice(6));
-        i++;
-        while (i < lines.length && lines[i].startsWith('"')) { msgid += unquote(lines[i]); i++; }
-        if (i >= lines.length || !lines[i].startsWith('msgstr ')) continue;
-        const msgstrLine = i + 1;
-        let msgstr = unquote(lines[i].slice(7));
-        i++;
-        while (i < lines.length && lines[i].startsWith('"')) { msgstr += unquote(lines[i]); i++; }
-        if (msgid === '' || msgstr === '') continue;
-        entries.push({ msgid, msgstr, msgstrLine });
-    }
-    return entries;
-}
-
-function unquote(s) {
-    s = s.trim();
-    if (s.startsWith('"') && s.endsWith('"')) s = s.slice(1, -1);
-    return s.replace(/\\"/g, '"').replace(/\\n/g, '\n').replace(/\\t/g, '\t').replace(/\\\\/g, '\\');
-}
 
 function loadState() {
     if (!fs.existsSync(STATE_FILE)) return { coverage: {} };
@@ -118,22 +91,26 @@ function main() {
 
     for (const loc of targets) {
         const entries = parsePOFile(path.join(LOCALES_DIR, `${loc}.po`));
-        const covered = new Set(state.coverage[loc] ?? []);
-        const remaining = entries.filter(e => !covered.has(e.msgstrLine));
+        // Filter to entries with a non-empty msgstr — empty translations
+        // carry no language signal and aren't useful spot-check fodder.
+        const filled = entries.filter(e => e.msgstr !== '');
+        const prev = state.coverage[loc] ?? { lines: [], batchCount: 0 };
+        const covered = new Set(prev.lines);
+        const remaining = filled.filter(e => !covered.has(e.msgstrLine));
         if (remaining.length === 0) {
-            console.log(`${loc}: 100% covered (${entries.length} entries) — skipping.`);
+            console.log(`${loc}: 100% covered (${filled.length} entries) — skipping.`);
             continue;
         }
 
         const sample = shuffled(remaining).slice(0, sampleSize);
-        const batchIdx = (state.coverage[loc]?.batchCount ?? 0) + 1;
+        const batchIdx = prev.batchCount + 1;
         const batchPath = path.join(OUT_DIR, `${loc}-batch-${String(batchIdx).padStart(3, '0')}.json`);
 
         const batch = {
             locale: loc,
             batchIndex: batchIdx,
             sampledFromRemaining: remaining.length,
-            totalEntries: entries.length,
+            totalEntries: filled.length,
             samples: sample.map(e => ({
                 line: e.msgstrLine,
                 msgid: e.msgid,
@@ -145,11 +122,18 @@ function main() {
         };
         fs.writeFileSync(batchPath, JSON.stringify(batch, null, 2));
 
-        // Update state
-        state.coverage[loc] = [...covered, ...sample.map(e => e.msgstrLine)];
+        // Update state: persist BOTH the covered lines and the batch
+        // count. Storing as an object (not a bare array) is what makes
+        // `prev.batchCount` survive across runs — without it, every
+        // run would write `locale-batch-001.json` and overwrite the
+        // previous batch silently.
+        state.coverage[loc] = {
+            lines: [...covered, ...sample.map(e => e.msgstrLine)],
+            batchCount: batchIdx,
+        };
         manifest.batches.push({ locale: loc, file: path.relative(OUT_DIR, batchPath), count: sample.length });
 
-        console.log(`${loc}: sampled ${sample.length} (covered ${covered.size + sample.length}/${entries.length}).`);
+        console.log(`${loc}: sampled ${sample.length} (covered ${covered.size + sample.length}/${filled.length}).`);
     }
 
     saveState(state);

@@ -4,86 +4,46 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import {
+    ALLOWED_SCRIPTS,
+    REQUIRED_SCRIPTS,
+    SCRIPT_RANGES,
+    looksTrivial,
+} from './locale-profiles.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Configuration
 const DEFAULT_LOCALES_DIR = '../../src/i18n/locales';
 
-// Locales whose msgstrs must contain at least one character in the named
-// Unicode script. Used by `applyTranslations` to refuse a batch whose
-// content is in the wrong language for its block header (the failure
-// mode that introduced the contamination fixed in PR #4684 / #4645 and
-// the hr/nb/tr cleanup). If you add a new non-Latin locale, list its
-// expected script range here.
-const SCRIPT_EXPECTATIONS = {
-    ar: { name: 'Arabic', test: c => /[؀-ۿݐ-ݿ]/.test(c) },
-    fa: { name: 'Persian/Arabic', test: c => /[؀-ۿݐ-ݿﭐ-﷿]/.test(c) },
-    he: { name: 'Hebrew', test: c => /[֐-׿]/.test(c) },
-    ru: { name: 'Cyrillic', test: c => /[Ѐ-ӿ]/.test(c) },
-    bg: { name: 'Cyrillic', test: c => /[Ѐ-ӿ]/.test(c) },
-    uk: { name: 'Cyrillic', test: c => /[Ѐ-ӿ]/.test(c) },
-    zh_Hans: { name: 'CJK', test: c => /[一-鿿]/.test(c) },
-    zh_Hant: { name: 'CJK', test: c => /[一-鿿]/.test(c) },
-    ja: { name: 'Japanese (Hira/Kana/CJK)', test: c => /[぀-ヿ一-鿿]/.test(c) },
-    ko: { name: 'Hangul', test: c => /[가-힯]/.test(c) },
-    ne: { name: 'Devanagari', test: c => /[ऀ-ॿ]/.test(c) },
-};
-
-// Foreign scripts that should never appear in a Latin-script locale's
-// msgstr at all. Catches the inverse failure (Arabic ending up in hr,
-// CJK in nb, Cyrillic in tr).
-const FOREIGN_SCRIPT_RANGES = {
-    arabic: /[؀-ۿݐ-ݿﭐ-﷿]/,
-    hebrew: /[֐-׿]/,
-    cyrillic: /[Ѐ-ӿ]/,
-    cjk: /[一-鿿]/,
-    hiragana: /[぀-ゟ]/,
-    katakana: /[゠-ヿ]/,
-    hangul: /[가-힯]/,
-    devanagari: /[ऀ-ॿ]/,
-};
-
-const ALLOWED_SCRIPTS_BY_LOCALE = {
-    ar: ['arabic'],
-    fa: ['arabic'],
-    he: ['hebrew'],
-    ru: ['cyrillic'],
-    bg: ['cyrillic'],
-    uk: ['cyrillic'],
-    zh_Hans: ['cjk'],
-    zh_Hant: ['cjk'],
-    ja: ['cjk', 'hiragana', 'katakana'],
-    ko: ['hangul', 'cjk'],
-    ne: ['devanagari'],
-};
-
 /**
  * Validates that translations for `languageCode` look like they belong to
  * that language. Returns an array of { msgid, msgstr, reason } violations.
  *
  * Two checks:
- *   1. SCRIPT_EXPECTATIONS — for non-Latin locales, every substantive
+ *   1. REQUIRED_SCRIPTS — for non-Latin locales, every substantive
  *      msgstr must contain at least one character from the expected
- *      script. This refuses an LLM batch that mislabelled an Arabic
- *      translation as `hr`, etc.
- *   2. FOREIGN_SCRIPT_RANGES — every msgstr must not contain a script
- *      that doesn't belong to this locale (catches the inverse case
- *      where ar content sneaks into the hr block).
+ *      script. This refuses an LLM batch that mislabelled e.g. an
+ *      Arabic translation as `hr`.
+ *   2. SCRIPT_RANGES vs ALLOWED_SCRIPTS — every msgstr must not contain
+ *      a script that doesn't belong to this locale (catches the inverse
+ *      case where ar content sneaks into the hr block).
  *
  * Trivial msgstrs (very short, all numbers/punctuation, or just an ICU
  * placeholder like "{count}") are skipped because they carry no script
- * signal and many are legitimate cross-locale verbatim copies.
+ * signal and many are legitimate cross-locale verbatim copies. The
+ * trivial-detection is shared with the heuristic auditor via
+ * `looksTrivial` so the two scripts can never disagree on what counts
+ * as too-short-to-judge.
  */
 function validateLocaleBatch(languageCode, translations) {
     const violations = [];
-    const expect = SCRIPT_EXPECTATIONS[languageCode];
-    const allowed = new Set(ALLOWED_SCRIPTS_BY_LOCALE[languageCode] ?? []);
+    const expect = REQUIRED_SCRIPTS[languageCode];
+    const allowed = new Set(ALLOWED_SCRIPTS[languageCode] ?? []);
 
     for (const [msgid, msgstr] of Object.entries(translations)) {
-        if (!msgstr || msgstr.length < 3) continue;
-        const stripped = msgstr.replace(/[\s\d{}%a-zA-Z_,\-:.()/]/g, '');
-        if (stripped.length < 2 && !/[a-z]{4,}/i.test(msgstr)) continue;
+        if (looksTrivial(msgstr)) continue;
 
         // Check expected script (non-Latin locales only)
         if (expect) {
@@ -102,7 +62,7 @@ function validateLocaleBatch(languageCode, translations) {
         }
 
         // Check foreign-script intrusion (any locale)
-        for (const [scriptName, re] of Object.entries(FOREIGN_SCRIPT_RANGES)) {
+        for (const [scriptName, re] of Object.entries(SCRIPT_RANGES)) {
             if (allowed.has(scriptName)) continue;
             if (re.test(msgstr)) {
                 violations.push({
@@ -366,8 +326,10 @@ function applyTranslations(translationsFile, localesDir = DEFAULT_LOCALES_DIR) {
             }
             if (violations.length > 5) console.error(`    …and ${violations.length - 5} more`);
         }
-        console.error('\nNo files were written. Re-check the translations file — most likely the');
-        console.error('block headers and content are mismatched (the LLM labelled the wrong locale).');
+        console.error('\nNo files were written. Re-check the translations file. Common causes:');
+        console.error('  - Block headers and content are mismatched (the LLM labelled the wrong locale).');
+        console.error('  - The LLM produced output in the wrong language for that block.');
+        console.error('  - A foreign-script character (e.g. Arabic, Cyrillic, CJK) leaked into a Latin-script locale.');
         process.exit(1);
     }
 

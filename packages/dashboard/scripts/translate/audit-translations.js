@@ -33,36 +33,41 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import {
+    ALLOWED_SCRIPTS,
+    REQUIRED_SCRIPTS,
+    SCRIPT_RANGES,
+    looksTrivial,
+    parsePOFile,
+} from './locale-profiles.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const LOCALES_DIR = path.resolve(__dirname, '../../src/i18n/locales');
 const OUT_DIR = path.resolve(__dirname, 'audit-out');
 
-// Locales to exclude entirely — sv is being fixed in PR #4684, so its
-// known-bad msgstrs would otherwise cross-pollute the cross-locale signal.
+// Locales to exclude from cross-locale comparison entirely. Currently
+// only contains `sv` because PR #4684 is fixing a known Polish-content
+// contamination there; including its known-bad msgstrs would surface
+// false matches against Polish for every other locale we audit.
+//
+// REMOVE once #4684 lands.
 const EXCLUDE_LOCALES = new Set(['sv']);
 
 // ---------------------------------------------------------------------------
 // Language profile data
+//
+// Most script tables (REQUIRED_SCRIPTS, SCRIPT_RANGES, ALLOWED_SCRIPTS)
+// are imported from `./locale-profiles.js`. The Latin-script-specific
+// data below (locale families, overlap groups, exclusive-character
+// hints) lives here because it's only needed by the auditor, not by the
+// apply-time guard or the spot-check sampler.
 // ---------------------------------------------------------------------------
 
-// Locales whose msgstr should contain at least some characters from a
-// specific Unicode script. If an msgstr has substantial Latin content and
-// zero characters in the expected script, it's flagged.
-const SCRIPT_EXPECTATIONS = {
-    ar: { name: 'Arabic', test: c => /[؀-ۿݐ-ݿ]/.test(c) },
-    fa: { name: 'Persian/Arabic', test: c => /[؀-ۿݐ-ݿﭐ-﷿]/.test(c) },
-    he: { name: 'Hebrew', test: c => /[֐-׿]/.test(c) },
-    ru: { name: 'Cyrillic', test: c => /[Ѐ-ӿ]/.test(c) },
-    bg: { name: 'Cyrillic', test: c => /[Ѐ-ӿ]/.test(c) },
-    uk: { name: 'Cyrillic', test: c => /[Ѐ-ӿ]/.test(c) },
-    zh_Hans: { name: 'CJK', test: c => /[一-鿿]/.test(c) },
-    zh_Hant: { name: 'CJK', test: c => /[一-鿿]/.test(c) },
-    ja: { name: 'Japanese (Hira/Kana/CJK)', test: c => /[぀-ヿ一-鿿]/.test(c) },
-    ko: { name: 'Hangul', test: c => /[가-힯]/.test(c) },
-    ne: { name: 'Devanagari', test: c => /[ऀ-ॿ]/.test(c) },
-};
+// Alias for clarity at call sites — REQUIRED_SCRIPTS is what we check
+// against when auditing a non-Latin locale.
+const SCRIPT_EXPECTATIONS = REQUIRED_SCRIPTS;
 
 // Locale family groups. Members within a family legitimately share many
 // translations (regional variants of the same language) and cross-locale
@@ -91,6 +96,13 @@ function sameFamily(a, b) {
 // msgstr is more likely a cognate than a translation error. Cross-locale
 // matches between members of the same overlap group are gated on length
 // (≥ 25 characters) or on additional confirming signals.
+//
+// Note: ru/bg/uk also appear in LOCALE_FAMILY ('cyr-slavic'), which
+// suppresses cross-locale matches between them entirely (regardless of
+// length). The overlap-group entry is therefore dead code for that
+// triple — but listed here for completeness and so that future edits
+// can't accidentally weaken protection by removing the family link
+// without also reinstating the overlap-group treatment.
 const OVERLAP_GROUPS = [
     new Set(['es', 'pt_BR', 'pt_PT', 'it', 'fr', 'ro']),       // Romance
     new Set(['de', 'nl', 'nb', 'sv']),                          // Germanic
@@ -152,79 +164,10 @@ const OWN_EXCLUSIVE = {
 };
 
 // ---------------------------------------------------------------------------
-// PO parser
-// ---------------------------------------------------------------------------
-
-/**
- * Parse a .po file into structured entries with line numbers preserved so
- * we can point at the offending line.
- */
-function parsePOFile(filePath) {
-    const content = fs.readFileSync(filePath, 'utf-8');
-    const lines = content.split('\n');
-    const entries = [];
-
-    let i = 0;
-    while (i < lines.length) {
-        // Skip blank lines and comment-only blocks until we find a msgid
-        const refs = [];
-        while (i < lines.length && !lines[i].startsWith('msgid ')) {
-            if (lines[i].startsWith('#:')) refs.push(lines[i].slice(2).trim());
-            i++;
-        }
-        if (i >= lines.length) break;
-
-        const msgidStartLine = i + 1; // 1-based for editor friendliness
-        let msgid = unquote(lines[i].slice(6));
-        i++;
-        while (i < lines.length && lines[i].startsWith('"')) {
-            msgid += unquote(lines[i]);
-            i++;
-        }
-
-        if (i >= lines.length || !lines[i].startsWith('msgstr ')) continue;
-        const msgstrStartLine = i + 1;
-        let msgstr = unquote(lines[i].slice(7));
-        i++;
-        while (i < lines.length && lines[i].startsWith('"')) {
-            msgstr += unquote(lines[i]);
-            i++;
-        }
-
-        // Skip the file header (empty msgid)
-        if (msgid === '') continue;
-
-        entries.push({ msgid, msgstr, msgstrLine: msgstrStartLine, refs });
-    }
-
-    return entries;
-}
-
-function unquote(s) {
-    s = s.trim();
-    if (s.startsWith('"') && s.endsWith('"')) s = s.slice(1, -1);
-    return s
-        .replace(/\\"/g, '"')
-        .replace(/\\n/g, '\n')
-        .replace(/\\t/g, '\t')
-        .replace(/\\\\/g, '\\');
-}
-
-// ---------------------------------------------------------------------------
 // Heuristics
 // ---------------------------------------------------------------------------
 
 const LATIN_RE = /[A-Za-zÀ-ÿĀ-ſ]/;
-
-function looksTrivial(s) {
-    // numbers, symbols, very short, format placeholders only
-    if (s.length < 3) return true;
-    const stripped = s.replace(/[\s\d\p{P}\p{S}]/gu, '');
-    if (stripped.length < 2) return true;
-    // Just an ICU/format placeholder like "{count}" or "%s"
-    if (/^[\s{}\d%a-zA-Z_,\-]*$/.test(s) && !/[a-z]{4,}/i.test(s)) return true;
-    return false;
-}
 
 /**
  * Returns the set of EXCLUSIVE_CHARS group keys whose chars appear in s but
@@ -244,43 +187,6 @@ function foreignExclusiveHits(s, ownLocale) {
     }
     return hits;
 }
-
-// Each script range that we recognise. Used for "wrong script altogether"
-// detection — e.g. Arabic chars appearing in hr.po.
-const SCRIPT_RANGES = {
-    arabic: /[؀-ۿݐ-ݿﭐ-﷿]/,
-    hebrew: /[֐-׿]/,
-    cyrillic: /[Ѐ-ӿ]/,
-    cjk: /[一-鿿]/,
-    hiragana: /[぀-ゟ]/,
-    katakana: /[゠-ヿ]/,
-    hangul: /[가-힯]/,
-    devanagari: /[ऀ-ॿ]/,
-    greek: /[Ͱ-Ͽ]/,
-};
-
-// What scripts should each locale's msgstrs use? (Latin is implicit for
-// any locale not in NON_LATIN_LOCALES.) Used to flag any character that
-// falls into a script the locale shouldn't be using.
-const NON_LATIN_LOCALES = new Set([
-    'ar', 'fa', 'he', 'ru', 'bg', 'uk', 'zh_Hans', 'zh_Hant', 'ja', 'ko', 'ne',
-]);
-
-const ALLOWED_FOREIGN_SCRIPTS = {
-    // None — these locales should only contain their native script + Latin
-    // (for product names, technical terms, brand names, ICU placeholders).
-    ar: ['arabic'],
-    fa: ['arabic'],
-    he: ['hebrew'],
-    ru: ['cyrillic'],
-    bg: ['cyrillic'],
-    uk: ['cyrillic'],
-    zh_Hans: ['cjk'],
-    zh_Hant: ['cjk'],
-    ja: ['cjk', 'hiragana', 'katakana'],
-    ko: ['hangul', 'cjk'],
-    ne: ['devanagari'],
-};
 
 /**
  * Returns true if msgstr is entirely Latin-script (substantial content) and
@@ -307,7 +213,7 @@ function scriptMismatch(s, locale) {
  */
 function foreignScriptHits(s, locale) {
     if (looksTrivial(s)) return null;
-    const allowed = new Set(ALLOWED_FOREIGN_SCRIPTS[locale] ?? []);
+    const allowed = new Set(ALLOWED_SCRIPTS[locale] ?? []);
     const hits = new Set();
     for (const [name, re] of Object.entries(SCRIPT_RANGES)) {
         if (allowed.has(name)) continue;
