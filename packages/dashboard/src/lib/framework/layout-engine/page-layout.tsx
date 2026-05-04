@@ -284,7 +284,8 @@ export function PageLayout({ children, className }: Readonly<PageLayoutProps>) {
                     const ExtensionBlock =
                         extensionBlock.component &&
                         extensionBlockShouldRender &&
-                        hasPermissions(permissions ?? []) ? (
+                        // using `hasPermissions` over `PermissionGuard` as this would defeat the `isPageBlock` typeguard
+                        hasPermissions(permissions) ? (
                             <BlockComponent
                                 key={extensionBlock.id}
                                 column={extensionBlock.location.column}
