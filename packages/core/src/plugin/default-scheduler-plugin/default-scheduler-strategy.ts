@@ -200,10 +200,6 @@ export class DefaultSchedulerStrategy implements SchedulerStrategy {
         Logger.debug(`Checking for manually triggered tasks: ${taskEntities.length}`);
 
         for (const taskEntity of taskEntities) {
-            await this.connection.rawConnection
-                .getRepository(ScheduledTaskRecord)
-                .update({ taskId: taskEntity.taskId }, { manuallyTriggeredAt: null });
-
             const task = this.tasks.get(taskEntity.taskId);
             if (task) {
                 Logger.info(`Executing manually triggered task: ${task.task.id}`);
@@ -264,10 +260,12 @@ export class DefaultSchedulerStrategy implements SchedulerStrategy {
                     return false;
                 }
 
-                // Now update the lock within the same transaction
+                // Now update the lock within the same transaction.
+                // Also clear manuallyTriggeredAt so that if the task was manually triggered,
+                // the flag is only cleared once the lock is actually acquired.
                 await manager
                     .getRepository(ScheduledTaskRecord)
-                    .update({ id: taskRecord.id }, { lockedAt: new Date() });
+                    .update({ id: taskRecord.id }, { lockedAt: new Date(), manuallyTriggeredAt: null });
 
                 return true;
             });
@@ -279,7 +277,7 @@ export class DefaultSchedulerStrategy implements SchedulerStrategy {
                 .getRepository(ScheduledTaskRecord)
                 .createQueryBuilder('task')
                 .update()
-                .set({ lockedAt: new Date() })
+                .set({ lockedAt: new Date(), manuallyTriggeredAt: null })
                 .where('taskId = :taskId', { taskId: task.id })
                 .andWhere('lockedAt IS NULL')
                 .andWhere('enabled = TRUE')
