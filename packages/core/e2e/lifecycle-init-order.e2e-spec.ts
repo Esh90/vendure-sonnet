@@ -1,5 +1,11 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { AutoIncrementIdStrategy, Injector, PluginCommonModule, VendurePlugin } from '@vendure/core';
+import {
+    AutoIncrementIdStrategy,
+    Injector,
+    PluginCommonModule,
+    ProductService,
+    VendurePlugin,
+} from '@vendure/core';
 import { createTestEnvironment } from '@vendure/testing';
 import path from 'path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -7,26 +13,30 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { initialData } from '../../../e2e-common/e2e-initial-data';
 import { TEST_SETUP_TIMEOUT_MS, testConfig } from '../../../e2e-common/test-config';
 
-let strategyInitedAt: number | null = null;
-let consumerOnModuleInitAt: number | null = null;
+let strategyInitialized = false;
+let strategyResolvedDependency = false;
 let consumerSawStrategyInitialized = false;
 
 class OrderingTestStrategy extends AutoIncrementIdStrategy {
-    async init(_: Injector) {
-        // Small delay so that, were ConfigModule to initialize strategies after
-        // other modules' onModuleInit, the consumer below would observe a still-
-        // null strategyInitedAt. With the correct ordering the delay does not
-        // matter — strategy init must complete before any onModuleInit fires.
+    async init(injector: Injector) {
+        // Locks down the other half of the contract: by the time a strategy's
+        // init() runs, its own dependencies must already be resolvable via the
+        // Injector.
+        const productService = injector.get(ProductService);
+        strategyResolvedDependency = productService.constructor.name === 'ProductService';
+        // The delay is not for synchronisation — it is purely to amplify the
+        // failure signal of a regression. If ConfigModule reverts to running
+        // strategy init at onApplicationBootstrap, this 50ms gap makes sure the
+        // consumer's onModuleInit observes strategyInitialized as still false.
         await new Promise(resolve => setTimeout(resolve, 50));
-        strategyInitedAt = Date.now();
+        strategyInitialized = true;
     }
 }
 
 @Injectable()
 class StrategyConsumerService implements OnModuleInit {
     onModuleInit() {
-        consumerOnModuleInitAt = Date.now();
-        consumerSawStrategyInitialized = strategyInitedAt !== null;
+        consumerSawStrategyInitialized = strategyInitialized;
     }
 }
 
@@ -73,10 +83,9 @@ describe('strategy init order', () => {
         await server.destroy();
     });
 
-    it('strategy init() completes before plugin service onModuleInit', () => {
-        expect(strategyInitedAt).not.toBeNull();
-        expect(consumerOnModuleInitAt).not.toBeNull();
+    it('resolves dependencies in strategy init() and runs it before plugin onModuleInit', () => {
+        expect(strategyInitialized).toBe(true);
+        expect(strategyResolvedDependency).toBe(true);
         expect(consumerSawStrategyInitialized).toBe(true);
-        expect(strategyInitedAt ?? Infinity).toBeLessThanOrEqual(consumerOnModuleInitAt ?? -Infinity);
     });
 });
