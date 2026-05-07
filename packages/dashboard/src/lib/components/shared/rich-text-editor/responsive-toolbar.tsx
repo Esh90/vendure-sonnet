@@ -229,7 +229,7 @@ export function ResponsiveToolbar({ editor, disabled }: Readonly<ResponsiveToolb
                 id: 'image',
                 priority: 7,
                 label: 'Image',
-                isActive: editor.isActive("image"),
+                isActive: editorState.isImage,
                 action: () => setImageDialogOpen(true),
                 element: (
                     <Button
@@ -238,7 +238,7 @@ export function ResponsiveToolbar({ editor, disabled }: Readonly<ResponsiveToolb
                         variant="ghost"
                         size="sm"
                         onClick={() => setImageDialogOpen(true)}
-                        className={`h-8 px-2 ${editor.isActive("image") ? 'bg-accent' : ''}`}
+                        className={`h-8 px-2 ${editorState.isImage ? 'bg-accent' : ''}`}
                         disabled={disabled}
                     >
                         <ImageIcon className="h-4 w-4" />
