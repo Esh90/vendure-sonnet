@@ -49,18 +49,24 @@ export function ResponsiveToolbar({ editor, disabled }: Readonly<ResponsiveToolb
     const toolbarRef = useRef<HTMLDivElement>(null);
 
     const editorState = useEditorState({
-        editor: editor!,
-        selector: (context) => ({
-            isBold: context.editor.isActive('bold'),
-            isItalic: context.editor.isActive('italic'),
-            isStrike: context.editor.isActive('strike'),
-            isBulletList: context.editor.isActive('bulletList'),
-            isOrderedList: context.editor.isActive('orderedList'),
-            isLink: context.editor.isActive('link'),
-            isImage: context.editor.isActive('image'),
-            isBlockquote: context.editor.isActive('blockquote'),
-            isTable: context.editor.isActive('table')
-        }),
+        editor: editor,
+        selector: (context) => {
+            if (context.editor == null) {
+                return;
+            }
+
+            return {
+                isBold: context.editor.isActive('bold'),
+                isItalic: context.editor.isActive('italic'),
+                isStrike: context.editor.isActive('strike'),
+                isBulletList: context.editor.isActive('bulletList'),
+                isOrderedList: context.editor.isActive('orderedList'),
+                isLink: context.editor.isActive('link'),
+                isImage: context.editor.isActive('image'),
+                isBlockquote: context.editor.isActive('blockquote'),
+                isTable: context.editor.isActive('table')
+            }
+        }
     })
 
     const handleHeadingChange = useCallback(
@@ -102,7 +108,7 @@ export function ResponsiveToolbar({ editor, disabled }: Readonly<ResponsiveToolb
     const canInsertTable = !!editor?.can().insertTable();
 
     const toolbarItems: ToolbarItem[] = useMemo(() => {
-        if (!editor) return [];
+        if (!editor || !editorState) return [];
 
         return [
             {
