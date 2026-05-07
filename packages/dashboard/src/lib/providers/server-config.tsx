@@ -270,7 +270,12 @@ export const ServerConfigProvider = ({ children }: { children: React.ReactNode }
         queryFn: () => api.query(getServerConfigDocument),
         retry: false,
         enabled: !!user?.id,
-        staleTime: 1000,
+        // The server config rarely changes during a session (it's driven by
+        // VendureConfig at boot time). Treat it as session-stable so we don't
+        // re-fetch on every reconnect, which would cause flashes of empty
+        // custom-field configuration as queries are re-derived.
+        staleTime: Infinity,
+        refetchOnReconnect: false,
     });
     const value: ServerConfig | null = data?.globalSettings
         ? {
