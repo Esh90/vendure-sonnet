@@ -51,8 +51,8 @@ export function ResponsiveToolbar({ editor, disabled }: Readonly<ResponsiveToolb
     const editorState = useEditorState({
         editor: editor!,
         selector: (context) => ({
-            isBold: context.editor.isActive("bold"),
-            isItalic: context.editor.isActive("italic"),
+            isBold: context.editor.isActive('bold'),
+            isItalic: context.editor.isActive('italic'),
             isStrike: context.editor.isActive('strike'),
             isBulletList: context.editor.isActive('bulletList'),
             isOrderedList: context.editor.isActive('orderedList'),
