@@ -277,16 +277,23 @@ export const ServerConfigProvider = ({ children }: { children: React.ReactNode }
         staleTime: Infinity,
         refetchOnReconnect: false,
     });
-    const value: ServerConfig | null = data?.globalSettings
-        ? {
-              availableLanguages: data?.globalSettings.availableLanguages ?? [],
-              moneyStrategyPrecision: data?.globalSettings.serverConfig.moneyStrategyPrecision ?? 2,
-              orderProcess: data?.globalSettings.serverConfig.orderProcess ?? [],
-              permittedAssetTypes: data?.globalSettings.serverConfig.permittedAssetTypes ?? [],
-              permissions: data?.globalSettings.serverConfig.permissions ?? [],
-              entityCustomFields: data?.globalSettings.serverConfig.entityCustomFields ?? [],
-          }
-        : null;
+    // Memoise the context value on the underlying query data so that
+    // consumers (and the memoised hooks downstream) see a stable reference
+    // for the array fields when the data hasn't changed.
+    const value = React.useMemo<ServerConfig | null>(
+        () =>
+            data?.globalSettings
+                ? {
+                      availableLanguages: data.globalSettings.availableLanguages ?? [],
+                      moneyStrategyPrecision: data.globalSettings.serverConfig.moneyStrategyPrecision ?? 2,
+                      orderProcess: data.globalSettings.serverConfig.orderProcess ?? [],
+                      permittedAssetTypes: data.globalSettings.serverConfig.permittedAssetTypes ?? [],
+                      permissions: data.globalSettings.serverConfig.permissions ?? [],
+                      entityCustomFields: data.globalSettings.serverConfig.entityCustomFields ?? [],
+                  }
+                : null,
+        [data],
+    );
 
     return <ServerConfigContext.Provider value={value}>{children}</ServerConfigContext.Provider>;
 };

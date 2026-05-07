@@ -1,7 +1,7 @@
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { zodResolver } from '@/vdb/lib/zod.js';
 import { VariablesOf } from 'gql.tada';
-import { FormEvent, useMemo } from 'react';
+import { FormEvent, useEffect, useMemo, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { useChannel } from '../../hooks/use-channel.js';
 import { useServerConfig } from '../../hooks/use-server-config.js';
@@ -13,6 +13,11 @@ import {
     stripNullNullableFields,
     transformRelationFields,
 } from './utils.js';
+
+// Stable empty array reference used as a fallback when the server config
+// (and therefore `availableLanguages`) has not yet loaded — keeps memo
+// dependencies stable across renders.
+const EMPTY_LANGUAGES: string[] = [];
 
 export type WithLooseCustomFields<T> = T extends { customFields?: any }
     ? Omit<T, 'customFields'> & { customFields?: T['customFields'] | unknown }
@@ -96,7 +101,16 @@ export function useGeneratedForm<
     const { document, entity, setValues, onSubmit, varName, customFieldConfig } = options;
     const { activeChannel } = useChannel();
     const serverConfig = useServerConfig();
-    const availableLanguages = serverConfig?.availableLanguages || [];
+
+    // Callers typically pass `setValues` as an inline arrow function, which
+    // would change identity every render. Hold it in a ref so the values
+    // memo below can call the latest version without recomputing — and
+    // without going stale on a closure.
+    const setValuesRef = useRef(setValues);
+    useEffect(() => {
+        setValuesRef.current = setValues;
+    }, [setValues]);
+
     // Recomputing this on every render produces a new array identity which
     // ripples into the schema and default-values memos below, defeating any
     // stable form state. Memoise on the document + varName.
@@ -104,6 +118,11 @@ export function useGeneratedForm<
         () => (document ? getOperationVariablesFields(document, varName) : []),
         [document, varName],
     );
+
+    // ServerConfigProvider memoises its value on the underlying query data,
+    // so this array has stable identity across renders when the server
+    // config hasn't changed.
+    const availableLanguages = serverConfig?.availableLanguages ?? EMPTY_LANGUAGES;
 
     // Without memoisation these objects/arrays are rebuilt on every render of
     // the parent route. When the schema changes identity, react-hook-form's
@@ -117,30 +136,22 @@ export function useGeneratedForm<
         () => getDefaultValuesFromFields(updateFields, activeChannel?.defaultLanguageCode),
         [updateFields, activeChannel?.defaultLanguageCode],
     );
-    const availableLanguagesKey = availableLanguages.join(',');
     const processedEntity = useMemo(
         () => ensureTranslationsForAllLanguages(entity, availableLanguages, defaultValues),
-        // availableLanguagesKey lets us depend on the *contents* of the
-        // languages array rather than its (possibly-new-each-render) identity.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [entity, availableLanguagesKey, defaultValues],
+        [entity, availableLanguages, defaultValues],
     );
     const processedDefaultValues = useMemo(
         () =>
             ensureTranslationsForAllLanguages(defaultValues, availableLanguages, defaultValues) ??
             defaultValues,
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [defaultValues, availableLanguagesKey],
+        [defaultValues, availableLanguages],
     );
 
     const values = useMemo(
         () =>
             processedEntity
-                ? transformRelationFields(updateFields, setValues(processedEntity))
+                ? transformRelationFields(updateFields, setValuesRef.current(processedEntity))
                 : processedDefaultValues,
-        // setValues is provided inline by callers and is intentionally excluded
-        // from deps — entity identity is the real driver here.
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         [processedEntity, processedDefaultValues, updateFields],
     );
 
