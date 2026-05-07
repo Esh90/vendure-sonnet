@@ -1,0 +1,13 @@
+---
+title: "UseIsServerConfigLoaded"
+generated: true
+---
+<GenerationInfo sourceFile="packages/dashboard/src/lib/hooks/use-custom-field-config.ts" sourceLine="38" packageName="@vendure/dashboard" since="3.6.4" />
+
+Returns whether the server config (and therefore the custom-field map)
+has been loaded yet. Useful for distinguishing "loading" from "no custom
+fields configured" so callers can render a skeleton instead of nothing.
+
+```ts title="Signature"
+function useIsServerConfigLoaded(): boolean
+```
