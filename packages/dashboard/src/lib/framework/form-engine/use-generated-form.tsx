@@ -1,7 +1,7 @@
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { zodResolver } from '@/vdb/lib/zod.js';
 import { VariablesOf } from 'gql.tada';
-import { FormEvent } from 'react';
+import { FormEvent, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useChannel } from '../../hooks/use-channel.js';
 import { useServerConfig } from '../../hooks/use-server-config.js';
@@ -97,19 +97,52 @@ export function useGeneratedForm<
     const { activeChannel } = useChannel();
     const serverConfig = useServerConfig();
     const availableLanguages = serverConfig?.availableLanguages || [];
-    const updateFields = document ? getOperationVariablesFields(document, varName) : [];
+    // Recomputing this on every render produces a new array identity which
+    // ripples into the schema and default-values memos below, defeating any
+    // stable form state. Memoise on the document + varName.
+    const updateFields = useMemo(
+        () => (document ? getOperationVariablesFields(document, varName) : []),
+        [document, varName],
+    );
 
-    const schema = createFormSchemaFromFields(updateFields, customFieldConfig);
-    const defaultValues = getDefaultValuesFromFields(updateFields, activeChannel?.defaultLanguageCode);
-    const processedEntity = ensureTranslationsForAllLanguages(entity, availableLanguages, defaultValues);
+    // Without memoisation these objects/arrays are rebuilt on every render of
+    // the parent route. When the schema changes identity, react-hook-form's
+    // resolver is replaced and the form re-validates everything; when
+    // defaultValues changes identity it can also reset uncontrolled inputs.
+    const schema = useMemo(
+        () => createFormSchemaFromFields(updateFields, customFieldConfig),
+        [updateFields, customFieldConfig],
+    );
+    const defaultValues = useMemo(
+        () => getDefaultValuesFromFields(updateFields, activeChannel?.defaultLanguageCode),
+        [updateFields, activeChannel?.defaultLanguageCode],
+    );
+    const availableLanguagesKey = availableLanguages.join(',');
+    const processedEntity = useMemo(
+        () => ensureTranslationsForAllLanguages(entity, availableLanguages, defaultValues),
+        // availableLanguagesKey lets us depend on the *contents* of the
+        // languages array rather than its (possibly-new-each-render) identity.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [entity, availableLanguagesKey, defaultValues],
+    );
+    const processedDefaultValues = useMemo(
+        () =>
+            ensureTranslationsForAllLanguages(defaultValues, availableLanguages, defaultValues) ??
+            defaultValues,
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [defaultValues, availableLanguagesKey],
+    );
 
-    // Also ensure defaultValues has translations for all languages (for creation case)
-    const processedDefaultValues =
-        ensureTranslationsForAllLanguages(defaultValues, availableLanguages, defaultValues) ?? defaultValues;
-
-    const values = processedEntity
-        ? transformRelationFields(updateFields, setValues(processedEntity))
-        : processedDefaultValues;
+    const values = useMemo(
+        () =>
+            processedEntity
+                ? transformRelationFields(updateFields, setValues(processedEntity))
+                : processedDefaultValues,
+        // setValues is provided inline by callers and is intentionally excluded
+        // from deps — entity identity is the real driver here.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [processedEntity, processedDefaultValues, updateFields],
+    );
 
     const form = useForm({
         resolver: async (values, context, options) => {
