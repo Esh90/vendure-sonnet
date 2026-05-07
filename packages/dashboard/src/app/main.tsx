@@ -1,7 +1,10 @@
 import { Toaster } from '@/vdb/components/ui/sonner.js';
 import { Spinner } from '@/vdb/components/ui/spinner.js';
 import { registerDefaults } from '@/vdb/framework/defaults.js';
-import { setCustomFieldsMap } from '@/vdb/framework/document-introspection/add-custom-fields.js';
+import {
+    clearCustomFieldsMap,
+    setCustomFieldsMap,
+} from '@/vdb/framework/document-introspection/add-custom-fields.js';
 import { executeDashboardExtensionCallbacks } from '@/vdb/framework/extension-api/define-dashboard-extension.js';
 import { useDashboardExtensions } from '@/vdb/framework/extension-api/use-dashboard-extensions.js';
 import { useExtendedRouter } from '@/vdb/framework/page/use-extended-router.js';
@@ -88,11 +91,17 @@ function InnerApp() {
 
     useEffect(() => {
         if (!serverConfig) {
+            // serverConfig clears on logout. Reset the global map and the
+            // local flag so a subsequent login as a different administrator
+            // re-derives queries against fresh custom-field config rather
+            // than reusing the previous user's map.
+            clearCustomFieldsMap();
+            setHasSetCustomFieldsMap(false);
             return;
         }
         setCustomFieldsMap(serverConfig.entityCustomFields);
         setHasSetCustomFieldsMap(true);
-    }, [serverConfig?.entityCustomFields.length]);
+    }, [serverConfig]);
 
     useEffect(() => {
         setDocumentDirection(isRTL ? 'rtl' : 'ltr');
@@ -147,11 +156,7 @@ function App() {
         // Show a minimal full-screen splash so the user sees that the app is
         // loading rather than a white screen while i18n catalogs and dashboard
         // extensions resolve.
-        return (
-            <div className="fixed inset-0 flex items-center justify-center bg-background">
-                <Spinner className="text-muted-foreground" />
-            </div>
-        );
+        return <BootSplash />;
     }
     return (
         <AppProviders>
