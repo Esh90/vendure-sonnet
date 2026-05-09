@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 import { omit } from '@vendure/common/lib/omit';
+import { CurrencyCode, LanguageCode } from '@vendure/common/lib/generated-types';
 import { User } from '@vendure/core';
-import { createTestEnvironment } from '@vendure/testing';
+import { createTestEnvironment, E2E_DEFAULT_CHANNEL_TOKEN } from '@vendure/testing';
 import * as fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
@@ -12,6 +13,7 @@ import { initialData } from '../../../e2e-common/e2e-initial-data';
 import { TEST_SETUP_TIMEOUT_MS, testConfig } from '../../../e2e-common/test-config';
 
 import { graphql } from './graphql/graphql-admin';
+import { createChannelDocument } from './graphql/shared-definitions';
 
 describe('Import resolver', () => {
     const { server, adminClient } = createTestEnvironment({
@@ -295,6 +297,67 @@ describe('Import resolver', () => {
         // T-Shirt should have 4 variants with 2 options each
         expect(tShirt.variants.length).toBe(4);
         expect(tShirt.variants[0].options.length).toBe(2);
+    }, 30000);
+
+    // https://github.com/vendure-ecommerce/vendure/issues/4673
+    it('imports facets and variantFacets when re-importing into a new channel', async () => {
+        const SECOND_CHANNEL_TOKEN = 'second_channel_token';
+
+        // Create a new channel
+        await adminClient.query(createChannelDocument, {
+            input: {
+                code: 'second-channel',
+                token: SECOND_CHANNEL_TOKEN,
+                defaultLanguageCode: LanguageCode.en,
+                currencyCode: CurrencyCode.USD,
+                pricesIncludeTax: false,
+                defaultShippingZoneId: 'T_1',
+                defaultTaxZoneId: 'T_1',
+            },
+        });
+
+        // Switch to the new channel
+        adminClient.setChannelToken(SECOND_CHANNEL_TOKEN);
+
+        // Import the same CSV into the new channel
+        const csvFile = path.join(__dirname, 'fixtures', 'product-import.csv');
+        const result = await adminClient.fileUploadMutation({
+            mutation: importProductsDocument1,
+            filePaths: [csvFile],
+            mapVariables: () => ({ csvFile: null }),
+        });
+
+        expect(result.importProducts.errors).toEqual([
+            'Invalid Record Length: header length is 20, got 1 on line 8',
+        ]);
+        expect(result.importProducts.imported).toBe(4);
+
+        // Query products in the new channel
+        const productResult = await adminClient.query(getProductsDocument1, {
+            options: {},
+        });
+
+        expect(productResult.products.totalItems).toBe(4);
+
+        const paperStretcher = productResult.products.items.find(
+            (p: any) => p.name === 'Perfect Paper Stretcher',
+        );
+        const smock = productResult.products.items.find((p: any) => p.name === 'Artists Smock');
+
+        if (!paperStretcher || !smock) {
+            throw new Error('Expected products to be found in second channel');
+        }
+
+        const byName = (e: { name: string }) => e.name;
+
+        // Verify product-level facets are present in the new channel
+        expect(smock.facetValues.map(byName).sort()).toEqual(['Denim', 'clothes']);
+
+        // Verify variant-level facets are present in the new channel
+        expect(paperStretcher.variants[0].facetValues.map(byName).sort()).toEqual(['Accessory', 'KB']);
+
+        // Switch back to default channel
+        adminClient.setChannelToken(E2E_DEFAULT_CHANNEL_TOKEN);
     }, 30000);
 
     describe('asset urls', () => {
