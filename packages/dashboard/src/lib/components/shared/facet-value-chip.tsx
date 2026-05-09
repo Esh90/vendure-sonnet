@@ -38,10 +38,10 @@ export function FacetValueChip({
             variant="secondary"
             className="flex items-center gap-2 py-0.5 pl-2 pr-1 h-6 max-w-full shrink hover:bg-secondary/80"
         >
-            <div className="flex items-center gap-1.5 min-w-0">
+            <div className="flex items-center gap-1.5 min-w-0 truncate">
                 <span className="font-medium truncate">{facetValue.name}</span>
                 {displayFacetName && (
-                    <span className="text-muted-foreground text-xs">in {facetValue.facet.name}</span>
+                    <span className="text-muted-foreground text-xs truncate">in {facetValue.facet.name}</span>
                 )}
             </div>
             {removable && (
