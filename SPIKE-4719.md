@@ -292,4 +292,49 @@ Either way: extensions still get served from user source (HMR preserved), dashbo
 
 **Verdict on first pass:** ❌ My approach was based on a wrong model of which entry to bundle. **Step 1 needs a redo:** bundle the app entry too AND restructure how vendureDashboardPlugin serves the dashboard in dev mode. Or simpler: just serve the existing `build:standalone` output in dev.
 
+### 2026-05-11 — Quick test: serve prod bundle (no Vite dev)
+
+**Setup:**
+- Stop `npm run dev:dashboard` (no Vite dev server)
+- Run `vite build` in the test project (which uses `vendureDashboardPlugin` in build mode → produces `dist/dashboard/` with the prod bundle including the CMS plugin's dashboard extension)
+- Vendure backend (`DashboardPlugin`) already serves `dist/dashboard/index.html` via the `/dashboard/` route on port 3001
+- Hit `http://localhost:3001/dashboard/` in browser
+
+**Result — full G1 measurement against the same scaffold:**
+
+| Metric | Baseline (vite dev) | Prod bundle | Δ |
+|---|--:|--:|--:|
+| Network requests (script/fetch/xhr) | **3,054** | **39** | **-98.7%** |
+| DOMContentLoaded | 897 ms | 179 ms | -80% |
+| Load event | 903 ms | 181 ms | -80% |
+| JS heap used | 168 MB | 20 MB | **-88%** |
+| JS heap total | 203 MB | 91 MB | -55% |
+| Console errors | 0 | 0 | — |
+| @fs raw module requests | 2,492 | 0 | -100% |
+| dashboard src/* requests | 472 | 0 | -100% |
+
+**Visual smoke check:** Dashboard renders identically. All widgets (Insights, charts, breadcrumbs, sidebar, etc.) work. Authentication state preserved across navigation.
+
+**Build cost:** `vite build` takes ~11s in the test project.
+
+### Architectural conclusion
+
+**The bundle approach categorically solves #4715.** This is conclusive — no debate needed about whether shipping/serving as a bundle is technically viable.
+
+**The actual hard problem the spike must solve:** the dev experience for extension authors. Today they have a binary choice:
+
+| Mode | Pros | Cons |
+|---|---|---|
+| `vite dev` (today) | Instant HMR, fast iteration | 3,054 requests on cold load, crashes Brave |
+| `vite build` + serve via Vendure backend | 39 requests, no crash, snappy | 11s rebuild per extension change → no iteration loop |
+
+**The ideal**: dashboard **core** served as static bundle (39-ish requests), extension **code** served by Vite dev with HMR (a handful more requests). The user iterates on their extension code with HMR; the dashboard core is "just there".
+
+This is a real engineering project — non-trivial — but the question of whether the spike is *viable* is now settled. **It is.** Remaining gates (G3 Context identity, G4 Tailwind, G5 Lingui, G6 IDE DX, G7 build/size) all need to be re-evaluated under this new architecture.
+
+**Open question for next session:** how to split the dashboard core from extension code at dev-time. Possible approaches:
+1. Serve `dist/dashboard/index.html` + bundled assets via Vite's middleware-mode, mount extension dev assets at a sub-path
+2. Build a "dashboard host" page that loads bundled core + dynamic extension module from Vite dev's port
+3. Wait — what if we just serve the bundle in `vite dev` mode by treating the bundle as a pre-built dep that Vite doesn't try to re-process? Worth checking.
+
 
