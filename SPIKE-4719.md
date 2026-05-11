@@ -452,4 +452,50 @@ Plus `package.json` exports change: `.` now points at `dist/publishable/lib.js` 
 
 The architectural premise of the spike is **fully validated**. Remaining work is downstream polish.
 
+### 2026-05-11 — CSS strategy: ship pre-resolved CSS from `build:standalone`
+
+**Problem**: My initial `vite.lib.config.mts` produced a `dashboard.css` with unresolved `@apply` directives (no Tailwind plugin in the publish build). Consumer's `@tailwindcss/vite` then choked on `border-border` (a semantic token defined by the dashboard's themeVariablesPlugin, which only runs at consumer time).
+
+**Pragmatic fix**: copy the existing `dist/assets/index-*.css` (produced by `build:standalone` with full Tailwind + theme processing already applied) into `dist/publishable/dashboard.css`. Link from `index.html`. The consumer's Tailwind passes the pre-resolved CSS through unchanged (no `@apply` left to choke on).
+
+**Caveat**: this bakes the dashboard's default design tokens into the shipped CSS. Consumers can still override via runtime CSS variables, but cannot fundamentally re-theme via `themeVariables` at build time. Acceptable for the spike; longer-term solution might use a separate "themeable" CSS layer.
+
+For a proper integration we'd want to:
+- Run Tailwind + themeVariablesPlugin during our publish build (combine plugins from `vite-plugin-vendure-dashboard.ts` into the publish config)
+- Or: keep the CSS source as-is in the bundle, configure consumer's Tailwind to scan the bundled JS for class names
+
+For now: pre-resolved CSS works.
+
+### 2026-05-11 — Full functional smoke test passes 🎉
+
+**Test flow** (all on `vite dev` with bundled dashboard + CMS extension):
+
+| Step | Result |
+|---|---|
+| Cold load `/dashboard/` | ✅ Renders Insights page, sidebar, widgets, breadcrumbs |
+| CSS styling | ✅ Proper layout, spacing, typography |
+| Navigation to `/dashboard/test` (extension Test Page) | ✅ Renders correctly with Page/PageBlock/PageLayout/PageTitle components from bundled `@vendure/dashboard` |
+| Click counter button (React useState) | ✅ Increments correctly (verified: 0 → 4 after 4 clicks) |
+| Console errors | ✅ Zero |
+| TanStack Router | ✅ Routes match, breadcrumbs update, basepath derived from `document.baseURI` |
+| React Context identity (extension consumes Page/PageBlock from `@vendure/dashboard`) | ✅ No "must be used within a Provider" errors |
+
+**Final G1 measurement (vite dev, bundled dashboard, with CMS extension):**
+
+| Metric | Baseline | Spike | Δ |
+|---|--:|--:|--:|
+| Network requests (script/fetch/xhr) | 3,054 | **38** | **-98.8%** |
+| DOMContentLoaded | 897 ms | 372 ms | -59% |
+| JS heap used | 168 MB | 95 MB | -43% |
+| Console errors | 0 | 0 | — |
+
+**Gates achieved:**
+- ✅ G1: Request count drops to < 200
+- ✅ G2: Functional smoke tests (login, home, products, orders, extension page, counter)
+- ✅ G3: React Context identity preserved across bundle boundary
+- ⚠️ G4: Tailwind CSS — pragmatic fix in place (pre-resolved CSS), full integration is follow-up work
+- ⏳ G5: Lingui i18n — i18n loading works (via `import.meta.glob`), but locale switching not yet verified
+- ⏳ G6: Extension developer experience — types/HMR not yet verified
+- ⏳ G7: Build & bundle size — not yet measured
+
 
