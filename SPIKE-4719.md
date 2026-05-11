@@ -158,8 +158,63 @@ These are the changes needed to make the spike viable. Order matters — each st
 
 ## Findings log
 
-_(populate as we go)_
+### 2026-05-11 — G1 baseline measurement
 
-| Date | Step | Finding |
-|---|---|---|
-| - | - | _to be filled_ |
+**Setup:**
+- `/tmp/vendure-4715-test` (scaffolded via `@vendure/create@3.6.3 --ci`)
+- One dashboard extension installed via `npx @vendure/cli@3.6.3 add --dashboard CmsPlugin`
+- `@vendure/dashboard@3.6.3` installed clean from npm (verified via `dist/vite/vite-plugin-config.js` matches the published source)
+- Vite cache cleared (`rm -rf node_modules/@vendure/dashboard/node_modules/.vite`)
+- Cold-load of `http://localhost:5173/dashboard/` (already-authenticated session → lands on Insights with sidebar)
+
+**Network**:
+
+| Metric | Value |
+|---|--:|
+| Total requests (script/fetch/xhr) | **3,054** |
+| @fs requests (unbundled node_modules) | 2,492 |
+| `src/*` requests (dashboard's own source) | 472 |
+| `.vite/deps/*` (pre-bundled chunks) | 30 |
+| Status 200 | 2,601 |
+| Status 304 (cached) | 399 |
+
+**Top @fs/ buckets (per-library, in node_modules):**
+
+| Library | Requests |
+|---|--:|
+| `@base-ui/react` | 609 |
+| `date-fns/locale` | 531 |
+| `motion-dom` | 218 |
+| `react-day-picker/dist` | 206 |
+| `framer-motion/dist` | 150 |
+| `zod/v4` | 69 |
+| `@vendure-io/ui` | 57 |
+| `graphql/validation` | 41 |
+| `@base-ui/utils` | 40 |
+| `motion-utils/dist` | 30 |
+| `graphql/utilities` | 23 |
+| `graphql/jsutils` | 23 |
+| `graphql/language` | 16 |
+| `@tiptap/pm` | 11 |
+| `zod/v3` | 10 |
+| others (use-callback-ref, use-sidecar, etc.) | ~50 combined |
+
+**Other measurements:**
+
+| Metric | Value |
+|---|--:|
+| DOMContentLoaded | 897 ms (fast Mac) |
+| Load event | 903 ms |
+| JS heap used | 168.3 MB |
+| JS heap total | 203.5 MB |
+| Console errors during load | 0 |
+
+**Notes**:
+- This is the *Insights* page, not the login page. The numbers are *higher* than the original #4715 login-page measurement (2,617) because the sidebar's Settings menu was expanded by default, eagerly loading more routes.
+- A truly cold "login-page" measurement was 2,617 (recorded earlier in #4715 investigation).
+- 472 dashboard `src/*` requests are unavoidable today because Vite's `root` is set to the dashboard package; if we ship as a bundle this drops to ~1 chunk.
+- The aggregated `@fs` count (2,492) is exactly the contributors that bundle pre-bundling would collapse. Target after bundling: < 100 total.
+
+**Verdict on G1 baseline:** ✅ Captured. Next step: implement Step 1 (Vite build config) and re-measure.
+
+
