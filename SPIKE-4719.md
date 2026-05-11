@@ -246,6 +246,50 @@ Locale chunk is automatically split because the dashboard imports them with `imp
 - `@lingui/core`, `@lingui/react` (consumer manages catalogs)
 - `virtual:admin-api-schema`, `virtual:dashboard-extensions`, `virtual:vendure-ui-config` (resolved by consumer's vendureDashboardPlugin)
 
-**Verdict:** ✅ A bundle is producible. Next: install in test project and verify it loads at runtime.
+**Verdict:** ✅ A bundle is producible.
+
+### 2026-05-11 — Step 1 verdict: bundle works, but wrong entry point
+
+Installed the bundled `@vendure/dashboard` into the test project (after patching `package.json` exports to point `.` at `dist/lib/index.js`). Restarted Vite, navigated.
+
+**Result:** Dashboard renders correctly, **but request count barely changed: 2,805 (was 3,054).**
+
+**Reason:** I bundled the **library entry** (`src/lib/index.ts`), which is the public API extensions import via `@vendure/dashboard`. But the dev-mode crash is about the **app entry** (`src/app/main.tsx`) — that's what Vite loads via `index.html` to render the dashboard UI.
+
+Because `vendureDashboardPlugin` still sets `config.root = packageRoot` (the dashboard's `node_modules` location), Vite serves the dashboard's `index.html` which loads `src/app/main.tsx` → which still imports `@/vdb/*` → which still pulls in `@base-ui/react`, `date-fns`, etc. raw.
+
+The library bundle helps **extensions** that import from `@vendure/dashboard` directly, but doesn't help the **app shell** rendering.
+
+### Architectural reframing
+
+The current dev flow is:
+
+```
+User's Vite (root = dashboard's node_modules path)
+  → serves dashboard's index.html
+  → loads dashboard's src/app/main.tsx
+  → imports @/vdb/*, virtual:* (all served as raw ESM)
+```
+
+For the spike to actually solve #4715, the dev flow needs to be:
+
+```
+User's Vite (root = user's project)
+  → serves an index.html that imports the *bundled* dashboard
+  → bundled dashboard registers extensions via virtual:dashboard-extensions
+  → extensions are still served from user's source (HMR-friendly)
+```
+
+This is a bigger architectural change than my initial "just add a vite.lib.config" framing. **The existing `build:standalone` already produces this prod bundle (`dist/assets/*` — 166 chunks, 6.2 MB).** The DashboardPlugin uses it in production. The spike question is now:
+
+> Can we serve this prod-style bundle in dev mode too?
+
+That would require changing `vendureDashboardPlugin` to NOT override `config.root`, and instead either:
+1. **(a)** Generate a dev-mode entry HTML pointing at the bundled `dist/` artifacts, OR
+2. **(b)** Run a build step on first invocation, then watch user extension code only (HMR for extensions only)
+
+Either way: extensions still get served from user source (HMR preserved), dashboard core comes from the bundle (~few chunks instead of ~3,000 raw modules).
+
+**Verdict on first pass:** ❌ My approach was based on a wrong model of which entry to bundle. **Step 1 needs a redo:** bundle the app entry too AND restructure how vendureDashboardPlugin serves the dashboard in dev mode. Or simpler: just serve the existing `build:standalone` output in dev.
 
 
