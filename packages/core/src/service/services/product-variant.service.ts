@@ -488,8 +488,7 @@ export class ProductVariantService {
 
             if (additionalChannelIds.length) {
                 // Load the variant's options with their groups so we can assign them
-                // to the additional channels, matching the pattern in
-                // ProductService.assignProductsToChannel()
+                // to the additional channels.
                 const optionIds = input.optionIds || [];
                 let variantOptions: ProductOption[] = [];
                 if (optionIds.length) {
