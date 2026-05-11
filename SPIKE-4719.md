@@ -337,4 +337,57 @@ This is a real engineering project — non-trivial — but the question of wheth
 2. Build a "dashboard host" page that loads bundled core + dynamic extension module from Vite dev's port
 3. Wait — what if we just serve the bundle in `vite dev` mode by treating the bundle as a pre-built dep that Vite doesn't try to re-process? Worth checking.
 
+### 2026-05-11 — Course correct: the actual spike question is publish-time bundling
+
+The 39-request measurement was misleading: it showed what happens when **the end-user runs `vite build`**, not what the spike is really about. That workflow is already documented as a workaround.
+
+**The real spike question**: can `@vendure/dashboard` ship a pre-built JS bundle inside the npm package so that even when end-users run `vite dev`, the dashboard's dependency tree is already collapsed?
+
+**Quick check via env-flag hack** (committed but rolled back): I added a `SPIKE_4719_USE_BUNDLE=true` flag to `vite-plugin-config.ts` that makes Vite root = `packageRoot/dist`. Then `vite dev` serves the pre-built `dist/index.html` + `dist/assets/*` (already in the published npm package).
+
+**Result of that hack**: Vite *served* the bundle, but the dashboard didn't render — `ECONN_REFUSED` connecting to admin API.
+
+**Why it failed — the real blocker**: inspecting `dist/assets/index-C2jxpU_G.js` (the shipped bundle):
+
+```
+virtual: occurrences: ['virtual:x']  (just a CSS @-rule)
+{ uiConfig: false, schema: false, extensions: false }
+```
+
+**The `virtual:*` modules are NOT external in the shipped bundle.** They were resolved at build time with the monorepo's `sample-vendure-config.ts` defaults (API host: localhost, API port: 3000, no real plugin extensions). When a consumer installs this dashboard and tries to use it, the bundled code is locked into the monorepo's config.
+
+**Conclusion: the existing `build:standalone` build does NOT produce a "publishable bundle" — it produces a fully-resolved end-user build.** The dashboard maintainer ships this resolved build, but only the dashboard's own HTML structure + chunks are useful to consumers; the API config, extension list, etc. are wrong for any consumer.
+
+### The real architectural change needed
+
+To make "publish JS bundles" work:
+
+**Publish-time** (dashboard maintainer):
+- Build the **app entry** (`src/app/main.tsx`) with `virtual:*` kept **external**
+- Build the **library entry** (`src/lib/index.ts`) similarly — extension authors import from here
+- Output to a new dir like `dist/publishable/` or similar — distinct from `build:standalone`'s output
+- Lingui macros pre-compiled
+- CSS pre-generated for the dashboard's own classes; consumers need their own Tailwind pass for extension classes
+
+**Consumer-time** (end-user with `vite dev`):
+- Vite root stays at consumer's project (NOT overridden to dashboard package)
+- The dashboard's bundled chunks are loaded via normal `@vendure/dashboard` import
+- `vendureDashboardPlugin` resolves `virtual:*` at consumer-time as today
+- Vite's normal dep pre-bundling collapses the dashboard chunks further
+- Extension code stays in user source → HMR works
+
+This is a substantial architectural change, but proves out the spike's central question: **a dashboard package can publish JS bundles**, and once the virtual-module resolution is preserved, consumers' `vite dev` would serve a few chunks instead of 3,054 individual modules.
+
+### Next concrete step
+
+Build a new config — `vite.publish.config.mts` — that:
+1. Bundles `src/app/main.tsx` with `virtual:*` external
+2. Bundles `src/lib/index.ts` with `virtual:*` external (already prototyped in `vite.lib.config.mts`)
+3. Ships both in `dist/publishable/`
+4. Then test whether consumer's `vite dev` can load them with the consumer's virtual-module resolvers
+
+### Rolled-back experiment
+
+Reverted: the `SPIKE_4719_USE_BUNDLE` flag in `vite-plugin-config.ts` (was useful only to prove the request-count theory; not the real spike answer).
+
 
