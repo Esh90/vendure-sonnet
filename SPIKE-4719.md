@@ -498,4 +498,31 @@ For now: pre-resolved CSS works.
 - ⏳ G6: Extension developer experience — types/HMR not yet verified
 - ⏳ G7: Build & bundle size — not yet measured
 
+### 2026-05-11 — G5 Lingui pass: locale switching works end-to-end
+
+**Test flow:** opened the user menu, clicked the language picker, selected "DE German" from the locale list. All 25+ locales were listed (Arabic, Brazilian Portuguese, Bulgarian, Croatian, Czech, Dutch, English, ..., Ukrainian).
+
+**Result:** dashboard immediately re-rendered in German:
+
+| UI element | Before | After |
+|---|---|---|
+| Sidebar nav items | "Catalog", "Products", "Sales", "Customers", "Settings" | "Katalog", "Produkte", "Verkäufe", "Kunden", "Einstellungen" |
+| Insights link | "Insights" | "Erkenntnisse" |
+| Product variants | "Product Variants" | "Produktvarianten" |
+| Collections | "Collections" | "Sammlungen" |
+| Channel header | "DC Default channel Language: English" | "DC Standardkanal Sprache: Englisch" |
+| Breadcrumb | "Catalog > Test Page" | "Katalog > Test Page" |
+| Dialog labels | "Display language", "Locale", "Sample Formatting" | "Anzeigesprache", "Gebietsschema", "Beispielformatierung" |
+| Date format | "Mar 14, 2025" | "14.03.2025" |
+| Number format | "$1.00" | "1,00 $" |
+
+Extension's own strings ("Congratulations...", "Clicked 0 times") stay English — that's expected because the extension's source doesn't wrap them in lingui `t\`\`` macros.
+
+**Confirmed working through the bundle boundary**:
+- bundled dashboard imports `@lingui/core` and `@lingui/react` (kept external — consumer provides)
+- bundled dashboard imports `import.meta.glob('../../i18n/locales/*.po')` (resolved at our publish-build time, producing one chunk per locale)
+- lazy locale loading: only the active locale chunk is fetched on demand
+
+**Gate G5: ✅ PASS**
+
 
