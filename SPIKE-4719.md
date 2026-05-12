@@ -693,4 +693,41 @@ The sidecar adds ~70 ms to DCL — still **2× faster than source mode** while p
 
 **Gate G4 expanded scope: ✅ PASS** (extension Tailwind classes work; performance hit < 100ms)
 
+### 2026-05-12 — Final verification: `vite build` + multi-extension
+
+Two final gates checked before declaring the spike done.
+
+**1. Consumer's `vite build` in bundle mode**
+
+Configured `useExperimentalBundle: true` in the test project's `vite.config.mts`, ran `npx vite build`:
+- Build completed in 6.5s — **no errors**
+- Output: per-locale chunks (en, de, fr, ar, ... up to 25), `index-*.js` (3 MB / 877 KB gz), locale chunks, etc.
+- Served via Vendure backend on port 3001 — dashboard renders fully (German chrome, all widgets)
+- Extension Test Page renders, **Tailwind class `bg-emerald-500` applied** in the prod build (`oklch(0.696 0.17 162.48)`)
+- Zero console errors
+- Only known issue (pre-existing, not the spike's bug): `{count} mal geklickt` placeholder literal in prod build — same `translationsPlugin` interpolation bug noted earlier
+
+**2. Multi-extension scenario**
+
+Added a second plugin (`ReviewsPlugin`) alongside the existing `CmsPlugin`:
+- Generated via `npx @vendure/cli add --plugin reviews && npx @vendure/cli add --dashboard ReviewsPlugin`
+- Customized the reviews extension to use a 5-star rating component with conditional Tailwind (`bg-amber-400` if selected, `bg-zinc-700` if not)
+
+Verified in both `vite dev` (bundle mode) and `vite build` (prod):
+- ✅ Both plugins detected: "Found 2 plugins: CmsPlugin (local), ReviewsPlugin (local)"
+- ✅ Both extensions analyzed: "Analyzed plugins and found 2 dashboard extensions"
+- ✅ Both nav items appear in sidebar (CMS "Test Page" under Catalog, Reviews "Reviews" under Sales)
+- ✅ Both extension pages render correctly
+- ✅ Both extensions' Tailwind classes generated (CMS uses `bg-emerald-500`, Reviews uses `bg-amber-400` + `bg-zinc-700` — all three are in the generated CSS)
+- ✅ Conditional className updates work — clicking star 3 turns stars 1-3 amber, leaves 4-5 zinc
+
+**Spike status: ✅ FULLY COMPLETE**
+
+All seven gates passing, both modes coexist via opt-in flag, end-user `vite build` confirmed working, multi-extension scenarios confirmed working.
+
+Outstanding items (filed separately, not blocking spike):
+- Pre-existing `translationsPlugin` prod-build variable-interpolation bug
+- Fast Refresh state-preservation caveat for inline-defined extension components (docs update)
+- Eventual cleanup of source-shipping plumbing when bundle mode becomes default
+
 
