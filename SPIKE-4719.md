@@ -658,4 +658,39 @@ When `true`, the dashboard is loaded from `node_modules/@vendure/dashboard/dist/
 
 **The spike is complete. Architecture is proven and ready for adopter testing.**
 
+### 2026-05-12 — Extension Tailwind classes in bundle mode
+
+**Problem discovered**: in bundle mode, the consumer's `@tailwindcss/vite` only saw the pre-built `dashboard.css` (already resolved, no class names to scan). Extensions could write Tailwind utility classes like `bg-emerald-500`, but those classes were not generated → the markup had the class names but no corresponding CSS rules → button rendered without the styling.
+
+Confirmed with the CMS extension by adding `className="bg-emerald-500 ring-4 ring-fuchsia-500 hover:bg-emerald-600 mt-12"` to its button:
+
+- **Source mode**: ✅ button renders green with pink ring — Tailwind generated the classes
+- **Bundle mode (before fix)**: ❌ button renders unstyled — classes in HTML but no CSS rules
+
+**Fix**: a dedicated `extension-tailwind.css` shipped in the dashboard's `src/app/`. The consumer's `bundleEntryPlugin` loads it via JS `import` (which travels through Vite's full transform-hook pipeline, unlike `<link>` tags). The chain:
+
+1. `themeVariablesPlugin` resolves `@import 'virtual:admin-theme'` and `@import 'virtual:admin-theme-inline'`
+2. `dashboardTailwindSourcePlugin` injects `@source` directives for: every dashboard extension dir, `@vendure-io/ui` source, AND (in bundle mode) the dashboard's `dist/publishable/` JS chunks
+3. `@tailwindcss/vite` processes the result, generating utility classes for everything scanned
+
+The two pre-existing plugins gained narrow extensions (also match `extension-tailwind.css`, take a `packageRoot`/`useExperimentalBundle` arg) — they remain backwards-compatible.
+
+**Key implementation detail**: the extension CSS MUST be loaded via `<script type="module">import '...'</script>`, NOT `<link rel="stylesheet">`. The latter bypasses Vite's transform hooks and `@tailwindcss/vite` then tries to resolve `virtual:admin-theme` with its own bundled resolver (enhanced-resolve) which doesn't know about Vite virtual modules, producing a 500 error.
+
+### Performance impact of the sidecar
+
+Measured on the same fresh scaffold + CMS extension, cold-load of `/dashboard/test`:
+
+| Mode | Network requests | DCL | JS heap | Extension Tailwind |
+|---|--:|--:|--:|:--:|
+| Source (current default) | 3,047 | 897 ms | 168 MB | ✅ |
+| Bundle mode (no Tailwind sidecar) | 39 | ~370 ms | 95 MB | ❌ |
+| **Bundle mode (with Tailwind sidecar)** | **36** | **441 ms** | **67 MB** | **✅** |
+
+The sidecar adds ~70 ms to DCL — still **2× faster than source mode** while preserving the extension authoring experience.
+
+**Bundle mode is now feature-parity with source mode for extension authors**, while being ~99% lighter on requests and ~60% faster cold-load.
+
+**Gate G4 expanded scope: ✅ PASS** (extension Tailwind classes work; performance hit < 100ms)
+
 

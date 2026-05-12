@@ -245,7 +245,11 @@ export function vendureDashboardPlugin(options: VitePluginVendureDashboardOption
         },
         {
             key: 'tailwindSource',
-            plugin: () => dashboardTailwindSourcePlugin(),
+            plugin: () =>
+                dashboardTailwindSourcePlugin({
+                    packageRoot,
+                    useExperimentalBundle: options.useExperimentalBundle,
+                }),
         },
         {
             key: 'tailwindcss',
