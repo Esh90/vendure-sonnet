@@ -1,4 +1,4 @@
-import { DeletionResult, LanguageCode } from '@vendure/common/lib/generated-types';
+import { DeletionResult, HistoryEntryType, LanguageCode } from '@vendure/common/lib/generated-types';
 import { SUPER_ADMIN_USER_IDENTIFIER } from '@vendure/common/lib/shared-constants';
 import { createTestEnvironment } from '@vendure/testing';
 import path from 'path';
@@ -147,6 +147,65 @@ describe('ApiKey resolver', () => {
         expect(readErr02?.errors).toBeDefined();
         expect(readErr02?.data?.administrator?.user?.identifier).toBeUndefined();
     });
+
+    // Regression test for the API-Key administrator resolution fix.
+    // The API-Key session's user is a synthetic "API-Key user" with no Administrator
+    // row. AdministratorService.findOneByUserId falls back to the key's `owner` so
+    // that HistoryEntry.administrator is attributed to the admin who created the key
+    // instead of being null.
+    it('HistoryEntry created via API-Key is attributed to the key owner', async ({ expect }) => {
+        const { apiKey } = (
+            await adminClient.query(CREATE_API_KEY, {
+                input: {
+                    roleIds: ['1'],
+                    translations: [{ languageCode: LanguageCode.en, name: 'Audit trail key' }],
+                },
+            })
+        ).createApiKey;
+
+        const { customers } = await adminClient.query(GET_CUSTOMER_LIST);
+        const customerId = customers.items[0].id;
+
+        type AddNoteResponse =
+            | {
+                  data?: { addNoteToCustomer?: { id?: string } };
+                  errors?: any[];
+              }
+            | undefined;
+
+        const addNoteResult = (await fetch(adminApiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [String(config.authOptions.apiKeyHeaderKey)]: apiKey,
+            },
+            body: JSON.stringify({
+                query: `mutation AddNote($input: AddNoteToCustomerInput!) {
+                    addNoteToCustomer(input: $input) { id }
+                }`,
+                variables: {
+                    input: { id: customerId, note: 'note via api-key', isPublic: false },
+                },
+            }),
+        }).then(res => res.json())) as AddNoteResponse;
+
+        expect(addNoteResult?.errors).toBeUndefined();
+        expect(addNoteResult?.data?.addNoteToCustomer?.id).toBe(customerId);
+
+        const { customer } = await adminClient.query(GET_CUSTOMER_HISTORY, {
+            id: customerId,
+            options: {
+                filter: { type: { eq: HistoryEntryType.CUSTOMER_NOTE } },
+            },
+        });
+
+        const noteEntry = customer?.history.items.find(
+            entry => (entry.data as { note?: string } | null)?.note === 'note via api-key',
+        );
+        expect(noteEntry).toBeDefined();
+        // SuperAdmin's Administrator id is 1 (seeded by ensureSuperAdminExists).
+        expect(noteEntry?.administrator?.id).toBe('1');
+    });
 });
 
 export const CREATE_API_KEY = graphql(`
@@ -211,6 +270,34 @@ export const ROTATE_API_KEY = graphql(`
     mutation RotateApiKey($id: ID!) {
         rotateApiKey(id: $id) {
             apiKey
+        }
+    }
+`);
+
+export const GET_CUSTOMER_LIST = graphql(`
+    query ApiKeyTestCustomerList {
+        customers(options: { take: 1 }) {
+            items {
+                id
+            }
+        }
+    }
+`);
+
+export const GET_CUSTOMER_HISTORY = graphql(`
+    query ApiKeyTestCustomerHistory($id: ID!, $options: HistoryEntryListOptions) {
+        customer(id: $id) {
+            id
+            history(options: $options) {
+                items {
+                    id
+                    type
+                    data
+                    administrator {
+                        id
+                    }
+                }
+            }
         }
     }
 `);

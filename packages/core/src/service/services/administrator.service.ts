@@ -13,9 +13,10 @@ import { Instrument } from '../../common';
 import { EntityNotFoundError, InternalServerError, UserInputError } from '../../common/error/errors';
 import { ListQueryOptions } from '../../common/types/common-types';
 import { assertFound, idsAreEqual, normalizeEmailAddress } from '../../common/utils';
-import { ConfigService } from '../../config';
+import { API_KEY_AUTH_STRATEGY_NAME, ConfigService } from '../../config';
 import { TransactionalConnection } from '../../connection/transactional-connection';
 import { Administrator } from '../../entity/administrator/administrator.entity';
+import { ApiKey } from '../../entity/api-key/api-key.entity';
 import { NativeAuthenticationMethod } from '../../entity/authentication-method/native-authentication-method.entity';
 import { Role } from '../../entity/role/role.entity';
 import { User } from '../../entity/user/user.entity';
@@ -104,22 +105,52 @@ export class AdministratorService {
     /**
      * @description
      * Get an Administrator based on the User id.
+     *
+     * For API-Key sessions, the session's user is the synthetic "API-Key user" created
+     * alongside the key, which has no associated `Administrator` row. In that case we
+     * fall back to the `Administrator` of the key's `owner` (i.e. the admin who created
+     * the key), so audit-trail consumers (HistoryEntry.administrator, `me`,
+     * `activeAdministrator`, ...) get a useful value instead of `null`.
      */
-    findOneByUserId(
+    async findOneByUserId(
         ctx: RequestContext,
         userId: ID,
         relations?: RelationPaths<Administrator>,
     ): Promise<Administrator | undefined> {
-        return this.connection
-            .getRepository(ctx, Administrator)
-            .findOne({
-                relations,
-                where: {
-                    user: { id: userId },
-                    deletedAt: IsNull(),
-                },
-            })
-            .then(result => result ?? undefined);
+        const direct = await this.connection.getRepository(ctx, Administrator).findOne({
+            relations,
+            where: {
+                user: { id: userId },
+                deletedAt: IsNull(),
+            },
+        });
+        if (direct) {
+            return direct;
+        }
+
+        const isApiKeySession = ctx.session?.authenticationStrategy === API_KEY_AUTH_STRATEGY_NAME;
+        if (!isApiKeySession) {
+            return undefined;
+        }
+
+        const apiKey = await this.connection.getRepository(ctx, ApiKey).findOne({
+            relations: ['owner'],
+            where: {
+                user: { id: userId },
+                deletedAt: IsNull(),
+            },
+        });
+        if (!apiKey?.owner) {
+            return undefined;
+        }
+        const ownerAdmin = await this.connection.getRepository(ctx, Administrator).findOne({
+            relations,
+            where: {
+                user: { id: apiKey.owner.id },
+                deletedAt: IsNull(),
+            },
+        });
+        return ownerAdmin ?? undefined;
     }
 
     /**
