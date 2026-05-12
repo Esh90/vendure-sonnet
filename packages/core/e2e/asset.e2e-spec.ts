@@ -1,10 +1,16 @@
-import { DeletionResult, LogicalOperator, SortOrder } from '@vendure/common/lib/generated-types';
+import {
+    DeletionResult,
+    LanguageCode,
+    LogicalOperator,
+    SortOrder,
+} from '@vendure/common/lib/generated-types';
 import { omit } from '@vendure/common/lib/omit';
 import { pick } from '@vendure/common/lib/pick';
-import { mergeConfig } from '@vendure/core';
+import { Asset, AssetService, AssetTranslation, mergeConfig, TransactionalConnection } from '@vendure/core';
 import { createErrorResultGuard, createTestEnvironment, ErrorResultGuard } from '@vendure/testing';
 import fs from 'fs-extra';
 import path from 'node:path';
+import { Readable } from 'node:stream';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { initialData } from '../../../e2e-common/e2e-initial-data';
@@ -542,6 +548,33 @@ describe('Asset resolver', () => {
             productGuard.assertSuccess(product);
             expect(product.featuredAsset).toBeNull();
             expect(product.assets.length).toEqual(0);
+        });
+    });
+
+    // https://github.com/vendurehq/vendure/issues/4651
+    describe('createFromFileStream without RequestContext', () => {
+        it('uses default languageCode for the asset translation', async () => {
+            const assetService = server.app.get(AssetService);
+            const connection = server.app.get(TransactionalConnection);
+
+            const stream = new Readable();
+            stream.push('oss-499 content');
+            stream.push(null);
+
+            const result = await assetService.createFromFileStream(stream, 'oss-499.pdf');
+
+            if (!(result instanceof Asset)) {
+                throw new Error(`Expected Asset, got ${JSON.stringify(result)}`);
+            }
+            expect(result.id).toBeDefined();
+            expect(result.name).toBe('oss-499.pdf');
+
+            const translations = await connection.rawConnection
+                .getRepository(AssetTranslation)
+                .find({ where: { base: { id: result.id } } });
+            expect(translations.length).toBe(1);
+            expect(translations[0].languageCode).toBe(LanguageCode.en);
+            expect(translations[0].name).toBe('oss-499.pdf');
         });
     });
 });

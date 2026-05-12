@@ -130,6 +130,13 @@ describe('RequestContext', () => {
         });
     });
 
+    describe('empty', () => {
+        // https://github.com/vendurehq/vendure/issues/4651
+        it('languageCode defaults to LanguageCode.en', () => {
+            expect(RequestContext.empty().languageCode).toBe(LanguageCode.en);
+        });
+    });
+
     describe('userHasPermissions', () => {
         it('returns false when no session', () => {
             const ctx = createRequestContextWithPermissions([], false);

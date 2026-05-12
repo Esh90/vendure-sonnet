@@ -228,6 +228,11 @@ export class RequestContext {
             authorizedAsOwnerOnly: false,
             channel: new Channel(),
             isAuthorized: true,
+            // The `languageCode` getter is typed as `LanguageCode` (non-optional),
+            // so we provide a default here to avoid an undefined value when callers
+            // use `RequestContext.empty()` for programmatic operations such as
+            // `AssetService.createFromFileStream()`.
+            languageCode: LanguageCode.en,
         });
     }
 
