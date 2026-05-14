@@ -36,7 +36,7 @@ Vendure Core is the open-source TypeScript backend that powers [Vendure](https:/
 
 - **Plugin architecture, no forks required**: Extend or override any part of the system through stable plugin contracts. Customise the edges without patching the core.
 - **TypeScript, Node.js, NestJS, GraphQL**: A coherent stack with strong types end to end, a large ecosystem, no proprietary query language, and agent-ready APIs that work with your developers' AI tools.
-- **One backend, every channel**: A single extensible core serves any frontend or channel through a GraphQL API, with no web of integrations to maintain.
+- **One backend, every channel**: A single extensible core serves any frontend or channel through a GraphQL API, so you avoid stitching together separate commerce services.
 - **Production-tested at scale**: Used in production by enterprise teams. Plugin contracts give you safe extension points without patching core.
 - **Built-in commerce building blocks**: Catalog, orders, customers, promotions, channels, tax, shipping, payments, and stock, with the primitives teams need from day one.
 
