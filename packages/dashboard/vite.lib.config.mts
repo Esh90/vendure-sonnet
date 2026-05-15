@@ -42,7 +42,10 @@ export default defineConfig({
     build: {
         outDir: path.resolve(import.meta.dirname, './dist/publishable'),
         emptyOutDir: true,
-        sourcemap: true,
+        // Skip sourcemaps in the published bundle: they would inflate the
+        // npm tarball by ~5-10x with no end-user benefit (sourcemaps are only
+        // useful for developers of the dashboard itself, who work from source).
+        sourcemap: false,
         minify: false,
         lib: {
             entry: {
