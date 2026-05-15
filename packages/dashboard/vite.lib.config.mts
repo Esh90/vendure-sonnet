@@ -1,7 +1,7 @@
 import { lingui } from '@lingui/vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import path from 'path';
+import path from 'node:path';
 import { defineConfig } from 'vite';
 
 import { themeVariablesPlugin } from './vite/vite-plugin-theme.js';

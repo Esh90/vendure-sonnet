@@ -38,9 +38,8 @@ const processedBaseUrl = (() => {
     try {
         const moduleUrl = typeof import.meta?.url === 'string' ? import.meta.url : '';
         if (moduleUrl) {
-            const m = new URL(moduleUrl).pathname.match(
-                /^(.*?)\/(?:src\/app\/main|dist\/publishable\/main)\.[a-z]+/,
-            );
+            const entryRe = /^(.*?)\/(?:src\/app\/main|dist\/publishable\/main)\.[a-z]+/;
+            const m = entryRe.exec(new URL(moduleUrl).pathname);
             if (m) derived = m[1] || '/';
         }
     } catch {
