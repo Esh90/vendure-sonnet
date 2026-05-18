@@ -210,6 +210,30 @@ describe('Promotion resolver', () => {
         expect(pick(updatePromotion, snapshotProps)).toMatchSnapshot();
     });
 
+    // #4700 — updatePromotion should not double-decode ID args in actions
+    it('updatePromotion with ID list args in actions', async () => {
+        const { updatePromotion } = await adminClient.query(updatePromotionDocument, {
+            input: {
+                id: promotion.id,
+                actions: [
+                    {
+                        code: promoAction.code,
+                        arguments: [{ name: 'facetValueIds', value: '["T_1"]' }],
+                    },
+                ],
+            },
+        });
+        promotionGuard.assertSuccess(updatePromotion);
+
+        // Verify the action args were correctly round-tripped (decoded and re-encoded)
+        const action = updatePromotion.actions.find(a => a.code === promoAction.code);
+        expect(action).toBeDefined();
+        const facetValueIdsArg = action!.args.find(a => a.name === 'facetValueIds');
+        expect(facetValueIdsArg).toBeDefined();
+        // The value should be a JSON-encoded array of encoded IDs
+        expect(facetValueIdsArg!.value).toBe('["T_1"]');
+    });
+
     it('updatePromotion return error result with empty conditions and no couponCode', async () => {
         const { updatePromotion } = await adminClient.query(updatePromotionDocument, {
             input: {
