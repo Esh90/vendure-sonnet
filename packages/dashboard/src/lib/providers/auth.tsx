@@ -135,6 +135,9 @@ export function AuthProvider({ children }: Readonly<{ children: React.ReactNode 
         }
     }, [settings.activeChannelId, currentUserData?.me?.channels]);
 
+    // Determine isAuthenticated from currentUserData
+    const isAuthenticated = !!currentUserData?.me?.id;
+
     // Auth actions
     const login = React.useCallback(
         (username: string, password: string, onLoginSuccess?: () => void) => {
@@ -189,23 +192,33 @@ export function AuthProvider({ children }: Readonly<{ children: React.ReactNode 
         async (onLogoutSuccess?: () => void) => {
             setIsLoginLogoutInProgress(true);
             setStatus('verifying');
-            api.mutate(LogOutMutation)({}).then(async data => {
-                if (data?.logout.success) {
-                    // Clear all cached queries to prevent stale data
-                    queryClient.clear();
-                    // Clear selected channel from localStorage
-                    localStorage.removeItem(LS_KEY_SELECTED_CHANNEL_TOKEN);
-                    setStatus('unauthenticated');
+            api.mutate(LogOutMutation)({})
+                .then(async data => {
+                    if (data?.logout.success) {
+                        // Clear all cached queries to prevent stale data
+                        queryClient.clear();
+                        // Clear selected channel from localStorage
+                        localStorage.removeItem(LS_KEY_SELECTED_CHANNEL_TOKEN);
+                        setStatus('unauthenticated');
+                        setIsLoginLogoutInProgress(false);
+                        onLogoutSuccess?.();
+                    } else {
+                        // Server responded but reported success=false. Restore the
+                        // pre-logout authenticated status so the UI is interactive again.
+                        setStatus(isAuthenticated ? 'authenticated' : 'unauthenticated');
+                        setIsLoginLogoutInProgress(false);
+                    }
+                })
+                .catch(error => {
+                    // Network/server failure. Match login()'s rejection handler:
+                    // surface the message and unblock the UI so the user can retry.
+                    setAuthenticationError(error?.message);
+                    setStatus(isAuthenticated ? 'authenticated' : 'unauthenticated');
                     setIsLoginLogoutInProgress(false);
-                    onLogoutSuccess?.();
-                }
-            });
+                });
         },
-        [queryClient],
+        [queryClient, isAuthenticated],
     );
-
-    // Determine isAuthenticated from currentUserData
-    const isAuthenticated = !!currentUserData?.me?.id;
 
     // Handle status transitions based on query state
     React.useEffect(() => {
