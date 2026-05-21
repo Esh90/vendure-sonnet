@@ -67,5 +67,43 @@ describe('terminus-compat', () => {
             const err = new HealthCheckError('x', { svc: { status: 'down' } });
             expect(err.name).toBe('HealthCheckError');
         });
+
+        it('carries the isHealthCheckError discriminator flag set to true', () => {
+            const err = new HealthCheckError('x', { svc: { status: 'down' } });
+            expect(err.isHealthCheckError).toBe(true);
+        });
+
+        it('accepts non-HealthIndicatorResult causes payloads (any-typed)', () => {
+            const arbitraryUpstreamError = {
+                response: { status: 503, statusText: 'Service Unavailable' },
+                code: 'ECONNREFUSED',
+            };
+            const err = new HealthCheckError('upstream failed', arbitraryUpstreamError);
+            expect(err.causes).toBe(arbitraryUpstreamError);
+        });
+    });
+
+    describe('HealthIndicatorResult generics', () => {
+        it('accepts a narrowed key parameter', () => {
+            const result: HealthIndicatorResult<'database'> = {
+                database: { status: 'up' },
+            };
+            expect(result.database.status).toBe('up');
+        });
+
+        it('accepts a narrowed status parameter', () => {
+            const result: HealthIndicatorResult<'database', 'down'> = {
+                database: { status: 'down', message: 'timeout' },
+            };
+            expect(result.database.status).toBe('down');
+        });
+
+        it('accepts a narrowed optional-data parameter', () => {
+            type DbData = { latencyMs: number };
+            const result: HealthIndicatorResult<'database', 'up', DbData> = {
+                database: { status: 'up', latencyMs: 12 },
+            };
+            expect(result.database.latencyMs).toBe(12);
+        });
     });
 });

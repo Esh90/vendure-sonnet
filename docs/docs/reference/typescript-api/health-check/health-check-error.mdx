@@ -2,16 +2,24 @@
 title: "HealthCheckError"
 generated: true
 ---
-<GenerationInfo sourceFile="packages/core/src/health-check/terminus-compat.ts" sourceLine="52" packageName="@vendure/core" />
+<GenerationInfo sourceFile="packages/core/src/health-check/terminus-compat.ts" sourceLine="72" packageName="@vendure/core" />
 
 Thrown from a health indicator to signal a failed check. The `causes`
 payload is forwarded to the `/health` response so callers can inspect
-which indicator failed and why.
+which indicator failed and why. `causes` is intentionally typed as
+`any` (matching terminus) so handlers can pass through arbitrary
+upstream error payloads (HTTP responses, DB driver errors, etc.)
+without forcing them to conform to [HealthIndicatorResult](/reference/typescript-api/health-check/health-indicator-result#healthindicatorresult).
+
+The `isHealthCheckError` flag is a cross-realm discriminator (more
+reliable than `instanceof` when multiple copies of the class can
+exist) and is part of the public contract inherited from terminus.
 
 ```ts title="Signature"
 class HealthCheckError extends Error {
-    causes: HealthIndicatorResult;
-    constructor(message: string, causes: HealthIndicatorResult)
+    isHealthCheckError = true;
+    causes: any;
+    constructor(message: string, causes: any)
 }
 ```
 * Extends: Error
@@ -20,9 +28,14 @@ class HealthCheckError extends Error {
 
 <div className="members-wrapper">
 
+### isHealthCheckError
+
+<MemberInfo kind="property" type={``}   />
+
+
 ### causes
 
-<MemberInfo kind="property" type={`<a href='/reference/typescript-api/health-check/health-indicator-result#healthindicatorresult'>HealthIndicatorResult</a>`}   />
+<MemberInfo kind="property" type={`any`}   />
 
 
 

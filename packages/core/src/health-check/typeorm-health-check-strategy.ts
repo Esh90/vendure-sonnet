@@ -54,6 +54,11 @@ export class TypeORMHealthCheckStrategy implements HealthCheckStrategy {
         return async (): Promise<HealthIndicatorResult> => {
             let timer: NodeJS.Timeout | undefined;
             try {
+                // SELECT 1 is valid for all drivers Vendure supports
+                // (postgres, mysql, sqlite, better-sqlite3, sqljs); Oracle's
+                // `SELECT 1 FROM DUAL` and SAP HANA's `SELECT now() FROM dummy`
+                // variants are not needed because those drivers are not in
+                // Vendure's supported set.
                 await Promise.race([
                     connection.rawConnection.query('SELECT 1'),
                     new Promise<never>((_, reject) => {

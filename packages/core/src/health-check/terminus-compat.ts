@@ -3,13 +3,27 @@
  * `@nestjs/terminus`. The health check feature these support is deprecated and
  * will be removed in v4.0.0; until then these types preserve the public API
  * surface of {@link HealthCheckStrategy} and {@link HealthCheckRegistryService}
- * without forcing a transitive dependency on `@nestjs/terminus` (and its
- * 5-package subtree: boxen, check-disk-space, ansi-align, cli-boxes, widest-line).
+ * without forcing a transitive dependency on `@nestjs/terminus` itself plus
+ * its five exclusive sub-dependencies (`boxen`, `check-disk-space`,
+ * `ansi-align`, `cli-boxes`, `widest-line`) — six packages in total dropped
+ * from the published install.
  *
- * The shapes are structurally compatible with the terminus equivalents, so
- * plugin code that previously imported these names from `@nestjs/terminus`
- * can migrate by changing the import path to `@vendure/core` (one-line change).
+ * The shapes are structurally compatible with the terminus equivalents
+ * (including the generic parameters on {@link HealthIndicatorResult}, the
+ * `isHealthCheckError` discriminator on {@link HealthCheckError}, and the
+ * `any`-typed `causes` argument), so plugin code that previously imported
+ * these names from `@nestjs/terminus` can migrate by changing the import
+ * path to `@vendure/core` (one-line change).
  */
+
+/**
+ * @description
+ * The two valid status values for a {@link HealthIndicatorResult} entry.
+ *
+ * @docsCategory health-check
+ * @deprecated Part of the deprecated health check feature; will be removed in v4.0.0.
+ */
+export type HealthIndicatorStatus = 'up' | 'down';
 
 /**
  * @description
@@ -20,12 +34,11 @@
  * @docsCategory health-check
  * @deprecated Part of the deprecated health check feature; will be removed in v4.0.0.
  */
-export type HealthIndicatorResult = {
-    [key: string]: {
-        status: 'up' | 'down';
-        [optionalKey: string]: unknown;
-    };
-};
+export type HealthIndicatorResult<
+    Key extends string = string,
+    Status extends HealthIndicatorStatus = HealthIndicatorStatus,
+    OptionalData extends Record<string, any> = Record<string, any>,
+> = Record<Key, { status: Status } & OptionalData>;
 
 /**
  * @description
@@ -44,15 +57,23 @@ export type HealthIndicatorFunction = () =>
  * @description
  * Thrown from a health indicator to signal a failed check. The `causes`
  * payload is forwarded to the `/health` response so callers can inspect
- * which indicator failed and why.
+ * which indicator failed and why. `causes` is intentionally typed as
+ * `any` (matching terminus) so handlers can pass through arbitrary
+ * upstream error payloads (HTTP responses, DB driver errors, etc.)
+ * without forcing them to conform to {@link HealthIndicatorResult}.
+ *
+ * The `isHealthCheckError` flag is a cross-realm discriminator (more
+ * reliable than `instanceof` when multiple copies of the class can
+ * exist) and is part of the public contract inherited from terminus.
  *
  * @docsCategory health-check
  * @deprecated Part of the deprecated health check feature; will be removed in v4.0.0.
  */
 export class HealthCheckError extends Error {
-    causes: HealthIndicatorResult;
+    isHealthCheckError = true;
+    causes: any;
 
-    constructor(message: string, causes: HealthIndicatorResult) {
+    constructor(message: string, causes: any) {
         super(message);
         this.name = 'HealthCheckError';
         this.causes = causes;
