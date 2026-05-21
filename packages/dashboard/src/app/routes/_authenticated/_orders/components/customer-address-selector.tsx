@@ -29,10 +29,17 @@ type CustomerAddressesQuery = ResultOf<typeof getCustomerAddressesDocument>;
 interface CustomerAddressSelectorProps {
     customerId: string | undefined;
     onSelect: (address: ResultOf<typeof addressFragment>) => void;
+    onCancel?: () => void;
+    defaultOpen?: boolean;
 }
 
-export function CustomerAddressSelector({ customerId, onSelect }: Readonly<CustomerAddressSelectorProps>) {
-    const [open, setOpen] = useState(false);
+export function CustomerAddressSelector({
+    customerId,
+    onSelect,
+    onCancel,
+    defaultOpen = false,
+}: Readonly<CustomerAddressSelectorProps>) {
+    const [open, setOpen] = useState(defaultOpen);
 
     const { data, isLoading } = useQuery<CustomerAddressesQuery>({
         queryKey: ['customerAddresses', customerId],
@@ -43,14 +50,20 @@ export function CustomerAddressSelector({ customerId, onSelect }: Readonly<Custo
     const addresses: ResultOf<typeof addressFragment>[] = data?.customer?.addresses || [];
 
     return (
-        <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-                <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" type="button" className="" disabled={!customerId}>
-                        <Plus className="h-4 w-4" />
-                        <Trans>Select address</Trans>
-                    </Button>
-                </div>
+        <Popover
+            open={open}
+            onOpenChange={value => {
+                setOpen(value);
+                if (!value) {
+                    onCancel?.();
+                }
+            }}
+        >
+            <PopoverTrigger render={<div className="flex items-center gap-2" />}>
+                <Button variant="outline" size="sm" type="button" className="" disabled={!customerId}>
+                    <Plus className="h-4 w-4" />
+                    <Trans>Select address</Trans>
+                </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[400px] p-0" align="start">
                 <div className="p-4">

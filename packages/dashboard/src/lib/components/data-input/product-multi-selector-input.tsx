@@ -5,6 +5,7 @@ import { Checkbox } from '@/vdb/components/ui/checkbox.js';
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -162,9 +163,11 @@ function ProductList({
     );
 }
 
-function ProductMultiSelectorDialog({
+const EMPTY_IDS: string[] = [];
+
+export function ProductMultiSelectorDialog({
     mode,
-    initialSelectionIds = [],
+    initialSelectionIds = EMPTY_IDS,
     onSelectionChange,
     open,
     onOpenChange,
@@ -277,6 +280,9 @@ function ProductMultiSelectorDialog({
                     <DialogTitle>
                         <Trans>{mode === 'product' ? 'Select Products' : 'Select Variants'}</Trans>
                     </DialogTitle>
+                    <DialogDescription className="sr-only">
+                        <Trans>{mode === 'product' ? 'Search and select products from the catalog' : 'Search and select product variants from the catalog'}</Trans>
+                    </DialogDescription>
                 </DialogHeader>
 
                 <div className="flex-1 min-h-0 flex flex-col">
@@ -372,7 +378,7 @@ function ProductMultiSelectorDialog({
     );
 }
 
-export const ProductMultiInput: DashboardFormComponent = ({ value, onChange, ...props }) => {
+export const ProductMultiInput: DashboardFormComponent = ({ value, onChange, disabled, ...props }) => {
     const [open, setOpen] = useState(false);
     const mode = props.fieldDef?.ui?.selectionMode === 'variant' ? 'variant' : 'product';
     const selectedIds = value || [];
@@ -388,7 +394,7 @@ export const ProductMultiInput: DashboardFormComponent = ({ value, onChange, ...
     return (
         <>
             <div className="space-y-2">
-                <Button variant="outline" onClick={() => setOpen(true)}>
+                <Button variant="outline" disabled={disabled} onClick={() => setOpen(true)}>
                     <Plus className="h-4 w-4 mr-2" />
                     <Trans>{buttonText}</Trans>
                 </Button>

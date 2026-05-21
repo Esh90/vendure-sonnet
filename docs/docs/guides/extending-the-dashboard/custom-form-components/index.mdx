@@ -17,12 +17,31 @@ All form components must implement the [DashboardFormComponent type](/reference/
 This type is based on the props that are made available from `react-hook-form`, which is the
 underlying form library used by the Dashboard.
 
+### Component metadata
+
+In addition to the standard React component signature, a dashboard form component can define a static `metadata` property.
+This lets the dashboard know how your component should be rendered in certain contexts.
+
+- **`isListInput`**: Declare whether your component is intended for list fields. Use `'dynamic'` if it can handle both list and non-list fields.
+- **`isFullWidth`**: When `true`, the dashboard will render the field so it spans the full width of the standard 2-column detail form grids (e.g. `DetailFormGrid`).
+
+```tsx
+import { DashboardFormComponentProps } from '@vendure/dashboard';
+
+export function MyCustomInput(props: DashboardFormComponentProps<string>) {
+    return <textarea value={props.value} onChange={e => props.onChange(e.target.value)} />;
+}
+
+MyCustomInput.metadata = {
+    isFullWidth: true,
+};
+```
+
 Here's an example custom form component that has been annotated to explain the typical parts you will be working with:
 
 ```tsx title="src/plugins/my-plugin/dashboard/components/color-picker.tsx"
-import { Button, Card, CardContent, cn, DashboardFormComponent, Input } from '@vendure/dashboard';
+import { Button, Card, CardContent, cn, DashboardFormComponent, Input, useFormContext } from '@vendure/dashboard';
 import { useState } from 'react';
-import { useFormContext } from 'react-hook-form';
 
 // By typing your component as DashboardFormComponent, the props will be correctly typed
 export const ColorPickerComponent: DashboardFormComponent = ({ value, onChange, name }) => {
@@ -256,8 +275,7 @@ if the input does not match the pattern.
 :::
 
 ```tsx title="src/plugins/my-plugin/dashboard/components/validated-input.tsx"
-import { DashboardFormComponent, Input, Alert, AlertDescription } from '@vendure/dashboard';
-import { useFormContext } from 'react-hook-form';
+import { DashboardFormComponent, Input, Alert, AlertDescription, useFormContext } from '@vendure/dashboard';
 import { CheckCircle2 } from 'lucide-react';
 
 export const ValidatedInputComponent: DashboardFormComponent = ({ value, onChange, name }) => {
@@ -342,9 +360,9 @@ import {
     DialogTrigger,
     Form,
     DashboardFormComponent,
-    handleNestedFormSubmit
+    handleNestedFormSubmit,
+    useForm,
 } from '@vendure/dashboard';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
@@ -374,8 +392,8 @@ export const NestedFormDialogComponent: DashboardFormComponent = (props) => {
 
     return (
         <Dialog>
-            <DialogTrigger asChild>
-                <Button variant="outline">Open Form</Button>
+            <DialogTrigger render={<Button variant="outline" />}>
+                Open Form
             </DialogTrigger>
             <DialogContent>
                 <Form {...form}>
@@ -415,7 +433,7 @@ import {
     SingleRelationInput,
     createRelationSelectorConfig,
     graphql,
-    CustomFormComponentInputProps,
+    DashboardFormComponentProps,
 } from '@vendure/dashboard';
 
 const productConfig = createRelationSelectorConfig({
@@ -438,7 +456,7 @@ const productConfig = createRelationSelectorConfig({
     }),
 });
 
-export function ProductSelectorComponent({ value, onChange }: CustomFormComponentInputProps) {
+export function ProductSelectorComponent({ value, onChange }: DashboardFormComponentProps) {
     return <SingleRelationInput value={value} onChange={onChange} config={productConfig} />;
 }
 ```
@@ -455,5 +473,5 @@ Features include:
 
 For detailed information about specific types of custom form elements, see these dedicated guides:
 
-- **[Form component examples](./form-component-examples)** - Detailed examples of how to use the APIs available for custom form components.
-- **[Relation selectors](./relation-selectors)** - Build powerful entity selection components with search, pagination, and multi-select capabilities for custom fields and form inputs
+- **[Form component examples](/extending-the-dashboard/custom-form-components/form-component-examples)** - Detailed examples of how to use the APIs available for custom form components.
+- **[Relation selectors](/extending-the-dashboard/custom-form-components/relation-selectors)** - Build powerful entity selection components with search, pagination, and multi-select capabilities for custom fields and form inputs

@@ -2,7 +2,6 @@ import { ConfirmationDialog } from '@/vdb/components/shared/confirmation-dialog.
 import { CustomFieldsForm } from '@/vdb/components/shared/custom-fields-form.js';
 import { CustomerSelector } from '@/vdb/components/shared/customer-selector.js';
 import { ErrorPage } from '@/vdb/components/shared/error-page.js';
-import { PermissionGuard } from '@/vdb/components/shared/permission-guard.js';
 import { Button } from '@/vdb/components/ui/button.js';
 import { Form } from '@/vdb/components/ui/form.js';
 import { addCustomFields } from '@/vdb/framework/document-introspection/add-custom-fields.js';
@@ -10,11 +9,11 @@ import { useGeneratedForm } from '@/vdb/framework/form-engine/use-generated-form
 import {
     Page,
     PageActionBar,
-    PageActionBarRight,
     PageBlock,
     PageLayout,
     PageTitle,
 } from '@/vdb/framework/layout-engine/page-layout.js';
+import { ActionBarItem } from '@/vdb/framework/layout-engine/action-bar-item-wrapper.js';
 import { useDetailPage } from '@/vdb/framework/page/use-detail-page.js';
 import { api } from '@/vdb/graphql/api.js';
 import { Trans, useLingui } from '@lingui/react/macro';
@@ -59,7 +58,9 @@ function DraftOrderPage() {
     const navigate = useNavigate();
 
     const { entity, refreshEntity, form } = useDetailPage({
-        queryDocument: addCustomFields(orderDetailDocument),
+        queryDocument: addCustomFields(orderDetailDocument, {
+            includeNestedFragments: ['OrderLine', 'Fulfillment'],
+        }),
         setValuesForUpdate: entity => {
             return {
                 id: entity.id,
@@ -89,6 +90,9 @@ function DraftOrderPage() {
         onSuccess: (result: ResultOf<typeof setDraftOrderCustomFieldsDocument>) => {
             toast.success(t`Order custom fields updated`);
             refreshEntity();
+        },
+        onError: error => {
+            toast.error(t`Failed to update order custom fields: ${error.message}`);
         },
     });
 
@@ -133,6 +137,9 @@ function DraftOrderPage() {
                     break;
             }
         },
+        onError: error => {
+            toast.error(t`Failed to update order line: ${error.message}`);
+        },
     });
 
     const { mutate: removeDraftOrderLine } = useMutation({
@@ -148,6 +155,9 @@ function DraftOrderPage() {
                     toast.error(order.message);
                     break;
             }
+        },
+        onError: error => {
+            toast.error(t`Failed to remove order line: ${error.message}`);
         },
     });
 
@@ -174,6 +184,9 @@ function DraftOrderPage() {
                     break;
             }
         },
+        onError: error => {
+            toast.error(t`Failed to set customer for order: ${error.message}`);
+        },
     });
 
     const { mutate: setShippingAddressForDraftOrder } = useMutation({
@@ -181,6 +194,9 @@ function DraftOrderPage() {
         onSuccess: (result: ResultOf<typeof setShippingAddressForDraftOrderDocument>) => {
             toast.success(t`Shipping address set for order`);
             refreshEntity();
+        },
+        onError: error => {
+            toast.error(t`Failed to set shipping address for order: ${error.message}`);
         },
     });
 
@@ -190,6 +206,9 @@ function DraftOrderPage() {
             toast.success(t`Billing address set for order`);
             refreshEntity();
         },
+        onError: error => {
+            toast.error(t`Failed to set billing address for order: ${error.message}`);
+        },
     });
 
     const { mutate: unsetShippingAddressForDraftOrder } = useMutation({
@@ -198,6 +217,9 @@ function DraftOrderPage() {
             toast.success(t`Shipping address unset for order`);
             refreshEntity();
         },
+        onError: error => {
+            toast.error(t`Failed to unset shipping address for order: ${error.message}`);
+        },
     });
 
     const { mutate: unsetBillingAddressForDraftOrder } = useMutation({
@@ -205,6 +227,9 @@ function DraftOrderPage() {
         onSuccess: (result: ResultOf<typeof unsetBillingAddressForDraftOrderDocument>) => {
             toast.success(t`Billing address unset for order`);
             refreshEntity();
+        },
+        onError: error => {
+            toast.error(t`Failed to unset billing address for order: ${error.message}`);
         },
     });
 
@@ -222,6 +247,9 @@ function DraftOrderPage() {
                     break;
             }
         },
+        onError: error => {
+            toast.error(t`Failed to set shipping method for order: ${error.message}`);
+        },
     });
 
     const { mutate: setCouponCodeForDraftOrder } = useMutation({
@@ -238,6 +266,9 @@ function DraftOrderPage() {
                     break;
             }
         },
+        onError: error => {
+            toast.error(t`Failed to set coupon code for order: ${error.message}`);
+        },
     });
 
     const { mutate: removeCouponCodeForDraftOrder } = useMutation({
@@ -245,6 +276,9 @@ function DraftOrderPage() {
         onSuccess: (result: ResultOf<typeof removeCouponCodeFromDraftOrderDocument>) => {
             toast.success(t`Coupon code removed from order`);
             refreshEntity();
+        },
+        onError: error => {
+            toast.error(t`Failed to remove coupon code from order: ${error.message}`);
         },
     });
 
@@ -265,6 +299,9 @@ function DraftOrderPage() {
                     break;
             }
         },
+        onError: error => {
+            toast.error(t`Failed to complete draft order: ${error.message}`);
+        },
     });
 
     const { mutate: deleteDraftOrder } = useMutation({
@@ -276,6 +313,9 @@ function DraftOrderPage() {
             } else {
                 toast.error(result.deleteDraftOrder.message);
             }
+        },
+        onError: error => {
+            toast.error(t`Failed to delete draft order: ${error.message}`);
         },
     });
 
@@ -303,30 +343,28 @@ function DraftOrderPage() {
                 <Trans>Draft order</Trans>: {entity?.code ?? ''}
             </PageTitle>
             <PageActionBar>
-                <PageActionBarRight>
-                    <PermissionGuard requires={['DeleteOrder']}>
-                        <ConfirmationDialog
-                            title={t`Delete draft order`}
-                            description={t`Are you sure you want to delete this draft order?`}
-                            onConfirm={() => {
-                                deleteDraftOrder({ orderId: entity.id });
-                            }}
-                        >
-                            <Button variant="destructive" type="button">
-                                <Trans>Delete draft</Trans>
-                            </Button>
-                        </ConfirmationDialog>
-                    </PermissionGuard>
-                    <PermissionGuard requires={['UpdateOrder']}>
-                        <Button
-                            type="button"
-                            disabled={isCompleteDraftDisabled}
-                            onClick={() => completeDraftOrder({ id: entity.id, state: 'ArrangingPayment' })}
-                        >
-                            <Trans>Complete draft</Trans>
+                <ActionBarItem itemId="delete-button" requiresPermission={['DeleteOrder']}>
+                    <ConfirmationDialog
+                        title={t`Delete draft order`}
+                        description={t`Are you sure you want to delete this draft order?`}
+                        onConfirm={() => {
+                            deleteDraftOrder({ orderId: entity.id });
+                        }}
+                    >
+                        <Button variant="destructive" type="button">
+                            <Trans>Delete draft</Trans>
                         </Button>
-                    </PermissionGuard>
-                </PageActionBarRight>
+                    </ConfirmationDialog>
+                </ActionBarItem>
+                <ActionBarItem itemId="complete-draft-button" requiresPermission={['UpdateOrder']}>
+                    <Button
+                        type="button"
+                        disabled={isCompleteDraftDisabled}
+                        onClick={() => completeDraftOrder({ id: entity.id, state: 'ArrangingPayment' })}
+                    >
+                        <Trans>Complete draft</Trans>
+                    </Button>
+                </ActionBarItem>
             </PageActionBar>
 
             <PageLayout>
@@ -418,11 +456,9 @@ function DraftOrderPage() {
                 </PageBlock>
                 <PageBlock column="side" blockId="customer" title={<Trans>Customer</Trans>}>
                     {entity?.customer?.id ? (
-                        <Button variant="outline" asChild className="mb-4">
-                            <Link to={`/customers/${entity?.customer?.id}`}>
-                                <User className="w-4 h-4" />
-                                {entity?.customer?.firstName} {entity?.customer?.lastName}
-                            </Link>
+                        <Button variant="outline" render={<Link to={`/customers/${entity?.customer?.id}`} />} className="mb-4">
+                            <User className="w-4 h-4" />
+                            {entity?.customer?.firstName} {entity?.customer?.lastName}
                         </Button>
                     ) : null}
                     <CustomerSelector
