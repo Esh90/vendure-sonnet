@@ -1,7 +1,7 @@
 import { DeletionResult, ErrorCode, HistoryEntryType } from '@vendure/common/lib/generated-types';
 import { omit } from '@vendure/common/lib/omit';
 import { pick } from '@vendure/common/lib/pick';
-import { AccountRegistrationEvent, EventBus } from '@vendure/core';
+import { AccountVerifiedEvent, AccountRegistrationEvent, EventBus, PasswordResetEvent } from '@vendure/core';
 import { createErrorResultGuard, createTestEnvironment, ErrorResultGuard } from '@vendure/testing';
 import path from 'path';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -9,6 +9,10 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { initialData } from '../../../e2e-common/e2e-initial-data';
 import { TEST_SETUP_TIMEOUT_MS, testConfig } from '../../../e2e-common/test-config';
 
+import {
+    resetCustomerPasswordAsAdminDocument,
+    verifyCustomerAccountAsAdminDocument,
+} from './graphql/admin-definitions';
 import { customerFragment } from './graphql/fragments-admin';
 import { FragmentOf, ResultOf } from './graphql/graphql-admin';
 import { FragmentOf as FragmentOfShop } from './graphql/graphql-shop';
@@ -679,6 +683,222 @@ describe('Customer resolver', () => {
                 id: firstCustomer.id,
             });
             expect(after?.history.totalItems).toBe(historyCount - 1);
+        });
+    });
+
+    describe('verifyCustomerAccountAsAdmin', () => {
+        let unverifiedCustomerId: string;
+        let unverifiedCustomerEmail: string;
+        let guestCustomerId: string;
+
+        beforeAll(async () => {
+            unverifiedCustomerEmail = 'unverified-admin-verify@test.com';
+            const { createCustomer } = await adminClient.query(createCustomerDocument, {
+                input: {
+                    emailAddress: unverifiedCustomerEmail,
+                    firstName: 'Unverified',
+                    lastName: 'Customer',
+                },
+            });
+            customerErrorGuard.assertSuccess(createCustomer);
+            unverifiedCustomerId = createCustomer.id;
+
+            await shopClient.asAnonymousUser();
+            await shopClient.query(addItemToOrderDocument, {
+                productVariantId: 'T_1',
+                quantity: 1,
+            });
+            const { setCustomerForOrder } = await shopClient.query(setCustomerDocument, {
+                input: {
+                    firstName: 'Guest',
+                    lastName: 'AdminVerify',
+                    emailAddress: 'guest-admin-verify@test.com',
+                },
+            });
+            setCustomerForOrderGuard.assertSuccess(setCustomerForOrder);
+            guestCustomerId = setCustomerForOrder.customer!.id;
+        });
+
+        it('returns CustomerAccountStateError when customer is a guest', async () => {
+            const { verifyCustomerAccountAsAdmin } = await adminClient.query(
+                verifyCustomerAccountAsAdminDocument,
+                { customerId: guestCustomerId },
+            );
+
+            expect(verifyCustomerAccountAsAdmin.__typename).toBe('CustomerAccountStateError');
+            if (verifyCustomerAccountAsAdmin.__typename === 'CustomerAccountStateError') {
+                expect(verifyCustomerAccountAsAdmin.accountState).toBe('guest');
+            }
+        });
+
+        it('verifies an unverified Customer and returns a generated password', async () => {
+            const sendEmailFn = vi.fn();
+            let resolveFn: () => void;
+            const subscription = server.app
+                .get(EventBus)
+                .ofType(AccountVerifiedEvent)
+                .subscribe(event => {
+                    sendEmailFn(event);
+                    resolveFn?.();
+                });
+            const eventReceived = new Promise<void>(resolve => {
+                resolveFn = resolve;
+            });
+
+            const { verifyCustomerAccountAsAdmin } = await adminClient.query(
+                verifyCustomerAccountAsAdminDocument,
+                { customerId: unverifiedCustomerId },
+            );
+
+            expect(verifyCustomerAccountAsAdmin.__typename).toBe('AdminGeneratedPassword');
+            if (verifyCustomerAccountAsAdmin.__typename !== 'AdminGeneratedPassword') {
+                subscription.unsubscribe();
+                throw new Error('expected AdminGeneratedPassword');
+            }
+            const generatedPassword = verifyCustomerAccountAsAdmin.password;
+            expect(generatedPassword).toMatch(/^.{16}$/);
+
+            await eventReceived;
+            expect(sendEmailFn).toHaveBeenCalledTimes(1);
+            expect(sendEmailFn.mock.calls[0][0] instanceof AccountVerifiedEvent).toBe(true);
+            subscription.unsubscribe();
+
+            const { customer } = await adminClient.query(getCustomerWithUserDocument, {
+                id: unverifiedCustomerId,
+            });
+            expect(customer?.user?.verified).toBe(true);
+
+            const { customer: customerHistory } = await adminClient.query(getCustomerHistoryDocument, {
+                id: unverifiedCustomerId,
+                options: {
+                    filter: {
+                        type: { eq: HistoryEntryType.CUSTOMER_VERIFIED },
+                    },
+                },
+            });
+            customerHistoryGuard.assertSuccess(customerHistory);
+            expect(customerHistory.history.items.length).toBe(1);
+            expect(customerHistory.history.items[0].type).toBe(HistoryEntryType.CUSTOMER_VERIFIED);
+
+            await shopClient.asUserWithCredentials(unverifiedCustomerEmail, generatedPassword);
+            const { me } = await shopClient.query(MeDocument);
+            expect(me?.identifier).toBe(unverifiedCustomerEmail);
+        });
+
+        it('returns CustomerAccountStateError when customer is already verified', async () => {
+            const { verifyCustomerAccountAsAdmin } = await adminClient.query(
+                verifyCustomerAccountAsAdminDocument,
+                { customerId: unverifiedCustomerId },
+            );
+
+            expect(verifyCustomerAccountAsAdmin.__typename).toBe('CustomerAccountStateError');
+            if (verifyCustomerAccountAsAdmin.__typename === 'CustomerAccountStateError') {
+                expect(verifyCustomerAccountAsAdmin.accountState).toBe('verified');
+            }
+        });
+    });
+
+    describe('resetCustomerPasswordAsAdmin', () => {
+        let unverifiedCustomerId: string;
+        let guestCustomerId: string;
+        let verifiedCustomerId: string;
+        let verifiedCustomerEmail: string;
+
+        beforeAll(async () => {
+            const { createCustomer: unverified } = await adminClient.query(createCustomerDocument, {
+                input: {
+                    emailAddress: 'unverified-admin-reset@test.com',
+                    firstName: 'Unverified',
+                    lastName: 'Customer',
+                },
+            });
+            customerErrorGuard.assertSuccess(unverified);
+            unverifiedCustomerId = unverified.id;
+
+            verifiedCustomerEmail = 'verified-admin-reset@test.com';
+            const { createCustomer: verified } = await adminClient.query(createCustomerDocument, {
+                input: {
+                    emailAddress: verifiedCustomerEmail,
+                    firstName: 'Verified',
+                    lastName: 'Customer',
+                },
+                password: 'test',
+            });
+            customerErrorGuard.assertSuccess(verified);
+            verifiedCustomerId = verified.id;
+
+            await shopClient.asAnonymousUser();
+            await shopClient.query(addItemToOrderDocument, {
+                productVariantId: 'T_1',
+                quantity: 1,
+            });
+            const { setCustomerForOrder } = await shopClient.query(setCustomerDocument, {
+                input: {
+                    firstName: 'Guest',
+                    lastName: 'AdminReset',
+                    emailAddress: 'guest-admin-reset@test.com',
+                },
+            });
+            setCustomerForOrderGuard.assertSuccess(setCustomerForOrder);
+            guestCustomerId = setCustomerForOrder.customer!.id;
+        });
+
+        it('returns CustomerAccountStateError when customer is a guest', async () => {
+            const { resetCustomerPasswordAsAdmin } = await adminClient.query(
+                resetCustomerPasswordAsAdminDocument,
+                { customerId: guestCustomerId },
+            );
+
+            expect(resetCustomerPasswordAsAdmin.__typename).toBe('CustomerAccountStateError');
+            if (resetCustomerPasswordAsAdmin.__typename === 'CustomerAccountStateError') {
+                expect(resetCustomerPasswordAsAdmin.accountState).toBe('guest');
+            }
+        });
+
+        it('returns CustomerAccountStateError when customer is unverified', async () => {
+            const { resetCustomerPasswordAsAdmin } = await adminClient.query(
+                resetCustomerPasswordAsAdminDocument,
+                { customerId: unverifiedCustomerId },
+            );
+
+            expect(resetCustomerPasswordAsAdmin.__typename).toBe('CustomerAccountStateError');
+            if (resetCustomerPasswordAsAdmin.__typename === 'CustomerAccountStateError') {
+                expect(resetCustomerPasswordAsAdmin.accountState).toBe('registered');
+            }
+        });
+
+        it('triggers a PasswordResetEvent for a verified customer', async () => {
+            const sendEmailFn = vi.fn();
+            let resolveFn: () => void;
+            const subscription = server.app
+                .get(EventBus)
+                .ofType(PasswordResetEvent)
+                .subscribe(passwordResetEvent => {
+                    sendEmailFn(passwordResetEvent);
+                    resolveFn?.();
+                });
+            const eventReceived = new Promise<void>(resolve => {
+                resolveFn = resolve;
+            });
+
+            const { resetCustomerPasswordAsAdmin } = await adminClient.query(
+                resetCustomerPasswordAsAdminDocument,
+                { customerId: verifiedCustomerId },
+            );
+
+            expect(resetCustomerPasswordAsAdmin.__typename).toBe('Success');
+            if (resetCustomerPasswordAsAdmin.__typename === 'Success') {
+                expect(resetCustomerPasswordAsAdmin.success).toBe(true);
+            }
+
+            await eventReceived;
+            expect(sendEmailFn).toHaveBeenCalledTimes(1);
+            const event = sendEmailFn.mock.calls[0][0] as PasswordResetEvent;
+            expect(event instanceof PasswordResetEvent).toBe(true);
+            expect(event.user.identifier).toBe(verifiedCustomerEmail);
+            expect(event.user.getNativeAuthenticationMethod().passwordResetToken).toBeTruthy();
+
+            subscription.unsubscribe();
         });
     });
 });

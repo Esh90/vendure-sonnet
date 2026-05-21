@@ -84,6 +84,16 @@ export enum AdjustmentType {
   PROMOTION = 'PROMOTION'
 }
 
+/**
+ * Returned by `verifyCustomerAccountAsAdmin` to expose the randomly generated password to the
+ * administrator. The cleartext password is included in the response only once and is not persisted
+ * anywhere else; the administrator is responsible for securely transmitting it to the customer.
+ */
+export type AdminGeneratedPassword = {
+  __typename?: 'AdminGeneratedPassword';
+  password: Scalars['String']['output'];
+};
+
 export type Administrator = Node & {
   __typename?: 'Administrator';
   createdAt: Scalars['DateTime']['output'];
@@ -1553,6 +1563,18 @@ export type CustomerOrdersArgs = {
   options?: InputMaybe<OrderListOptions>;
 };
 
+/**
+ * Returned when an administrator action requires the Customer to be in a specific account state
+ * (e.g. trying to reset the password of a guest or registered customer, or trying to manually
+ * verify a customer that is already verified or has no User).
+ */
+export type CustomerAccountStateError = ErrorResult & {
+  __typename?: 'CustomerAccountStateError';
+  accountState: Scalars['String']['output'];
+  errorCode: ErrorCode;
+  message: Scalars['String']['output'];
+};
+
 export type CustomerFilterParameter = {
   _and?: InputMaybe<Array<CustomerFilterParameter>>;
   _or?: InputMaybe<Array<CustomerFilterParameter>>;
@@ -1803,6 +1825,7 @@ export enum ErrorCode {
   COUPON_CODE_INVALID_ERROR = 'COUPON_CODE_INVALID_ERROR',
   COUPON_CODE_LIMIT_ERROR = 'COUPON_CODE_LIMIT_ERROR',
   CREATE_FULFILLMENT_ERROR = 'CREATE_FULFILLMENT_ERROR',
+  CUSTOMER_ACCOUNT_STATE_ERROR = 'CUSTOMER_ACCOUNT_STATE_ERROR',
   DUPLICATE_ENTITY_ERROR = 'DUPLICATE_ENTITY_ERROR',
   EMAIL_ADDRESS_CONFLICT_ERROR = 'EMAIL_ADDRESS_CONFLICT_ERROR',
   EMPTY_ORDER_LINE_SELECTION_ERROR = 'EMPTY_ORDER_LINE_SELECTION_ERROR',
@@ -3142,6 +3165,13 @@ export type Mutation = {
   /** Removes StockLocations from the specified Channel */
   removeStockLocationsFromChannel: Array<StockLocation>;
   /**
+   * Triggers the standard password-reset email flow for a verified Customer, on behalf of an
+   * administrator. Equivalent to the Customer calling `requestPasswordReset` from the Shop API:
+   * a reset token is issued and a `PasswordResetEvent` is published so the configured email
+   * handler can send the customer a reset link.
+   */
+  resetCustomerPasswordAsAdmin: ResetCustomerPasswordAsAdminResult;
+  /**
    * Replaces the old with a new API-Key.
    * This is a convenience method to invalidate an API-Key without
    * deleting the underlying roles and permissions.
@@ -3236,6 +3266,12 @@ export type Mutation = {
   updateTaxRate: TaxRate;
   /** Update an existing Zone */
   updateZone: Zone;
+  /**
+   * Completes the email verification step of a registered Customer with a randomly generated
+   * password. Returns the generated password so the administrator can communicate it to the
+   * customer. Intended for situations where the customer never confirmed the verification email.
+   */
+  verifyCustomerAccountAsAdmin: VerifyCustomerAccountAsAdminResult;
 };
 
 
@@ -3880,6 +3916,11 @@ export type MutationRemoveStockLocationsFromChannelArgs = {
 };
 
 
+export type MutationResetCustomerPasswordAsAdminArgs = {
+  customerId: Scalars['ID']['input'];
+};
+
+
 export type MutationRotateApiKeyArgs = {
   id: Scalars['ID']['input'];
 };
@@ -4146,6 +4187,11 @@ export type MutationUpdateTaxRateArgs = {
 
 export type MutationUpdateZoneArgs = {
   input: UpdateZoneInput;
+};
+
+
+export type MutationVerifyCustomerAccountAsAdminArgs = {
+  customerId: Scalars['ID']['input'];
 };
 
 export type NativeAuthInput = {
@@ -6056,6 +6102,8 @@ export type RemoveStockLocationsFromChannelInput = {
   stockLocationIds: Array<Scalars['ID']['input']>;
 };
 
+export type ResetCustomerPasswordAsAdminResult = CustomerAccountStateError | Success;
+
 export type Return = Node & StockMovement & {
   __typename?: 'Return';
   createdAt: Scalars['DateTime']['output'];
@@ -7239,6 +7287,8 @@ export type User = Node & {
   updatedAt: Scalars['DateTime']['output'];
   verified: Scalars['Boolean']['output'];
 };
+
+export type VerifyCustomerAccountAsAdminResult = AdminGeneratedPassword | CustomerAccountStateError;
 
 export type Zone = Node & {
   __typename?: 'Zone';

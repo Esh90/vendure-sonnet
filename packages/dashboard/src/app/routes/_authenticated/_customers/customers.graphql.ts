@@ -217,3 +217,33 @@ export const deleteCustomersDocument = graphql(`
         }
     }
 `);
+
+export const verifyCustomerAccountAsAdminDocument = graphql(`
+    mutation VerifyCustomerAccountAsAdmin($customerId: ID!) {
+        verifyCustomerAccountAsAdmin(customerId: $customerId) {
+            __typename
+            ... on AdminGeneratedPassword {
+                password
+            }
+            ... on ErrorResult {
+                errorCode
+                message
+            }
+        }
+    }
+`);
+
+export const resetCustomerPasswordAsAdminDocument = graphql(`
+    mutation ResetCustomerPasswordAsAdmin($customerId: ID!) {
+        resetCustomerPasswordAsAdmin(customerId: $customerId) {
+            __typename
+            ... on Success {
+                success
+            }
+            ... on ErrorResult {
+                errorCode
+                message
+            }
+        }
+    }
+`);
