@@ -1,7 +1,13 @@
-import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import { OTLPLogExporter } from '@opentelemetry/exporter-logs-otlp-proto';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express';
+import { GraphQLInstrumentation } from '@opentelemetry/instrumentation-graphql';
+import { HttpInstrumentation } from '@opentelemetry/instrumentation-http';
+import { IORedisInstrumentation } from '@opentelemetry/instrumentation-ioredis';
+import { MySQL2Instrumentation } from '@opentelemetry/instrumentation-mysql2';
+import { NestInstrumentation } from '@opentelemetry/instrumentation-nestjs-core';
+import { PgInstrumentation } from '@opentelemetry/instrumentation-pg';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import {
     BatchLogRecordProcessor,
@@ -45,6 +51,13 @@ export interface SdkConfigurationOptions {
  * Creates a configuration object for the OpenTelemetry Node SDK. This is used to set up a custom
  * preload script which must be run before the main Vendure server is loaded by means of the
  * Node.js `--require` flag.
+ *
+ * The default `instrumentations` array covers the libraries Vendure itself uses: HTTP, Express,
+ * NestJS, GraphQL, the PostgreSQL and MySQL2 database drivers, and ioredis. To capture spans from
+ * other libraries used in your own plugins (for example `kafkajs`, `mongoose`, `winston`), install
+ * `@opentelemetry/auto-instrumentations-node` (or the specific `@opentelemetry/instrumentation-*`
+ * package you need) and pass your own `instrumentations` array via `config.instrumentations` —
+ * this will replace the curated default.
  *
  * @example
  * ```ts
@@ -110,7 +123,15 @@ export function getSdkConfiguration(options?: SdkConfigurationOptions): Partial<
         }),
         ...devModeAwareConfig,
         contextManager: new AsyncLocalStorageContextManager(),
-        instrumentations: [getNodeAutoInstrumentations()],
+        instrumentations: [
+            new HttpInstrumentation(),
+            new ExpressInstrumentation(),
+            new NestInstrumentation(),
+            new GraphQLInstrumentation(),
+            new PgInstrumentation(),
+            new MySQL2Instrumentation(),
+            new IORedisInstrumentation(),
+        ],
         ...rest,
     };
 }

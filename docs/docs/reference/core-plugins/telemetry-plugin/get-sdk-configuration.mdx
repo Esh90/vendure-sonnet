@@ -4,11 +4,18 @@ generated: true
 ---
 ## getSdkConfiguration
 
-<GenerationInfo sourceFile="packages/telemetry-plugin/src/instrumentation.ts" sourceLine="89" packageName="@vendure/telemetry-plugin" />
+<GenerationInfo sourceFile="packages/telemetry-plugin/src/instrumentation.ts" sourceLine="102" packageName="@vendure/telemetry-plugin" />
 
 Creates a configuration object for the OpenTelemetry Node SDK. This is used to set up a custom
 preload script which must be run before the main Vendure server is loaded by means of the
 Node.js `--require` flag.
+
+The default `instrumentations` array covers the libraries Vendure itself uses: HTTP, Express,
+NestJS, GraphQL, the PostgreSQL and MySQL2 database drivers, and ioredis. To capture spans from
+other libraries used in your own plugins (for example `kafkajs`, `mongoose`, `winston`), install
+`@opentelemetry/auto-instrumentations-node` (or the specific `@opentelemetry/instrumentation-*`
+package you need) and pass your own `instrumentations` array via `config.instrumentations` —
+this will replace the curated default.
 
 *Example*
 
@@ -58,7 +65,7 @@ Parameters
 
 ## SdkConfigurationOptions
 
-<GenerationInfo sourceFile="packages/telemetry-plugin/src/instrumentation.ts" sourceLine="27" packageName="@vendure/telemetry-plugin" />
+<GenerationInfo sourceFile="packages/telemetry-plugin/src/instrumentation.ts" sourceLine="33" packageName="@vendure/telemetry-plugin" />
 
 Options for configuring the OpenTelemetry Node SDK.
 
