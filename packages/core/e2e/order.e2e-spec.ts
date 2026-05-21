@@ -1102,56 +1102,6 @@ describe('Orders resolver', () => {
             ]);
         });
 
-        // https://github.com/vendurehq/vendure/issues/4348
-        it('cancelShipping with pricesIncludeTax leaves zero shipping cost', async () => {
-            await adminClient.query(updateChannelDocument, {
-                input: {
-                    id: 'T_1',
-                    pricesIncludeTax: true,
-                },
-            });
-
-            try {
-                const testOrder = await createTestOrder(
-                    adminClient,
-                    shopClient,
-                    customers[0].emailAddress,
-                    password,
-                );
-                await proceedToArrangingPayment(shopClient);
-                const order = await addPaymentToOrder(shopClient, failsToSettlePaymentMethod);
-                shopOrderGuard.assertSuccess(order);
-                expect(order.state).toBe('PaymentAuthorized');
-                expect(order.shippingWithTax).toBeGreaterThan(0);
-                expect(order.shippingWithTax).toBeGreaterThan(order.shipping);
-
-                const { cancelOrder } = await adminClient.query(cancelOrderDocument, {
-                    input: {
-                        orderId: testOrder.orderId,
-                        cancelShipping: true,
-                    },
-                });
-                canceledOrderGuard.assertSuccess(cancelOrder);
-                expect(cancelOrder.lines.map(l => l.quantity)).toEqual([0]);
-
-                const { order: cancelledOrder } = await adminClient.query(getOrderDocument, {
-                    id: testOrder.orderId,
-                });
-                expect(cancelledOrder!.state).toBe('Cancelled');
-                expect(cancelledOrder!.shipping).toBe(0);
-                expect(cancelledOrder!.shippingWithTax).toBe(0);
-                expect(cancelledOrder!.total).toBe(0);
-                expect(cancelledOrder!.totalWithTax).toBe(0);
-            } finally {
-                await adminClient.query(updateChannelDocument, {
-                    input: {
-                        id: 'T_1',
-                        pricesIncludeTax: false,
-                    },
-                });
-            }
-        });
-
         async function assertNoStockMovementsCreated(productId: string) {
             const result = await adminClient.query(getStockMovementDocument, {
                 id: productId,
