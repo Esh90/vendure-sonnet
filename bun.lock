@@ -58,7 +58,7 @@
     },
     "packages/admin-ui": {
       "name": "@vendure/admin-ui",
-      "version": "3.6.2",
+      "version": "3.6.3",
       "dependencies": {
         "@angular/animations": "^19.2.4",
         "@angular/cdk": "^19.2.7",
@@ -148,7 +148,7 @@
     },
     "packages/admin-ui-plugin": {
       "name": "@vendure/admin-ui-plugin",
-      "version": "3.6.2",
+      "version": "3.6.3",
       "dependencies": {
         "date-fns": "^4.0.0",
         "express-rate-limit": "^7.5.0",
@@ -167,7 +167,7 @@
     },
     "packages/asset-server-plugin": {
       "name": "@vendure/asset-server-plugin",
-      "version": "3.6.2",
+      "version": "3.6.3",
       "dependencies": {
         "file-type": "^19.0.0",
         "fs-extra": "^11.2.0",
@@ -189,7 +189,7 @@
     },
     "packages/cli": {
       "name": "@vendure/cli",
-      "version": "3.6.2",
+      "version": "3.6.3",
       "bin": {
         "vendure": "dist/cli.js",
       },
@@ -215,7 +215,7 @@
     },
     "packages/common": {
       "name": "@vendure/common",
-      "version": "3.6.2",
+      "version": "3.6.3",
       "devDependencies": {
         "rimraf": "^5.0.5",
         "typescript": "5.8.2",
@@ -223,7 +223,7 @@
     },
     "packages/core": {
       "name": "@vendure/core",
-      "version": "3.6.2",
+      "version": "3.6.3",
       "dependencies": {
         "@apollo/server": "^4.12.2",
         "@graphql-tools/stitch": "^10.1.16",
@@ -234,7 +234,7 @@
         "@nestjs/platform-express": "^11.0.12",
         "@nestjs/terminus": "^11.0.0",
         "@nestjs/typeorm": "^11.0.0",
-        "@vendure/common": "3.6.2",
+        "@vendure/common": "3.6.3",
         "bcrypt": "^6.0.0",
         "body-parser": "^1.20.2",
         "cookie-session": "^2.1.0",
@@ -245,7 +245,6 @@
         "express": "^5.1.0",
         "fs-extra": "^11.2.0",
         "graphql": "~16.11.0",
-        "graphql-fields": "^2.0.3",
         "graphql-scalars": "^1.24.2",
         "graphql-tag": "^2.12.6",
         "graphql-upload": "^17.0.0",
@@ -300,7 +299,7 @@
     },
     "packages/create": {
       "name": "@vendure/create",
-      "version": "3.6.2",
+      "version": "3.6.3",
       "bin": {
         "create": "./index.js",
       },
@@ -330,7 +329,7 @@
     },
     "packages/dashboard": {
       "name": "@vendure/dashboard",
-      "version": "3.6.2",
+      "version": "3.6.3",
       "dependencies": {
         "@babel/core": "^7.29.0",
         "@babel/preset-react": "^7.28.5",
@@ -429,7 +428,7 @@
     },
     "packages/dev-server": {
       "name": "dev-server",
-      "version": "3.6.2",
+      "version": "3.6.3",
       "dependencies": {
         "@nestjs/axios": "^4.0.0",
         "@vendure/admin-ui-plugin": "3.6.2",
@@ -453,7 +452,7 @@
     },
     "packages/email-plugin": {
       "name": "@vendure/email-plugin",
-      "version": "3.6.2",
+      "version": "3.6.3",
       "dependencies": {
         "@types/nodemailer": "^6.4.9",
         "dateformat": "^3.0.3",
@@ -476,7 +475,7 @@
     },
     "packages/graphiql-plugin": {
       "name": "@vendure/graphiql-plugin",
-      "version": "3.6.2",
+      "version": "3.6.3",
       "dependencies": {
         "express": "^5.1.0",
       },
@@ -498,7 +497,7 @@
     },
     "packages/harden-plugin": {
       "name": "@vendure/harden-plugin",
-      "version": "3.6.2",
+      "version": "3.6.3",
       "dependencies": {
         "graphql-query-complexity": "^0.12.0",
       },
@@ -512,7 +511,7 @@
     },
     "packages/job-queue-plugin": {
       "name": "@vendure/job-queue-plugin",
-      "version": "3.6.2",
+      "version": "3.6.3",
       "devDependencies": {
         "@vendure/common": "3.6.2",
         "@vendure/core": "3.6.2",
@@ -532,7 +531,7 @@
     },
     "packages/telemetry-plugin": {
       "name": "@vendure/telemetry-plugin",
-      "version": "3.6.2",
+      "version": "3.6.3",
       "dependencies": {
         "@opentelemetry/api": "^1.9.0",
         "@opentelemetry/auto-instrumentations-node": "^0.58.0",
@@ -552,7 +551,7 @@
     },
     "packages/testing": {
       "name": "@vendure/testing",
-      "version": "3.6.2",
+      "version": "3.6.3",
       "dependencies": {
         "@graphql-typed-document-node/core": "^3.2.0",
         "@vendure/common": "3.6.2",
@@ -577,7 +576,7 @@
     },
     "packages/ui-devkit": {
       "name": "@vendure/ui-devkit",
-      "version": "3.6.2",
+      "version": "3.6.3",
       "dependencies": {
         "@angular-devkit/build-angular": "^19.2.5",
         "@angular/cli": "^19.2.5",
@@ -3773,8 +3772,6 @@
     "graphql": ["graphql@16.11.0", "", {}, "sha512-mS1lbMsxgQj6hge1XZ6p7GPhbrtFwUFYi3wRzXAC/FmYnyXMTvvI3td3rjmQ2u8ewXueaSvRPWaEcgVVOT9Jnw=="],
 
     "graphql-config": ["graphql-config@5.1.5", "", { "dependencies": { "@graphql-tools/graphql-file-loader": "^8.0.0", "@graphql-tools/json-file-loader": "^8.0.0", "@graphql-tools/load": "^8.1.0", "@graphql-tools/merge": "^9.0.0", "@graphql-tools/url-loader": "^8.0.0", "@graphql-tools/utils": "^10.0.0", "cosmiconfig": "^8.1.0", "jiti": "^2.0.0", "minimatch": "^9.0.5", "string-env-interpolation": "^1.0.1", "tslib": "^2.4.0" }, "peerDependencies": { "cosmiconfig-toml-loader": "^1.0.0", "graphql": "^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0" }, "optionalPeers": ["cosmiconfig-toml-loader"] }, "sha512-mG2LL1HccpU8qg5ajLROgdsBzx/o2M6kgI3uAmoaXiSH9PCUbtIyLomLqUtCFaAeG2YCFsl0M5cfQ9rKmDoMVA=="],
-
-    "graphql-fields": ["graphql-fields@2.0.3", "", {}, "sha512-x3VE5lUcR4XCOxPIqaO4CE+bTK8u6gVouOdpQX9+EKHr+scqtK5Pp/l8nIGqIpN1TUlkKE6jDCCycm/WtLRAwA=="],
 
     "graphql-language-service": ["graphql-language-service@5.5.0", "", { "dependencies": { "debounce-promise": "^3.1.2", "nullthrows": "^1.0.0", "vscode-languageserver-types": "^3.17.1" }, "peerDependencies": { "graphql": "^15.5.0 || ^16.0.0 || ^17.0.0" }, "bin": { "graphql": "dist/temp-bin.js" } }, "sha512-9EvWrLLkF6Y5e29/2cmFoAO6hBPPAZlCyjznmpR11iFtRydfkss+9m6x+htA8h7YznGam+TtJwS6JuwoWWgb2Q=="],
 
