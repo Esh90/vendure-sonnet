@@ -2004,7 +2004,7 @@
                   "title": "HealthCheckError",
                   "slug": "health-check-error",
                   "file": "docs/reference/typescript-api/health-check/health-check-error.mdx",
-                  "lastModified": "2026-05-21T17:28:23+02:00"
+                  "lastModified": "2026-05-21T17:40:03+02:00"
                 },
                 {
                   "title": "HealthCheckRegistryService",
@@ -2022,19 +2022,25 @@
                   "title": "HealthIndicator",
                   "slug": "health-indicator",
                   "file": "docs/reference/typescript-api/health-check/health-indicator.mdx",
-                  "lastModified": "2026-05-21T17:28:23+02:00"
+                  "lastModified": "2026-05-21T17:40:03+02:00"
                 },
                 {
                   "title": "HealthIndicatorFunction",
                   "slug": "health-indicator-function",
                   "file": "docs/reference/typescript-api/health-check/health-indicator-function.mdx",
-                  "lastModified": "2026-05-21T17:28:23+02:00"
+                  "lastModified": "2026-05-21T17:40:03+02:00"
                 },
                 {
                   "title": "HealthIndicatorResult",
                   "slug": "health-indicator-result",
                   "file": "docs/reference/typescript-api/health-check/health-indicator-result.mdx",
-                  "lastModified": "2026-05-21T17:28:23+02:00"
+                  "lastModified": "2026-05-21T17:40:03+02:00"
+                },
+                {
+                  "title": "HealthIndicatorStatus",
+                  "slug": "health-indicator-status",
+                  "file": "docs/reference/typescript-api/health-check/health-indicator-status.mdx",
+                  "lastModified": "2026-05-21T17:40:03+02:00"
                 },
                 {
                   "title": "HttpHealthCheckStrategy",
