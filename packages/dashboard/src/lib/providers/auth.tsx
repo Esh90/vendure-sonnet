@@ -190,6 +190,11 @@ export function AuthProvider({ children }: Readonly<{ children: React.ReactNode 
 
     const logout = React.useCallback(
         async (onLogoutSuccess?: () => void) => {
+            // Clear any stale error from a previous logout attempt. Matches the
+            // login() pattern (line 149 below clears it on the success path)
+            // and ensures UI doesn't keep rendering a previous failure's
+            // message during a retry.
+            setAuthenticationError(undefined);
             setIsLoginLogoutInProgress(true);
             setStatus('verifying');
             // Try block scoped to the mutation call only. Exceptions thrown
