@@ -507,41 +507,46 @@ function throwDatabaseSchemaDoesNotExist(dbName: string, schemaName: string) {
 
 /**
  * Returns `true` if the given TCP port on `127.0.0.1` is already bound, `false`
- * otherwise. Any error other than `ECONNREFUSED` (e.g. DNS or permission
- * failure) is treated as "unknown" — we log a warning and return `false` so
- * the caller can proceed; if there really is a conflict, the server's own
- * listen() call will fail later with a clearer error.
- *
- * Replaces the previous `tcp-port-used` dependency, which pulled a seven
- * package subtree (is2 + ip-regex + is-url + ms + debug + deep-is) just for
- * a thin wrapper around `net.Socket.connect`.
+ * if the port is free. Rejects on invalid port input or on any socket error
+ * other than `ECONNREFUSED` — surfacing the real error (e.g. `EACCES`,
+ * `EHOSTUNREACH`) to the caller rather than silently treating it as "in use"
+ * and letting a port scan exhaust before reporting a misleading message.
  */
 export function isServerPortInUse(port: number): Promise<boolean> {
-    return new Promise(resolve => {
+    if (!Number.isInteger(port) || port < 1 || port > 65535) {
+        return Promise.reject(new Error(`Invalid port: ${port}`));
+    }
+    return new Promise((resolve, reject) => {
         const client = new Socket();
         let settled = false;
         const cleanup = () => {
             client.removeAllListeners();
+            client.unref();
             client.destroy();
         };
-        const settle = (inUse: boolean) => {
-            if (settled) return;
+        const settle = (): boolean => {
+            if (settled) return false;
             settled = true;
             cleanup();
-            resolve(inUse);
+            return true;
         };
-        client.once('connect', () => settle(true));
+        client.once('connect', () => {
+            if (settle()) resolve(true);
+        });
         client.once('error', (err: NodeJS.ErrnoException) => {
-            if (err.code !== 'ECONNREFUSED') {
-                log(
-                    pc.yellow(
-                        `Warning: could not determine whether port ${port} is available (${
-                            err.code ?? err.message
-                        })`,
-                    ),
-                );
+            if (!settle()) return;
+            if (err.code === 'ECONNREFUSED') {
+                resolve(false);
+                return;
             }
-            settle(false);
+            log(
+                pc.yellow(
+                    `Warning: could not determine whether port ${port} is available (${
+                        err.code ?? err.message
+                    })`,
+                ),
+            );
+            reject(err);
         });
         client.connect({ port, host: '127.0.0.1' });
     });
