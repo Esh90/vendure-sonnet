@@ -3,6 +3,7 @@ import spawn from 'cross-spawn';
 import fs from 'fs-extra';
 import { execFile, execFileSync, execSync } from 'node:child_process';
 import { createWriteStream } from 'node:fs';
+import { Socket } from 'node:net';
 import { platform } from 'node:os';
 import path from 'node:path';
 import { Readable } from 'node:stream';
@@ -504,15 +505,46 @@ function throwDatabaseSchemaDoesNotExist(dbName: string, schemaName: string) {
     );
 }
 
+/**
+ * Returns `true` if the given TCP port on `127.0.0.1` is already bound, `false`
+ * otherwise. Any error other than `ECONNREFUSED` (e.g. DNS or permission
+ * failure) is treated as "unknown" — we log a warning and return `false` so
+ * the caller can proceed; if there really is a conflict, the server's own
+ * listen() call will fail later with a clearer error.
+ *
+ * Replaces the previous `tcp-port-used` dependency, which pulled a seven
+ * package subtree (is2 + ip-regex + is-url + ms + debug + deep-is) just for
+ * a thin wrapper around `net.Socket.connect`.
+ */
 export function isServerPortInUse(port: number): Promise<boolean> {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const tcpPortUsed = require('tcp-port-used');
-    try {
-        return tcpPortUsed.check(port);
-    } catch (e: any) {
-        log(pc.yellow(`Warning: could not determine whether port ${port} is available`));
-        return Promise.resolve(false);
-    }
+    return new Promise(resolve => {
+        const client = new Socket();
+        let settled = false;
+        const cleanup = () => {
+            client.removeAllListeners();
+            client.destroy();
+        };
+        const settle = (inUse: boolean) => {
+            if (settled) return;
+            settled = true;
+            cleanup();
+            resolve(inUse);
+        };
+        client.once('connect', () => settle(true));
+        client.once('error', (err: NodeJS.ErrnoException) => {
+            if (err.code !== 'ECONNREFUSED') {
+                log(
+                    pc.yellow(
+                        `Warning: could not determine whether port ${port} is available (${
+                            err.code ?? err.message
+                        })`,
+                    ),
+                );
+            }
+            settle(false);
+        });
+        client.connect({ port, host: '127.0.0.1' });
+    });
 }
 
 /**
