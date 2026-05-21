@@ -1,0 +1,29 @@
+---
+title: "HealthIndicatorResult"
+generated: true
+---
+<GenerationInfo sourceFile="packages/core/src/health-check/terminus-compat.ts" sourceLine="23" packageName="@vendure/core" />
+
+The result returned by a [HealthIndicatorFunction](/reference/typescript-api/health-check/health-indicator-function#healthindicatorfunction). Keyed by the
+indicator name, with a `status` of `'up'` or `'down'` and optional
+additional diagnostic data.
+
+```ts title="Signature"
+type HealthIndicatorResult = {
+    [key: string]: {
+        status: 'up' | 'down';
+        [optionalKey: string]: unknown;
+    };
+}
+```
+
+<div className="members-wrapper">
+
+### [index]
+
+<MemberInfo kind="property" type={`{         status: 'up' | 'down';         [optionalKey: string]: unknown;     }`}   />
+
+
+
+
+</div>
