@@ -3532,7 +3532,7 @@
                   "title": "EmailGenerator",
                   "slug": "email-generator",
                   "file": "docs/reference/core-plugins/email-plugin/email-generator.mdx",
-                  "lastModified": "2026-04-20T16:08:16+02:00"
+                  "lastModified": "2026-05-21T12:52:24+02:00"
                 },
                 {
                   "title": "EmailPluginOptions",
@@ -3565,7 +3565,7 @@
                   "lastModified": "2026-04-20T16:08:16+02:00"
                 }
               ],
-              "lastModified": "2026-01-28T14:49:21+01:00"
+              "lastModified": "2026-05-21T12:52:24+02:00"
             },
             {
               "title": "GraphiQLPlugin",
