@@ -1,6 +1,5 @@
 import dateFormat from 'dateformat';
 import Handlebars from 'handlebars';
-import mjml2html from 'mjml';
 
 import { InitializedEmailPluginOptions } from '../types';
 
@@ -11,11 +10,33 @@ import { EmailGenerator } from './email-generator';
  * Uses Handlebars (https://handlebarsjs.com/) to output MJML (https://mjml.io) which is then
  * compiled down to responsive email HTML.
  *
+ * Since v3.7 the `mjml` package is an optional peer dependency of `@vendure/email-plugin`.
+ * If you use this generator (it is the default when no `emailGenerator` is supplied to
+ * `EmailPlugin.init()`), install it explicitly:
+ *
+ * ```bash
+ * npm install mjml
+ * ```
+ *
+ * If you supply your own `emailGenerator` you do not need to install `mjml`.
+ *
  * @docsCategory core plugins/EmailPlugin
  * @docsPage EmailGenerator
  */
 export class HandlebarsMjmlGenerator implements EmailGenerator {
+    private mjml2html: typeof import('mjml');
+
     async onInit(options: InitializedEmailPluginOptions) {
+        try {
+            this.mjml2html = require('mjml') as typeof import('mjml');
+        } catch (e) {
+            throw new Error(
+                'The default HandlebarsMjmlGenerator requires the "mjml" package to be installed. ' +
+                    'Install it with `npm install mjml`, or pass a different `emailGenerator` to ' +
+                    '`EmailPlugin.init()`. Underlying error: ' +
+                    (e instanceof Error ? e.message : String(e)),
+            );
+        }
         if (options.templateLoader.loadPartials) {
             const partials = await options.templateLoader.loadPartials();
             partials.forEach(({ name, content }) => Handlebars.registerPartial(name, content));
@@ -35,7 +56,7 @@ export class HandlebarsMjmlGenerator implements EmailGenerator {
         const fromResult = compiledFrom(templateVars, templateOptions);
         const subjectResult = compiledSubject(templateVars, templateOptions);
         const mjml = compiledTemplate(templateVars, templateOptions);
-        const body = mjml2html(mjml).html;
+        const body = this.mjml2html(mjml).html;
         return { from: fromResult, subject: subjectResult, body };
     }
 

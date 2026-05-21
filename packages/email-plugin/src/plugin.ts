@@ -58,6 +58,16 @@ import {
  *
  * `npm install \@vendure/email-plugin`
  *
+ * Since v3.7, the [`mjml`](https://mjml.io/) package is an optional peer dependency. If you use the
+ * default email generator (which is used unless you supply your own `emailGenerator` to
+ * `EmailPlugin.init()`), install it alongside the plugin:
+ *
+ * `yarn add mjml`
+ *
+ * or
+ *
+ * `npm install mjml`
+ *
  * @example
  * ```ts
  * import { defaultEmailHandlers, EmailPlugin, FileBasedTemplateLoader } from '\@vendure/email-plugin';

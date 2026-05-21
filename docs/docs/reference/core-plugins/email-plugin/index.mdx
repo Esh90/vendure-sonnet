@@ -2,7 +2,7 @@
 title: "EmailPlugin"
 generated: true
 ---
-<GenerationInfo sourceFile="packages/email-plugin/src/plugin.ts" sourceLine="304" packageName="@vendure/email-plugin" />
+<GenerationInfo sourceFile="packages/email-plugin/src/plugin.ts" sourceLine="314" packageName="@vendure/email-plugin" />
 
 The EmailPlugin creates and sends transactional emails based on Vendure events. By default, it uses an [MJML](https://mjml.io/)-based
 email generator to generate the email body and [Nodemailer](https://nodemailer.com/about/) to send the emails.
@@ -26,6 +26,16 @@ You can also create your own handler and register them with the plugin - see the
 or
 
 `npm install @vendure/email-plugin`
+
+Since v3.7, the [`mjml`](https://mjml.io/) package is an optional peer dependency. If you use the
+default email generator (which is used unless you supply your own `emailGenerator` to
+`EmailPlugin.init()`), install it alongside the plugin:
+
+`yarn add mjml`
+
+or
+
+`npm install mjml`
 
 *Example*
 

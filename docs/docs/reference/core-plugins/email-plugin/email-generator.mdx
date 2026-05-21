@@ -41,10 +41,20 @@ interpolated email text.
 </div>
 ## HandlebarsMjmlGenerator
 
-<GenerationInfo sourceFile="packages/email-plugin/src/generator/handlebars-mjml-generator.ts" sourceLine="17" packageName="@vendure/email-plugin" />
+<GenerationInfo sourceFile="packages/email-plugin/src/generator/handlebars-mjml-generator.ts" sourceLine="26" packageName="@vendure/email-plugin" />
 
 Uses Handlebars (https://handlebarsjs.com/) to output MJML (https://mjml.io) which is then
 compiled down to responsive email HTML.
+
+Since v3.7 the `mjml` package is an optional peer dependency of `@vendure/email-plugin`.
+If you use this generator (it is the default when no `emailGenerator` is supplied to
+`EmailPlugin.init()`), install it explicitly:
+
+```bash
+npm install mjml
+```
+
+If you supply your own `emailGenerator` you do not need to install `mjml`.
 
 ```ts title="Signature"
 class HandlebarsMjmlGenerator implements EmailGenerator {
