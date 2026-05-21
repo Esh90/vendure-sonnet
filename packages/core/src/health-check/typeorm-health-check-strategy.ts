@@ -1,9 +1,10 @@
-import { HealthIndicatorFunction, TypeOrmHealthIndicator } from '@nestjs/terminus';
-
 import { Injector } from '../common/injector';
 import { HealthCheckStrategy } from '../config/system/health-check-strategy';
+import { TransactionalConnection } from '../connection/transactional-connection';
 
-let indicator: TypeOrmHealthIndicator;
+import { HealthCheckError, HealthIndicatorFunction, HealthIndicatorResult } from './terminus-compat';
+
+let connection: TransactionalConnection;
 
 /**
  * @deprecated This interface is part of the deprecated health check feature and will be removed in v4.0.0.
@@ -44,12 +45,33 @@ export class TypeORMHealthCheckStrategy implements HealthCheckStrategy {
     constructor(private options?: TypeORMHealthCheckOptions) {}
 
     async init(injector: Injector) {
-        indicator = await injector.resolve(TypeOrmHealthIndicator);
+        connection = await injector.resolve(TransactionalConnection);
     }
 
     getHealthIndicator(): HealthIndicatorFunction {
         const key = this.options?.key || 'database';
         const timeout = this.options?.timeout ?? 1000;
-        return () => indicator.pingCheck(key, { timeout });
+        return async (): Promise<HealthIndicatorResult> => {
+            let timer: NodeJS.Timeout | undefined;
+            try {
+                await Promise.race([
+                    connection.rawConnection.query('SELECT 1'),
+                    new Promise<never>((_, reject) => {
+                        timer = setTimeout(
+                            () => reject(new Error(`database health check timed out after ${timeout}ms`)),
+                            timeout,
+                        );
+                    }),
+                ]);
+                return { [key]: { status: 'up' } };
+            } catch (err) {
+                const message = err instanceof Error ? err.message : String(err);
+                throw new HealthCheckError(message, { [key]: { status: 'down', message } });
+            } finally {
+                if (timer) {
+                    clearTimeout(timer);
+                }
+            }
+        };
     }
 }
