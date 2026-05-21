@@ -219,8 +219,15 @@ export function AuthProvider({ children }: Readonly<{ children: React.ReactNode 
             if (data?.logout.success) {
                 // Clear all cached queries to prevent stale data
                 queryClient.clear();
-                // Clear selected channel from localStorage
-                localStorage.removeItem(LS_KEY_SELECTED_CHANNEL_TOKEN);
+                try {
+                    // localStorage can throw (quota exceeded, Safari private
+                    // mode, security errors, storage disabled). The server-side
+                    // logout already succeeded — don't let storage cleanup
+                    // failure block the UI state transition below.
+                    localStorage.removeItem(LS_KEY_SELECTED_CHANNEL_TOKEN);
+                } catch {
+                    // intentionally swallowed — see comment above
+                }
                 setStatus('unauthenticated');
                 setIsLoginLogoutInProgress(false);
                 onLogoutSuccess?.();
