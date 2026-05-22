@@ -5,7 +5,7 @@ import fs from 'fs';
 import { DocumentNode } from 'graphql';
 import { print } from 'graphql/language/printer';
 import gql from 'graphql-tag';
-import path from 'path';
+import path from 'node:path';
 import { stringify } from 'querystring';
 
 import { QueryParams } from './types';
@@ -28,6 +28,8 @@ const TEST_FIXTURE_MIME_TYPES: Record<string, string> = {
     '.html': 'text/html',
     '.css': 'text/css',
     '.js': 'application/javascript',
+    '.csv': 'text/csv',
+    '.zip': 'application/zip',
 };
 
 const LOGIN = gql`
