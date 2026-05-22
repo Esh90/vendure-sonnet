@@ -4,6 +4,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import pc from 'picocolors';
 
+import { pipePrefixedOutput, resolvePackageBin, waitForChildProcesses } from '../../shared/cli-process-utils';
 import { findPackageJsonWithDependency } from '../../utilities/monorepo-utils';
 
 export type DevTarget = 'all' | 'server' | 'worker' | 'dashboard';
@@ -44,7 +45,9 @@ export async function devCommand(targetArg?: string, options: DevOptions = {}): 
         const children = processes.map(processDefinition =>
             startDevProcess(projectDir, processDefinition, { prefixOutput }),
         );
-        return await waitForDevProcesses(children);
+        return await waitForChildProcesses(children, {
+            onError: error => log.error(error.message),
+        });
     } catch (e: unknown) {
         log.error(e instanceof Error ? e.message : String(e));
         return 1;
@@ -167,94 +170,13 @@ function resolveInspectAddress(inspectValue: boolean | string, portOffset: numbe
     if (inspectValue === false) {
         return String(9229 + portOffset);
     }
-    const match = inspectValue.match(/^(.*:)?(\d+)$/);
+    const match = /^(.*:)?(\d+)$/.exec(inspectValue);
     if (!match) {
         throw new Error('When using --inspect with "dev all", pass a numeric port or host:port value.');
     }
     const host = match[1] ?? '';
     const port = Number(match[2]);
     return `${host}${port + portOffset}`;
-}
-
-function pipePrefixedOutput(
-    stream: NodeJS.ReadableStream | null,
-    output: NodeJS.WriteStream,
-    processDefinition: DevProcessDefinition,
-) {
-    if (!stream) {
-        return;
-    }
-    let buffered = '';
-    const prefix = processDefinition.color(`[${processDefinition.target}]`);
-    stream.on('data', data => {
-        buffered += data.toString();
-        const lines = buffered.split(/\r?\n/);
-        buffered = lines.pop() ?? '';
-        for (const line of lines) {
-            output.write(line.length ? `${prefix} ${line}\n` : '\n');
-        }
-    });
-    stream.on('end', () => {
-        if (buffered.length) {
-            output.write(`${prefix} ${buffered}\n`);
-        }
-    });
-}
-
-function waitForDevProcesses(children: ChildProcess[]): Promise<number> {
-    if (children.length === 0) {
-        return Promise.resolve(0);
-    }
-
-    return new Promise(resolve => {
-        let resolved = false;
-        let shutdownRequested = false;
-        let remainingChildren = children.length;
-
-        const cleanup = () => {
-            process.off('SIGINT', handleSigint);
-            process.off('SIGTERM', handleSigterm);
-        };
-        const resolveOnce = (code: number) => {
-            if (!resolved) {
-                resolved = true;
-                cleanup();
-                resolve(code);
-            }
-        };
-        const stopChildren = (signal: NodeJS.Signals) => {
-            shutdownRequested = true;
-            for (const child of children) {
-                if (!child.killed) {
-                    child.kill(signal);
-                }
-            }
-        };
-        const handleSigint = () => stopChildren('SIGINT');
-        const handleSigterm = () => stopChildren('SIGTERM');
-
-        process.once('SIGINT', handleSigint);
-        process.once('SIGTERM', handleSigterm);
-
-        for (const child of children) {
-            child.once('error', error => {
-                log.error(error.message);
-                stopChildren('SIGTERM');
-                resolveOnce(1);
-            });
-            child.once('close', (code, signal) => {
-                remainingChildren--;
-                if (!shutdownRequested) {
-                    stopChildren('SIGTERM');
-                    resolveOnce(code ?? signalToExitCode(signal) ?? 1);
-                    return;
-                }
-                if (remainingChildren === 0) {
-                    resolveOnce(code ?? signalToExitCode(signal) ?? 0);
-                }
-            });
-        }
-    });
 }
 
 function validateProjectFiles(projectDir: string, processes: DevProcessDefinition[]) {
@@ -273,32 +195,6 @@ function assertFileExists(projectDir: string, relativePath: string) {
     }
 }
 
-function resolvePackageBin(packageName: string, binName: string, projectDir: string): string {
-    const packageJsonPath = resolvePackageJsonPath(packageName, projectDir);
-
-    const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8')) as {
-        bin?: string | Record<string, string>;
-    };
-    const bin = typeof packageJson.bin === 'string' ? packageJson.bin : packageJson.bin?.[binName];
-
-    if (!bin) {
-        throw new Error(`Could not find the "${binName}" binary in "${packageName}".`);
-    }
-    return path.resolve(path.dirname(packageJsonPath), bin);
-}
-
-function resolvePackageJsonPath(packageName: string, projectDir: string): string {
-    try {
-        return require.resolve(`${packageName}/package.json`, { paths: [projectDir] });
-    } catch (e: unknown) {
-        try {
-            return require.resolve(`${packageName}/package.json`);
-        } catch {
-            throw new Error(`Could not find "${packageName}". Make sure @vendure/cli is installed.`);
-        }
-    }
-}
-
 function hasVendureCoreDependency(packageJsonPath: string): boolean {
     if (!existsSync(packageJsonPath)) {
         return false;
@@ -313,14 +209,5 @@ function hasVendureCoreDependency(packageJsonPath: string): boolean {
         );
     } catch {
         return false;
-    }
-}
-
-function signalToExitCode(signal: NodeJS.Signals | null): number | undefined {
-    if (signal === 'SIGINT') {
-        return 130;
-    }
-    if (signal === 'SIGTERM') {
-        return 143;
     }
 }

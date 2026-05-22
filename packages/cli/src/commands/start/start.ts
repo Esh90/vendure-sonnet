@@ -4,6 +4,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import pc from 'picocolors';
 
+import { pipePrefixedOutput, waitForChildProcesses } from '../../shared/cli-process-utils';
 import { resolveVendureProjectDirectory } from '../dev/dev';
 
 export type StartTarget = 'all' | 'server' | 'worker';
@@ -35,7 +36,9 @@ export async function startCommand(targetArg?: string, options: StartOptions = {
         const children = processes.map(processDefinition =>
             startProcess(projectDir, processDefinition, { prefixOutput }),
         );
-        return await waitForStartProcesses(children);
+        return await waitForChildProcesses(children, {
+            onError: error => log.error(error.message),
+        });
     } catch (e: unknown) {
         log.error(e instanceof Error ? e.message : String(e));
         return 1;
@@ -102,87 +105,6 @@ function startProcess(
     return child;
 }
 
-function pipePrefixedOutput(
-    stream: NodeJS.ReadableStream | null,
-    output: NodeJS.WriteStream,
-    processDefinition: StartProcessDefinition,
-) {
-    if (!stream) {
-        return;
-    }
-    let buffered = '';
-    const prefix = processDefinition.color(`[${processDefinition.target}]`);
-    stream.on('data', data => {
-        buffered += data.toString();
-        const lines = buffered.split(/\r?\n/);
-        buffered = lines.pop() ?? '';
-        for (const line of lines) {
-            output.write(line.length ? `${prefix} ${line}\n` : '\n');
-        }
-    });
-    stream.on('end', () => {
-        if (buffered.length) {
-            output.write(`${prefix} ${buffered}\n`);
-        }
-    });
-}
-
-function waitForStartProcesses(children: ChildProcess[]): Promise<number> {
-    if (children.length === 0) {
-        return Promise.resolve(0);
-    }
-
-    return new Promise(resolve => {
-        let resolved = false;
-        let shutdownRequested = false;
-        let remainingChildren = children.length;
-
-        const cleanup = () => {
-            process.off('SIGINT', handleSigint);
-            process.off('SIGTERM', handleSigterm);
-        };
-        const resolveOnce = (code: number) => {
-            if (!resolved) {
-                resolved = true;
-                cleanup();
-                resolve(code);
-            }
-        };
-        const stopChildren = (signal: NodeJS.Signals) => {
-            shutdownRequested = true;
-            for (const child of children) {
-                if (!child.killed) {
-                    child.kill(signal);
-                }
-            }
-        };
-        const handleSigint = () => stopChildren('SIGINT');
-        const handleSigterm = () => stopChildren('SIGTERM');
-
-        process.once('SIGINT', handleSigint);
-        process.once('SIGTERM', handleSigterm);
-
-        for (const child of children) {
-            child.once('error', error => {
-                log.error(error.message);
-                stopChildren('SIGTERM');
-                resolveOnce(1);
-            });
-            child.once('close', (code, signal) => {
-                remainingChildren--;
-                if (!shutdownRequested) {
-                    stopChildren('SIGTERM');
-                    resolveOnce(code ?? signalToExitCode(signal) ?? 1);
-                    return;
-                }
-                if (remainingChildren === 0) {
-                    resolveOnce(code ?? signalToExitCode(signal) ?? 0);
-                }
-            });
-        }
-    });
-}
-
 function validateProjectFiles(projectDir: string, processes: StartProcessDefinition[]) {
     for (const processDefinition of processes) {
         assertFileExists(projectDir, processDefinition.requiredFile);
@@ -194,14 +116,5 @@ function assertFileExists(projectDir: string, relativePath: string) {
         throw new Error(
             `Could not find ${relativePath}. Run this command after building your Vendure server project.`,
         );
-    }
-}
-
-function signalToExitCode(signal: NodeJS.Signals | null): number | undefined {
-    if (signal === 'SIGINT') {
-        return 130;
-    }
-    if (signal === 'SIGTERM') {
-        return 143;
     }
 }

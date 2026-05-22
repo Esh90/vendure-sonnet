@@ -1,10 +1,16 @@
 import { log, spinner } from '@clack/prompts';
 import { ChildProcess, spawn } from 'node:child_process';
-import { existsSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import pc from 'picocolors';
 import ts from 'typescript';
 
+import {
+    getProcessPrefix,
+    pipePrefixedOutput,
+    resolvePackageBin,
+    signalToExitCode,
+} from '../../shared/cli-process-utils';
 import { resolveVendureProjectDirectory } from '../dev/dev';
 
 export type BuildTarget = 'all' | 'server' | 'worker' | 'dashboard';
@@ -296,7 +302,16 @@ function startBuildProcess(
     processDefinition: BuildProcessDefinition,
     options: { prefixOutput: boolean; disableSpinner?: boolean; suppressStatus?: boolean },
 ): RunningBuildProcess {
-    const binPath = resolvePackageBin(processDefinition.packageName, processDefinition.binName, projectDir);
+    const installHint =
+        processDefinition.packageName === '@typescript/native-preview'
+            ? 'Install @typescript/native-preview to use --experimental-tsgo.'
+            : undefined;
+    const binPath = resolvePackageBin(
+        processDefinition.packageName,
+        processDefinition.binName,
+        projectDir,
+        installHint,
+    );
     const buildSpinner =
         !options.disableSpinner && shouldUseSpinner(processDefinition, options.prefixOutput)
             ? spinner()
@@ -336,31 +351,6 @@ function startBuildProcess(
         spinner: buildSpinner,
         output,
     };
-}
-
-function pipePrefixedOutput(
-    stream: NodeJS.ReadableStream | null,
-    output: NodeJS.WriteStream,
-    processDefinition: BuildProcessDefinition,
-) {
-    if (!stream) {
-        return;
-    }
-    let buffered = '';
-    const prefix = getBuildProcessPrefix(processDefinition);
-    stream.on('data', data => {
-        buffered += data.toString();
-        const lines = buffered.split(/\r?\n/);
-        buffered = lines.pop() ?? '';
-        for (const line of lines) {
-            output.write(line.length ? `${prefix} ${line}\n` : '\n');
-        }
-    });
-    stream.on('end', () => {
-        if (buffered.length) {
-            output.write(`${prefix} ${buffered}\n`);
-        }
-    });
 }
 
 function waitForBuildProcesses(
@@ -538,7 +528,7 @@ function writeCapturedOutput(
         return;
     }
 
-    const prefix = getBuildProcessPrefix(processDefinition);
+    const prefix = getProcessPrefix(processDefinition);
     for (const line of output.split(/\r?\n/)) {
         if (line.length) {
             stream.write(`${prefix} ${line}\n`);
@@ -552,16 +542,12 @@ function writeBuildStatus(
     message: string,
     output: NodeJS.WriteStream = process.stdout,
 ) {
-    const prefix = getBuildProcessPrefix(processDefinition);
+    const prefix = getProcessPrefix(processDefinition);
     output.write(prefixOutput ? `${prefix} ${message}\n` : `${message}\n`);
 }
 
 function getBuildProcessLabel(processDefinition: BuildProcessDefinition): string {
     return processDefinition.displayLabel ?? processDefinition.target;
-}
-
-function getBuildProcessPrefix(processDefinition: BuildProcessDefinition): string {
-    return processDefinition.color(`[${processDefinition.prefixLabel ?? processDefinition.target}]`);
 }
 
 function createBuildProgressRenderer(output: NodeJS.WriteStream = process.stdout): BuildProgressRenderer {
@@ -611,7 +597,7 @@ function createBuildProgressRenderer(output: NodeJS.WriteStream = process.stdout
         },
         complete(buildProcess) {
             const item = items.get(buildProcess);
-            if (!item || item.status !== 'running') {
+            if (item?.status !== 'running') {
                 return;
             }
             item.status = 'success';
@@ -624,7 +610,10 @@ function createBuildProgressRenderer(output: NodeJS.WriteStream = process.stdout
         },
         fail(buildProcess, message) {
             const item = items.get(buildProcess);
-            if (!item || item.status === 'failure') {
+            if (!item) {
+                return;
+            }
+            if (item.status === 'failure') {
                 return;
             }
             item.status = 'failure';
@@ -668,7 +657,7 @@ interface BuildProgressItem {
 
 function formatBuildProgressStartLine(item: BuildProgressItem): string {
     const { processDefinition } = item.buildProcess;
-    return `${getBuildProcessPrefix(processDefinition)} Building ${getBuildProcessLabel(
+    return `${getProcessPrefix(processDefinition)} Building ${getBuildProcessLabel(
         processDefinition,
     )} with ${processDefinition.binName}...`;
 }
@@ -677,7 +666,7 @@ function formatBuildProgressLine(item: BuildProgressItem, frame: string): string
     const { processDefinition } = item.buildProcess;
     const label = getBuildProcessLabel(processDefinition);
     const elapsed = pc.dim(`(${formatDuration(item.startedAt, item.finishedAt)})`);
-    const prefix = getBuildProcessPrefix(processDefinition);
+    const prefix = getProcessPrefix(processDefinition);
 
     if (item.status === 'success') {
         return `${prefix} ${pc.green('OK')} Built ${label} with ${processDefinition.binName} ${elapsed}`;
@@ -694,45 +683,6 @@ function formatDuration(startedAt: number, finishedAt: number = Date.now()): str
         return `${duration}ms`;
     }
     return `${(duration / 1000).toFixed(1)}s`;
-}
-
-function signalToExitCode(signal: NodeJS.Signals | null): number | undefined {
-    if (signal === 'SIGINT') {
-        return 130;
-    }
-    if (signal === 'SIGTERM') {
-        return 143;
-    }
-}
-
-function resolvePackageBin(packageName: string, binName: string, projectDir: string): string {
-    const packageJsonPath = resolvePackageJsonPath(packageName, projectDir);
-
-    const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8')) as {
-        bin?: string | Record<string, string>;
-    };
-    const bin = typeof packageJson.bin === 'string' ? packageJson.bin : packageJson.bin?.[binName];
-
-    if (!bin) {
-        throw new Error(`Could not find the "${binName}" binary in "${packageName}".`);
-    }
-    return path.resolve(path.dirname(packageJsonPath), bin);
-}
-
-function resolvePackageJsonPath(packageName: string, projectDir: string): string {
-    try {
-        return require.resolve(`${packageName}/package.json`, { paths: [projectDir] });
-    } catch (e: unknown) {
-        try {
-            return require.resolve(`${packageName}/package.json`);
-        } catch {
-            const installHint =
-                packageName === '@typescript/native-preview'
-                    ? 'Install @typescript/native-preview to use --experimental-tsgo.'
-                    : `Make sure "${packageName}" is installed.`;
-            throw new Error(`Could not find "${packageName}". ${installHint}`);
-        }
-    }
 }
 
 function formatTsDiagnostics(diagnostics: readonly ts.Diagnostic[]) {
