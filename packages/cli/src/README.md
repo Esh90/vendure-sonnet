@@ -73,6 +73,9 @@ npx vendure dev all --server-entry ./src/server.ts --worker-entry ./src/jobs.ts
 
 # Start the Dashboard with a custom Vite config
 npx vendure dev dashboard --vite-config ./config/vite.dashboard.mts
+
+# Start server and worker with the Node.js inspector
+npx vendure dev all --inspect
 ```
 
 ### Build Command
@@ -91,15 +94,23 @@ npx vendure build worker
 
 # Build the Dashboard
 npx vendure build dashboard
+```
 
 By default, server and worker TypeScript configs are discovered in this order:
 `tsconfig.server.json`/`tsconfig.worker.json`, then `tsconfig.build.json`, then `tsconfig.json`.
 
+```bash
 # Use a custom TypeScript config
 npx vendure build server --tsconfig ./tsconfig.server.json
 
 # Use a separate worker TypeScript config
 npx vendure build all --tsconfig ./tsconfig.server.json --worker-tsconfig ./tsconfig.worker.json
+
+# Clean output directories before building
+npx vendure build all --clean
+
+# Watch source files and rebuild
+npx vendure build all --watch
 
 # Use the experimental native TypeScript compiler
 npx vendure build server --experimental-tsgo
@@ -109,6 +120,24 @@ npx vendure build all --verbose
 
 # Disable progress rendering for stable logs in scripts or agents
 npx vendure build all --no-progress
+```
+
+### Start Command
+
+The `start` command starts compiled server and worker entrypoints.
+
+```bash
+# Start the server and worker
+npx vendure start all
+
+# Start only the server
+npx vendure start server
+
+# Start only the worker
+npx vendure start worker
+
+# Start with custom compiled entrypoints
+npx vendure start all --server-entry ./build/server.js --worker-entry ./build/worker.js
 ```
 
 ### Add Command

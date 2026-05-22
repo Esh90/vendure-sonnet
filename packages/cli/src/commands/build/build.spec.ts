@@ -4,9 +4,11 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import {
+    getBuildCleanPathsForTarget,
     getBuildProcessDefinitions,
     getBuildProcessesForTarget,
     getBuildTsConfigsForTarget,
+    getTsConfigOutDir,
     normalizeBuildTarget,
     resolveBuildTsConfigs,
     shouldUseMultiBuildSpinner,
@@ -26,6 +28,26 @@ describe('build command', () => {
             expect(definitions.server.binName).toBe('tsc');
             expect(definitions.server.args).toEqual(['-p', './tsconfig.json', '--noEmitOnError']);
             expect(definitions.dashboard.args).toEqual(['build', '--logLevel', 'warn']);
+        });
+
+        it('uses watch mode for server, worker and Dashboard builds', () => {
+            const definitions = getBuildProcessDefinitions({
+                watch: true,
+            });
+
+            expect(definitions.server.args).toEqual(['-p', './tsconfig.json', '--noEmitOnError', '--watch']);
+            expect(definitions.worker.args).toEqual(['-p', './tsconfig.json', '--noEmitOnError', '--watch']);
+            expect(definitions.dashboard.args).toEqual(['build', '--watch', '--logLevel', 'warn']);
+            expect(definitions.server.captureOutput).toBe(false);
+            expect(definitions.dashboard.captureOutput).toBe(false);
+        });
+
+        it('passes emptyOutDir to Vite when cleaning Dashboard builds', () => {
+            const definitions = getBuildProcessDefinitions({
+                clean: true,
+            });
+
+            expect(definitions.dashboard.args).toEqual(['build', '--emptyOutDir', '--logLevel', 'warn']);
         });
 
         it('uses tsgo when experimentalTsgo is enabled', () => {
@@ -140,6 +162,69 @@ describe('build command', () => {
                     workerTsconfig: './tsconfig.server.json',
                 }),
             ).toEqual(['./tsconfig.server.json']);
+        });
+    });
+
+    describe('getBuildCleanPathsForTarget()', () => {
+        it('returns unique TypeScript outDirs for the selected target', () => {
+            const dir = createTempDir();
+            try {
+                writeFileSync(path.join(dir, 'index.ts'), 'export const value = 1;\n');
+                writeFileSync(
+                    path.join(dir, 'tsconfig.server.json'),
+                    JSON.stringify({ compilerOptions: { outDir: './dist/server' } }),
+                );
+                writeFileSync(
+                    path.join(dir, 'tsconfig.worker.json'),
+                    JSON.stringify({ compilerOptions: { outDir: './dist/worker' } }),
+                );
+
+                expect(
+                    getBuildCleanPathsForTarget(dir, 'all', {
+                        serverTsconfig: './tsconfig.server.json',
+                        workerTsconfig: './tsconfig.worker.json',
+                    }).map(cleanPath => path.relative(dir, cleanPath)),
+                ).toEqual(['dist/server', 'dist/worker']);
+            } finally {
+                rmSync(dir, { recursive: true, force: true });
+            }
+        });
+
+        it('deduplicates shared TypeScript outDirs', () => {
+            const dir = createTempDir();
+            try {
+                writeFileSync(path.join(dir, 'index.ts'), 'export const value = 1;\n');
+                writeFileSync(
+                    path.join(dir, 'tsconfig.build.json'),
+                    JSON.stringify({ compilerOptions: { outDir: './dist' } }),
+                );
+
+                expect(
+                    getBuildCleanPathsForTarget(dir, 'all', {
+                        serverTsconfig: './tsconfig.build.json',
+                        workerTsconfig: './tsconfig.build.json',
+                    }).map(cleanPath => path.relative(dir, cleanPath)),
+                ).toEqual(['dist']);
+            } finally {
+                rmSync(dir, { recursive: true, force: true });
+            }
+        });
+    });
+
+    describe('getTsConfigOutDir()', () => {
+        it('resolves an outDir from a tsconfig file', () => {
+            const dir = createTempDir();
+            try {
+                writeFileSync(path.join(dir, 'index.ts'), 'export const value = 1;\n');
+                writeFileSync(
+                    path.join(dir, 'tsconfig.json'),
+                    JSON.stringify({ compilerOptions: { outDir: './dist' } }),
+                );
+
+                expect(getTsConfigOutDir(dir, './tsconfig.json')).toBe(path.join(dir, 'dist'));
+            } finally {
+                rmSync(dir, { recursive: true, force: true });
+            }
         });
     });
 

@@ -18,7 +18,9 @@ describe('dev command', () => {
         it('uses default entrypoints', () => {
             const definitions = getDevProcessDefinitions();
 
+            expect(definitions.server.nodeArgs).toEqual([]);
             expect(definitions.server.args).toEqual(['./src/index.ts']);
+            expect(definitions.worker.nodeArgs).toEqual([]);
             expect(definitions.worker.args).toEqual(['./src/index-worker.ts']);
             expect(definitions.dashboard.args).toEqual(['--clearScreen', 'false']);
         });
@@ -38,6 +40,53 @@ describe('dev command', () => {
                 '--config',
                 './config/vite.dashboard.mts',
             ]);
+        });
+
+        it('adds inspector flags to a single dev target', () => {
+            const definitions = getDevProcessDefinitions(
+                {
+                    inspect: '127.0.0.1:9230',
+                },
+                'server',
+            );
+
+            expect(definitions.server.nodeArgs).toEqual(['--inspect=127.0.0.1:9230']);
+            expect(definitions.worker.nodeArgs).toEqual(['--inspect=127.0.0.1:9230']);
+        });
+
+        it('assigns adjacent inspector ports for dev all', () => {
+            const definitions = getDevProcessDefinitions(
+                {
+                    inspect: true,
+                },
+                'all',
+            );
+
+            expect(definitions.server.nodeArgs).toEqual(['--inspect=9229']);
+            expect(definitions.worker.nodeArgs).toEqual(['--inspect=9230']);
+        });
+
+        it('increments a custom inspector port for the worker in dev all', () => {
+            const definitions = getDevProcessDefinitions(
+                {
+                    inspectBrk: '127.0.0.1:9330',
+                },
+                'all',
+            );
+
+            expect(definitions.server.nodeArgs).toEqual(['--inspect-brk=127.0.0.1:9330']);
+            expect(definitions.worker.nodeArgs).toEqual(['--inspect-brk=127.0.0.1:9331']);
+        });
+
+        it('rejects inspect for the dashboard target', () => {
+            expect(() =>
+                getDevProcessDefinitions(
+                    {
+                        inspect: true,
+                    },
+                    'dashboard',
+                ),
+            ).toThrow('--inspect can only be used');
         });
     });
 

@@ -584,9 +584,9 @@ function getServerPackageScripts(): Record<string, string> {
         'build:server': 'vendure build server',
         'build:worker': 'vendure build worker',
         'build:dashboard': 'vendure build dashboard',
-        'start:server': 'node ./dist/index.js',
-        'start:worker': 'node ./dist/index-worker.js',
-        start: 'concurrently npm:start:*',
+        'start:server': 'vendure start server',
+        'start:worker': 'vendure start worker',
+        start: 'vendure start all',
     };
 }
 

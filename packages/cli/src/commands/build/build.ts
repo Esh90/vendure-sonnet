@@ -1,6 +1,6 @@
 import { log, spinner } from '@clack/prompts';
 import { ChildProcess, spawn } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import pc from 'picocolors';
 import ts from 'typescript';
@@ -51,8 +51,10 @@ export interface BuildOptions {
     workerTsconfig?: string;
     viteConfig?: string;
     experimentalTsgo?: boolean;
+    clean?: boolean;
     noProgress?: boolean;
     verbose?: boolean;
+    watch?: boolean;
 }
 
 export interface BuildTsConfigPaths {
@@ -72,6 +74,10 @@ export async function buildCommand(targetArg?: string, options: BuildOptions = {
 
         for (const tsconfig of getBuildTsConfigsForTarget(target, tsconfigs)) {
             validateTsConfig(projectDir, tsconfig);
+        }
+
+        if (options.clean) {
+            cleanBuildOutputs(projectDir, target, tsconfigs);
         }
 
         const buildProcessDefinitions = getBuildProcessDefinitions(options, tsconfigs);
@@ -110,12 +116,25 @@ export function getBuildProcessDefinitions(
     const compilerPackageName = options.experimentalTsgo ? '@typescript/native-preview' : 'typescript';
     const compilerBinName = options.experimentalTsgo ? 'tsgo' : 'tsc';
     const dashboardArgs = ['build'];
+    if (options.watch) {
+        dashboardArgs.push('--watch');
+    }
     if (options.viteConfig) {
         dashboardArgs.push('--config', options.viteConfig);
+    }
+    if (options.clean) {
+        dashboardArgs.push('--emptyOutDir');
     }
     if (!options.verbose) {
         dashboardArgs.push('--logLevel', 'warn');
     }
+    const compilerArgs = (tsconfig: string) => {
+        const args = ['-p', tsconfig, '--noEmitOnError'];
+        if (options.watch) {
+            args.push('--watch');
+        }
+        return args;
+    };
 
     return {
         server: {
@@ -123,8 +142,8 @@ export function getBuildProcessDefinitions(
             tsconfig: tsconfigs.serverTsconfig,
             packageName: compilerPackageName,
             binName: compilerBinName,
-            args: ['-p', tsconfigs.serverTsconfig, '--noEmitOnError'],
-            captureOutput: !options.verbose,
+            args: compilerArgs(tsconfigs.serverTsconfig),
+            captureOutput: !options.verbose && !options.watch,
             color: pc.blue,
         },
         worker: {
@@ -132,8 +151,8 @@ export function getBuildProcessDefinitions(
             tsconfig: tsconfigs.workerTsconfig,
             packageName: compilerPackageName,
             binName: compilerBinName,
-            args: ['-p', tsconfigs.workerTsconfig, '--noEmitOnError'],
-            captureOutput: !options.verbose,
+            args: compilerArgs(tsconfigs.workerTsconfig),
+            captureOutput: !options.verbose && !options.watch,
             color: pc.cyan,
         },
         dashboard: {
@@ -141,7 +160,7 @@ export function getBuildProcessDefinitions(
             packageName: 'vite',
             binName: 'vite',
             args: dashboardArgs,
-            captureOutput: !options.verbose,
+            captureOutput: !options.verbose && !options.watch,
             color: pc.magenta,
         },
     };
@@ -195,6 +214,26 @@ export function shouldUseMultiBuildSpinner(processes: BuildProcessDefinition[]):
     return processes.length > 1 && processes.every(processDefinition => processDefinition.captureOutput);
 }
 
+export function getBuildCleanPathsForTarget(
+    projectDir: string,
+    target: BuildTarget,
+    tsconfigs: BuildTsConfigPaths,
+): string[] {
+    const cleanPaths = getBuildTsConfigsForTarget(target, tsconfigs)
+        .map(tsconfig => getTsConfigOutDir(projectDir, tsconfig))
+        .filter((outDir): outDir is string => outDir != null);
+    return Array.from(new Set(cleanPaths));
+}
+
+export function getTsConfigOutDir(projectDir: string, tsconfig: string): string | undefined {
+    const parsed = parseTsConfig(projectDir, tsconfig);
+    const outDir = parsed.options.outDir;
+    if (!outDir) {
+        return;
+    }
+    return path.isAbsolute(outDir) ? outDir : path.resolve(projectDir, outDir);
+}
+
 export function normalizeBuildTarget(targetArg?: string): BuildTarget {
     const target = (targetArg ?? 'all').trim();
     if (validTargets.includes(target as BuildTarget)) {
@@ -204,6 +243,10 @@ export function normalizeBuildTarget(targetArg?: string): BuildTarget {
 }
 
 export function validateTsConfig(projectDir: string, tsconfig: string = './tsconfig.json') {
+    parseTsConfig(projectDir, tsconfig);
+}
+
+function parseTsConfig(projectDir: string, tsconfig: string = './tsconfig.json'): ts.ParsedCommandLine {
     const tsconfigPath = path.resolve(projectDir, tsconfig);
     if (!existsSync(tsconfigPath)) {
         throw new Error(`Could not find TypeScript config file: ${tsconfig}`);
@@ -224,10 +267,27 @@ export function validateTsConfig(projectDir: string, tsconfig: string = './tscon
     if (parsed.errors.length) {
         throw new Error(formatTsDiagnostics(parsed.errors));
     }
+    return parsed;
 }
 
 function discoverTsConfig(projectDir: string, candidates: string[]): string {
     return candidates.find(candidate => existsSync(path.resolve(projectDir, candidate))) ?? './tsconfig.json';
+}
+
+function cleanBuildOutputs(projectDir: string, target: BuildTarget, tsconfigs: BuildTsConfigPaths) {
+    const cleanPaths = getBuildCleanPathsForTarget(projectDir, target, tsconfigs);
+    for (const cleanPath of cleanPaths) {
+        assertSafeCleanPath(projectDir, cleanPath);
+        rmSync(cleanPath, { recursive: true, force: true });
+        log.info(`Cleaned ${path.relative(projectDir, cleanPath)}`);
+    }
+}
+
+function assertSafeCleanPath(projectDir: string, cleanPath: string) {
+    const relativePath = path.relative(projectDir, cleanPath);
+    if (!relativePath || relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+        throw new Error(`Refusing to clean output directory outside the project: ${cleanPath}`);
+    }
 }
 
 function startBuildProcess(
@@ -312,13 +372,19 @@ function waitForBuildProcesses(
 
     return new Promise(resolve => {
         let resolved = false;
+        let shutdownRequested = false;
         let progressRendererStopped = false;
         let remainingChildren = buildProcesses.length;
         let firstNonZeroExitCode = 0;
 
+        const cleanup = () => {
+            process.off('SIGINT', handleSigint);
+            process.off('SIGTERM', handleSigterm);
+        };
         const resolveOnce = (code: number) => {
             if (!resolved) {
                 resolved = true;
+                cleanup();
                 resolve(code);
             }
         };
@@ -328,13 +394,19 @@ function waitForBuildProcesses(
                 progressRendererStopped = true;
             }
         };
-        const stopChildren = () => {
+        const stopChildren = (signal: NodeJS.Signals = 'SIGTERM') => {
+            shutdownRequested = true;
             for (const { child } of buildProcesses) {
                 if (!child.killed && child.exitCode === null) {
-                    child.kill('SIGTERM');
+                    child.kill(signal);
                 }
             }
         };
+        const handleSigint = () => stopChildren('SIGINT');
+        const handleSigterm = () => stopChildren('SIGTERM');
+
+        process.once('SIGINT', handleSigint);
+        process.once('SIGTERM', handleSigterm);
 
         for (const buildProcess of buildProcesses) {
             const {
@@ -352,11 +424,18 @@ function waitForBuildProcesses(
                 if (!buildSpinner && !options.progressRenderer) {
                     writeBuildStatus(processDefinition, prefixOutput, error.message, process.stderr);
                 }
-                stopChildren();
+                stopChildren('SIGTERM');
                 resolveOnce(1);
             });
-            child.once('close', code => {
+            child.once('close', (code, signal) => {
                 remainingChildren--;
+                if (shutdownRequested) {
+                    if (remainingChildren === 0) {
+                        stopProgressRenderer();
+                        resolveOnce(code ?? signalToExitCode(signal) ?? 0);
+                    }
+                    return;
+                }
                 if (code && code !== 0) {
                     firstNonZeroExitCode = code;
                     const message = `Failed to build ${getBuildProcessLabel(processDefinition)} after ${formatDuration(
@@ -369,7 +448,7 @@ function waitForBuildProcesses(
                     if (!buildSpinner && !options.progressRenderer) {
                         writeBuildStatus(processDefinition, prefixOutput, message, process.stderr);
                     }
-                    stopChildren();
+                    stopChildren('SIGTERM');
                 } else if (firstNonZeroExitCode === 0) {
                     const message = pc.green(
                         `Built ${getBuildProcessLabel(processDefinition)} successfully in ${formatDuration(
@@ -404,7 +483,9 @@ function shouldUseSpinner(processDefinition: BuildProcessDefinition, prefixOutpu
 }
 
 function shouldUseProgress(options: BuildOptions): boolean {
-    return !options.noProgress && process.stdout.isTTY === true && process.env.CI !== 'true';
+    return (
+        !options.noProgress && !options.watch && process.stdout.isTTY === true && process.env.CI !== 'true'
+    );
 }
 
 function stopBuildSpinner(
@@ -610,6 +691,15 @@ function formatDuration(startedAt: number, finishedAt: number = Date.now()): str
         return `${duration}ms`;
     }
     return `${(duration / 1000).toFixed(1)}s`;
+}
+
+function signalToExitCode(signal: NodeJS.Signals | null): number | undefined {
+    if (signal === 'SIGINT') {
+        return 130;
+    }
+    if (signal === 'SIGTERM') {
+        return 143;
+    }
 }
 
 function resolvePackageBin(packageName: string, binName: string, projectDir: string): string {

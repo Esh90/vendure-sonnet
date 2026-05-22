@@ -185,6 +185,16 @@ export const cliCommands: CliCommandDefinition[] = [
                 description: 'Path to the Vite config file used by the Dashboard',
                 required: false,
             },
+            {
+                long: '--inspect [host:port]',
+                description: 'Enable the Node.js inspector for server and worker processes',
+                required: false,
+            },
+            {
+                long: '--inspect-brk [host:port]',
+                description: 'Enable the Node.js inspector and break before user code starts',
+                required: false,
+            },
         ],
         action: async (target, options) => {
             const { devCommand } = await import('./dev/dev');
@@ -225,6 +235,11 @@ export const cliCommands: CliCommandDefinition[] = [
                 required: false,
             },
             {
+                long: '--clean',
+                description: 'Clean build output directories before building',
+                required: false,
+            },
+            {
                 long: '--no-progress',
                 description: 'Disable spinner/progress rendering for stable logs',
                 required: false,
@@ -234,10 +249,43 @@ export const cliCommands: CliCommandDefinition[] = [
                 description: 'Show full build output from underlying tools',
                 required: false,
             },
+            {
+                long: '--watch',
+                description: 'Watch source files and rebuild when they change',
+                required: false,
+            },
         ],
         action: async (target, options) => {
             const { buildCommand } = await import('./build/build');
             const exitCode = await buildCommand(target, options);
+            process.exit(exitCode);
+        },
+    },
+    {
+        name: 'start',
+        description: 'Start a built Vendure project',
+        arguments: [
+            {
+                name: 'target',
+                description: 'Target to start: all, server or worker',
+                required: false,
+            },
+        ],
+        options: [
+            {
+                long: '--server-entry <path>',
+                description: 'Path to the compiled server entry file',
+                required: false,
+            },
+            {
+                long: '--worker-entry <path>',
+                description: 'Path to the compiled worker entry file',
+                required: false,
+            },
+        ],
+        action: async (target, options) => {
+            const { startCommand } = await import('./start/start');
+            const exitCode = await startCommand(target, options);
             process.exit(exitCode);
         },
     },

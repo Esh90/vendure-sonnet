@@ -12,6 +12,7 @@ interface DevProcessDefinition {
     target: Exclude<DevTarget, 'all'>;
     packageName: string;
     binName: string;
+    nodeArgs: string[];
     args: string[];
     requiredFile?: string;
     color: (text: string) => string;
@@ -21,6 +22,8 @@ export interface DevOptions {
     serverEntry?: string;
     workerEntry?: string;
     viteConfig?: string;
+    inspect?: boolean | string;
+    inspectBrk?: boolean | string;
 }
 
 const validTargets: DevTarget[] = ['all', 'server', 'worker', 'dashboard'];
@@ -29,7 +32,7 @@ export async function devCommand(targetArg?: string, options: DevOptions = {}): 
     try {
         const target = normalizeDevTarget(targetArg);
         const projectDir = resolveVendureProjectDirectory(process.cwd());
-        const devProcessDefinitions = getDevProcessDefinitions(options);
+        const devProcessDefinitions = getDevProcessDefinitions(options, target);
         const processes =
             target === 'all'
                 ? (['server', 'worker', 'dashboard'] as const).map(t => devProcessDefinitions[t])
@@ -50,6 +53,7 @@ export async function devCommand(targetArg?: string, options: DevOptions = {}): 
 
 export function getDevProcessDefinitions(
     options: DevOptions = {},
+    target: DevTarget = 'all',
 ): Record<Exclude<DevTarget, 'all'>, DevProcessDefinition> {
     const serverEntry = options.serverEntry ?? './src/index.ts';
     const workerEntry = options.workerEntry ?? './src/index-worker.ts';
@@ -63,6 +67,7 @@ export function getDevProcessDefinitions(
             target: 'server',
             packageName: 'ts-node',
             binName: 'ts-node',
+            nodeArgs: getInspectArgs(options, target, 'server'),
             args: [serverEntry],
             requiredFile: serverEntry,
             color: pc.blue,
@@ -71,6 +76,7 @@ export function getDevProcessDefinitions(
             target: 'worker',
             packageName: 'ts-node',
             binName: 'ts-node',
+            nodeArgs: getInspectArgs(options, target, 'worker'),
             args: [workerEntry],
             requiredFile: workerEntry,
             color: pc.cyan,
@@ -79,6 +85,7 @@ export function getDevProcessDefinitions(
             target: 'dashboard',
             packageName: 'vite',
             binName: 'vite',
+            nodeArgs: [],
             args: dashboardArgs,
             requiredFile: options.viteConfig,
             color: pc.magenta,
@@ -109,19 +116,64 @@ function startDevProcess(
     options: { prefixOutput: boolean },
 ): ChildProcess {
     const binPath = resolvePackageBin(processDefinition.packageName, processDefinition.binName, projectDir);
-    const child = spawn(process.execPath, [binPath, ...processDefinition.args], {
-        cwd: projectDir,
-        env: {
-            ...process.env,
-            FORCE_COLOR: process.env.FORCE_COLOR ?? '1',
+    const child = spawn(
+        process.execPath,
+        [...processDefinition.nodeArgs, binPath, ...processDefinition.args],
+        {
+            cwd: projectDir,
+            env: {
+                ...process.env,
+                FORCE_COLOR: process.env.FORCE_COLOR ?? '1',
+            },
+            stdio: options.prefixOutput ? ['inherit', 'pipe', 'pipe'] : 'inherit',
         },
-        stdio: options.prefixOutput ? ['inherit', 'pipe', 'pipe'] : 'inherit',
-    });
+    );
     if (options.prefixOutput) {
         pipePrefixedOutput(child.stdout, process.stdout, processDefinition);
         pipePrefixedOutput(child.stderr, process.stderr, processDefinition);
     }
     return child;
+}
+
+function getInspectArgs(
+    options: DevOptions,
+    commandTarget: DevTarget,
+    processTarget: Exclude<DevTarget, 'all' | 'dashboard'>,
+): string[] {
+    if (options.inspect && options.inspectBrk) {
+        throw new Error('Use either --inspect or --inspect-brk, not both.');
+    }
+    const inspectValue = options.inspectBrk ?? options.inspect;
+    if (inspectValue == null || inspectValue === false) {
+        return [];
+    }
+    if (commandTarget === 'dashboard') {
+        throw new Error('--inspect can only be used with the server or worker dev targets.');
+    }
+    const inspectFlag = options.inspectBrk ? '--inspect-brk' : '--inspect';
+    if (commandTarget === 'all') {
+        return [`${inspectFlag}=${resolveInspectAddress(inspectValue, processTarget === 'server' ? 0 : 1)}`];
+    }
+    if (inspectValue === true) {
+        return [inspectFlag];
+    }
+    return [`${inspectFlag}=${inspectValue}`];
+}
+
+function resolveInspectAddress(inspectValue: boolean | string, portOffset: number): string {
+    if (inspectValue === true) {
+        return String(9229 + portOffset);
+    }
+    if (inspectValue === false) {
+        return String(9229 + portOffset);
+    }
+    const match = inspectValue.match(/^(.*:)?(\d+)$/);
+    if (!match) {
+        throw new Error('When using --inspect with "dev all", pass a numeric port or host:port value.');
+    }
+    const host = match[1] ?? '';
+    const port = Number(match[2]);
+    return `${host}${port + portOffset}`;
 }
 
 function pipePrefixedOutput(
