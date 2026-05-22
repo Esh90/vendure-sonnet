@@ -14,7 +14,7 @@ for (const file of templateFiles) {
 
 const cliBinPath = path.join(__dirname, 'dist', 'cli.js');
 if (fs.existsSync(cliBinPath)) {
-    fs.chmodSync(cliBinPath, 0o755); // NOSONAR - published CLI bin must be executable after install.
+    fs.chmodSync(cliBinPath, 0o755); // NOSONAR - workspace bin symlinks must remain executable after local builds.
 }
 
 function findFilesWithSuffix(directory: string, suffix: string | string[]): string[] {
