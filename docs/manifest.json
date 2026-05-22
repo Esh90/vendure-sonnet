@@ -2048,13 +2048,21 @@
                   "title": "DefaultAssetImportStrategy",
                   "slug": "default-asset-import-strategy",
                   "file": "docs/reference/typescript-api/import-export/default-asset-import-strategy.mdx",
+<<<<<<< chore/dep-audit-vendor-change-case
                   "lastModified": "2026-05-21T12:08:23Z"
+=======
+                  "lastModified": "2026-05-22T14:56:03+02:00"
+>>>>>>> minor
                 },
                 {
                   "title": "DefaultAssetImportStrategyOptions",
                   "slug": "default-asset-import-strategy-options",
                   "file": "docs/reference/typescript-api/import-export/default-asset-import-strategy-options.mdx",
+<<<<<<< chore/dep-audit-vendor-change-case
                   "lastModified": "2026-05-21T12:08:23Z"
+=======
+                  "lastModified": "2026-05-22T14:56:03+02:00"
+>>>>>>> minor
                 },
                 {
                   "title": "FastImporterService",
@@ -4139,7 +4147,11 @@
                   "title": "PaginatedListDataTable",
                   "slug": "paginated-list-data-table",
                   "file": "docs/reference/dashboard/list-views/paginated-list-data-table.mdx",
+<<<<<<< chore/dep-audit-vendor-change-case
                   "lastModified": "2026-05-21T12:08:23Z"
+=======
+                  "lastModified": "2026-05-22T14:56:03+02:00"
+>>>>>>> minor
                 }
               ],
               "lastModified": "2026-01-28T14:49:21+01:00"
