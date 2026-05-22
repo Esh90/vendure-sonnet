@@ -558,10 +558,12 @@
         "faker": "^4.1.0",
         "graphql": "~16.11.0",
         "graphql-tag": "^2.12.6",
+        "mime-types": "^3.0.2",
         "sql.js": "1.14.1",
       },
       "devDependencies": {
         "@types/faker": "^5.5.9",
+        "@types/mime-types": "^3.0.1",
         "@types/mysql": "^2.15.26",
         "@types/pg": "^8.11.2",
         "@vendure/core": "3.6.3",
