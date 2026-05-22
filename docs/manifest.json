@@ -2046,7 +2046,7 @@
                   "title": "HttpHealthCheckStrategy",
                   "slug": "http-health-check-strategy",
                   "file": "docs/reference/typescript-api/health-check/http-health-check-strategy.mdx",
-                  "lastModified": "2026-05-22T15:41:37+02:00"
+                  "lastModified": "2026-05-22T14:27:20Z"
                 },
                 {
                   "title": "TypeORMHealthCheckStrategy",
