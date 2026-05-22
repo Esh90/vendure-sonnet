@@ -8,6 +8,7 @@ import { IORedisInstrumentation } from '@opentelemetry/instrumentation-ioredis';
 import { MySQL2Instrumentation } from '@opentelemetry/instrumentation-mysql2';
 import { NestInstrumentation } from '@opentelemetry/instrumentation-nestjs-core';
 import { PgInstrumentation } from '@opentelemetry/instrumentation-pg';
+import { RuntimeNodeInstrumentation } from '@opentelemetry/instrumentation-runtime-node';
 import { resourceFromAttributes } from '@opentelemetry/resources';
 import {
     BatchLogRecordProcessor,
@@ -22,6 +23,28 @@ import { ENABLE_INSTRUMENTATION_ENV_VAR } from '@vendure/core/dist/common/instru
 
 const traceExporter = new OTLPTraceExporter();
 const logExporter = new OTLPLogExporter();
+
+/**
+ * @description
+ * Returns a fresh array of the OpenTelemetry instrumentations Vendure enables by default. Callers
+ * can spread this into their own `instrumentations` array to add extra integrations without
+ * losing the curated set.
+ *
+ * @docsCategory core plugins/TelemetryPlugin
+ * @docsPage getSdkConfiguration
+ */
+export function getDefaultInstrumentations(): NonNullable<NodeSDKConfiguration['instrumentations']> {
+    return [
+        new HttpInstrumentation(),
+        new ExpressInstrumentation(),
+        new NestInstrumentation(),
+        new GraphQLInstrumentation(),
+        new PgInstrumentation(),
+        new MySQL2Instrumentation(),
+        new IORedisInstrumentation(),
+        new RuntimeNodeInstrumentation(),
+    ];
+}
 
 /**
  * @description
@@ -53,11 +76,26 @@ export interface SdkConfigurationOptions {
  * Node.js `--require` flag.
  *
  * The default `instrumentations` array covers the libraries Vendure itself uses: HTTP, Express,
- * NestJS, GraphQL, the PostgreSQL and MySQL2 database drivers, and ioredis. To capture spans from
- * other libraries used in your own plugins (for example `kafkajs`, `mongoose`, `winston`), install
- * `@opentelemetry/auto-instrumentations-node` (or the specific `@opentelemetry/instrumentation-*`
- * package you need) and pass your own `instrumentations` array via `config.instrumentations` —
- * this will replace the curated default.
+ * NestJS, GraphQL, the PostgreSQL and MySQL2 database drivers, ioredis, plus Node.js runtime
+ * metrics (event-loop lag, GC pause, heap, CPU). SQLite (`better-sqlite3`) has no OpenTelemetry
+ * instrumentation available upstream and is therefore not covered. To capture spans from other
+ * libraries used in your own plugins (for example `kafkajs`, `mongoose`, `winston`), install the
+ * specific `@opentelemetry/instrumentation-*` package you need and extend the defaults via
+ * `getDefaultInstrumentations()`:
+ *
+ * ```ts
+ * import { getDefaultInstrumentations, getSdkConfiguration } from '\@vendure/telemetry-plugin/preload';
+ * import { KafkaJsInstrumentation } from '\@opentelemetry/instrumentation-kafkajs';
+ *
+ * const config = getSdkConfiguration({
+ *     config: {
+ *         instrumentations: [...getDefaultInstrumentations(), new KafkaJsInstrumentation()],
+ *     },
+ * });
+ * ```
+ *
+ * Passing your own `instrumentations` via `config.instrumentations` replaces the curated default
+ * entirely.
  *
  * @example
  * ```ts
@@ -123,15 +161,7 @@ export function getSdkConfiguration(options?: SdkConfigurationOptions): Partial<
         }),
         ...devModeAwareConfig,
         contextManager: new AsyncLocalStorageContextManager(),
-        instrumentations: [
-            new HttpInstrumentation(),
-            new ExpressInstrumentation(),
-            new NestInstrumentation(),
-            new GraphQLInstrumentation(),
-            new PgInstrumentation(),
-            new MySQL2Instrumentation(),
-            new IORedisInstrumentation(),
-        ],
+        instrumentations: getDefaultInstrumentations(),
         ...rest,
     };
 }
