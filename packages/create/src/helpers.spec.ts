@@ -1,7 +1,7 @@
 import { Socket, createServer, type Server } from 'node:net';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { isServerPortInUse } from './helpers';
+import { findAvailablePort, isServerPortInUse } from './helpers';
 import { log } from './logger';
 
 // Replace the project's logger with a spy so we can assert on warning calls
@@ -80,6 +80,21 @@ describe('isServerPortInUse', () => {
         },
     );
 
+    it('times out rather than hanging when the SYN is silently dropped', async () => {
+        // Simulate a firewall that drops SYN packets: connect() neither resolves
+        // nor emits ECONNREFUSED. Without a setTimeout guard the promise would
+        // hang for the OS-level connect timeout (~75s macOS, ~127s Linux).
+        const connectSpy = vi
+            .spyOn(Socket.prototype, 'connect')
+            .mockImplementation(function (this: Socket) {
+                // Intentionally never emit anything — let the socket's own timeout fire.
+                return this;
+            });
+
+        await expect(isServerPortInUse(12345)).rejects.toThrow(/Timed out/);
+        expect(connectSpy).toHaveBeenCalledOnce();
+    });
+
     it('rejects with the underlying error on non-ECONNREFUSED socket failures', async () => {
         // Intercept Socket.connect so the next call emits a synthetic
         // EHOSTUNREACH error instead of actually opening a connection. This
@@ -101,5 +116,46 @@ describe('isServerPortInUse', () => {
         await expect(isServerPortInUse(12345)).rejects.toMatchObject({ code: 'EHOSTUNREACH' });
         expect(connectSpy).toHaveBeenCalledOnce();
         expect(log).toHaveBeenCalledWith(expect.stringContaining('could not determine'));
+    });
+});
+
+describe('findAvailablePort', () => {
+    let openServers: Server[] = [];
+
+    afterEach(async () => {
+        for (const server of openServers) {
+            await closeServer(server).catch(() => undefined);
+        }
+        openServers = [];
+        vi.restoreAllMocks();
+    });
+
+    it('returns the first available port when the start port is free', async () => {
+        const { server, port } = await listenOnEphemeralPort();
+        await closeServer(server);
+
+        await expect(findAvailablePort(port, 5)).resolves.toBe(port);
+    });
+
+    it('skips occupied ports until it finds a free one', async () => {
+        const { server: busy, port: busyPort } = await listenOnEphemeralPort();
+        openServers.push(busy);
+
+        const next = await findAvailablePort(busyPort, 100);
+        expect(next).toBeGreaterThan(busyPort);
+    });
+
+    it('surfaces probe failures with a useful message rather than masking them', async () => {
+        // Make every probe reject with EACCES so the loop can't paper over it.
+        vi.spyOn(Socket.prototype, 'connect').mockImplementation(function (this: Socket) {
+            queueMicrotask(() => {
+                const err = new Error('Permission denied') as NodeJS.ErrnoException;
+                err.code = 'EACCES';
+                this.emit('error', err);
+            });
+            return this;
+        });
+
+        await expect(findAvailablePort(3000, 1)).rejects.toThrow(/Could not probe port/);
     });
 });

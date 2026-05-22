@@ -13,7 +13,7 @@ import pc from 'picocolors';
 import semver from 'semver';
 import * as tar from 'tar';
 
-import { STOREFRONT_BRANCH, STOREFRONT_REPO, TYPESCRIPT_VERSION, VITE_VERSION } from './constants';
+import { SOCKET_TIMEOUT_MS, STOREFRONT_BRANCH, STOREFRONT_REPO, TYPESCRIPT_VERSION, VITE_VERSION } from './constants';
 import { log } from './logger';
 import { CliLogLevel, DbType } from './types';
 
@@ -521,17 +521,25 @@ export function isServerPortInUse(port: number): Promise<boolean> {
         let settled = false;
         const cleanup = () => {
             client.removeAllListeners();
-            client.unref();
             client.destroy();
         };
+        // Node can emit `error` after `close`, and on some platforms an `error` may follow a
+        // successful `connect`. Guarding every handler with this flag means only the first
+        // outcome decides the promise.
         const settle = (): boolean => {
             if (settled) return false;
             settled = true;
             cleanup();
             return true;
         };
+        client.setTimeout(SOCKET_TIMEOUT_MS);
         client.once('connect', () => {
-            if (settle()) resolve(true);
+            if (!settle()) return;
+            resolve(true);
+        });
+        client.once('timeout', () => {
+            if (!settle()) return;
+            reject(new Error(`Timed out checking port ${port} after ${SOCKET_TIMEOUT_MS}ms`));
         });
         client.once('error', (err: NodeJS.ErrnoException) => {
             if (!settle()) return;
@@ -664,11 +672,19 @@ export async function downloadAndExtractStorefront(targetDir: string): Promise<v
  */
 export async function findAvailablePort(startPort: number, range: number = 20): Promise<number> {
     let port = startPort;
-    while (await isServerPortInUse(port)) {
+    while (true) {
+        let inUse: boolean;
+        try {
+            inUse = await isServerPortInUse(port);
+        } catch (e) {
+            throw new Error(
+                `Could not probe port ${port}: ${e instanceof Error ? e.message : String(e)}`,
+            );
+        }
+        if (!inUse) return port;
         port++;
         if (port > startPort + range) {
             throw new Error(`Could not find an available port between ${startPort} and ${startPort + range}`);
         }
     }
-    return port;
 }
