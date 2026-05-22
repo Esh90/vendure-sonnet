@@ -110,6 +110,19 @@ describe('graphqlFields', () => {
         expect(graphqlFields(buildInfo(source, { show: true }))).toEqual({ id: {}, name: {} });
     });
 
+    it('skips an inline fragment with @skip(if: true)', () => {
+        const info = buildInfo(`{ user { id ... on User @skip(if: true) { name email } } }`);
+        expect(graphqlFields(info)).toEqual({ id: {} });
+    });
+
+    it('skips a fragment spread with @skip(if: true)', () => {
+        const info = buildInfo(`
+            { user { id ...UserDetails @skip(if: true) } }
+            fragment UserDetails on User { name email }
+        `);
+        expect(graphqlFields(info)).toEqual({ id: {} });
+    });
+
     it('handles a paginated-list style query (the Vendure @Relations() shape)', () => {
         // Mimics the shape `@Relations()` reads when isPaginatedListQuery(info)
         // is true: it pulls `fields.items` from the result. Verifies the

@@ -1,7 +1,7 @@
 import {
+    ArgumentNode,
     FieldNode,
     FragmentDefinitionNode,
-    FragmentSpreadNode,
     GraphQLResolveInfo,
     InlineFragmentNode,
     SelectionNode,
@@ -22,10 +22,14 @@ export type FieldTree = { [fieldName: string]: FieldTree };
  * Walks a `GraphQLResolveInfo` and produces a nested object describing the
  * fields the client has selected on this resolver's return type.
  *
- * Vendored from `graphql-fields@2.0.3` (MIT). Trimmed to the subset Vendure
- * actually uses — the `processArguments` and `excludedFields` options upstream
- * supports are omitted because the single call site (`@Relations()` decorator)
- * never passes them.
+ * Vendored from `graphql-fields@2.0.3`:
+ *   - Source: https://github.com/robrichard/graphql-fields
+ *   - Copyright (c) 2016 Rob Richard
+ *   - Licence: MIT (https://github.com/robrichard/graphql-fields/blob/master/LICENSE)
+ *
+ * Trimmed to the subset Vendure actually uses — the `processArguments` and
+ * `excludedFields` options upstream supports are omitted because the single
+ * call site (`@Relations()` decorator) never passes them.
  *
  * Supports:
  *   - direct field selections
@@ -53,7 +57,7 @@ function flattenSelection(
         if (selection.kind === 'InlineFragment') {
             flattenSelection(selection, info, tree);
         } else if (selection.kind === 'FragmentSpread') {
-            const fragment = resolveFragment(selection, info);
+            const fragment = info.fragments[selection.name.value];
             if (fragment) {
                 flattenSelection(fragment, info, tree);
             }
@@ -87,22 +91,14 @@ function shouldInclude(selection: SelectionNode, info: GraphQLResolveInfo): bool
     return true;
 }
 
-function resolveBooleanArgument(
-    arg: { value: { kind: string; value?: unknown; name?: { value: string } } },
-    info: GraphQLResolveInfo,
-): boolean | undefined {
+function resolveBooleanArgument(arg: ArgumentNode, info: GraphQLResolveInfo): boolean {
     if (arg.value.kind === 'BooleanValue') {
-        return Boolean(arg.value.value);
+        return arg.value.value;
     }
-    if (arg.value.kind === 'Variable' && arg.value.name) {
+    if (arg.value.kind === 'Variable') {
         return Boolean(info.variableValues[arg.value.name.value]);
     }
-    return undefined;
-}
-
-function resolveFragment(
-    spread: FragmentSpreadNode,
-    info: GraphQLResolveInfo,
-): FragmentDefinitionNode | undefined {
-    return info.fragments[spread.name.value];
+    // `@skip`/`@include` are spec-typed as `Boolean!`, so unreachable in any valid
+    // query — but stay conservative: treat as false to leave fields visible by default.
+    return false;
 }
