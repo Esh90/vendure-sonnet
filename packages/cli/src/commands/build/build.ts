@@ -52,6 +52,7 @@ export interface BuildOptions {
     viteConfig?: string;
     experimentalTsgo?: boolean;
     clean?: boolean;
+    progress?: boolean;
     noProgress?: boolean;
     verbose?: boolean;
     watch?: boolean;
@@ -373,6 +374,7 @@ function waitForBuildProcesses(
     return new Promise(resolve => {
         let resolved = false;
         let shutdownRequested = false;
+        let shutdownExitCode: number | undefined;
         let progressRendererStopped = false;
         let remainingChildren = buildProcesses.length;
         let firstNonZeroExitCode = 0;
@@ -394,16 +396,17 @@ function waitForBuildProcesses(
                 progressRendererStopped = true;
             }
         };
-        const stopChildren = (signal: NodeJS.Signals = 'SIGTERM') => {
+        const stopChildren = (signal: NodeJS.Signals = 'SIGTERM', exitCode?: number) => {
             shutdownRequested = true;
+            shutdownExitCode ??= exitCode;
             for (const { child } of buildProcesses) {
                 if (!child.killed && child.exitCode === null) {
                     child.kill(signal);
                 }
             }
         };
-        const handleSigint = () => stopChildren('SIGINT');
-        const handleSigterm = () => stopChildren('SIGTERM');
+        const handleSigint = () => stopChildren('SIGINT', signalToExitCode('SIGINT'));
+        const handleSigterm = () => stopChildren('SIGTERM', signalToExitCode('SIGTERM'));
 
         process.once('SIGINT', handleSigint);
         process.once('SIGTERM', handleSigterm);
@@ -429,15 +432,16 @@ function waitForBuildProcesses(
             });
             child.once('close', (code, signal) => {
                 remainingChildren--;
+                const exitCode = code ?? signalToExitCode(signal) ?? 0;
                 if (shutdownRequested) {
                     if (remainingChildren === 0) {
                         stopProgressRenderer();
-                        resolveOnce(code ?? signalToExitCode(signal) ?? 0);
+                        resolveOnce(firstNonZeroExitCode || (shutdownExitCode ?? exitCode));
                     }
                     return;
                 }
-                if (code && code !== 0) {
-                    firstNonZeroExitCode = code;
+                if (exitCode !== 0) {
+                    firstNonZeroExitCode = exitCode;
                     const message = `Failed to build ${getBuildProcessLabel(processDefinition)} after ${formatDuration(
                         startedAt,
                     )}.`;
@@ -482,10 +486,9 @@ function shouldUseSpinner(processDefinition: BuildProcessDefinition, prefixOutpu
     return !prefixOutput && processDefinition.captureOutput;
 }
 
-function shouldUseProgress(options: BuildOptions): boolean {
-    return (
-        !options.noProgress && !options.watch && process.stdout.isTTY === true && process.env.CI !== 'true'
-    );
+export function shouldUseProgress(options: BuildOptions): boolean {
+    const progressEnabled = options.progress !== false && options.noProgress !== true;
+    return progressEnabled && !options.watch && process.stdout.isTTY === true && process.env.CI !== 'true';
 }
 
 function stopBuildSpinner(

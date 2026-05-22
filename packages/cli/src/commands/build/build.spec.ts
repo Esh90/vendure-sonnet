@@ -1,9 +1,10 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import {
+    buildCommand,
     getBuildCleanPathsForTarget,
     getBuildProcessDefinitions,
     getBuildProcessesForTarget,
@@ -12,14 +13,86 @@ import {
     normalizeBuildTarget,
     resolveBuildTsConfigs,
     shouldUseMultiBuildSpinner,
+    shouldUseProgress,
     validateTsConfig,
 } from './build';
+
+const originalCwd = process.cwd();
+const stdoutIsTTYDescriptor = Object.getOwnPropertyDescriptor(process.stdout, 'isTTY');
 
 function createTempDir() {
     return mkdtempSync(path.join(tmpdir(), 'vendure-cli-build-'));
 }
 
+function writeJsonFile(filePath: string, value: unknown) {
+    writeFileSync(filePath, JSON.stringify(value, null, 2));
+}
+
+function writePackageBin(projectDir: string, packageName: string, binName: string, script: string) {
+    const packageDir = path.join(projectDir, 'node_modules', ...packageName.split('/'));
+    mkdirSync(packageDir, { recursive: true });
+    writeJsonFile(path.join(packageDir, 'package.json'), {
+        name: packageName,
+        version: '0.0.0',
+        bin: {
+            [binName]: `./${binName}.js`,
+        },
+    });
+    writeFileSync(path.join(packageDir, `${binName}.js`), script);
+}
+
+function setStdoutIsTTY(isTTY: boolean) {
+    Object.defineProperty(process.stdout, 'isTTY', {
+        configurable: true,
+        value: isTTY,
+    });
+}
+
+afterEach(() => {
+    process.chdir(originalCwd);
+    if (stdoutIsTTYDescriptor) {
+        Object.defineProperty(process.stdout, 'isTTY', stdoutIsTTYDescriptor);
+    } else {
+        delete (process.stdout as NodeJS.WriteStream & { isTTY?: boolean }).isTTY;
+    }
+    vi.unstubAllEnvs();
+});
+
 describe('build command', () => {
+    describe('buildCommand()', () => {
+        it('preserves the first failing target exit code when stopping remaining builds', async () => {
+            const dir = createTempDir();
+            try {
+                writeJsonFile(path.join(dir, 'package.json'), {
+                    dependencies: {
+                        '@vendure/core': '0.0.0',
+                    },
+                });
+                writeFileSync(path.join(dir, 'index.ts'), 'export const value = 1;\n');
+                writeJsonFile(path.join(dir, 'tsconfig.json'), {
+                    compilerOptions: {},
+                    include: ['index.ts'],
+                });
+                writePackageBin(dir, 'typescript', 'tsc', 'setTimeout(() => process.exit(2), 20);\n');
+                writePackageBin(
+                    dir,
+                    'vite',
+                    'vite',
+                    [
+                        "process.on('SIGTERM', () => process.exit(0));",
+                        'setTimeout(() => process.exit(0), 30000);',
+                    ].join('\n'),
+                );
+
+                process.chdir(dir);
+
+                await expect(buildCommand('all', { noProgress: true })).resolves.toBe(2);
+            } finally {
+                rmSync(dir, { recursive: true, force: true });
+            }
+        });
+    });
+
     describe('getBuildProcessDefinitions()', () => {
         it('uses tsc by default', () => {
             const definitions = getBuildProcessDefinitions();
@@ -327,6 +400,18 @@ describe('build command', () => {
             const processes = getBuildProcessesForTarget('all', definitions);
 
             expect(shouldUseMultiBuildSpinner(processes)).toBe(false);
+        });
+    });
+
+    describe('shouldUseProgress()', () => {
+        it('honors both Commander and direct API progress-disabling options', () => {
+            setStdoutIsTTY(true);
+            vi.stubEnv('CI', 'false');
+
+            expect(shouldUseProgress({})).toBe(true);
+            expect(shouldUseProgress({ progress: false })).toBe(false);
+            expect(shouldUseProgress({ noProgress: true })).toBe(false);
+            expect(shouldUseProgress({ watch: true })).toBe(false);
         });
     });
 
