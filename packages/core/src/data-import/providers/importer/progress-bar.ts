@@ -5,7 +5,7 @@
  *
  * Supports the format tokens Vendure templates use:
  *
- *   `:bar`       width-aware progress bar
+ *   `:bar`       width-aware progress bar (capped to terminal columns)
  *   `:current`   current tick count
  *   `:total`     total tick count
  *   `:percent`   completion percentage (e.g. "42%")
@@ -17,6 +17,15 @@
  * terminal. The bar redraws in-place using `\r` and clears the trailing line
  * with `\x1B[2K`. Output goes to `process.stderr` by default to match the
  * upstream `progress` package's behaviour.
+ *
+ * Deliberately omitted from the upstream surface (none of which the Importer
+ * uses): the `head` character on the leading edge of the bar, the `clear`
+ * option that wipes the bar on completion, the `:elapsed` and `:rate` tokens,
+ * and the `update()` method.
+ *
+ * Non-TTY behaviour (CI logs, piped output): like upstream `progress`, output
+ * is suppressed entirely so log files don't get peppered with `\r\x1B[2K`
+ * escape sequences.
  */
 
 const ANSI_CLEAR_LINE = '\x1B[2K';
@@ -91,6 +100,11 @@ export class ProgressBar {
     }
 
     private render(tokens: Record<string, string | number> | undefined): void {
+        // Match the original `progress` package: silent in non-TTY environments
+        // (CI logs, file redirects) so we don't spam escape sequences into logs.
+        const tty = this.stream as NodeJS.WritableStream & { isTTY?: boolean; columns?: number };
+        if (!tty.isTTY) return;
+
         const ratio = Math.min(Math.max(this.current / this.total, 0), 1);
         const percent = `${Math.floor(ratio * 100)}%`;
         const elapsedMs = Date.now() - this.startTime;
@@ -104,9 +118,14 @@ export class ProgressBar {
             .replace(':etas', etas);
 
         if (output.includes(':bar')) {
-            const completeLength = Math.round(this.width * ratio);
+            // Cap bar width to whatever space the terminal can show after the
+            // non-bar prefix/suffix. Without this, narrow terminals overflow.
+            const nonBarLen = output.replace(':bar', '').length;
+            const available = Math.max(0, (tty.columns ?? this.width + nonBarLen) - nonBarLen);
+            const barWidth = Math.min(this.width, available);
+            const completeLength = Math.round(barWidth * ratio);
             const bar =
-                this.complete.repeat(completeLength) + this.incomplete.repeat(this.width - completeLength);
+                this.complete.repeat(completeLength) + this.incomplete.repeat(barWidth - completeLength);
             output = output.replace(':bar', bar);
         }
 

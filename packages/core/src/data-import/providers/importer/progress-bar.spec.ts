@@ -3,7 +3,10 @@ import { describe, expect, it } from 'vitest';
 
 import { ProgressBar } from './progress-bar';
 
-function captureStream(): { stream: Writable; output: () => string } {
+function captureStream(opts: { isTTY?: boolean; columns?: number } = {}): {
+    stream: Writable;
+    output: () => string;
+} {
     const chunks: string[] = [];
     const stream = new Writable({
         write(chunk, _encoding, callback) {
@@ -11,6 +14,10 @@ function captureStream(): { stream: Writable; output: () => string } {
             callback();
         },
     });
+    // Default to TTY so the test surface stays focused on rendering logic.
+    // Non-TTY behaviour gets its own explicit case below.
+    (stream as Writable & { isTTY?: boolean; columns?: number }).isTTY = opts.isTTY ?? true;
+    (stream as Writable & { isTTY?: boolean; columns?: number }).columns = opts.columns ?? 200;
     return { stream, output: () => chunks.join('') };
 }
 
@@ -112,6 +119,43 @@ describe('ProgressBar', () => {
 
         bar.tick(); // Reaches total → completion frame renders unthrottled.
         expect(strip(output())).toContain('3/3');
+    });
+
+    it('produces no escape sequences in non-TTY environments (CI logs, file redirects)', () => {
+        // Matches upstream `progress`: when stream.isTTY is falsy, render() is a no-op so
+        // logs don't get peppered with \r\x1B[2K. The completion newline is still emitted.
+        const { stream, output } = captureStream({ isTTY: false });
+        const bar = new ProgressBar(':bar :percent', {
+            total: 2,
+            width: 8,
+            stream,
+            renderThrottle: 0,
+        });
+        bar.tick();
+        bar.tick();
+        const raw = output();
+        expect(raw).not.toContain('\x1B[');
+        expect(raw).not.toContain('\r');
+        expect(raw).toBe('\n'); // Only the terminal newline from completion.
+    });
+
+    it('caps the bar width to terminal columns on narrow terminals', () => {
+        // 12-column terminal: "[:bar] 100%" leaves space for a bar of <=5 chars.
+        const { stream, output } = captureStream({ columns: 12 });
+        const bar = new ProgressBar('[:bar] :percent', {
+            total: 1,
+            width: 40, // requested
+            complete: '#',
+            incomplete: '.',
+            stream,
+            renderThrottle: 0,
+        });
+        bar.tick();
+        const out = strip(output());
+        const match = out.match(/\[([#.]*)]/);
+        expect(match).not.toBeNull();
+        // Bar must be narrower than the configured width (capped to fit terminal).
+        expect(match![1].length).toBeLessThanOrEqual(5);
     });
 
     it('renders the Vendure Importer-shape format string correctly', () => {
