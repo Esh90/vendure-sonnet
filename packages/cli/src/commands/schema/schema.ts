@@ -1,7 +1,7 @@
 import { cancel, intro, isCancel, log, outro, select, text } from '@clack/prompts';
 import pc from 'picocolors';
 
-import { withInteractiveTimeout } from '../../utilities/utils';
+import { abortIfNonInteractive, withInteractiveTimeout } from '../../utilities/utils';
 
 const cancelledMessage = 'Schema generation cancelled.';
 
@@ -46,6 +46,15 @@ async function handleNonInteractiveMode(options: SchemaOptions) {
 }
 
 async function handleInteractiveMode(configFile?: string) {
+    if (
+        abortIfNonInteractive('vendure schema', [
+            'vendure schema --api admin',
+            'vendure schema --api shop --format json',
+        ])
+    ) {
+        return;
+    }
+
     // eslint-disable-next-line no-console
     console.log(`\n`);
     intro(pc.blue('🛠️️ Generate a schema file of your GraphQL API'));

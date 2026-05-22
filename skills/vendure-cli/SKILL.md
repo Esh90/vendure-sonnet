@@ -56,10 +56,14 @@ prefix each one with the runner for the detected package manager.
 
 1. **Never hardcode `npx`.** Resolve the runner from the project's lockfile —
    see "Running the CLI" above (`bunx`, `pnpm exec`, `yarn`, `npx`).
-2. **`add` and `codemod` are interactive by default.** Run them with explicit
-   flags/arguments so they take the non-interactive path — otherwise the
-   process blocks waiting on a terminal prompt. The exact non-interactive flags
-   are in each command's reference file.
+2. **Prompt-capable commands (`add`, `migrate`, `schema`, `codemod`) need
+   explicit flags/arguments from agents.** Run them with explicit inputs so they
+   take the non-interactive path; otherwise the process rejects prompt-only
+   invocations in non-interactive environments. Set
+   `VENDURE_CLI_NON_INTERACTIVE=true` when calling the CLI from an agent so
+   prompt-only invocations fail fast with examples instead of waiting on a
+   terminal prompt. The exact non-interactive flags are in each command's
+   reference file.
 3. **`dev`, `start`, and `build --watch` are long-running processes.** Do not
    run them just to "check" something. Run them only when the user asks, and
    prefer running them in the background.

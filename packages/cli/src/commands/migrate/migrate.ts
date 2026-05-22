@@ -1,7 +1,7 @@
 import { cancel, intro, isCancel, log, outro, select } from '@clack/prompts';
 import pc from 'picocolors';
 
-import { withInteractiveTimeout } from '../../utilities/utils';
+import { abortIfNonInteractive, withInteractiveTimeout } from '../../utilities/utils';
 
 import {
     generateMigrationOperation,
@@ -84,6 +84,16 @@ async function handleNonInteractiveMode(options: MigrateOptions) {
 }
 
 async function handleInteractiveMode(configFile?: string) {
+    if (
+        abortIfNonInteractive('vendure migrate', [
+            'vendure migrate -g my-migration',
+            'vendure migrate -r',
+            'vendure migrate --revert',
+        ])
+    ) {
+        return;
+    }
+
     // eslint-disable-next-line no-console
     console.log(`\n`);
     intro(pc.blue('🛠️️ Vendure migrations'));
