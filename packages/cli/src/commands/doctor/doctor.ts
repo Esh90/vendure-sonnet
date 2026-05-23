@@ -4,6 +4,7 @@ import { RuntimeVendureConfig } from '@vendure/core';
 import { runConfigCheck } from './checks/config-check';
 import { runDependencyCheck } from './checks/dependency-check';
 import { runProjectCheck } from './checks/project-check';
+import { runSchemaCheck } from './checks/schema-check';
 import { formatConsoleReport } from './formatters/console-formatter';
 import { formatJsonReport } from './formatters/json-formatter';
 import { CheckResult, DoctorOptions, DoctorReport } from './types';
@@ -65,7 +66,20 @@ export async function doctorCommand(options?: DoctorOptions) {
         }
     }
 
-    // Checks 4-5 (schema, database) will use loadedConfig when implemented.
+    // Check 4: GraphQL schema generation
+    if (checksToRun.includes('schema')) {
+        if (loadedConfig) {
+            results.push(await runSchemaCheck(loadedConfig));
+        } else {
+            results.push({
+                name: 'Schema',
+                status: 'skip',
+                message: 'Skipped (config check must run first)',
+            });
+        }
+    }
+
+    // Check 5 (database) will use loadedConfig when implemented.
 
     outputReport(buildReport(results, options), options);
 }
