@@ -320,10 +320,7 @@ function detectDbTypeFromSource(cwd: string): string | undefined {
             // Match type within dbConnectionOptions block
             const dbBlockMatch = content.match(/dbConnectionOptions\s*[:{][\s\S]*?type\s*:\s*['"]([^'"]+)['"]/);
             if (dbBlockMatch) {
-                const type = dbBlockMatch[1];
-                if (type in DB_DRIVER_MAP) {
-                    return type;
-                }
+                return dbBlockMatch[1];
             }
         } catch {
             continue;

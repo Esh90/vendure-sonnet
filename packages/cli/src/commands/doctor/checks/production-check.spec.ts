@@ -179,6 +179,32 @@ describe('production-check', () => {
         expect(result.details?.some(d => d.includes('CORS'))).toBe(true);
     });
 
+    it('detects wildcard CORS string with credentials', async () => {
+        const config = createTestConfig({
+            apiOptions: {
+                cors: { origin: '*', credentials: true },
+            },
+        });
+
+        const result = await runProductionCheck(config);
+
+        expect(result.status).toBe('warn');
+        expect(result.details?.some(d => d.includes('CORS'))).toBe(true);
+    });
+
+    it('detects wildcard in CORS array with credentials', async () => {
+        const config = createTestConfig({
+            apiOptions: {
+                cors: { origin: ['https://example.com', '*'], credentials: true },
+            },
+        });
+
+        const result = await runProductionCheck(config);
+
+        expect(result.status).toBe('warn');
+        expect(result.details?.some(d => d.includes('CORS'))).toBe(true);
+    });
+
     it('detects InMemoryJobQueueStrategy', async () => {
         const config = createTestConfig({
             jobQueueOptions: {

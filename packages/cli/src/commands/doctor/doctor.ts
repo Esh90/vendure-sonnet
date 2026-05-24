@@ -42,6 +42,13 @@ export async function doctorCommand(options?: DoctorOptions) {
                     message: 'Skipped due to project check failure',
                 });
             }
+            if (options?.profile === 'production') {
+                results.push({
+                    name: 'Production',
+                    status: 'skip',
+                    message: 'Skipped due to project check failure',
+                });
+            }
             outputReport(buildReport(results, options, { vendureVersion, packageManager }), options);
             return;
         }
@@ -61,10 +68,17 @@ export async function doctorCommand(options?: DoctorOptions) {
 
         // If config check fails, skip checks that depend on a loaded config
         if (configResult.check.status === 'fail') {
-            const configDependentChecks = ['schema', 'database', 'production'];
+            const configDependentChecks = ['schema', 'database'];
             for (const check of configDependentChecks.filter(c => checksToRun.includes(c))) {
                 results.push({
                     name: capitalize(check),
+                    status: 'skip',
+                    message: 'Skipped due to config check failure',
+                });
+            }
+            if (options?.profile === 'production') {
+                results.push({
+                    name: 'Production',
                     status: 'skip',
                     message: 'Skipped due to config check failure',
                 });

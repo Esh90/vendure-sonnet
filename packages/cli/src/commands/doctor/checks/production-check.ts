@@ -75,8 +75,13 @@ export async function runProductionCheck(config: RuntimeVendureConfig): Promise<
 
     // 7. Broad CORS with credentials
     const cors = config.apiOptions.cors;
-    if (cors && typeof cors === 'object' && 'origin' in cors) {
-        if (cors.origin === true && cors.credentials === true) {
+    if (cors && typeof cors === 'object' && 'origin' in cors && cors.credentials === true) {
+        const origin = cors.origin;
+        if (
+            origin === true ||
+            origin === '*' ||
+            (Array.isArray(origin) && origin.includes('*'))
+        ) {
             warn('CORS allows all origins with credentials enabled');
         }
     }
