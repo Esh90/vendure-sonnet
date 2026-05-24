@@ -34,6 +34,8 @@ const SINGLETON_PACKAGES = [
     'typeorm',
     '@nestjs/core',
     '@nestjs/common',
+    '@nestjs/graphql',
+    '@nestjs/typeorm',
     '@apollo/server',
 ];
 
