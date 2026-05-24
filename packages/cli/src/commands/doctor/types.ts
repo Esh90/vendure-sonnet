@@ -5,6 +5,7 @@ export interface CheckResult {
     status: CheckStatus;
     message: string;
     details?: string[];
+    packageManager?: string;
 }
 
 export interface DoctorOptions {

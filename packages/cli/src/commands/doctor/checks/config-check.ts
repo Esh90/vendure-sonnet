@@ -1,11 +1,8 @@
-import { log } from '@clack/prompts';
 import {
     getCompatibility,
-    getConfig,
     preBootstrapConfig,
     resetConfig,
     RuntimeVendureConfig,
-    setConfig,
     VENDURE_VERSION,
 } from '@vendure/core';
 import { satisfies } from 'semver';
@@ -19,6 +16,8 @@ export interface ConfigCheckResult {
     check: CheckResult;
     /** The loaded runtime config, available for subsequent checks (schema, db, production). */
     config?: RuntimeVendureConfig;
+    /** The Vendure version detected from @vendure/core. */
+    vendureVersion?: string;
 }
 
 /**
@@ -69,6 +68,7 @@ export async function runConfigCheck(configFlag?: string): Promise<ConfigCheckRe
         return {
             check: { name: 'Config', status, message, details },
             config: runtimeConfig,
+            vendureVersion: VENDURE_VERSION,
         };
     } catch (e: any) {
         const errorMessage = e instanceof Error ? e.message : String(e);
@@ -81,6 +81,7 @@ export async function runConfigCheck(configFlag?: string): Promise<ConfigCheckRe
                 details,
             },
             config: runtimeConfig,
+            vendureVersion: VENDURE_VERSION,
         };
     } finally {
         process.env.VENDURE_RUNNING_IN_CLI = undefined;

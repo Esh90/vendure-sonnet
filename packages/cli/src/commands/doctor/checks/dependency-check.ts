@@ -315,10 +315,10 @@ function detectDbTypeFromSource(cwd: string): string | undefined {
 
         try {
             const content = fs.readFileSync(filePath, 'utf-8');
-            // Match patterns like: type: 'postgres' or type: "mysql"
-            const match = content.match(/type\s*:\s*['"]([^'"]+)['"]/);
-            if (match) {
-                const type = match[1];
+            // Match type within dbConnectionOptions block
+            const dbBlockMatch = content.match(/dbConnectionOptions\s*[:{][\s\S]*?type\s*:\s*['"]([^'"]+)['"]/);
+            if (dbBlockMatch) {
+                const type = dbBlockMatch[1];
                 if (type in DB_DRIVER_MAP) {
                     return type;
                 }

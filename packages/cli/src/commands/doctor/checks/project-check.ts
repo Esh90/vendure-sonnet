@@ -101,6 +101,7 @@ export async function runProjectCheck(configFlag?: string): Promise<CheckResult>
         status: 'pass',
         message,
         details,
+        packageManager,
     };
 }
 
@@ -125,8 +126,10 @@ function detectLockfiles(cwd: string): string[] {
     if (fs.existsSync(path.join(cwd, 'package-lock.json'))) lockfiles.push('package-lock.json');
     if (fs.existsSync(path.join(cwd, 'yarn.lock'))) lockfiles.push('yarn.lock');
     if (fs.existsSync(path.join(cwd, 'pnpm-lock.yaml'))) lockfiles.push('pnpm-lock.yaml');
-    if (fs.existsSync(path.join(cwd, 'bun.lockb'))) lockfiles.push('bun.lockb');
-    if (fs.existsSync(path.join(cwd, 'bun.lock'))) lockfiles.push('bun.lock');
+    // bun.lockb (binary) and bun.lock (text) are both bun lockfiles -- count as one
+    if (fs.existsSync(path.join(cwd, 'bun.lockb')) || fs.existsSync(path.join(cwd, 'bun.lock'))) {
+        lockfiles.push('bun.lock');
+    }
     return lockfiles;
 }
 

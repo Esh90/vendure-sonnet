@@ -1,7 +1,7 @@
 import { log } from '@clack/prompts';
 import pc from 'picocolors';
 
-import { CheckResult, CheckStatus, DoctorReport } from '../types';
+import { CheckStatus, DoctorReport } from '../types';
 
 const STATUS_LABELS: Record<CheckStatus, string> = {
     pass: pc.green('pass'),
@@ -21,11 +21,11 @@ export function formatConsoleReport(report: DoctorReport): void {
     for (const check of report.checks) {
         const status = STATUS_LABELS[check.status];
         const name = check.name.padEnd(16);
-        log.message(`${name}${status}  ${check.message}`);
+        log.info(`${name}${status}  ${check.message}`);
 
         if (check.details?.length) {
             for (const detail of check.details) {
-                log.message(pc.dim(`                  ${detail}`));
+                log.info(pc.dim(`                  ${detail}`));
             }
         }
     }
