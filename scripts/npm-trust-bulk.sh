@@ -96,12 +96,36 @@ for pkg in "${VENDURE_PACKAGES[@]}"; do
   echo "==> $pkg"
 
   # Step 1: find any existing trust entry and revoke it.
-  # `npm trust list --json` returns an array (possibly empty).
+  #
+  # npm allows only ONE trusted publisher per package. Every @vendure/*
+  # package already has a publish-only entry (from the prior OIDC setup),
+  # so it must be revoked before we can create the new dual-permission one —
+  # otherwise `npm trust github` fails with 409 Conflict.
+  #
+  # `npm trust list --json` returns a SINGLE OBJECT {id,...} when an entry
+  # exists (not an array), or errors when none does. Parse defensively so
+  # the script copes with object / array / wrapped shapes alike.
+  #
+  # NOTE: run this as a script (not `source`d into zsh). Socket Firewall is
+  # wired in via a `npm='sfw npm'` zsh alias which mangles the trust API
+  # endpoints; a bash subprocess does not inherit that alias, so plain npm
+  # here is the real binary.
   existing_id=""
-  if list_json=$(npm trust list "$pkg" --json 2>/dev/null); then
-    existing_id=$(echo "$list_json" | node -e \
-      'const d = JSON.parse(require("fs").readFileSync(0, "utf8")); process.stdout.write((Array.isArray(d) && d[0] && d[0].id) || "");' \
-      2>/dev/null || true)
+  if list_out=$(npm trust list "$pkg" --json); then
+    existing_id=$(printf '%s' "$list_out" | node -e '
+      let raw = "";
+      try { raw = require("fs").readFileSync(0, "utf8"); } catch {}
+      let id = "";
+      try {
+        const d = JSON.parse(raw);
+        const arr = Array.isArray(d)
+          ? d
+          : (d && d.id ? [d]
+            : (d && Array.isArray(d.trustedPublishers) ? d.trustedPublishers : []));
+        if (arr.length && arr[0] && arr[0].id) id = arr[0].id;
+      } catch {}
+      process.stdout.write(id);
+    ' 2>/dev/null || true)
   fi
 
   if [[ -n "$existing_id" ]]; then
