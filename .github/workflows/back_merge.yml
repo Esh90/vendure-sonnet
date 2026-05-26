@@ -59,7 +59,8 @@ jobs:
               with:
                   app-id: ${{ secrets.CI_BOT_APP_ID }}
                   private-key: ${{ secrets.CI_BOT_APP_PRIVATE_KEY }}
-                  # Least privilege: token is only used to push the back-merge to the target branch.
+                  # Least privilege: token is used to push the back-merge to the target branch and
+                  # to look up the bot user id (a public /users endpoint needing no extra permission).
                   permission-contents: write
 
             - name: Checkout target branch
