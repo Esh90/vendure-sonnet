@@ -141,6 +141,8 @@ jobs:
       # Approve all staged packages at once with: scripts/npm-stage-approve-all.sh <version>
       # Nightly builds still use direct `npm publish` because they target non-default dist-tags
       # (`master` / `minor`) that nobody installs unless they opt in explicitly.
+      #
+      # No --tag here is intentional: releases go to the default `latest` tag.
       - name: Publish to NPM (release)
         if: matrix.type == 'release'
         run: |

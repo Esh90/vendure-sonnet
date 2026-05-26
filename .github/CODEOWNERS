@@ -9,6 +9,13 @@
 # The npm publishing workflow is the supply-chain security perimeter: with
 # trusted publishing, whoever can change this file can change what gets
 # published and how. Guard it tightly.
+#
+# NOTE: this guards *changes to* the workflow files. It does NOT restrict who
+# can trigger publish_to_npm.yml via workflow_dispatch — anyone with repo write
+# access can. That path is mitigated separately: a dispatched `release` runs
+# `npm stage publish`, which still requires a maintainer's 2FA staging approval
+# before anything goes live. Restricting workflow_dispatch is a GitHub setting,
+# not expressible here.
 /.github/workflows/   @michaelbromley @dlhck
 
 # Protect this file itself, so the ownership rules can't be removed without
