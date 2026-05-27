@@ -3,7 +3,13 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-import { getDevProcessDefinitions, normalizeDevTarget, resolveVendureProjectDirectory } from './dev';
+import {
+    discoverDashboardExtensionDirectories,
+    getDevProcessDefinitions,
+    normalizeDevTarget,
+    resolveVendureProjectDirectory,
+    shouldRestartOnFileChange,
+} from './dev';
 
 function createTempDir() {
     return mkdtempSync(path.join(tmpdir(), 'vendure-cli-dev-'));
@@ -20,9 +26,12 @@ describe('dev command', () => {
 
             expect(definitions.server.nodeArgs).toEqual([]);
             expect(definitions.server.args).toEqual(['./src/index.ts']);
+            expect(definitions.server.reloadOnChange).toBe(true);
             expect(definitions.worker.nodeArgs).toEqual([]);
             expect(definitions.worker.args).toEqual(['./src/index-worker.ts']);
+            expect(definitions.worker.reloadOnChange).toBe(true);
             expect(definitions.dashboard.args).toEqual(['--clearScreen', 'false']);
+            expect(definitions.dashboard.reloadOnChange).toBe(false);
         });
 
         it('uses custom entrypoints', () => {
@@ -139,6 +148,111 @@ describe('dev command', () => {
                 });
 
                 expect(resolveVendureProjectDirectory(dir)).toBe(serverDir);
+            } finally {
+                rmSync(dir, { recursive: true, force: true });
+            }
+        });
+    });
+
+    describe('reload file filtering', () => {
+        it('does not restart server or worker processes for Dashboard extension files declared in plugin metadata', () => {
+            const projectDir = path.resolve('/project');
+            const dashboardDir = path.join(projectDir, 'src', 'plugins', 'reviews', 'dashboard');
+
+            expect(
+                shouldRestartOnFileChange(path.join(dashboardDir, 'index.tsx'), projectDir, [dashboardDir]),
+            ).toBe(false);
+            expect(
+                shouldRestartOnFileChange(path.join(dashboardDir, 'components', 'rating.ts'), projectDir, [
+                    dashboardDir,
+                ]),
+            ).toBe(false);
+        });
+
+        it('does not restart server or worker processes for discovered Dashboard extension directories', () => {
+            const projectDir = path.resolve('/project');
+            const dashboardDir = path.join(projectDir, 'src', 'plugins', 'reviews', 'ui');
+
+            expect(
+                shouldRestartOnFileChange(path.join(dashboardDir, 'components', 'rating.ts'), projectDir, [
+                    dashboardDir,
+                ]),
+            ).toBe(false);
+        });
+
+        it('restarts server or worker processes for backend source files', () => {
+            const projectDir = path.resolve('/project');
+
+            expect(
+                shouldRestartOnFileChange(
+                    path.join(projectDir, 'src', 'plugins', 'reviews', 'reviews.plugin.ts'),
+                    projectDir,
+                ),
+            ).toBe(true);
+        });
+
+        it('does not restart server or worker processes for Vite config changes', () => {
+            const projectDir = path.resolve('/project');
+
+            expect(shouldRestartOnFileChange(path.join(projectDir, 'vite.config.mts'), projectDir)).toBe(
+                false,
+            );
+        });
+
+        it('restarts server or worker processes for TypeScript source files and env changes only', () => {
+            const projectDir = path.resolve('/project');
+
+            expect(
+                shouldRestartOnFileChange(path.join(projectDir, 'src', 'vendure-config.js'), projectDir),
+            ).toBe(false);
+            expect(shouldRestartOnFileChange(path.join(projectDir, '.env'), projectDir)).toBe(true);
+            expect(shouldRestartOnFileChange(path.join(projectDir, '.env.local'), projectDir)).toBe(true);
+            expect(shouldRestartOnFileChange(path.join(projectDir, 'package.json'), projectDir)).toBe(false);
+        });
+
+        it('discovers Dashboard extension directories from plugin metadata', () => {
+            const dir = createTempDir();
+            const pluginDir = path.join(dir, 'src', 'plugins', 'reviews');
+            try {
+                mkdirSync(pluginDir, { recursive: true });
+                writeFileSync(
+                    path.join(pluginDir, 'reviews.plugin.ts'),
+                    `
+                    import { VendurePlugin } from '@vendure/core';
+
+                    @VendurePlugin({
+                        dashboard: { location: './ui/index.tsx' },
+                    })
+                    export class ReviewsPlugin {}
+                `,
+                );
+
+                expect(discoverDashboardExtensionDirectories(dir)).toEqual([path.join(pluginDir, 'ui')]);
+            } finally {
+                rmSync(dir, { recursive: true, force: true });
+            }
+        });
+
+        it('discovers conventional Dashboard extension directories from plugin metadata', () => {
+            const dir = createTempDir();
+            const pluginDir = path.join(dir, 'src', 'plugins', 'reviews');
+            try {
+                mkdirSync(pluginDir, { recursive: true });
+                writeFileSync(
+                    path.join(pluginDir, 'reviews.plugin.ts'),
+                    `
+                    import { VendurePlugin } from '@vendure/core';
+
+                    @VendurePlugin({
+                        dashboard: './dashboard/index.tsx',
+                    })
+                    export class ReviewsPlugin {}
+                `,
+                );
+
+                expect(discoverDashboardExtensionDirectories(dir)).toEqual([
+                    path.join(pluginDir, 'dashboard'),
+                ]);
             } finally {
                 rmSync(dir, { recursive: true, force: true });
             }

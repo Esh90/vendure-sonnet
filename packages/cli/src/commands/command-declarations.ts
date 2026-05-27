@@ -200,6 +200,11 @@ export const cliCommands: CliCommandDefinition[] = [
                     'Enable the Node.js inspector and break before user code starts (default: disabled; dev all uses ports 9229/9230)',
                 required: false,
             },
+            {
+                long: '--no-reload',
+                description: 'Disable automatic server and worker restarts when backend source files change',
+                required: false,
+            },
         ],
         action: async (target, options) => {
             const { devCommand } = await import('./dev/dev');

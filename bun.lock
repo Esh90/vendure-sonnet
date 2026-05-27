@@ -195,6 +195,8 @@
       "dependencies": {
         "@clack/prompts": "^0.7.0",
         "@vendure/common": "3.6.3",
+        "change-case": "^4.1.2",
+        "chokidar": "^3.6.0",
         "commander": "^11.0.0",
         "cross-spawn": "^7.0.6",
         "dotenv": "^16.4.5",

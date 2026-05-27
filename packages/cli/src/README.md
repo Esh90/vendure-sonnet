@@ -76,7 +76,14 @@ npx vendure dev dashboard --vite-config ./config/vite.dashboard.mts
 
 # Start server and worker with the Node.js inspector
 npx vendure dev all --inspect
+
+# Start without automatic server/worker reloads
+npx vendure dev all --no-reload
 ```
+
+The server and worker dev targets automatically restart when backend source files change. Dashboard
+extension directories are excluded from these restarts because `vendure dev dashboard` runs Vite, which
+handles Dashboard hot updates separately.
 
 ### Build Command
 
