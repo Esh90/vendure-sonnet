@@ -1220,7 +1220,7 @@
                   "title": "Middleware",
                   "slug": "middleware",
                   "file": "docs/reference/typescript-api/common/middleware.mdx",
-                  "lastModified": "2026-01-28T14:49:21+01:00"
+                  "lastModified": "2026-05-22T16:47:46+02:00"
                 },
                 {
                   "title": "PaginatedList",
@@ -2046,7 +2046,7 @@
                   "title": "HttpHealthCheckStrategy",
                   "slug": "http-health-check-strategy",
                   "file": "docs/reference/typescript-api/health-check/http-health-check-strategy.mdx",
-                  "lastModified": "2026-05-22T15:41:37+02:00"
+                  "lastModified": "2026-05-22T16:47:46+02:00"
                 },
                 {
                   "title": "TypeORMHealthCheckStrategy",
@@ -3358,7 +3358,7 @@
                   "title": "SimpleGraphQLClient",
                   "slug": "simple-graph-qlclient",
                   "file": "docs/reference/typescript-api/testing/simple-graph-qlclient.mdx",
-                  "lastModified": "2026-04-20T16:08:16+02:00"
+                  "lastModified": "2026-05-22T16:47:46+02:00"
                 },
                 {
                   "title": "TestConfig",
