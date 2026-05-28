@@ -539,7 +539,9 @@ function shouldUseSpinner(processDefinition: BuildProcessDefinition, prefixOutpu
 
 export function shouldUseProgress(options: BuildOptions): boolean {
     const progressEnabled = options.progress !== false && options.noProgress !== true;
-    return progressEnabled && !options.watch && process.stdout.isTTY === true && process.env.CI !== 'true';
+    const ciValue = process.env.CI?.trim().toLowerCase();
+    const isCi = ciValue != null && ciValue !== '' && ciValue !== 'false';
+    return progressEnabled && !options.watch && process.stdout.isTTY === true && !isCi;
 }
 
 function stopBuildSpinner(

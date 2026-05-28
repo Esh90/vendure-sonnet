@@ -12,35 +12,35 @@ there is no add operation to run.
 
 ## Usage
 
-```
+```bash
 vendure add <feature-flag> [value] [sub-options]
 ```
 
-| Feature flag                  | Creates                                  | Required inputs (non-interactive)              |
-| ------------------------------ | ----------------------------------------- | ---------------------------------------------- |
-| `-p, --plugin <name>`          | A new plugin                              | Plugin class name                              |
-| `-e, --entity <name>`          | An entity in an existing plugin           | Entity class name, `--selected-plugin <name>`  |
-| `-s, --service <name>`         | A service in an existing plugin           | Service class name, `--selected-plugin <name>` |
-| `-j, --job-queue [plugin]`     | A job queue handler                       | Plugin value, `--name <name>`, `--selected-service <name>` |
-| `-c, --codegen [plugin]`       | GraphQL codegen configuration             | Plugin value                                  |
-| `-a, --api-extension [plugin]` | An API extension scaffold                 | Plugin value, `--selected-service <name>`, and `--query-name` or `--mutation-name` |
-| `-d, --dashboard [plugin]`     | Dashboard UI extensions                   | Plugin value                                  |
-| `-u, --ui-extensions [plugin]` | Admin UI extensions (**deprecated** — prefer `--dashboard`) | Plugin value           |
+| Feature flag                   | Creates                                                     | Required inputs (non-interactive)                                                  |
+| ------------------------------ | ----------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `-p, --plugin <name>`          | A new plugin                                                | Plugin class name                                                                  |
+| `-e, --entity <name>`          | An entity in an existing plugin                             | Entity class name, `--selected-plugin <name>`                                      |
+| `-s, --service <name>`         | A service in an existing plugin                             | Service class name, `--selected-plugin <name>`                                     |
+| `-j, --job-queue [plugin]`     | A job queue handler                                         | Plugin value, `--name <name>`, `--selected-service <name>`                         |
+| `-c, --codegen [plugin]`       | GraphQL codegen configuration                               | Plugin value                                                                       |
+| `-a, --api-extension [plugin]` | An API extension scaffold                                   | Plugin value, `--selected-service <name>`, and `--query-name` or `--mutation-name` |
+| `-d, --dashboard [plugin]`     | Dashboard UI extensions                                     | Plugin value                                                                       |
+| `-u, --ui-extensions [plugin]` | Admin UI extensions (**deprecated** — prefer `--dashboard`) | Plugin value                                                                       |
 
 ### Sub-options
 
-| Sub-option                  | Used with        | Description                                         |
-| --------------------------- | ---------------- | --------------------------------------------------- |
-| `--selected-plugin <name>`  | `-e`, `-s`       | Plugin to add the entity/service to                 |
-| `--custom-fields`           | `-e`             | Add custom fields support to the entity             |
-| `--translatable`            | `-e`             | Make the entity translatable                        |
-| `--type <basic\|entity>`    | `-s`             | Service type (default `basic`)                      |
-| `--selected-entity <name>`  | `-s`             | Entity for an entity service (forces `--type entity`) |
-| `--name <name>`             | `-j`             | Name for the job queue                              |
-| `--selected-service <name>` | `-j`, `-a`       | Service to attach the job queue / API extension to  |
-| `--query-name <name>`       | `-a`             | Name for the generated query                        |
-| `--mutation-name <name>`    | `-a`             | Name for the generated mutation                     |
-| `--config <path>`           | any              | Path to a custom Vendure config file                |
+| Sub-option                  | Used with  | Description                                           |
+| --------------------------- | ---------- | ----------------------------------------------------- |
+| `--selected-plugin <name>`  | `-e`, `-s` | Plugin to add the entity/service to                   |
+| `--custom-fields`           | `-e`       | Add custom fields support to the entity               |
+| `--translatable`            | `-e`       | Make the entity translatable                          |
+| `--type <basic\|entity>`    | `-s`       | Service type (default `basic`)                        |
+| `--selected-entity <name>`  | `-s`       | Entity for an entity service (forces `--type entity`) |
+| `--name <name>`             | `-j`       | Name for the job queue                                |
+| `--selected-service <name>` | `-j`, `-a` | Service to attach the job queue / API extension to    |
+| `--query-name <name>`       | `-a`       | Name for the generated query                          |
+| `--mutation-name <name>`    | `-a`       | Name for the generated mutation                       |
+| `--config <path>`           | any        | Path to a custom Vendure config file                  |
 
 ## Notes
 

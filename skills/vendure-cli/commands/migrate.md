@@ -4,13 +4,13 @@ Generates, runs or reverts TypeORM database migrations for a Vendure project.
 
 ## Usage
 
-```
-vendure migrate <action> [options]
+```bash
+vendure migrate [--generate <name> | --run | --revert] [options]
 ```
 
-Exactly one action:
+Exactly one operation flag:
 
-| Action                  | Description                                          |
+| Operation flag          | Description                                          |
 | ----------------------- | ---------------------------------------------------- |
 | `-g, --generate <name>` | Generate a new migration from pending schema changes |
 | `-r, --run`             | Run all pending migrations                           |
@@ -18,10 +18,10 @@ Exactly one action:
 
 ## Options
 
-| Option                  | Description                                       |
-| ----------------------- | ------------------------------------------------- |
-| `-o, --output-dir <path>` | Output directory for a generated migration      |
-| `--config <path>`       | Path to a custom Vendure config file              |
+| Option                    | Description                                |
+| ------------------------- | ------------------------------------------ |
+| `-o, --output-dir <path>` | Output directory for a generated migration |
+| `--config <path>`         | Path to a custom Vendure config file       |
 
 ## Notes
 

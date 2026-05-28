@@ -122,6 +122,7 @@ async function handleInteractiveMode(configFile?: string) {
         outro('✅ Done!');
     } catch (e: unknown) {
         logError(e);
+        process.exitCode = 1;
     } finally {
         delete process.env.VENDURE_RUNNING_IN_CLI;
     }

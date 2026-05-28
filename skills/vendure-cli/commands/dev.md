@@ -6,7 +6,7 @@ GraphQL **server** (`ts-node ./src/index.ts`), the **worker**
 
 ## Usage
 
-```
+```bash
 vendure dev [target]
 ```
 
@@ -14,13 +14,13 @@ vendure dev [target]
 
 ## Options
 
-| Option                      | Description                                            |
-| --------------------------- | ------------------------------------------------------ |
-| `--server-entry <path>`     | Server entry file (default `./src/index.ts`)           |
-| `--worker-entry <path>`     | Worker entry file (default `./src/index-worker.ts`)    |
-| `--vite-config <path>`      | Vite config file used by the dashboard                 |
-| `--inspect [host:port]`     | Enable the Node.js inspector for server/worker         |
-| `--inspect-brk [host:port]` | Enable the inspector and break before user code starts |
+| Option                      | Description                                                      |
+| --------------------------- | ---------------------------------------------------------------- |
+| `--server-entry <path>`     | Server entry file (default `./src/index.ts`)                     |
+| `--worker-entry <path>`     | Worker entry file (default `./src/index-worker.ts`)              |
+| `--vite-config <path>`      | Vite config file used by the dashboard                           |
+| `--inspect [host:port]`     | Enable the Node.js inspector for server/worker                   |
+| `--inspect-brk [host:port]` | Enable the inspector and break before user code starts           |
 | `--no-reload`               | Disable automatic server/worker restarts on backend file changes |
 
 ## Notes

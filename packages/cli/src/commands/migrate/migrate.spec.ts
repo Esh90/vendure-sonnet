@@ -62,6 +62,7 @@ describe('migrateCommand()', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         delete process.env.VENDURE_RUNNING_IN_CLI;
+        process.exitCode = undefined;
         consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined);
 
         vi.mocked(generateMigrationOperation).mockResolvedValue({
@@ -94,6 +95,7 @@ describe('migrateCommand()', () => {
 
     afterEach(() => {
         delete process.env.VENDURE_RUNNING_IN_CLI;
+        process.exitCode = undefined;
         consoleLogSpy.mockRestore();
     });
 
@@ -105,6 +107,18 @@ describe('migrateCommand()', () => {
         expect(commandMocks.revertMigrationRun).toHaveBeenCalledWith({
             configFile: './custom-vendure-config.ts',
         });
+        expect(process.exitCode).toBeUndefined();
+        expect(process.env.VENDURE_RUNNING_IN_CLI).toBeUndefined();
+    });
+
+    it('sets a non-zero exit code when an interactive operation throws', async () => {
+        vi.mocked(select).mockResolvedValueOnce('run');
+        commandMocks.runMigrationRun.mockRejectedValueOnce(new Error('interactive migration failed'));
+
+        await migrateCommand();
+
+        expect(log.error).toHaveBeenCalledWith('interactive migration failed');
+        expect(process.exitCode).toBe(1);
         expect(process.env.VENDURE_RUNNING_IN_CLI).toBeUndefined();
     });
 

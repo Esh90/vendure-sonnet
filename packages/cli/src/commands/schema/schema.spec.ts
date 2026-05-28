@@ -1,4 +1,4 @@
-import { log } from '@clack/prompts';
+import { log, select, text } from '@clack/prompts';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { generateSchema } from './generate-schema/generate-schema';
@@ -26,14 +26,20 @@ vi.mock('./generate-schema/generate-schema', () => ({
 }));
 
 describe('schemaCommand()', () => {
+    let consoleLogSpy: ReturnType<typeof vi.spyOn>;
+
     beforeEach(() => {
         vi.clearAllMocks();
         delete process.env.VENDURE_RUNNING_IN_CLI;
+        process.exitCode = undefined;
+        consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined);
         vi.mocked(generateSchema).mockResolvedValue(undefined);
     });
 
     afterEach(() => {
         delete process.env.VENDURE_RUNNING_IN_CLI;
+        process.exitCode = undefined;
+        consoleLogSpy.mockRestore();
     });
 
     it('cleans up the CLI env var after a non-interactive schema generation', async () => {
@@ -56,6 +62,18 @@ describe('schemaCommand()', () => {
         }
 
         expect(log.error).toHaveBeenCalledWith('schema failed');
+        expect(process.env.VENDURE_RUNNING_IN_CLI).toBeUndefined();
+    });
+
+    it('sets a non-zero exit code when interactive schema generation throws', async () => {
+        vi.mocked(select).mockResolvedValueOnce('admin').mockResolvedValueOnce('sdl');
+        vi.mocked(text).mockResolvedValueOnce('/tmp').mockResolvedValueOnce('schema.graphql');
+        vi.mocked(generateSchema).mockRejectedValueOnce(new Error('interactive schema failed'));
+
+        await schemaCommand();
+
+        expect(log.error).toHaveBeenCalledWith('interactive schema failed');
+        expect(process.exitCode).toBe(1);
         expect(process.env.VENDURE_RUNNING_IN_CLI).toBeUndefined();
     });
 });

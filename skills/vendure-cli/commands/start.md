@@ -4,7 +4,7 @@ Runs a project that has already been compiled with `vendure build`.
 
 ## Usage
 
-```
+```bash
 vendure start [target]
 ```
 
@@ -15,10 +15,10 @@ and served by the server.
 
 ## Options
 
-| Option                  | Description                              |
-| ----------------------- | ---------------------------------------- |
-| `--server-entry <path>` | Path to the compiled server entry file   |
-| `--worker-entry <path>` | Path to the compiled worker entry file   |
+| Option                  | Description                            |
+| ----------------------- | -------------------------------------- |
+| `--server-entry <path>` | Path to the compiled server entry file |
+| `--worker-entry <path>` | Path to the compiled worker entry file |
 
 ## Notes
 

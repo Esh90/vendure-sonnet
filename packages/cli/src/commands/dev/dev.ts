@@ -225,7 +225,7 @@ function startSupervisedDevProcess(
         if (restartTimer) {
             clearTimeout(restartTimer);
         }
-        void watcher.close();
+        closeWatcher();
         if (child) {
             stopChild(child, signal);
         }
@@ -240,10 +240,14 @@ function startSupervisedDevProcess(
                 startChild();
                 return;
             }
-            void watcher.close();
+            closeWatcher();
             runningProcess.emitClose(code, signal);
         });
     };
+
+    function closeWatcher() {
+        void watcher.close().catch(error => runningProcess.emit('error', error));
+    }
 
     const restartChild = (changedFile: string) => {
         if (stopping || runningProcess.hasClosed) {

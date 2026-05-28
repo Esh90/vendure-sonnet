@@ -5,7 +5,7 @@ with TypeScript, the dashboard with Vite.
 
 ## Usage
 
-```
+```bash
 vendure build [target]
 ```
 

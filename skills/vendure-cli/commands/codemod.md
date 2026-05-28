@@ -10,7 +10,7 @@ name** so the command runs non-interactively.
 
 ## Usage
 
-```
+```bash
 vendure codemod <transform> [directory]
 ```
 
@@ -21,9 +21,9 @@ vendure codemod <transform> [directory]
 
 ## Available transforms
 
-| Transform           | Description                                                     |
-| ------------------- | --------------------------------------------------------------- |
-| `dashboard-base-ui` | Migrate dashboard extensions from Radix UI to Base UI patterns  |
+| Transform           | Description                                                    |
+| ------------------- | -------------------------------------------------------------- |
+| `dashboard-base-ui` | Migrate dashboard extensions from Radix UI to Base UI patterns |
 
 Run `vendure codemod` (interactively) or check the CLI's codemod registry
 for the current list if a transform name is not recognised.

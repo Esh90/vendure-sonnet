@@ -488,6 +488,16 @@ describe('build command', () => {
             expect(shouldUseProgress({ noProgress: true })).toBe(false);
             expect(shouldUseProgress({ watch: true })).toBe(false);
         });
+
+        it('disables progress for any non-empty CI value except false', () => {
+            setStdoutIsTTY(true);
+
+            vi.stubEnv('CI', '1');
+            expect(shouldUseProgress({})).toBe(false);
+
+            vi.stubEnv('CI', 'false');
+            expect(shouldUseProgress({})).toBe(true);
+        });
     });
 
     describe('normalizeBuildTarget()', () => {
