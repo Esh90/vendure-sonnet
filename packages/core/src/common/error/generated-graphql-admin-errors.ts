@@ -127,6 +127,19 @@ export class CreateFulfillmentError extends ErrorResult {
   }
 }
 
+export class CustomerAccountStateError extends ErrorResult {
+  readonly __typename = 'CustomerAccountStateError';
+  readonly errorCode = 'CUSTOMER_ACCOUNT_STATE_ERROR' as any;
+  readonly message = 'CUSTOMER_ACCOUNT_STATE_ERROR';
+  readonly accountState: Scalars['String'];
+  constructor(
+    input: { accountState: Scalars['String'] }
+  ) {
+    super();
+    this.accountState = input.accountState
+  }
+}
+
 export class DuplicateEntityError extends ErrorResult {
   readonly __typename = 'DuplicateEntityError';
   readonly errorCode = 'DUPLICATE_ENTITY_ERROR' as any;
@@ -618,7 +631,7 @@ export class SettlePaymentError extends ErrorResult {
 }
 
 
-const errorTypeNames = new Set<string>(['AlreadyRefundedError', 'CancelActiveOrderError', 'CancelPaymentError', 'ChannelDefaultLanguageError', 'CouponCodeExpiredError', 'CouponCodeInvalidError', 'CouponCodeLimitError', 'CreateFulfillmentError', 'DuplicateEntityError', 'EmailAddressConflictError', 'EmptyOrderLineSelectionError', 'FacetInUseError', 'FulfillmentStateTransitionError', 'GuestCheckoutError', 'IneligibleShippingMethodError', 'InsufficientStockError', 'InsufficientStockOnHandError', 'InvalidCredentialsError', 'InvalidFulfillmentHandlerError', 'ItemsAlreadyFulfilledError', 'LanguageNotAvailableError', 'ManualPaymentStateError', 'MimeTypeError', 'MissingConditionsError', 'MultipleOrderError', 'NativeAuthStrategyError', 'NegativeQuantityError', 'NoActiveOrderError', 'NoChangesSpecifiedError', 'NothingToRefundError', 'OrderInterceptorError', 'OrderLimitError', 'OrderModificationError', 'OrderModificationStateError', 'OrderStateTransitionError', 'PaymentMethodMissingError', 'PaymentOrderMismatchError', 'PaymentStateTransitionError', 'ProductOptionGroupInUseError', 'ProductOptionInUseError', 'QuantityTooGreatError', 'RefundAmountError', 'RefundOrderStateError', 'RefundPaymentIdMissingError', 'RefundStateTransitionError', 'SettlePaymentError']);
+const errorTypeNames = new Set<string>(['AlreadyRefundedError', 'CancelActiveOrderError', 'CancelPaymentError', 'ChannelDefaultLanguageError', 'CouponCodeExpiredError', 'CouponCodeInvalidError', 'CouponCodeLimitError', 'CreateFulfillmentError', 'CustomerAccountStateError', 'DuplicateEntityError', 'EmailAddressConflictError', 'EmptyOrderLineSelectionError', 'FacetInUseError', 'FulfillmentStateTransitionError', 'GuestCheckoutError', 'IneligibleShippingMethodError', 'InsufficientStockError', 'InsufficientStockOnHandError', 'InvalidCredentialsError', 'InvalidFulfillmentHandlerError', 'ItemsAlreadyFulfilledError', 'LanguageNotAvailableError', 'ManualPaymentStateError', 'MimeTypeError', 'MissingConditionsError', 'MultipleOrderError', 'NativeAuthStrategyError', 'NegativeQuantityError', 'NoActiveOrderError', 'NoChangesSpecifiedError', 'NothingToRefundError', 'OrderInterceptorError', 'OrderLimitError', 'OrderModificationError', 'OrderModificationStateError', 'OrderStateTransitionError', 'PaymentMethodMissingError', 'PaymentOrderMismatchError', 'PaymentStateTransitionError', 'ProductOptionGroupInUseError', 'ProductOptionInUseError', 'QuantityTooGreatError', 'RefundAmountError', 'RefundOrderStateError', 'RefundPaymentIdMissingError', 'RefundStateTransitionError', 'SettlePaymentError']);
 function isGraphQLError(input: any): input is import('@vendure/common/lib/generated-types').ErrorResult {
   return input instanceof ErrorResult || errorTypeNames.has(input.__typename);
 }
@@ -719,6 +732,11 @@ export const adminErrorOperationTypeResolvers = {
       return isGraphQLError(value) ? (value as any).__typename : 'ProductOptionGroup';
     },
   },
+  ResetCustomerPasswordAsAdminResult: {
+    __resolveType(value: any) {
+      return isGraphQLError(value) ? (value as any).__typename : 'Success';
+    },
+  },
   SetCustomerForDraftOrderResult: {
     __resolveType(value: any) {
       return isGraphQLError(value) ? (value as any).__typename : 'Order';
@@ -772,6 +790,11 @@ export const adminErrorOperationTypeResolvers = {
   UpdatePromotionResult: {
     __resolveType(value: any) {
       return isGraphQLError(value) ? (value as any).__typename : 'Promotion';
+    },
+  },
+  VerifyCustomerAccountAsAdminResult: {
+    __resolveType(value: any) {
+      return isGraphQLError(value) ? (value as any).__typename : 'AdminGeneratedPassword';
     },
   },
 };

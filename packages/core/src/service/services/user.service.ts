@@ -436,6 +436,36 @@ export class UserService {
 
     /**
      * @description
+     * Directly resets the password on a User's {@link NativeAuthenticationMethod} without requiring
+     * a password-reset token. Intended for administrator-driven flows. If the User is unverified,
+     * it will also be marked as verified (mirroring the behaviour of `resetPasswordByToken`).
+     */
+    async resetPasswordAsAdmin(
+        ctx: RequestContext,
+        userId: ID,
+        newPassword: string,
+    ): Promise<User | PasswordValidationError> {
+        const passwordValidationResult = await this.validatePassword(ctx, newPassword);
+        if (passwordValidationResult !== true) {
+            return passwordValidationResult;
+        }
+        const user = await this.getUserByIdWithPasswordHash(ctx, userId);
+        if (!user) {
+            throw new EntityNotFoundError('User', userId);
+        }
+        const nativeAuthMethod = user.getNativeAuthenticationMethod();
+        nativeAuthMethod.passwordHash = await this.passwordCipher.hash(newPassword);
+        nativeAuthMethod.passwordResetToken = null;
+        if (user.verified === false) {
+            nativeAuthMethod.verificationToken = null;
+            user.verified = true;
+        }
+        await this.connection.getRepository(ctx, NativeAuthenticationMethod).save(nativeAuthMethod);
+        return this.connection.getRepository(ctx, User).save(user);
+    }
+
+    /**
+     * @description
      * Updates the password for a User with the {@link NativeAuthenticationMethod}.
      */
     async updatePassword(
@@ -444,13 +474,7 @@ export class UserService {
         currentPassword: string,
         newPassword: string,
     ): Promise<boolean | InvalidCredentialsError | PasswordValidationError> {
-        const user = await this.connection
-            .getRepository(ctx, User)
-            .createQueryBuilder('user')
-            .leftJoinAndSelect('user.authenticationMethods', 'authenticationMethods')
-            .addSelect('authenticationMethods.passwordHash')
-            .where('user.id = :id', { id: userId })
-            .getOne();
+        const user = await this.getUserByIdWithPasswordHash(ctx, userId);
         if (!user) {
             throw new EntityNotFoundError('User', userId);
         }
@@ -469,6 +493,25 @@ export class UserService {
             .getRepository(ctx, NativeAuthenticationMethod)
             .save(nativeAuthMethod, { reload: false });
         return true;
+    }
+
+    /**
+     * Internal helper that loads a User by id along with its authentication methods and the
+     * (normally `select: false`) `passwordHash` column. Used by every flow that needs to inspect
+     * or rewrite the User's native authentication credentials.
+     */
+    private async getUserByIdWithPasswordHash(
+        ctx: RequestContext,
+        userId: ID,
+    ): Promise<User | undefined> {
+        const user = await this.connection
+            .getRepository(ctx, User)
+            .createQueryBuilder('user')
+            .leftJoinAndSelect('user.authenticationMethods', 'authenticationMethods')
+            .addSelect('authenticationMethods.passwordHash')
+            .where('user.id = :id', { id: userId })
+            .getOne();
+        return user ?? undefined;
     }
 
     private async validatePassword(

@@ -73,7 +73,7 @@ msgstr "請至少新增一件商品到訂單"
 msgid "Add products to create a test order"
 msgstr "新增商品以建立測試訂單"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:124
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:125
 msgid "Failed to create address"
 msgstr "建立地址失敗"
 
@@ -94,7 +94,7 @@ msgstr "使用外部驗證策略：{strategy}"
 msgid "Select a reason..."
 msgstr "選擇原因..."
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:79
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:100
 msgid "Heading 5"
 msgstr "標題 5"
 
@@ -104,7 +104,7 @@ msgstr "標題 5"
 msgid "Failed to add payment"
 msgstr "新增付款失敗"
 
-#: src/lib/framework/layout-engine/page-layout.tsx:718
+#: src/lib/framework/layout-engine/page-layout.tsx:730
 msgid "Updated"
 msgstr "已更新"
 
@@ -164,7 +164,7 @@ msgstr "類型"
 #. placeholder {0}: entityName.toLowerCase()
 #. placeholder {0}: group.name
 #: src/app/routes/_authenticated/_products/components/product-option-select.tsx:57
-#: src/lib/components/data-input/default-relation-input.tsx:618
+#: src/lib/components/data-input/default-relation-input.tsx:616
 msgid "Select {0}"
 msgstr "選取 {0}"
 
@@ -209,7 +209,7 @@ msgstr "自動重新整理：{0}"
 
 #: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:34
 msgid "Successfully cancelled {fulfilled} job"
-msgstr ""
+msgstr "已成功取消 {fulfilled} 個任務"
 
 #: src/app/routes/_authenticated/_system/healthchecks.tsx:43
 #~ msgid "Health checks"
@@ -264,7 +264,7 @@ msgstr "庫存位置"
 msgid "Fulfillment handler"
 msgstr "履行處理器"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:247
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:264
 #: src/app/routes/_authenticated/_orders/orders.tsx:21
 #: src/app/routes/_authenticated/_orders/orders.tsx:37
 #: src/app/routes/_authenticated/_orders/utils/order-detail-loaders.tsx:48
@@ -319,8 +319,8 @@ msgid "Type at least 2 characters to search..."
 msgstr "至少輸入 2 個字元進行搜尋..."
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:121
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:182
-#: src/app/routes/_authenticated/_profile/profile.tsx:100
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:199
+#: src/app/routes/_authenticated/_profile/profile.tsx:108
 msgid "Last name"
 msgstr "姓氏"
 
@@ -364,7 +364,7 @@ msgstr "檢視詳細資料"
 msgid "Select a channel to assign {0} {entityType} to"
 msgstr "選取要將 {0} {entityType} 指派到的通路"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:98
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:99
 msgid "Successfully created customer"
 msgstr "已成功建立客戶"
 
@@ -451,7 +451,7 @@ msgstr "稅率"
 #. placeholder {1}: import { DataTableBulkActionItem } from '@/vdb/components/data-table/data-table-bulk-action-item.js'; import { BulkActionComponent } from '@/vdb/framework/extension-api/types/data-table.js'; import { api } from '@/vdb/graphql/api.js'; import { usePaginatedList } from '@/vdb/hooks/use-paginated-list.js'; import { plural } from '@lingui/core/macro'; import { Plural, useLingui } from '@lingui/react/macro'; import { useMutation } from '@tanstack/react-query'; import { Ban } from 'lucide-react'; import { toast } from 'sonner'; import { cancelJobDocument } from '../job-queue.graphql.js'; export const CancelJobsBulkAction: BulkActionComponent<any> = ({ selection, table }) => { const { refetchPaginatedList } = usePaginatedList(); const { t } = useLingui(); const cancellableJobs = selection.filter(job => job.state === 'RUNNING' || job.state === 'PENDING'); const cancellableCount = cancellableJobs.length; const { mutate, isPending } = useMutation({ mutationFn: async () => { const results = await Promise.allSettled( cancellableJobs.map(job => api.mutate(cancelJobDocument, { jobId: job.id })), ); const fulfilled = results.filter(r => r.status === 'fulfilled').length; const rejected = results.filter(r => r.status === 'rejected').length; return { fulfilled, rejected }; }, onSuccess: ({ fulfilled, rejected }) => { if (fulfilled > 0) { toast.success( plural(fulfilled, { one: t`Successfully cancelled ${fulfilled} job`, other: t`Successfully cancelled ${fulfilled} jobs`, }), ); } if (rejected > 0) { toast.error( plural(rejected, { one: t`Failed to cancel ${rejected} job`, other: t`Failed to cancel ${rejected} jobs`, }), ); } refetchPaginatedList(); table.resetRowSelection(); }, }); if (cancellableCount === 0) { return null; } return ( <DataTableBulkActionItem requiresPermission={['DeleteSettings', 'DeleteSystem']} onClick={() => mutate()} disabled={isPending} label={ <Plural value={cancellableCount} one={`Cancel ${cancellableCount} job`} other={`Cancel ${cancellableCount} jobs`} /> } confirmationText={ <Plural value={cancellableCount} one={`Are you sure you want to cancel ${cancellableCount} job? This action cannot be undone.`} other={`Are you sure you want to cancel ${cancellableCount} jobs? This action cannot be undone.`} /> } icon={Ban} className="text-destructive" /> ); }; 
 #: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:33
 msgid "{fulfilled, plural, one {{0}} other {{1}}}"
-msgstr ""
+msgstr "{fulfilled, plural, one {已成功取消 {fulfilled} 個任務} other {已成功取消 {fulfilled} 個任務}}"
 
 #: src/app/routes/_authenticated/_orders/components/draft-order-status.tsx:34
 msgid "Order draft isn't ready to be completed"
@@ -687,10 +687,10 @@ msgstr "中繼資料"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:251
 msgid "Failed to set shipping method for order: {0}"
-msgstr ""
+msgstr "為訂單設定配送方式失敗：{0}"
 
 #: src/app/routes/_authenticated/_option-groups/components/option-group-products-block.tsx:48
-#: src/lib/components/data-table/data-table.tsx:367
+#: src/lib/components/data-table/data-table.tsx:378
 msgid "Filter..."
 msgstr "篩選..."
 
@@ -862,7 +862,7 @@ msgstr "確認"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:303
 msgid "Failed to complete draft order: {0}"
-msgstr ""
+msgstr "完成訂單草稿失敗：{0}"
 
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:118
 msgid "Failed to create collection"
@@ -882,6 +882,10 @@ msgstr "建立商品失敗"
 #: src/lib/components/shared/role-code-label.tsx:8
 msgid "Customer"
 msgstr "客戶"
+
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:73
+msgid "Failed to send password reset email"
+msgstr "傳送密碼重設電子郵件失敗"
 
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/components/order-history/order-history-container.tsx:46
@@ -943,8 +947,8 @@ msgid "Failed to update zone"
 msgstr "更新區域失敗"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:133
-#: src/app/routes/_authenticated/_profile/profile.tsx:112
-#: src/app/routes/_authenticated/_profile/profile.tsx:129
+#: src/app/routes/_authenticated/_profile/profile.tsx:120
+#: src/app/routes/_authenticated/_profile/profile.tsx:137
 #: src/lib/components/login/login-form.tsx:93
 msgid "Password"
 msgstr "密碼"
@@ -1014,7 +1018,7 @@ msgstr "已配置"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:270
 msgid "Failed to set coupon code for order: {0}"
-msgstr ""
+msgstr "為訂單設定優惠券代碼失敗：{0}"
 
 #: src/lib/components/layout/nav-user.tsx:102
 msgid "Explore Platform & Cloud"
@@ -1094,6 +1098,10 @@ msgstr "更新促銷失敗"
 msgid "Images"
 msgstr "圖片"
 
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:65
+msgid "The customer will receive an email containing a link to set a new password. Their existing password remains valid until they complete the reset flow."
+msgstr "客戶將收到一封包含設定新密碼連結的電子郵件。在完成重設流程之前，其現有密碼仍然有效。"
+
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:158
 msgid "API Keys"
@@ -1121,14 +1129,14 @@ msgstr "工作佇列"
 msgid "Assets"
 msgstr "資源"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:188
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:205
 msgid "Email address"
 msgstr "電子郵件地址"
 
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:281
 msgid "Failed to remove coupon code from order: {0}"
-msgstr ""
+msgstr "從訂單中移除優惠券代碼失敗：{0}"
 
 #: src/lib/components/data-input/slug-input.tsx:266
 #: src/lib/components/data-input/slug-input.tsx:267
@@ -1272,7 +1280,7 @@ msgstr "僅您帳戶已指派的角色可用。"
 
 #: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:63
 msgid "{cancellableCount, plural, one {Cancel {cancellableCount} job} other {Cancel {cancellableCount} jobs}}"
-msgstr ""
+msgstr "{cancellableCount, plural, one {取消 {cancellableCount} 個任務} other {取消 {cancellableCount} 個任務}}"
 
 #: src/lib/components/data-input/product-multi-selector-input.tsx:399
 #: src/lib/components/shared/configurable-operation-multi-selector.tsx:264
@@ -1310,7 +1318,7 @@ msgstr "建立賣家失敗"
 msgid "Configure duplication settings for {0}s"
 msgstr "設定{0}的複製設定"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:203
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:220
 #: src/app/routes/_authenticated/_orders/orders_.$id_.modify.tsx:245
 msgid "Addresses"
 msgstr "地址"
@@ -1408,7 +1416,7 @@ msgstr "之前"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:188
 msgid "Failed to set customer for order: {0}"
-msgstr ""
+msgstr "為訂單設定客戶失敗：{0}"
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:745
 msgid "Size"
@@ -1480,7 +1488,7 @@ msgstr "重新命名檢視失敗"
 msgid "Available"
 msgstr "可用"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:74
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:95
 msgid "Normal"
 msgstr "正常"
 
@@ -1523,7 +1531,7 @@ msgstr "地址已成功更新"
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:226
 #: src/app/routes/_authenticated/_orders/components/fulfillment-details.tsx:124
 #: src/lib/components/shared/asset/asset-gallery.tsx:747
-#: src/lib/framework/layout-engine/page-layout.tsx:705
+#: src/lib/framework/layout-engine/page-layout.tsx:717
 msgid "Created"
 msgstr "已建立"
 
@@ -1539,7 +1547,7 @@ msgstr "選取要將 {0} 移動到的目標集合。"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:232
 msgid "Failed to unset billing address for order: {0}"
-msgstr ""
+msgstr "取消訂單的帳單地址失敗：{0}"
 
 #: src/app/routes/_authenticated/_customers/components/customer-history/customer-history-utils.tsx:45
 msgid "Customer details updated"
@@ -1565,6 +1573,7 @@ msgstr "前往最後一頁"
 #: src/app/routes/_authenticated/_api-keys/components/rotate-api-key-button.tsx:61
 #: src/app/routes/_authenticated/_assets/components/manage-tags-dialog.tsx:203
 #: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:418
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:154
 #: src/app/routes/_authenticated/_orders/components/add-manual-payment-dialog.tsx:168
 #: src/app/routes/_authenticated/_orders/components/fulfill-order-dialog.tsx:310
 #: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:352
@@ -1592,7 +1601,7 @@ msgstr "取消"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:95
 msgid "Failed to update order custom fields: {0}"
-msgstr ""
+msgstr "更新訂單自訂欄位失敗：{0}"
 
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:127
 #: src/app/routes/_authenticated/_products/components/add-product-variant-dialog.tsx:160
@@ -1756,7 +1765,7 @@ msgstr "退款已成功完成"
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:148
 #: src/app/routes/_authenticated/_countries/countries_.$id.tsx:84
 #: src/app/routes/_authenticated/_customer-groups/customer-groups_.$id.tsx:93
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:159
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:176
 #: src/app/routes/_authenticated/_facets/facets_.$facetId.values_.$id.tsx:110
 #: src/app/routes/_authenticated/_facets/facets_.$id.tsx:99
 #: src/app/routes/_authenticated/_global-settings/global-settings.tsx:102
@@ -1767,7 +1776,7 @@ msgstr "退款已成功完成"
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:226
 #: src/app/routes/_authenticated/_products/components/assign-facet-values-dialog.tsx:276
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:219
-#: src/app/routes/_authenticated/_profile/profile.tsx:84
+#: src/app/routes/_authenticated/_profile/profile.tsx:92
 #: src/app/routes/_authenticated/_promotions/promotions_.$id.tsx:144
 #: src/app/routes/_authenticated/_roles/roles_.$id.tsx:84
 #: src/app/routes/_authenticated/_sellers/sellers_.$id.tsx:78
@@ -1780,7 +1789,7 @@ msgstr "退款已成功完成"
 msgid "Update"
 msgstr "更新"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:76
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:97
 msgid "Heading 2"
 msgstr "標題 2"
 
@@ -1788,7 +1797,7 @@ msgstr "標題 2"
 msgid "Order placed"
 msgstr "訂單已下單"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:63
+#: src/app/routes/_authenticated/_profile/profile.tsx:71
 msgid "Successfully updated profile"
 msgstr "已成功更新個人資料"
 
@@ -1840,7 +1849,7 @@ msgstr "開始於"
 msgid "Duplicate"
 msgstr "複製"
 
-#: src/lib/components/data-table/data-table.tsx:558
+#: src/lib/components/data-table/data-table.tsx:588
 #: src/lib/components/shared/customer-group-selector.tsx:56
 msgid "No results"
 msgstr "無結果"
@@ -2339,7 +2348,7 @@ msgstr "已註冊"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:199
 msgid "Failed to set shipping address for order: {0}"
-msgstr ""
+msgstr "為訂單設定配送地址失敗：{0}"
 
 #: src/app/routes/_authenticated/_system/job-queue.tsx:231
 msgid "Cancel Job"
@@ -2402,6 +2411,10 @@ msgstr "已出貨"
 #: src/lib/components/data-table/save-view-button.tsx:35
 msgid "Save View"
 msgstr "儲存檢視"
+
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:63
+msgid "Send password reset email?"
+msgstr "傳送密碼重設電子郵件？"
 
 #. placeholder {0}: selection.length
 #: src/lib/components/data-table/data-table-bulk-actions.tsx:78
@@ -2489,6 +2502,10 @@ msgstr "預設通路"
 msgid "Insert a new image with source, title, and dimensions"
 msgstr "插入帶有來源、標題和尺寸的新圖片"
 
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:70
+msgid "Send reset email"
+msgstr "傳送重設電子郵件"
+
 #: src/app/routes/_authenticated/_facets/facets_.$facetId.values_.$id.tsx:93
 msgid "Failed to create facet value"
 msgstr "建立屬性值失敗"
@@ -2538,7 +2555,7 @@ msgstr "新增稅務類別"
 msgid "Successfully created channel"
 msgstr "已成功建立通路"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:98
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:99
 msgid "Successfully updated customer"
 msgstr "已成功更新客戶"
 
@@ -2550,7 +2567,7 @@ msgstr "檢視資料"
 msgid "Delete View"
 msgstr "刪除檢視"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:231
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:248
 msgid "Add a new address to the customer."
 msgstr "為客戶新增地址。"
 
@@ -2677,8 +2694,8 @@ msgstr "金額"
 msgid "Phone Number"
 msgstr "電話號碼"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:62
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:152
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:63
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:153
 msgid "New customer"
 msgstr "新增客戶"
 
@@ -2712,12 +2729,12 @@ msgstr "確定要刪除此全域檢視嗎？此動作無法復原，將影響所
 msgid "Force remove option group"
 msgstr "強制移除選項群組"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:132
+#: src/app/routes/_authenticated/_profile/profile.tsx:140
 msgid "Added"
 msgstr "已新增"
 
 #: src/app/routes/_authenticated/_customers/components/customer-history/customer-history-container.tsx:30
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:250
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:267
 msgid "Customer history"
 msgstr "客戶歷程"
 
@@ -2725,7 +2742,7 @@ msgstr "客戶歷程"
 msgid "Successfully updated facet values for {entityIdsLength} {entityType}"
 msgstr "已成功為 {entityIdsLength} {entityType} 更新屬性值"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:144
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:145
 msgid "Failed to remove customer from group"
 msgstr "從群組中移除客戶失敗"
 
@@ -2765,7 +2782,7 @@ msgstr "刪除全域檢視"
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:148
 #: src/app/routes/_authenticated/_countries/countries_.$id.tsx:84
 #: src/app/routes/_authenticated/_customer-groups/customer-groups_.$id.tsx:93
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:159
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:176
 #: src/app/routes/_authenticated/_facets/facets_.$facetId.values_.$id.tsx:110
 #: src/app/routes/_authenticated/_facets/facets_.$id.tsx:99
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$groupId.options_.$id.tsx:177
@@ -2800,8 +2817,8 @@ msgstr "新增國家"
 msgid "From {0} to {1}"
 msgstr "從 {0} 到 {1}"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:105
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:111
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:106
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:112
 msgid "Failed to create customer"
 msgstr "建立客戶失敗"
 
@@ -2891,6 +2908,10 @@ msgstr "未選取標籤"
 msgid "Back"
 msgstr "返回"
 
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:81
+msgid "This marks the account as verified and sets a new random password, bypassing the email verification flow. The password will be displayed once — the customer will not receive any notification."
+msgstr "此操作會將帳戶標記為已驗證，並設定一個新的隨機密碼，略過電子郵件驗證流程。密碼僅顯示一次——客戶不會收到任何通知。"
+
 #: src/lib/components/data-table/views-sheet.tsx:63
 msgid "View renamed successfully"
 msgstr "檢視已成功重新命名"
@@ -2948,6 +2969,10 @@ msgstr "地址已更新"
 msgid "Refund processed successfully"
 msgstr "退款處理成功"
 
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:90
+msgid "The account is now verified. Copy the generated password now — it will not be shown again."
+msgstr "帳戶現已通過驗證。請立即複製產生的密碼——它將不會再次顯示。"
+
 #. placeholder {0}: action.label
 #. placeholder {0}: entityType === 'products' ? 'Product' : 'Variant'
 #. placeholder {0}: entry.type.replace(/_/g, ' ').toLowerCase()
@@ -2961,7 +2986,7 @@ msgstr "退款處理成功"
 #: src/lib/components/data-input/product-multi-selector-input.tsx:281
 #: src/lib/components/data-input/product-multi-selector-input.tsx:284
 #: src/lib/components/data-input/relation-selector.tsx:404
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:418
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:439
 msgid "{0}"
 msgstr "{0}"
 
@@ -3026,7 +3051,7 @@ msgstr "確定要離開此頁面嗎？任何未儲存的變更都將遺失。"
 msgid "Toggle header column"
 msgstr "切換標題欄"
 
-#: src/app/routes/_authenticated/_promotions/promotions.tsx:87
+#: src/app/routes/_authenticated/_promotions/promotions.tsx:88
 msgid "New Promotion"
 msgstr "新增促銷"
 
@@ -3110,7 +3135,7 @@ msgstr "訂單指標"
 msgid "Select display language"
 msgstr "選取顯示語言"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:120
+#: src/app/routes/_authenticated/_profile/profile.tsx:128
 msgid "Authentication methods"
 msgstr "驗證方式"
 
@@ -3133,7 +3158,7 @@ msgstr "搜尋角色..."
 
 #: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:35
 msgid "Successfully cancelled {fulfilled} jobs"
-msgstr ""
+msgstr "已成功取消 {fulfilled} 個任務"
 
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:69
 #: src/app/routes/_authenticated/_product-variants/product-variants.tsx:19
@@ -3227,7 +3252,7 @@ msgstr "載入更多{0}個 (剩餘{remaining}個)"
 msgid "Facet values"
 msgstr "屬性值"
 
-#: src/lib/components/data-table/data-table.tsx:228
+#: src/lib/components/data-table/data-table.tsx:237
 msgid "Failed to reorder items"
 msgstr "重新排序商品失敗"
 
@@ -3441,7 +3466,7 @@ msgstr "未執行"
 msgid "Assigned"
 msgstr "已指派"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:75
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:96
 msgid "Heading 1"
 msgstr "標題 1"
 
@@ -3504,7 +3529,7 @@ msgstr "搜尋貨幣..."
 msgid "Remove from channel"
 msgstr "從頻道中移除"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:169
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:186
 #: src/lib/components/shared/rich-text-editor/image-dialog.tsx:157
 msgid "Title"
 msgstr "標題"
@@ -3556,7 +3581,7 @@ msgstr "屬性"
 #. placeholder {1}: import { DataTableBulkActionItem } from '@/vdb/components/data-table/data-table-bulk-action-item.js'; import { BulkActionComponent } from '@/vdb/framework/extension-api/types/data-table.js'; import { api } from '@/vdb/graphql/api.js'; import { usePaginatedList } from '@/vdb/hooks/use-paginated-list.js'; import { plural } from '@lingui/core/macro'; import { Plural, useLingui } from '@lingui/react/macro'; import { useMutation } from '@tanstack/react-query'; import { Ban } from 'lucide-react'; import { toast } from 'sonner'; import { cancelJobDocument } from '../job-queue.graphql.js'; export const CancelJobsBulkAction: BulkActionComponent<any> = ({ selection, table }) => { const { refetchPaginatedList } = usePaginatedList(); const { t } = useLingui(); const cancellableJobs = selection.filter(job => job.state === 'RUNNING' || job.state === 'PENDING'); const cancellableCount = cancellableJobs.length; const { mutate, isPending } = useMutation({ mutationFn: async () => { const results = await Promise.allSettled( cancellableJobs.map(job => api.mutate(cancelJobDocument, { jobId: job.id })), ); const fulfilled = results.filter(r => r.status === 'fulfilled').length; const rejected = results.filter(r => r.status === 'rejected').length; return { fulfilled, rejected }; }, onSuccess: ({ fulfilled, rejected }) => { if (fulfilled > 0) { toast.success( plural(fulfilled, { one: t`Successfully cancelled ${fulfilled} job`, other: t`Successfully cancelled ${fulfilled} jobs`, }), ); } if (rejected > 0) { toast.error( plural(rejected, { one: t`Failed to cancel ${rejected} job`, other: t`Failed to cancel ${rejected} jobs`, }), ); } refetchPaginatedList(); table.resetRowSelection(); }, }); if (cancellableCount === 0) { return null; } return ( <DataTableBulkActionItem requiresPermission={['DeleteSettings', 'DeleteSystem']} onClick={() => mutate()} disabled={isPending} label={ <Plural value={cancellableCount} one={`Cancel ${cancellableCount} job`} other={`Cancel ${cancellableCount} jobs`} /> } confirmationText={ <Plural value={cancellableCount} one={`Are you sure you want to cancel ${cancellableCount} job? This action cannot be undone.`} other={`Are you sure you want to cancel ${cancellableCount} jobs? This action cannot be undone.`} /> } icon={Ban} className="text-destructive" /> ); }; 
 #: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:41
 msgid "{rejected, plural, one {{0}} other {{1}}}"
-msgstr ""
+msgstr "{rejected, plural, one {取消 {rejected} 個任務失敗} other {取消 {rejected} 個任務失敗}}"
 
 #: src/lib/components/shared/assigned-channels.tsx:58
 msgid "Cannot remove from active channel"
@@ -3663,7 +3688,7 @@ msgid "Add a price in another currency"
 msgstr "新增另一種貨幣的價格"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:127
-#: src/app/routes/_authenticated/_profile/profile.tsx:106
+#: src/app/routes/_authenticated/_profile/profile.tsx:114
 msgid "Email Address or identifier"
 msgstr "電子郵件地址或識別碼"
 
@@ -3674,13 +3699,13 @@ msgid "Refund #{0} transitioned to {1}"
 msgstr "退款 #{0} 已轉換到 {1}"
 
 #: src/app/routes/_authenticated/_customer-groups/customer-groups_.$id.tsx:110
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:61
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:62
 #: src/app/routes/_authenticated/_customers/customers.tsx:15
 #: src/app/routes/_authenticated/_customers/customers.tsx:21
 msgid "Customers"
 msgstr "客戶"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:78
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:99
 msgid "Heading 4"
 msgstr "標題 4"
 
@@ -3761,6 +3786,11 @@ msgstr "新增項目"
 msgid "Successfully created API key"
 msgstr "API Key 建立成功"
 
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:77
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:87
+msgid "Verify account"
+msgstr "驗證帳戶"
+
 #: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:165
 msgid "Loading preview…"
 msgstr "正在載入預覽..."
@@ -3800,7 +3830,7 @@ msgstr "國家"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:160
 msgid "Failed to remove order line: {0}"
-msgstr ""
+msgstr "移除訂單行失敗：{0}"
 
 #: src/app/routes/_authenticated/_shipping-methods/components/test-address-form.tsx:182
 msgid "Street Address 2"
@@ -4033,7 +4063,7 @@ msgstr "已出貨"
 #~ msgid "Monitored Resources"
 #~ msgstr "監控資源"
 
-#: src/lib/framework/layout-engine/page-layout.tsx:677
+#: src/lib/framework/layout-engine/page-layout.tsx:689
 msgid "Entity Information"
 msgstr "實體資訊"
 
@@ -4065,7 +4095,7 @@ msgstr "超級管理員"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:141
 msgid "Failed to update order line: {0}"
-msgstr ""
+msgstr "更新訂單行失敗：{0}"
 
 #: src/lib/components/shared/rich-text-editor/link-dialog.tsx:84
 msgid "Insert link"
@@ -4078,6 +4108,10 @@ msgstr "如果啟用，篩選器將從父集合繼承，並與此集合上設定
 #: src/lib/components/shared/zone-selector.tsx:50
 msgid "Select a zone"
 msgstr "選取一個區域"
+
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:95
+msgid "Failed to verify account"
+msgstr "驗證帳戶失敗"
 
 #: src/app/routes/_authenticated/_shipping-methods/components/test-shipping-methods-sheet.tsx:27
 msgid "Test shipping methods"
@@ -4239,7 +4273,7 @@ msgstr "客戶資訊已更新"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:318
 msgid "Failed to delete draft order: {0}"
-msgstr ""
+msgstr "刪除訂單草稿失敗：{0}"
 
 #: src/lib/components/data-table/views-sheet.tsx:120
 msgid "Failed to convert view to global"
@@ -4298,11 +4332,15 @@ msgstr "隱藏密碼"
 msgid "New seller"
 msgstr "新增賣家"
 
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:79
+msgid "Verify customer account?"
+msgstr "驗證客戶帳戶？"
+
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:153
 msgid "e.g., Red, Large, Cotton"
 msgstr "例如：紅色、大號、棉質"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:67
+#: src/app/routes/_authenticated/_profile/profile.tsx:75
 msgid "Failed to update profile"
 msgstr "更新個人資料失敗"
 
@@ -4398,7 +4436,7 @@ msgstr "訂單已履行"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:210
 msgid "Failed to set billing address for order: {0}"
-msgstr ""
+msgstr "為訂單設定帳單地址失敗：{0}"
 
 #: src/app/routes/_authenticated/_orders/orders_.$id_.modify.tsx:271
 msgid "No shipping address"
@@ -4514,6 +4552,10 @@ msgstr "發錯商品"
 #: src/app/routes/_authenticated/_orders/orders_.$id_.modify.tsx:201
 msgid "Summary of modifications"
 msgstr "修改摘要"
+
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:61
+msgid "Reset password"
+msgstr "重設密碼"
 
 #. placeholder {0}: payment.refunds.length
 #: src/app/routes/_authenticated/_orders/components/payment-details.tsx:208
@@ -4726,7 +4768,7 @@ msgstr "設定"
 msgid "Settings Store"
 msgstr "設定商店"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:77
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:98
 msgid "Heading 3"
 msgstr "標題 3"
 
@@ -4822,7 +4864,7 @@ msgstr "內容"
 
 #: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:43
 msgid "Failed to cancel {rejected} jobs"
-msgstr ""
+msgstr "取消 {rejected} 個任務失敗"
 
 #: src/lib/components/data-table/views-sheet.tsx:110
 msgid "Failed to convert global view to personal view"
@@ -4855,8 +4897,8 @@ msgstr "變體名稱"
 msgid "Remove"
 msgstr "移除"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:105
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:111
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:106
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:112
 msgid "Failed to update customer"
 msgstr "更新客戶失敗"
 
@@ -5055,7 +5097,7 @@ msgstr "刪除全域檢視失敗"
 msgid "Default language"
 msgstr "預設語言"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:253
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:270
 #: src/app/routes/_authenticated/_customers/customers.tsx:48
 msgid "Status"
 msgstr "狀態"
@@ -5143,7 +5185,7 @@ msgid "Customer not found"
 msgstr "找不到客戶"
 
 #. placeholder {0}: entityName.toLowerCase()
-#: src/lib/components/data-input/default-relation-input.tsx:605
+#: src/lib/components/data-input/default-relation-input.tsx:603
 msgid "Select {0}s"
 msgstr "選取 {0}"
 
@@ -5151,14 +5193,18 @@ msgstr "選取 {0}"
 msgid "New facet values to add:"
 msgstr "要新增的屬性值："
 
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:74
+msgid "Password reset email sent to the customer"
+msgstr "密碼重設電子郵件已傳送給客戶"
+
 #: src/app/routes/_authenticated/_orders/hooks/use-refund-order.ts:289
 #: src/app/routes/_authenticated/_orders/hooks/use-refund-order.ts:302
 msgid "Failed to process refund"
 msgstr "處理退款失敗"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:115
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:176
-#: src/app/routes/_authenticated/_profile/profile.tsx:94
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:193
+#: src/app/routes/_authenticated/_profile/profile.tsx:102
 msgid "First name"
 msgstr "名字"
 
@@ -5206,8 +5252,8 @@ msgstr "新增篩選器"
 msgid "Tax category"
 msgstr "稅務類別"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:31
-#: src/app/routes/_authenticated/_profile/profile.tsx:76
+#: src/app/routes/_authenticated/_profile/profile.tsx:38
+#: src/app/routes/_authenticated/_profile/profile.tsx:84
 #: src/lib/components/layout/nav-user.tsx:108
 msgid "Profile"
 msgstr "個人資料"
@@ -5237,7 +5283,7 @@ msgstr "重複值「{trimmed}」已存在"
 msgid "Reason"
 msgstr "原因"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:256
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:273
 msgid "Customer groups"
 msgstr "客戶群組"
 
@@ -5270,7 +5316,7 @@ msgstr "第 {page} 頁，共 {totalPages} 頁"
 
 #: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:42
 msgid "Failed to cancel {rejected} job"
-msgstr ""
+msgstr "取消 {rejected} 個任務失敗"
 
 #: src/lib/components/date-range-picker.tsx:79
 msgctxt "date-range"
@@ -5382,8 +5428,8 @@ msgstr "一般"
 #~ msgid "Failed to remove product from channel"
 #~ msgstr "從頻道移除產品失敗"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:223
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:228
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:240
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:245
 msgid "Add new address"
 msgstr "新增地址"
 
@@ -5440,7 +5486,7 @@ msgstr "這些變更不需要付款或退款。"
 
 #: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:70
 msgid "{cancellableCount, plural, one {Are you sure you want to cancel {cancellableCount} job? This action cannot be undone.} other {Are you sure you want to cancel {cancellableCount} jobs? This action cannot be undone.}}"
-msgstr ""
+msgstr "{cancellableCount, plural, one {您確定要取消 {cancellableCount} 個任務嗎？此操作無法復原。} other {您確定要取消 {cancellableCount} 個任務嗎？此操作無法復原。}}"
 
 #: src/lib/framework/dashboard-widget/orders-summary/index.tsx:100
 msgid "Total Revenue"
@@ -5591,6 +5637,10 @@ msgstr "從通路中移除屬性失敗：{message}"
 msgid "Set link"
 msgstr "設定連結"
 
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:88
+msgid "Account verified"
+msgstr "帳戶已驗證"
+
 #: src/app/routes/_authenticated/_sellers/sellers.tsx:45
 msgid "New Seller"
 msgstr "新增賣家"
@@ -5669,7 +5719,7 @@ msgstr "向 {groupName} 新增選項值"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:221
 msgid "Failed to unset shipping address for order: {0}"
-msgstr ""
+msgstr "取消訂單的配送地址失敗：{0}"
 
 #: src/app/routes/_authenticated/_orders/components/add-surcharge-form.tsx:82
 #: src/app/routes/_authenticated/_orders/components/edit-order-table.tsx:96
@@ -5724,7 +5774,7 @@ msgstr "您沒有檢視全域語言設定的權限"
 msgid "Successfully created tax rate"
 msgstr "已成功建立稅率"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:80
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:101
 msgid "Heading 6"
 msgstr "標題 6"
 
@@ -5777,7 +5827,7 @@ msgstr "使用中的篩選條件"
 
 #: src/app/routes/_authenticated/_assets/components/asset-tag-filter.tsx:178
 #: src/lib/components/data-table/data-table-active-filters-popover.tsx:54
-#: src/lib/components/data-table/data-table.tsx:423
+#: src/lib/components/data-table/data-table.tsx:434
 msgid "Clear all"
 msgstr "全部清除"
 
@@ -5852,7 +5902,7 @@ msgid "Payment method is required"
 msgstr "付款方式為必填欄位"
 
 #: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:61
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:134
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:135
 msgid "Failed to add customer to group"
 msgstr "將客戶新增至群組失敗"
 
@@ -5890,7 +5940,7 @@ msgstr "選項"
 msgid "Order process"
 msgstr "訂單流程"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:194
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:211
 msgid "Phone number"
 msgstr "電話號碼"
 

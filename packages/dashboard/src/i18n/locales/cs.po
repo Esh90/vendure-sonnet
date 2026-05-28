@@ -73,7 +73,7 @@ msgstr "Přidejte alespoň jednu položku do objednávky"
 msgid "Add products to create a test order"
 msgstr "Přidejte produkty pro vytvoření testovací objednávky"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:124
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:125
 msgid "Failed to create address"
 msgstr "Nepodařilo se vytvořit adresu"
 
@@ -94,7 +94,7 @@ msgstr "Použití externí autentizační strategie: {strategy}"
 msgid "Select a reason..."
 msgstr "Vyberte důvod..."
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:79
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:100
 msgid "Heading 5"
 msgstr "Nadpis 5"
 
@@ -104,7 +104,7 @@ msgstr "Nadpis 5"
 msgid "Failed to add payment"
 msgstr "Nepodařilo se přidat platbu"
 
-#: src/lib/framework/layout-engine/page-layout.tsx:718
+#: src/lib/framework/layout-engine/page-layout.tsx:730
 msgid "Updated"
 msgstr "Aktualizováno"
 
@@ -164,7 +164,7 @@ msgstr "Typ"
 #. placeholder {0}: entityName.toLowerCase()
 #. placeholder {0}: group.name
 #: src/app/routes/_authenticated/_products/components/product-option-select.tsx:57
-#: src/lib/components/data-input/default-relation-input.tsx:618
+#: src/lib/components/data-input/default-relation-input.tsx:616
 msgid "Select {0}"
 msgstr "Vybrat {0}"
 
@@ -209,7 +209,7 @@ msgstr "Automatické obnovení: {0}"
 
 #: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:34
 msgid "Successfully cancelled {fulfilled} job"
-msgstr ""
+msgstr "Úspěšně zrušena {fulfilled} úloha"
 
 #: src/app/routes/_authenticated/_system/healthchecks.tsx:43
 #~ msgid "Health checks"
@@ -264,7 +264,7 @@ msgstr "Sklady"
 msgid "Fulfillment handler"
 msgstr "Správce expedice"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:247
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:264
 #: src/app/routes/_authenticated/_orders/orders.tsx:21
 #: src/app/routes/_authenticated/_orders/orders.tsx:37
 #: src/app/routes/_authenticated/_orders/utils/order-detail-loaders.tsx:48
@@ -319,8 +319,8 @@ msgid "Type at least 2 characters to search..."
 msgstr "Zadejte alespoň 2 znaky pro vyhledávání..."
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:121
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:182
-#: src/app/routes/_authenticated/_profile/profile.tsx:100
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:199
+#: src/app/routes/_authenticated/_profile/profile.tsx:108
 msgid "Last name"
 msgstr "Příjmení"
 
@@ -364,7 +364,7 @@ msgstr "Zobrazit podrobnosti"
 msgid "Select a channel to assign {0} {entityType} to"
 msgstr "Vyberte kanál pro přiřazení {0} {entityType}"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:98
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:99
 msgid "Successfully created customer"
 msgstr "Zákazník úspěšně vytvořen"
 
@@ -451,7 +451,7 @@ msgstr "Daňová sazba"
 #. placeholder {1}: import { DataTableBulkActionItem } from '@/vdb/components/data-table/data-table-bulk-action-item.js'; import { BulkActionComponent } from '@/vdb/framework/extension-api/types/data-table.js'; import { api } from '@/vdb/graphql/api.js'; import { usePaginatedList } from '@/vdb/hooks/use-paginated-list.js'; import { plural } from '@lingui/core/macro'; import { Plural, useLingui } from '@lingui/react/macro'; import { useMutation } from '@tanstack/react-query'; import { Ban } from 'lucide-react'; import { toast } from 'sonner'; import { cancelJobDocument } from '../job-queue.graphql.js'; export const CancelJobsBulkAction: BulkActionComponent<any> = ({ selection, table }) => { const { refetchPaginatedList } = usePaginatedList(); const { t } = useLingui(); const cancellableJobs = selection.filter(job => job.state === 'RUNNING' || job.state === 'PENDING'); const cancellableCount = cancellableJobs.length; const { mutate, isPending } = useMutation({ mutationFn: async () => { const results = await Promise.allSettled( cancellableJobs.map(job => api.mutate(cancelJobDocument, { jobId: job.id })), ); const fulfilled = results.filter(r => r.status === 'fulfilled').length; const rejected = results.filter(r => r.status === 'rejected').length; return { fulfilled, rejected }; }, onSuccess: ({ fulfilled, rejected }) => { if (fulfilled > 0) { toast.success( plural(fulfilled, { one: t`Successfully cancelled ${fulfilled} job`, other: t`Successfully cancelled ${fulfilled} jobs`, }), ); } if (rejected > 0) { toast.error( plural(rejected, { one: t`Failed to cancel ${rejected} job`, other: t`Failed to cancel ${rejected} jobs`, }), ); } refetchPaginatedList(); table.resetRowSelection(); }, }); if (cancellableCount === 0) { return null; } return ( <DataTableBulkActionItem requiresPermission={['DeleteSettings', 'DeleteSystem']} onClick={() => mutate()} disabled={isPending} label={ <Plural value={cancellableCount} one={`Cancel ${cancellableCount} job`} other={`Cancel ${cancellableCount} jobs`} /> } confirmationText={ <Plural value={cancellableCount} one={`Are you sure you want to cancel ${cancellableCount} job? This action cannot be undone.`} other={`Are you sure you want to cancel ${cancellableCount} jobs? This action cannot be undone.`} /> } icon={Ban} className="text-destructive" /> ); }; 
 #: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:33
 msgid "{fulfilled, plural, one {{0}} other {{1}}}"
-msgstr ""
+msgstr "{fulfilled, plural, one {{0}} other {{1}}}"
 
 #: src/app/routes/_authenticated/_orders/components/draft-order-status.tsx:34
 msgid "Order draft isn't ready to be completed"
@@ -687,10 +687,10 @@ msgstr "Metadata"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:251
 msgid "Failed to set shipping method for order: {0}"
-msgstr ""
+msgstr "Nepodařilo se nastavit způsob dopravy pro objednávku: {0}"
 
 #: src/app/routes/_authenticated/_option-groups/components/option-group-products-block.tsx:48
-#: src/lib/components/data-table/data-table.tsx:367
+#: src/lib/components/data-table/data-table.tsx:378
 msgid "Filter..."
 msgstr "Filtrovat..."
 
@@ -862,7 +862,7 @@ msgstr "Potvrdit"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:303
 msgid "Failed to complete draft order: {0}"
-msgstr ""
+msgstr "Nepodařilo se dokončit koncept objednávky: {0}"
 
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:118
 msgid "Failed to create collection"
@@ -882,6 +882,10 @@ msgstr "Nepodařilo se vytvořit produkt"
 #: src/lib/components/shared/role-code-label.tsx:8
 msgid "Customer"
 msgstr "Zákazník"
+
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:73
+msgid "Failed to send password reset email"
+msgstr "Nepodařilo se odeslat e-mail pro obnovení hesla"
 
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/components/order-history/order-history-container.tsx:46
@@ -943,8 +947,8 @@ msgid "Failed to update zone"
 msgstr "Nepodařilo se aktualizovat zónu"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:133
-#: src/app/routes/_authenticated/_profile/profile.tsx:112
-#: src/app/routes/_authenticated/_profile/profile.tsx:129
+#: src/app/routes/_authenticated/_profile/profile.tsx:120
+#: src/app/routes/_authenticated/_profile/profile.tsx:137
 #: src/lib/components/login/login-form.tsx:93
 msgid "Password"
 msgstr "Heslo"
@@ -1014,7 +1018,7 @@ msgstr "Alokováno"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:270
 msgid "Failed to set coupon code for order: {0}"
-msgstr ""
+msgstr "Nepodařilo se nastavit slevový kód pro objednávku: {0}"
 
 #: src/lib/components/layout/nav-user.tsx:102
 msgid "Explore Platform & Cloud"
@@ -1094,6 +1098,10 @@ msgstr "Nepodařilo se aktualizovat akci"
 msgid "Images"
 msgstr "Obrázky"
 
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:65
+msgid "The customer will receive an email containing a link to set a new password. Their existing password remains valid until they complete the reset flow."
+msgstr "Zákazník obdrží e-mail s odkazem pro nastavení nového hesla. Jeho stávající heslo zůstane platné, dokud nedokončí proces obnovení."
+
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:158
 msgid "API Keys"
@@ -1121,14 +1129,14 @@ msgstr "Fronta úloh"
 msgid "Assets"
 msgstr "Soubory"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:188
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:205
 msgid "Email address"
 msgstr "E-mailová adresa"
 
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:281
 msgid "Failed to remove coupon code from order: {0}"
-msgstr ""
+msgstr "Nepodařilo se odebrat slevový kód z objednávky: {0}"
 
 #: src/lib/components/data-input/slug-input.tsx:266
 #: src/lib/components/data-input/slug-input.tsx:267
@@ -1272,7 +1280,7 @@ msgstr "K dispozici jsou pouze role přiřazené k vašemu účtu."
 
 #: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:63
 msgid "{cancellableCount, plural, one {Cancel {cancellableCount} job} other {Cancel {cancellableCount} jobs}}"
-msgstr ""
+msgstr "{cancellableCount, plural, one {Zrušit {cancellableCount} úlohu} other {Zrušit {cancellableCount} úloh}}"
 
 #: src/lib/components/data-input/product-multi-selector-input.tsx:399
 #: src/lib/components/shared/configurable-operation-multi-selector.tsx:264
@@ -1310,7 +1318,7 @@ msgstr "Nepodařilo se vytvořit prodejce"
 msgid "Configure duplication settings for {0}s"
 msgstr "Konfigurovat nastavení duplikace pro {0}s"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:203
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:220
 #: src/app/routes/_authenticated/_orders/orders_.$id_.modify.tsx:245
 msgid "Addresses"
 msgstr "Adresy"
@@ -1408,7 +1416,7 @@ msgstr "před"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:188
 msgid "Failed to set customer for order: {0}"
-msgstr ""
+msgstr "Nepodařilo se nastavit zákazníka pro objednávku: {0}"
 
 #: src/lib/components/shared/asset/asset-gallery.tsx:745
 msgid "Size"
@@ -1480,7 +1488,7 @@ msgstr "Nepodařilo se přejmenovat pohled"
 msgid "Available"
 msgstr "Dostupné"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:74
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:95
 msgid "Normal"
 msgstr "Normální"
 
@@ -1523,7 +1531,7 @@ msgstr "Adresa úspěšně aktualizována"
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:226
 #: src/app/routes/_authenticated/_orders/components/fulfillment-details.tsx:124
 #: src/lib/components/shared/asset/asset-gallery.tsx:747
-#: src/lib/framework/layout-engine/page-layout.tsx:705
+#: src/lib/framework/layout-engine/page-layout.tsx:717
 msgid "Created"
 msgstr "Vytvořeno"
 
@@ -1539,7 +1547,7 @@ msgstr "Vyberte cílovou kolekci pro přesunutí {0}."
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:232
 msgid "Failed to unset billing address for order: {0}"
-msgstr ""
+msgstr "Nepodařilo se zrušit fakturační adresu pro objednávku: {0}"
 
 #: src/app/routes/_authenticated/_customers/components/customer-history/customer-history-utils.tsx:45
 msgid "Customer details updated"
@@ -1565,6 +1573,7 @@ msgstr "Přejít na poslední stránku"
 #: src/app/routes/_authenticated/_api-keys/components/rotate-api-key-button.tsx:61
 #: src/app/routes/_authenticated/_assets/components/manage-tags-dialog.tsx:203
 #: src/app/routes/_authenticated/_collections/components/move-collections-dialog.tsx:418
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:154
 #: src/app/routes/_authenticated/_orders/components/add-manual-payment-dialog.tsx:168
 #: src/app/routes/_authenticated/_orders/components/fulfill-order-dialog.tsx:310
 #: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:352
@@ -1592,7 +1601,7 @@ msgstr "Zrušit"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:95
 msgid "Failed to update order custom fields: {0}"
-msgstr ""
+msgstr "Nepodařilo se aktualizovat vlastní pole objednávky: {0}"
 
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:127
 #: src/app/routes/_authenticated/_products/components/add-product-variant-dialog.tsx:160
@@ -1756,7 +1765,7 @@ msgstr "Refund úspěšně vypořádán"
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:148
 #: src/app/routes/_authenticated/_countries/countries_.$id.tsx:84
 #: src/app/routes/_authenticated/_customer-groups/customer-groups_.$id.tsx:93
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:159
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:176
 #: src/app/routes/_authenticated/_facets/facets_.$facetId.values_.$id.tsx:110
 #: src/app/routes/_authenticated/_facets/facets_.$id.tsx:99
 #: src/app/routes/_authenticated/_global-settings/global-settings.tsx:102
@@ -1767,7 +1776,7 @@ msgstr "Refund úspěšně vypořádán"
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:226
 #: src/app/routes/_authenticated/_products/components/assign-facet-values-dialog.tsx:276
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:219
-#: src/app/routes/_authenticated/_profile/profile.tsx:84
+#: src/app/routes/_authenticated/_profile/profile.tsx:92
 #: src/app/routes/_authenticated/_promotions/promotions_.$id.tsx:144
 #: src/app/routes/_authenticated/_roles/roles_.$id.tsx:84
 #: src/app/routes/_authenticated/_sellers/sellers_.$id.tsx:78
@@ -1780,7 +1789,7 @@ msgstr "Refund úspěšně vypořádán"
 msgid "Update"
 msgstr "Aktualizovat"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:76
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:97
 msgid "Heading 2"
 msgstr "Nadpis 2"
 
@@ -1788,7 +1797,7 @@ msgstr "Nadpis 2"
 msgid "Order placed"
 msgstr "Objednávka vytvořena"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:63
+#: src/app/routes/_authenticated/_profile/profile.tsx:71
 msgid "Successfully updated profile"
 msgstr "Profil úspěšně aktualizován"
 
@@ -1840,7 +1849,7 @@ msgstr "Začíná"
 msgid "Duplicate"
 msgstr "Duplikovat"
 
-#: src/lib/components/data-table/data-table.tsx:558
+#: src/lib/components/data-table/data-table.tsx:588
 #: src/lib/components/shared/customer-group-selector.tsx:56
 msgid "No results"
 msgstr "Žádné výsledky"
@@ -2339,7 +2348,7 @@ msgstr "Registrovaný"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:199
 msgid "Failed to set shipping address for order: {0}"
-msgstr ""
+msgstr "Nepodařilo se nastavit dodací adresu pro objednávku: {0}"
 
 #: src/app/routes/_authenticated/_system/job-queue.tsx:231
 msgid "Cancel Job"
@@ -2402,6 +2411,10 @@ msgstr "Odesláno"
 #: src/lib/components/data-table/save-view-button.tsx:35
 msgid "Save View"
 msgstr "Uložit zobrazení"
+
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:63
+msgid "Send password reset email?"
+msgstr "Odeslat e-mail pro obnovení hesla?"
 
 #. placeholder {0}: selection.length
 #: src/lib/components/data-table/data-table-bulk-actions.tsx:78
@@ -2489,6 +2502,10 @@ msgstr "Výchozí kanál"
 msgid "Insert a new image with source, title, and dimensions"
 msgstr "Vložit nový obrázek se zdrojem, názvem a rozměry"
 
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:70
+msgid "Send reset email"
+msgstr "Odeslat e-mail pro obnovení"
+
 #: src/app/routes/_authenticated/_facets/facets_.$facetId.values_.$id.tsx:93
 msgid "Failed to create facet value"
 msgstr "Nepodařilo se vytvořit hodnotu vlastnosti"
@@ -2538,7 +2555,7 @@ msgstr "Nová daňová kategorie"
 msgid "Successfully created channel"
 msgstr "Kanál úspěšně vytvořen"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:98
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:99
 msgid "Successfully updated customer"
 msgstr "Zákazník úspěšně aktualizován"
 
@@ -2550,7 +2567,7 @@ msgstr "Zobrazit data"
 msgid "Delete View"
 msgstr "Smazat pohled"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:231
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:248
 msgid "Add a new address to the customer."
 msgstr "Přidejte novou adresu k zákazníkovi."
 
@@ -2677,8 +2694,8 @@ msgstr "Částka"
 msgid "Phone Number"
 msgstr "Telefonní číslo"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:62
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:152
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:63
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:153
 msgid "New customer"
 msgstr "Nový zákazník"
 
@@ -2712,12 +2729,12 @@ msgstr "Opravdu chcete smazat tento globální pohled? Tuto akci nelze vrátit z
 msgid "Force remove option group"
 msgstr "Vynutit odebrání skupiny možností"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:132
+#: src/app/routes/_authenticated/_profile/profile.tsx:140
 msgid "Added"
 msgstr "Přidáno"
 
 #: src/app/routes/_authenticated/_customers/components/customer-history/customer-history-container.tsx:30
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:250
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:267
 msgid "Customer history"
 msgstr "Historie zákazníka"
 
@@ -2725,7 +2742,7 @@ msgstr "Historie zákazníka"
 msgid "Successfully updated facet values for {entityIdsLength} {entityType}"
 msgstr "Úspěšně aktualizovány hodnoty vlastností pro {entityIdsLength} {entityType}"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:144
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:145
 msgid "Failed to remove customer from group"
 msgstr "Nepodařilo se odebrat zákazníka ze skupiny"
 
@@ -2765,7 +2782,7 @@ msgstr "Smazat globální pohled"
 #: src/app/routes/_authenticated/_collections/collections_.$id.tsx:148
 #: src/app/routes/_authenticated/_countries/countries_.$id.tsx:84
 #: src/app/routes/_authenticated/_customer-groups/customer-groups_.$id.tsx:93
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:159
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:176
 #: src/app/routes/_authenticated/_facets/facets_.$facetId.values_.$id.tsx:110
 #: src/app/routes/_authenticated/_facets/facets_.$id.tsx:99
 #: src/app/routes/_authenticated/_option-groups/option-groups_.$groupId.options_.$id.tsx:177
@@ -2800,8 +2817,8 @@ msgstr "Nová země"
 msgid "From {0} to {1}"
 msgstr "Z {0} na {1}"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:105
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:111
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:106
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:112
 msgid "Failed to create customer"
 msgstr "Nepodařilo se vytvořit zákazníka"
 
@@ -2891,6 +2908,10 @@ msgstr "Nejsou vybrány žádné štítky"
 msgid "Back"
 msgstr "Zpět"
 
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:81
+msgid "This marks the account as verified and sets a new random password, bypassing the email verification flow. The password will be displayed once — the customer will not receive any notification."
+msgstr "Tímto se účet označí jako ověřený a nastaví se nové náhodné heslo s vynecháním procesu ověřování e-mailem. Heslo bude zobrazeno pouze jednou — zákazník neobdrží žádné oznámení."
+
 #: src/lib/components/data-table/views-sheet.tsx:63
 msgid "View renamed successfully"
 msgstr "Pohled úspěšně přejmenován"
@@ -2948,6 +2969,10 @@ msgstr "Adresa aktualizována"
 msgid "Refund processed successfully"
 msgstr "Vrácení bylo úspěšně zpracováno"
 
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:90
+msgid "The account is now verified. Copy the generated password now — it will not be shown again."
+msgstr "Účet je nyní ověřen. Zkopírujte vygenerované heslo nyní — již nebude znovu zobrazeno."
+
 #. placeholder {0}: action.label
 #. placeholder {0}: entityType === 'products' ? 'Product' : 'Variant'
 #. placeholder {0}: entry.type.replace(/_/g, ' ').toLowerCase()
@@ -2961,7 +2986,7 @@ msgstr "Vrácení bylo úspěšně zpracováno"
 #: src/lib/components/data-input/product-multi-selector-input.tsx:281
 #: src/lib/components/data-input/product-multi-selector-input.tsx:284
 #: src/lib/components/data-input/relation-selector.tsx:404
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:418
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:439
 msgid "{0}"
 msgstr "{0}"
 
@@ -3026,7 +3051,7 @@ msgstr "Opravdu chcete opustit tuto stránku? Všechny neuložené změny budou 
 msgid "Toggle header column"
 msgstr "Přepnout sloupec hlavičky"
 
-#: src/app/routes/_authenticated/_promotions/promotions.tsx:87
+#: src/app/routes/_authenticated/_promotions/promotions.tsx:88
 msgid "New Promotion"
 msgstr "Nová akce"
 
@@ -3110,7 +3135,7 @@ msgstr "Metriky objednávek"
 msgid "Select display language"
 msgstr "Vyberte jazyk rozhraní"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:120
+#: src/app/routes/_authenticated/_profile/profile.tsx:128
 msgid "Authentication methods"
 msgstr "Metody ověření"
 
@@ -3133,7 +3158,7 @@ msgstr "Hledat role..."
 
 #: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:35
 msgid "Successfully cancelled {fulfilled} jobs"
-msgstr ""
+msgstr "Úspěšně zrušeno {fulfilled} úloh"
 
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:69
 #: src/app/routes/_authenticated/_product-variants/product-variants.tsx:19
@@ -3227,7 +3252,7 @@ msgstr "Načíst dalších {0} ({remaining} zbývá)"
 msgid "Facet values"
 msgstr "Hodnoty vlastností"
 
-#: src/lib/components/data-table/data-table.tsx:228
+#: src/lib/components/data-table/data-table.tsx:237
 msgid "Failed to reorder items"
 msgstr "Nepodařilo se přeuspořádat položky"
 
@@ -3441,7 +3466,7 @@ msgstr "Neběží"
 msgid "Assigned"
 msgstr "Přiřazeno"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:75
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:96
 msgid "Heading 1"
 msgstr "Nadpis 1"
 
@@ -3504,7 +3529,7 @@ msgstr "Hledat měny..."
 msgid "Remove from channel"
 msgstr "Odebrat z kanálu"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:169
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:186
 #: src/lib/components/shared/rich-text-editor/image-dialog.tsx:157
 msgid "Title"
 msgstr "Nadpis"
@@ -3556,7 +3581,7 @@ msgstr "Vlastnost"
 #. placeholder {1}: import { DataTableBulkActionItem } from '@/vdb/components/data-table/data-table-bulk-action-item.js'; import { BulkActionComponent } from '@/vdb/framework/extension-api/types/data-table.js'; import { api } from '@/vdb/graphql/api.js'; import { usePaginatedList } from '@/vdb/hooks/use-paginated-list.js'; import { plural } from '@lingui/core/macro'; import { Plural, useLingui } from '@lingui/react/macro'; import { useMutation } from '@tanstack/react-query'; import { Ban } from 'lucide-react'; import { toast } from 'sonner'; import { cancelJobDocument } from '../job-queue.graphql.js'; export const CancelJobsBulkAction: BulkActionComponent<any> = ({ selection, table }) => { const { refetchPaginatedList } = usePaginatedList(); const { t } = useLingui(); const cancellableJobs = selection.filter(job => job.state === 'RUNNING' || job.state === 'PENDING'); const cancellableCount = cancellableJobs.length; const { mutate, isPending } = useMutation({ mutationFn: async () => { const results = await Promise.allSettled( cancellableJobs.map(job => api.mutate(cancelJobDocument, { jobId: job.id })), ); const fulfilled = results.filter(r => r.status === 'fulfilled').length; const rejected = results.filter(r => r.status === 'rejected').length; return { fulfilled, rejected }; }, onSuccess: ({ fulfilled, rejected }) => { if (fulfilled > 0) { toast.success( plural(fulfilled, { one: t`Successfully cancelled ${fulfilled} job`, other: t`Successfully cancelled ${fulfilled} jobs`, }), ); } if (rejected > 0) { toast.error( plural(rejected, { one: t`Failed to cancel ${rejected} job`, other: t`Failed to cancel ${rejected} jobs`, }), ); } refetchPaginatedList(); table.resetRowSelection(); }, }); if (cancellableCount === 0) { return null; } return ( <DataTableBulkActionItem requiresPermission={['DeleteSettings', 'DeleteSystem']} onClick={() => mutate()} disabled={isPending} label={ <Plural value={cancellableCount} one={`Cancel ${cancellableCount} job`} other={`Cancel ${cancellableCount} jobs`} /> } confirmationText={ <Plural value={cancellableCount} one={`Are you sure you want to cancel ${cancellableCount} job? This action cannot be undone.`} other={`Are you sure you want to cancel ${cancellableCount} jobs? This action cannot be undone.`} /> } icon={Ban} className="text-destructive" /> ); }; 
 #: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:41
 msgid "{rejected, plural, one {{0}} other {{1}}}"
-msgstr ""
+msgstr "{rejected, plural, one {{0}} other {{1}}}"
 
 #: src/lib/components/shared/assigned-channels.tsx:58
 msgid "Cannot remove from active channel"
@@ -3663,7 +3688,7 @@ msgid "Add a price in another currency"
 msgstr "Přidat cenu v jiné měně"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:127
-#: src/app/routes/_authenticated/_profile/profile.tsx:106
+#: src/app/routes/_authenticated/_profile/profile.tsx:114
 msgid "Email Address or identifier"
 msgstr "E-mailová adresa nebo identifikátor"
 
@@ -3674,13 +3699,13 @@ msgid "Refund #{0} transitioned to {1}"
 msgstr "Refund #{0} převeden na {1}"
 
 #: src/app/routes/_authenticated/_customer-groups/customer-groups_.$id.tsx:110
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:61
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:62
 #: src/app/routes/_authenticated/_customers/customers.tsx:15
 #: src/app/routes/_authenticated/_customers/customers.tsx:21
 msgid "Customers"
 msgstr "Zákazníci"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:78
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:99
 msgid "Heading 4"
 msgstr "Nadpis 4"
 
@@ -3761,6 +3786,11 @@ msgstr "Přidat položku"
 msgid "Successfully created API key"
 msgstr "API key úspěšně vytvořen"
 
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:77
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:87
+msgid "Verify account"
+msgstr "Ověřit účet"
+
 #: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:165
 msgid "Loading preview…"
 msgstr "Načítání náhledu..."
@@ -3800,7 +3830,7 @@ msgstr "Země"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:160
 msgid "Failed to remove order line: {0}"
-msgstr ""
+msgstr "Nepodařilo se odebrat položku objednávky: {0}"
 
 #: src/app/routes/_authenticated/_shipping-methods/components/test-address-form.tsx:182
 msgid "Street Address 2"
@@ -4033,7 +4063,7 @@ msgstr "Odesláno"
 #~ msgid "Monitored Resources"
 #~ msgstr "Monitorované zdroje"
 
-#: src/lib/framework/layout-engine/page-layout.tsx:677
+#: src/lib/framework/layout-engine/page-layout.tsx:689
 msgid "Entity Information"
 msgstr "Informace o entitě"
 
@@ -4065,7 +4095,7 @@ msgstr "Super Admin"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:141
 msgid "Failed to update order line: {0}"
-msgstr ""
+msgstr "Nepodařilo se aktualizovat položku objednávky: {0}"
 
 #: src/lib/components/shared/rich-text-editor/link-dialog.tsx:84
 msgid "Insert link"
@@ -4078,6 +4108,10 @@ msgstr "Pokud je povoleno, filtry budou zděděny z nadřazené kolekce a slouč
 #: src/lib/components/shared/zone-selector.tsx:50
 msgid "Select a zone"
 msgstr "Vyberte zónu"
+
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:95
+msgid "Failed to verify account"
+msgstr "Nepodařilo se ověřit účet"
 
 #: src/app/routes/_authenticated/_shipping-methods/components/test-shipping-methods-sheet.tsx:27
 msgid "Test shipping methods"
@@ -4239,7 +4273,7 @@ msgstr "Informace o zákazníkovi aktualizovány"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:318
 msgid "Failed to delete draft order: {0}"
-msgstr ""
+msgstr "Nepodařilo se smazat koncept objednávky: {0}"
 
 #: src/lib/components/data-table/views-sheet.tsx:120
 msgid "Failed to convert view to global"
@@ -4298,11 +4332,15 @@ msgstr "Skrýt heslo"
 msgid "New seller"
 msgstr "Nový prodejce"
 
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:79
+msgid "Verify customer account?"
+msgstr "Ověřit zákaznický účet?"
+
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:153
 msgid "e.g., Red, Large, Cotton"
 msgstr "např. Červená, Velká, Bavlna"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:67
+#: src/app/routes/_authenticated/_profile/profile.tsx:75
 msgid "Failed to update profile"
 msgstr "Nepodařilo se aktualizovat profil"
 
@@ -4398,7 +4436,7 @@ msgstr "Objednávka expedována"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:210
 msgid "Failed to set billing address for order: {0}"
-msgstr ""
+msgstr "Nepodařilo se nastavit fakturační adresu pro objednávku: {0}"
 
 #: src/app/routes/_authenticated/_orders/orders_.$id_.modify.tsx:271
 msgid "No shipping address"
@@ -4514,6 +4552,10 @@ msgstr "Špatná položka"
 #: src/app/routes/_authenticated/_orders/orders_.$id_.modify.tsx:201
 msgid "Summary of modifications"
 msgstr "Souhrn úprav"
+
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:61
+msgid "Reset password"
+msgstr "Obnovit heslo"
 
 #. placeholder {0}: payment.refunds.length
 #: src/app/routes/_authenticated/_orders/components/payment-details.tsx:208
@@ -4726,7 +4768,7 @@ msgstr "Nastavení"
 msgid "Settings Store"
 msgstr "Nastavení obchodu"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:77
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:98
 msgid "Heading 3"
 msgstr "Nadpis 3"
 
@@ -4822,7 +4864,7 @@ msgstr "Obsah"
 
 #: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:43
 msgid "Failed to cancel {rejected} jobs"
-msgstr ""
+msgstr "Nepodařilo se zrušit {rejected} úloh"
 
 #: src/lib/components/data-table/views-sheet.tsx:110
 msgid "Failed to convert global view to personal view"
@@ -4855,8 +4897,8 @@ msgstr "Název varianty"
 msgid "Remove"
 msgstr "Odebrat"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:105
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:111
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:106
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:112
 msgid "Failed to update customer"
 msgstr "Nepodařilo se aktualizovat zákazníka"
 
@@ -5055,7 +5097,7 @@ msgstr "Nepodařilo se smazat globální pohled"
 msgid "Default language"
 msgstr "Výchozí jazyk"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:253
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:270
 #: src/app/routes/_authenticated/_customers/customers.tsx:48
 msgid "Status"
 msgstr "Stav"
@@ -5143,7 +5185,7 @@ msgid "Customer not found"
 msgstr "Zákazník nenalezen"
 
 #. placeholder {0}: entityName.toLowerCase()
-#: src/lib/components/data-input/default-relation-input.tsx:605
+#: src/lib/components/data-input/default-relation-input.tsx:603
 msgid "Select {0}s"
 msgstr "Vybrat {0}"
 
@@ -5151,14 +5193,18 @@ msgstr "Vybrat {0}"
 msgid "New facet values to add:"
 msgstr "Nové hodnoty vlastností k přidání:"
 
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:74
+msgid "Password reset email sent to the customer"
+msgstr "E-mail pro obnovení hesla byl odeslán zákazníkovi"
+
 #: src/app/routes/_authenticated/_orders/hooks/use-refund-order.ts:289
 #: src/app/routes/_authenticated/_orders/hooks/use-refund-order.ts:302
 msgid "Failed to process refund"
 msgstr "Nepodařilo se zpracovat vrácení"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:115
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:176
-#: src/app/routes/_authenticated/_profile/profile.tsx:94
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:193
+#: src/app/routes/_authenticated/_profile/profile.tsx:102
 msgid "First name"
 msgstr "Jméno"
 
@@ -5206,8 +5252,8 @@ msgstr "Přidat filtr"
 msgid "Tax category"
 msgstr "Daňová kategorie"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:31
-#: src/app/routes/_authenticated/_profile/profile.tsx:76
+#: src/app/routes/_authenticated/_profile/profile.tsx:38
+#: src/app/routes/_authenticated/_profile/profile.tsx:84
 #: src/lib/components/layout/nav-user.tsx:108
 msgid "Profile"
 msgstr "Profil"
@@ -5237,7 +5283,7 @@ msgstr "Duplicitní hodnota \"{trimmed}\" již existuje"
 msgid "Reason"
 msgstr "Důvod"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:256
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:273
 msgid "Customer groups"
 msgstr "Skupiny zákazníků"
 
@@ -5270,7 +5316,7 @@ msgstr "Stránka {page} z {totalPages}"
 
 #: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:42
 msgid "Failed to cancel {rejected} job"
-msgstr ""
+msgstr "Nepodařilo se zrušit {rejected} úlohu"
 
 #: src/lib/components/date-range-picker.tsx:79
 msgctxt "date-range"
@@ -5382,8 +5428,8 @@ msgstr "Obecné"
 #~ msgid "Failed to remove product from channel"
 #~ msgstr "Nepodařilo se odstranit produkt z kanálu"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:223
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:228
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:240
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:245
 msgid "Add new address"
 msgstr "Přidat novou adresu"
 
@@ -5440,7 +5486,7 @@ msgstr "Pro tyto změny není vyžadována žádná platba ani refund."
 
 #: src/app/routes/_authenticated/_system/components/cancel-jobs-bulk-action.tsx:70
 msgid "{cancellableCount, plural, one {Are you sure you want to cancel {cancellableCount} job? This action cannot be undone.} other {Are you sure you want to cancel {cancellableCount} jobs? This action cannot be undone.}}"
-msgstr ""
+msgstr "{cancellableCount, plural, one {Opravdu chcete zrušit {cancellableCount} úlohu? Tuto akci nelze vrátit zpět.} other {Opravdu chcete zrušit {cancellableCount} úloh? Tuto akci nelze vrátit zpět.}}"
 
 #: src/lib/framework/dashboard-widget/orders-summary/index.tsx:100
 msgid "Total Revenue"
@@ -5591,6 +5637,10 @@ msgstr "Nepodařilo se odebrat vlastnost z kanálu: {message}"
 msgid "Set link"
 msgstr "Nastavit odkaz"
 
+#: src/app/routes/_authenticated/_customers/components/customer-credential-action-button.tsx:88
+msgid "Account verified"
+msgstr "Účet ověřen"
+
 #: src/app/routes/_authenticated/_sellers/sellers.tsx:45
 msgid "New Seller"
 msgstr "Nový prodejce"
@@ -5669,7 +5719,7 @@ msgstr "Přidat hodnotu volby do {groupName}"
 #. placeholder {0}: error.message
 #: src/app/routes/_authenticated/_orders/orders_.draft.$id.tsx:221
 msgid "Failed to unset shipping address for order: {0}"
-msgstr ""
+msgstr "Nepodařilo se zrušit dodací adresu pro objednávku: {0}"
 
 #: src/app/routes/_authenticated/_orders/components/add-surcharge-form.tsx:82
 #: src/app/routes/_authenticated/_orders/components/edit-order-table.tsx:96
@@ -5724,7 +5774,7 @@ msgstr "Nemáte oprávnění k zobrazení globálních nastavení jazyků"
 msgid "Successfully created tax rate"
 msgstr "Daňová sazba úspěšně vytvořena"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:80
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:101
 msgid "Heading 6"
 msgstr "Nadpis 6"
 
@@ -5777,7 +5827,7 @@ msgstr "Aktivní filtry"
 
 #: src/app/routes/_authenticated/_assets/components/asset-tag-filter.tsx:178
 #: src/lib/components/data-table/data-table-active-filters-popover.tsx:54
-#: src/lib/components/data-table/data-table.tsx:423
+#: src/lib/components/data-table/data-table.tsx:434
 msgid "Clear all"
 msgstr "Vymazat vše"
 
@@ -5852,7 +5902,7 @@ msgid "Payment method is required"
 msgstr "Způsob platby je povinný"
 
 #: src/app/routes/_authenticated/_customer-groups/components/customer-group-members-table.tsx:61
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:134
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:135
 msgid "Failed to add customer to group"
 msgstr "Nepodařilo se přidat zákazníka do skupiny"
 
@@ -5890,7 +5940,7 @@ msgstr "Volba"
 msgid "Order process"
 msgstr "Proces objednávky"
 
-#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:194
+#: src/app/routes/_authenticated/_customers/customers_.$id.tsx:211
 msgid "Phone number"
 msgstr "Telefonní číslo"
 

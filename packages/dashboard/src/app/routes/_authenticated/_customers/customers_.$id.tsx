@@ -35,6 +35,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { CustomerAddressCard } from './components/customer-address-card.js';
 import { CustomerAddressForm } from './components/customer-address-form.js';
+import { CustomerCredentialActionButton } from './components/customer-credential-action-button.js';
 import { CustomerHistoryContainer } from './components/customer-history/customer-history-container.js';
 import { CustomerOrderTable } from './components/customer-order-table.js';
 import { CustomerStatusBadge } from './components/customer-status-badge.js';
@@ -151,6 +152,22 @@ function CustomerDetailPage() {
         <Page pageId={pageId} form={form} submitHandler={submitHandler} entity={entity}>
             <PageTitle>{creatingNewEntity ? <Trans>New customer</Trans> : customerName}</PageTitle>
             <PageActionBar>
+                {entity?.user?.verified && (
+                    <ActionBarItem
+                        itemId="reset-customer-password"
+                        requiresPermission={['UpdateCustomer']}
+                    >
+                        <CustomerCredentialActionButton customerId={entity.id} action="reset" />
+                    </ActionBarItem>
+                )}
+                {entity?.user && !entity.user.verified && (
+                    <ActionBarItem
+                        itemId="verify-customer-account"
+                        requiresPermission={['UpdateCustomer']}
+                    >
+                        <CustomerCredentialActionButton customerId={entity.id} action="verify" />
+                    </ActionBarItem>
+                )}
                 <ActionBarItem itemId="save-button" requiresPermission={['UpdateCustomer']}>
                     <Button
                         type="submit"

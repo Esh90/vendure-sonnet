@@ -21,13 +21,17 @@ import {
     UpdateCustomerResult,
 } from '@vendure/common/lib/generated-types';
 import { ID, PaginatedList } from '@vendure/common/lib/shared-types';
+import { randomInt } from 'crypto';
 import { IsNull } from 'typeorm';
 
 import { RequestContext } from '../../api/common/request-context';
 import { RelationPaths } from '../../api/decorators/relations.decorator';
 import { ErrorResultUnion, isGraphQlErrorResult } from '../../common/error/error-result';
 import { EntityNotFoundError, InternalServerError } from '../../common/error/errors';
-import { EmailAddressConflictError as EmailAddressConflictAdminError } from '../../common/error/generated-graphql-admin-errors';
+import {
+    CustomerAccountStateError,
+    EmailAddressConflictError as EmailAddressConflictAdminError,
+} from '../../common/error/generated-graphql-admin-errors';
 import {
     EmailAddressConflictError,
     IdentifierChangeTokenExpiredError,
@@ -62,6 +66,7 @@ import { PasswordResetEvent } from '../../event-bus/events/password-reset-event'
 import { PasswordResetVerifiedEvent } from '../../event-bus/events/password-reset-verified-event';
 import { CustomFieldRelationService } from '../helpers/custom-field-relation/custom-field-relation.service';
 import { ListQueryBuilder } from '../helpers/list-query-builder/list-query-builder';
+import { RequestContextService } from '../helpers/request-context/request-context.service';
 import { TranslatorService } from '../helpers/translator/translator.service';
 import { addressToLine } from '../helpers/utils/address-to-line';
 import { patchEntity } from '../helpers/utils/patch-entity';
@@ -90,6 +95,7 @@ export class CustomerService {
         private historyService: HistoryService,
         private channelService: ChannelService,
         private customFieldRelationService: CustomFieldRelationService,
+        private requestContextService: RequestContextService,
         private translator: TranslatorService,
     ) {}
 
@@ -561,6 +567,103 @@ export class CustomerService {
         });
         await this.eventBus.publish(new PasswordResetVerifiedEvent(ctx, result));
         return result;
+    }
+
+    /**
+     * @description
+     * Administrator-driven counterpart to the storefront `requestPasswordReset` mutation: for a
+     * verified Customer, issues a password-reset token and publishes a {@link PasswordResetEvent}
+     * so the configured email handler can send the customer a reset link. No password is generated
+     * or returned — the customer chooses their new password through the standard reset flow.
+     */
+    async resetCustomerPasswordAsAdmin(
+        ctx: RequestContext,
+        customerId: ID,
+    ): Promise<{ success: boolean } | CustomerAccountStateError> {
+        const customer = await this.findOne(ctx, customerId, ['user']);
+        if (!customer) {
+            throw new EntityNotFoundError('Customer', customerId);
+        }
+        if (!customer.user) {
+            return new CustomerAccountStateError({ accountState: 'guest' });
+        }
+        if (!customer.user.verified) {
+            return new CustomerAccountStateError({ accountState: 'registered' });
+        }
+
+        const customerShopCtx = await this.requestContextService.create(
+            {
+                apiType: 'shop',
+                channelOrToken: ctx.channel,
+                req: ctx.req,
+                user: customer.user
+            }
+        )
+        await this.requestPasswordReset(customerShopCtx, customer.emailAddress);
+        return { success: true };
+    }
+
+    /**
+     * @description
+     * Administrator-driven action which completes the email-verification step for a registered
+     * Customer (one whose User has been created but never verified) with a randomly generated
+     * password, bypassing the verification-token flow. The cleartext password is returned in the
+     * result so the administrator can communicate it to the customer; it is not persisted
+     * anywhere else.
+     */
+    async verifyCustomerAccountAsAdmin(
+        ctx: RequestContext,
+        customerId: ID,
+    ): Promise<{ password: string } | CustomerAccountStateError> {
+        const customer = await this.findOne(ctx, customerId, ['user']);
+        if (!customer) {
+            throw new EntityNotFoundError('Customer', customerId);
+        }
+        if (!customer.user) {
+            return new CustomerAccountStateError({ accountState: 'guest' });
+        }
+        if (customer.user.verified) {
+            return new CustomerAccountStateError({ accountState: 'verified' });
+        }
+        const password = this.generateRandomPassword();
+        const user = await this.userService.resetPasswordAsAdmin(ctx, customer.user.id, password);
+        if (isGraphQlErrorResult(user)) {
+            throw new InternalServerError(
+                'The randomly generated password failed validation by the configured ' +
+                    'PasswordValidationStrategy. Adjust the strategy or override ' +
+                    'CustomerService.generateRandomPassword.',
+            );
+        }
+        await this.historyService.createHistoryEntryForCustomer({
+            customerId: customer.id,
+            ctx,
+            type: HistoryEntryType.CUSTOMER_VERIFIED,
+            data: { strategy: NATIVE_AUTH_STRATEGY_NAME },
+        });
+        await this.eventBus.publish(new AccountVerifiedEvent(ctx, customer));
+        return { password };
+    }
+
+    /**
+     * Generates a 16-character password containing at least one lowercase, uppercase, digit and
+     * symbol so that it comfortably passes the default `PasswordValidationStrategy`.
+     */
+    private generateRandomPassword(): string {
+        const lower = 'abcdefghijklmnopqrstuvwxyz';
+        const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const digits = '0123456789';
+        const symbols = '!@#$%^&*()-_=+';
+        const all = lower + upper + digits + symbols;
+        const pickRandom = (chars: string) => chars[randomInt(0, chars.length - 1)];
+        const required = [pickRandom(lower), pickRandom(upper), pickRandom(digits), pickRandom(symbols)];
+        const remaining = Array.from({ length: 12 }, () => pickRandom(all));
+        const combined = [...required, ...remaining];
+        // Fisher-Yates shuffle so that the required characters aren't always at the start.
+        for (let i = combined.length - 1; i > 0; i--) {
+            const j = randomInt(0, i);
+            [combined[i], combined[j]] = [combined[j], combined[i]];
+        }
+        return combined.join('');
     }
 
     /**
