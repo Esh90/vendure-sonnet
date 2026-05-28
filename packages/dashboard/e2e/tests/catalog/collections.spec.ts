@@ -318,7 +318,9 @@ test.describe('Issue #3548: Collection facet filter boolean args', () => {
         collectionId = '';
     });
 
-    test('should allow saving a facet-value-filter without toggling Contains any', async ({ page }) => {
+    test('should initialize containsAny through the UI when adding a facet-value-filter', async ({
+        page,
+    }) => {
         const client = new VendureAdminClient(page);
         await client.login();
         const { facetValues } = await client.gql(`
@@ -339,6 +341,9 @@ test.describe('Issue #3548: Collection facet filter boolean args', () => {
         await page.getByPlaceholder('Search facet values...').fill(facetValueName);
         await page.getByRole('option', { name: facetValueName, exact: true }).click();
 
+        await expect(
+            page.locator('[data-slot="field"]').filter({ hasText: 'Contains any' }).getByRole('switch'),
+        ).not.toBeChecked();
         await expect(dp.createButton).toBeEnabled({ timeout: 5_000 });
         await dp.clickCreate();
         await dp.expectNavigatedToExisting();
