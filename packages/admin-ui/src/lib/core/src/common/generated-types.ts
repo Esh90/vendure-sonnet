@@ -3256,6 +3256,8 @@ export type Mutation = {
   updateUserChannels: UserStatus;
   /** Update an existing Zone */
   updateZone: Zone;
+  /** Manually verify a customer account, bypassing the email verification token flow. */
+  verifyCustomerAccount: Customer;
 };
 
 
@@ -4211,6 +4213,11 @@ export type MutationUpdateUserChannelsArgs = {
 
 export type MutationUpdateZoneArgs = {
   input: UpdateZoneInput;
+};
+
+
+export type MutationVerifyCustomerAccountArgs = {
+  id: Scalars['ID']['input'];
 };
 
 export type NativeAuthInput = {

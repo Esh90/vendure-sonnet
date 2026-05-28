@@ -513,6 +513,46 @@ export class CustomerService {
 
     /**
      * @description
+     * Manually marks a Customer's email address as verified, bypassing the email
+     * verification token flow. Intended for use by administrators when the customer
+     * has not received or is unable to complete the verification email.
+     *
+     * If the Customer is already verified, this method is a no-op and returns the
+     * Customer unchanged.
+     */
+    async verifyCustomerAccount(ctx: RequestContext, customerId: ID): Promise<Customer> {
+        const customer = await this.connection.getEntityOrThrow(ctx, Customer, customerId, {
+            channelId: ctx.channelId,
+            relations: ['user', 'user.authenticationMethods'],
+        });
+        if (!customer.user) {
+            throw new InternalServerError('error.cannot-locate-customer-for-user');
+        }
+        if (!customer.user.verified) {
+            const nativeAuthMethod = customer.user.getNativeAuthenticationMethod(false);
+            if (nativeAuthMethod) {
+                nativeAuthMethod.verificationToken = null;
+                await this.connection
+                    .getRepository(ctx, NativeAuthenticationMethod)
+                    .save(nativeAuthMethod);
+            }
+            customer.user.verified = true;
+            await this.connection.getRepository(ctx, User).save(customer.user, { reload: false });
+            await this.historyService.createHistoryEntryForCustomer({
+                customerId: customer.id,
+                ctx,
+                type: HistoryEntryType.CUSTOMER_VERIFIED,
+                data: {
+                    strategy: NATIVE_AUTH_STRATEGY_NAME,
+                },
+            });
+            await this.eventBus.publish(new AccountVerifiedEvent(ctx, customer));
+        }
+        return assertFound(this.findOne(ctx, customer.id));
+    }
+
+    /**
+     * @description
      * Publishes a new {@link PasswordResetEvent} for the given email address. This event creates
      * a token which can be used in the `resetPassword()` method.
      */

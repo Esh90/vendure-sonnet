@@ -28,6 +28,9 @@ type Mutation {
     addNoteToCustomer(input: AddNoteToCustomerInput!): Customer!
     updateCustomerNote(input: UpdateCustomerNoteInput!): HistoryEntry!
     deleteCustomerNote(id: ID!): DeletionResponse!
+
+    "Manually verify a customer account, bypassing the email verification token flow."
+    verifyCustomerAccount(id: ID!): Customer!
 }
 
 input UpdateCustomerInput {

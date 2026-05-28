@@ -1,7 +1,7 @@
 import { DeletionResult, ErrorCode, HistoryEntryType } from '@vendure/common/lib/generated-types';
 import { omit } from '@vendure/common/lib/omit';
 import { pick } from '@vendure/common/lib/pick';
-import { AccountRegistrationEvent, EventBus } from '@vendure/core';
+import { AccountRegistrationEvent, AccountVerifiedEvent, EventBus } from '@vendure/core';
 import { createErrorResultGuard, createTestEnvironment, ErrorResultGuard } from '@vendure/testing';
 import path from 'path';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -29,6 +29,7 @@ import {
     updateAddressDocument,
     updateCustomerDocument,
     updateCustomerNoteDocument,
+    verifyCustomerAccountDocument,
 } from './graphql/shared-definitions';
 import {
     activeOrderCustomerDocument,
@@ -679,6 +680,91 @@ describe('Customer resolver', () => {
                 id: firstCustomer.id,
             });
             expect(after?.history.totalItems).toBe(historyCount - 1);
+        });
+    });
+
+    describe('verifyCustomerAccount', () => {
+        let unverifiedCustomerId: string;
+
+        beforeAll(async () => {
+            const { createCustomer } = await adminClient.query(createCustomerDocument, {
+                input: {
+                    emailAddress: 'unverified@test.com',
+                    firstName: 'Unverified',
+                    lastName: 'Customer',
+                },
+            });
+            customerErrorGuard.assertSuccess(createCustomer);
+            unverifiedCustomerId = createCustomer.id;
+            expect(createCustomer.user!.verified).toBe(false);
+        });
+
+        it('verifies an unverified customer', async () => {
+            const { verifyCustomerAccount } = await adminClient.query(verifyCustomerAccountDocument, {
+                id: unverifiedCustomerId,
+            });
+
+            expect(verifyCustomerAccount.user!.verified).toBe(true);
+        });
+
+        it('records a CUSTOMER_VERIFIED history entry', async () => {
+            const { customer } = await adminClient.query(getCustomerHistoryDocument, {
+                id: unverifiedCustomerId,
+                options: {
+                    filter: {
+                        type: {
+                            eq: HistoryEntryType.CUSTOMER_VERIFIED,
+                        },
+                    },
+                },
+            });
+
+            customerHistoryGuard.assertSuccess(customer);
+
+            expect(customer.history.items.map(pick(['type', 'data']))).toContainEqual({
+                type: HistoryEntryType.CUSTOMER_VERIFIED,
+                data: { strategy: 'native' },
+            });
+        });
+
+        it('emits an AccountVerifiedEvent', async () => {
+            const { createCustomer } = await adminClient.query(createCustomerDocument, {
+                input: {
+                    emailAddress: 'unverified2@test.com',
+                    firstName: 'Unverified2',
+                    lastName: 'Customer',
+                },
+            });
+            customerErrorGuard.assertSuccess(createCustomer);
+
+            const eventFn = vi.fn();
+            let resolveFn: () => void;
+            const subscription = server.app
+                .get(EventBus)
+                .ofType(AccountVerifiedEvent)
+                .subscribe(event => {
+                    eventFn(event);
+                    resolveFn?.();
+                });
+            const eventReceived = new Promise<void>(resolve => {
+                resolveFn = resolve;
+            });
+
+            await adminClient.query(verifyCustomerAccountDocument, { id: createCustomer.id });
+            await eventReceived;
+
+            expect(eventFn).toHaveBeenCalledTimes(1);
+            expect(eventFn.mock.calls[0][0] instanceof AccountVerifiedEvent).toBe(true);
+
+            subscription.unsubscribe();
+        });
+
+        it('is idempotent for an already-verified customer', async () => {
+            const { verifyCustomerAccount } = await adminClient.query(verifyCustomerAccountDocument, {
+                id: unverifiedCustomerId,
+            });
+
+            expect(verifyCustomerAccount.user!.verified).toBe(true);
         });
     });
 });

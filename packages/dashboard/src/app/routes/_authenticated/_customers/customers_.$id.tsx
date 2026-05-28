@@ -45,6 +45,7 @@ import {
     customerDetailDocument,
     removeCustomerFromGroupDocument,
     updateCustomerDocument,
+    verifyCustomerAccountDocument,
 } from './customers.graphql.js';
 
 const pageId = 'customer-detail';
@@ -145,12 +146,35 @@ function CustomerDetailPage() {
         },
     });
 
+    const { mutate: verifyCustomer, isPending: isVerifyPending } = useMutation({
+        mutationFn: api.mutate(verifyCustomerAccountDocument),
+        onSuccess: () => {
+            toast.success(t`Customer account verified`);
+            refreshEntity();
+        },
+        onError: () => {
+            toast.error(t`Failed to verify customer account`);
+        },
+    });
+
     const customerName = entity ? `${entity.firstName} ${entity.lastName}` : '';
 
     return (
         <Page pageId={pageId} form={form} submitHandler={submitHandler} entity={entity}>
             <PageTitle>{creatingNewEntity ? <Trans>New customer</Trans> : customerName}</PageTitle>
             <PageActionBar>
+                {entity?.user && !entity.user.verified && (
+                    <ActionBarItem itemId="verify-button" requiresPermission={['UpdateCustomer']}>
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            disabled={isVerifyPending}
+                            onClick={() => verifyCustomer({ id: entity.id })}
+                        >
+                            <Trans>Verify account</Trans>
+                        </Button>
+                    </ActionBarItem>
+                )}
                 <ActionBarItem itemId="save-button" requiresPermission={['UpdateCustomer']}>
                     <Button
                         type="submit"

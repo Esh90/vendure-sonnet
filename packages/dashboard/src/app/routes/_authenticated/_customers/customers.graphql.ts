@@ -142,6 +142,18 @@ export const deleteCustomerDocument = graphql(`
     }
 `);
 
+export const verifyCustomerAccountDocument = graphql(`
+    mutation VerifyCustomerAccount($id: ID!) {
+        verifyCustomerAccount(id: $id) {
+            id
+            user {
+                id
+                verified
+            }
+        }
+    }
+`);
+
 export const createCustomerAddressDocument = graphql(`
     mutation CreateCustomerAddress($customerId: ID!, $input: CreateAddressInput!) {
         createCustomerAddress(customerId: $customerId, input: $input) {
