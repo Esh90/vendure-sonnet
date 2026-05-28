@@ -32,7 +32,7 @@ export async function runSchemaCheck(config: RuntimeVendureConfig): Promise<Chec
             typesLoader,
             apiType: 'admin',
         } as any);
-        details.push('Admin API schema generated successfully');
+        details.push('Admin API schema validated successfully');
     } catch (e: any) {
         worstStatus = 'fail';
         const errorMessage = e instanceof Error ? e.message : String(e);
@@ -47,7 +47,7 @@ export async function runSchemaCheck(config: RuntimeVendureConfig): Promise<Chec
             typesLoader,
             apiType: 'shop',
         } as any);
-        details.push('Shop API schema generated successfully');
+        details.push('Shop API schema validated successfully');
     } catch (e: any) {
         worstStatus = 'fail';
         const errorMessage = e instanceof Error ? e.message : String(e);
@@ -56,8 +56,8 @@ export async function runSchemaCheck(config: RuntimeVendureConfig): Promise<Chec
 
     const message =
         worstStatus === 'pass'
-            ? 'Admin and Shop schemas generated successfully'
-            : 'Schema generation failed';
+            ? 'Admin and Shop API schemas validated successfully'
+            : 'Schema validation failed';
 
     return {
         name: 'Schema',

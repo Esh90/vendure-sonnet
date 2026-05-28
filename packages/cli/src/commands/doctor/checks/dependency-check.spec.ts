@@ -97,7 +97,7 @@ describe('dependency-check', () => {
 
         const result = await runDependencyCheck('/fake/node_modules');
 
-        expect(result.status).toBe('fail');
+        expect(result.status).toBe('warn');
         expect(result.details?.some(d => d.includes('Multiple graphql versions'))).toBe(true);
     });
 

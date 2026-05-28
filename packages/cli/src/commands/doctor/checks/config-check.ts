@@ -58,12 +58,19 @@ export async function runConfigCheck(configFlag?: string): Promise<ConfigCheckRe
         details.push(...pluginResults.details);
 
         const status = pluginResults.hasIncompatible ? 'fail' : pluginResults.hasNoCompat ? 'warn' : 'pass';
-        const message =
-            status === 'pass'
-                ? 'Vendure config loaded and validated successfully'
-                : status === 'warn'
-                  ? 'Config loaded with warnings'
-                  : 'Plugin compatibility issues detected';
+        let message: string;
+        if (status === 'pass') {
+            message = 'Vendure config loaded and validated successfully';
+        } else if (status === 'fail') {
+            message = 'Plugin compatibility issues detected';
+        } else {
+            // warn -- explain why
+            const parts: string[] = [];
+            if (pluginResults.noCompatCount > 0) {
+                parts.push(`${pluginResults.noCompatCount} plugin(s) without compatibility range`);
+            }
+            message = `Config loaded (${parts.join(', ')})`;
+        }
 
         return {
             check: { name: 'Config', status, message, details },
@@ -92,6 +99,7 @@ interface PluginCheckResult {
     details: string[];
     hasIncompatible: boolean;
     hasNoCompat: boolean;
+    noCompatCount: number;
 }
 
 /**
@@ -102,20 +110,23 @@ function checkPlugins(config: RuntimeVendureConfig): PluginCheckResult {
     const details: string[] = [];
     let hasIncompatible = false;
     let hasNoCompat = false;
+    let noCompatCount = 0;
 
     if (!config.plugins || config.plugins.length === 0) {
         details.push('No plugins configured');
-        return { details, hasIncompatible, hasNoCompat };
+        return { details, hasIncompatible, hasNoCompat, noCompatCount };
     }
 
     details.push(`${config.plugins.length} plugin(s) loaded`);
 
     for (const plugin of config.plugins) {
-        const pluginName = (plugin as any).name as string;
+        // DynamicModule plugins (e.g. SomePlugin.init()) have the class on .module
+        const pluginName = getPluginName(plugin);
         const compatibility = getCompatibility(plugin);
 
         if (!compatibility) {
             hasNoCompat = true;
+            noCompatCount++;
             details.push(`Plugin "${pluginName}": no compatibility range specified`);
         } else if (
             !satisfies(VENDURE_VERSION, compatibility, { loose: true, includePrerelease: true })
@@ -127,5 +138,20 @@ function checkPlugins(config: RuntimeVendureConfig): PluginCheckResult {
         }
     }
 
-    return { details, hasIncompatible, hasNoCompat };
+    return { details, hasIncompatible, hasNoCompat, noCompatCount };
+}
+
+/**
+ * Extracts the plugin name, handling both plain classes and DynamicModule objects.
+ */
+function getPluginName(plugin: any): string {
+    // DynamicModule has { module: Type<any>, ... }
+    if (plugin && plugin.module && plugin.module.name) {
+        return plugin.module.name;
+    }
+    // Plain class
+    if (plugin && plugin.name) {
+        return plugin.name;
+    }
+    return 'Unknown';
 }

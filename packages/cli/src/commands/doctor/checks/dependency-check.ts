@@ -89,11 +89,14 @@ export async function runDependencyCheck(nodeModulesPath?: string): Promise<Chec
     }
 
     // 2. Check for duplicate singleton dependencies
+    // Duplicates are a warning rather than a failure because in monorepos,
+    // nested copies (e.g. msw bundling its own graphql) may not actually
+    // cause runtime issues for the Vendure application.
     const duplicates = findDuplicatePackages(modulesDir, SINGLETON_PACKAGES);
     for (const [pkg, versions] of duplicates) {
         if (versions.length > 1) {
-            worstStatus = 'fail';
-            details.push(`Multiple ${pkg} versions: ${versions.join(', ')}`);
+            if (worstStatus === 'pass') worstStatus = 'warn';
+            details.push(`Multiple ${pkg} versions found: ${versions.join(', ')}`);
         }
     }
     if (duplicates.size === 0 || [...duplicates.values()].every(v => v.length <= 1)) {
