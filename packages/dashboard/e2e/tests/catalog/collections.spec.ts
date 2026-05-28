@@ -294,6 +294,7 @@ test.describe('Issue #4389: Collection form dirty state with filters', () => {
     });
 });
 
+// #3548 — Collection facet filter boolean args
 test.describe('Issue #3548: Collection facet filter boolean args', () => {
     let collectionId: string;
 
@@ -317,8 +318,6 @@ test.describe('Issue #3548: Collection facet filter boolean args', () => {
         collectionId = '';
     });
 
-    // #3548 — A newly-added facet-value-filter should initialize the required
-    // containsAny boolean to the same explicit false value shown by the switch.
     test('should allow saving a facet-value-filter without toggling Contains any', async ({ page }) => {
         const client = new VendureAdminClient(page);
         await client.login();
