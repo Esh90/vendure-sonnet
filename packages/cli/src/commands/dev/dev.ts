@@ -176,7 +176,7 @@ function spawnDevChild(
                 ...process.env,
                 FORCE_COLOR: process.env.FORCE_COLOR ?? '1',
             },
-            stdio: options.prefixOutput ? ['inherit', 'pipe', 'pipe'] : 'inherit',
+            stdio: options.prefixOutput ? ['ignore', 'pipe', 'pipe'] : 'inherit',
         },
     );
     if (options.prefixOutput) {
@@ -194,7 +194,7 @@ function startPlainDevProcess(
 ): ManagedDevProcess {
     const child = spawnDevChild(projectDir, processDefinition, binPath, options);
     const runningProcess = new ManagedDevProcess(signal => {
-        stopChild(child, signal);
+        stopChildWithGrace(child, signal, restartShutdownGraceMs);
     });
 
     child.once('error', error => runningProcess.emit('error', error));
@@ -227,7 +227,7 @@ function startSupervisedDevProcess(
         }
         closeWatcher();
         if (child) {
-            stopChild(child, signal);
+            stopChildWithGrace(child, signal, restartShutdownGraceMs);
         }
     });
 
@@ -393,12 +393,6 @@ function writeDevStatus(
     }
 }
 
-function stopChild(child: ChildProcess, signal: NodeJS.Signals): void {
-    if (isChildRunning(child)) {
-        child.kill(signal);
-    }
-}
-
 function stopChildWithGrace(child: ChildProcess, signal: NodeJS.Signals, graceMs: number): void {
     if (!isChildRunning(child)) {
         return;
@@ -426,6 +420,10 @@ export function shouldRestartOnFileChange(
     }
     const fileName = path.basename(filePath);
     if (reloadIgnoredFileNames.has(fileName)) {
+        return false;
+    }
+    // Declaration files have no runtime effect, so generated types should not churn process restarts.
+    if (isTypeDeclarationFile(fileName)) {
         return false;
     }
     if (fileName === '.env' || fileName.startsWith('.env.')) {
@@ -487,7 +485,10 @@ function findDashboardMetadataCandidateFiles(projectDir: string): string[] {
             }
             if (entry.isDirectory()) {
                 visit(filePath);
-            } else if (reloadFileExtensions.has(path.extname(entry.name))) {
+            } else if (
+                reloadFileExtensions.has(path.extname(entry.name)) &&
+                !isTypeDeclarationFile(entry.name)
+            ) {
                 files.push(filePath);
             }
         }
@@ -585,6 +586,10 @@ function isPathInside(filePath: string, parentPath: string): boolean {
 
 function normalizePath(filePath: string): string {
     return filePath.split(path.sep).join('/');
+}
+
+function isTypeDeclarationFile(fileName: string): boolean {
+    return /\.d\.[cm]?ts$/.test(fileName);
 }
 
 function getInspectArgs(

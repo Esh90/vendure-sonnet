@@ -214,6 +214,23 @@ describe('dev command', () => {
             ).toBe(true);
         });
 
+        it('does not restart server or worker processes for generated type declaration files', () => {
+            const projectDir = path.resolve('/project');
+
+            expect(
+                shouldRestartOnFileChange(
+                    path.join(projectDir, 'src', 'graphql', 'graphql-env.d.ts'),
+                    projectDir,
+                ),
+            ).toBe(false);
+            expect(
+                shouldRestartOnFileChange(path.join(projectDir, 'src', 'types', 'schema.d.cts'), projectDir),
+            ).toBe(false);
+            expect(
+                shouldRestartOnFileChange(path.join(projectDir, 'src', 'types', 'schema.d.mts'), projectDir),
+            ).toBe(false);
+        });
+
         it('does not restart server or worker processes for Vite config changes', () => {
             const projectDir = path.resolve('/project');
 
