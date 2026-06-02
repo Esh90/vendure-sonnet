@@ -94,7 +94,7 @@ msgstr "使用外部驗證策略：{strategy}"
 msgid "Select a reason..."
 msgstr "選擇原因..."
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:79
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:100
 msgid "Heading 5"
 msgstr "標題 5"
 
@@ -104,7 +104,7 @@ msgstr "標題 5"
 msgid "Failed to add payment"
 msgstr "新增付款失敗"
 
-#: src/lib/framework/layout-engine/page-layout.tsx:718
+#: src/lib/framework/layout-engine/page-layout.tsx:730
 msgid "Updated"
 msgstr "已更新"
 
@@ -164,7 +164,7 @@ msgstr "類型"
 #. placeholder {0}: entityName.toLowerCase()
 #. placeholder {0}: group.name
 #: src/app/routes/_authenticated/_products/components/product-option-select.tsx:57
-#: src/lib/components/data-input/default-relation-input.tsx:618
+#: src/lib/components/data-input/default-relation-input.tsx:616
 msgid "Select {0}"
 msgstr "選取 {0}"
 
@@ -320,7 +320,7 @@ msgstr "至少輸入 2 個字元進行搜尋..."
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:121
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:182
-#: src/app/routes/_authenticated/_profile/profile.tsx:100
+#: src/app/routes/_authenticated/_profile/profile.tsx:108
 msgid "Last name"
 msgstr "姓氏"
 
@@ -348,6 +348,7 @@ msgstr "已成功建立庫存位置"
 #: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:180
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:112
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:204
+#: src/lib/components/shared/asset/asset-preview.tsx:142
 msgid "Unknown error"
 msgstr "未知錯誤"
 
@@ -690,7 +691,7 @@ msgid "Failed to set shipping method for order: {0}"
 msgstr ""
 
 #: src/app/routes/_authenticated/_option-groups/components/option-group-products-block.tsx:48
-#: src/lib/components/data-table/data-table.tsx:367
+#: src/lib/components/data-table/data-table.tsx:378
 msgid "Filter..."
 msgstr "篩選..."
 
@@ -893,6 +894,7 @@ msgid "Shipping address set for order"
 msgstr "訂單已設定配送地址"
 
 #: src/app/routes/_authenticated/_assets/assets_.$id.tsx:173
+#: src/lib/components/shared/asset/asset-preview.tsx:168
 msgid "Focal Point"
 msgstr "焦點"
 
@@ -943,8 +945,8 @@ msgid "Failed to update zone"
 msgstr "更新區域失敗"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:133
-#: src/app/routes/_authenticated/_profile/profile.tsx:112
-#: src/app/routes/_authenticated/_profile/profile.tsx:129
+#: src/app/routes/_authenticated/_profile/profile.tsx:120
+#: src/app/routes/_authenticated/_profile/profile.tsx:137
 #: src/lib/components/login/login-form.tsx:93
 msgid "Password"
 msgstr "密碼"
@@ -1284,9 +1286,17 @@ msgstr "{buttonText}"
 msgid "Item added to order"
 msgstr "項目已新增至訂單"
 
+#: src/lib/components/shared/asset/asset-preview.tsx:161
+msgid "Edit focal point"
+msgstr ""
+
 #: src/lib/components/shared/seller-selector.tsx:92
 #~ msgid "No sellers found"
 #~ msgstr "找不到賣家"
+
+#: src/lib/components/shared/asset/asset-preview-dialog.tsx:34
+msgid "Asset"
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/components/shared-option-group-warning.tsx:13
 msgid "{productCount, plural, one {This option group is used by one other product. Changes will affect it too.} other {This option group is shared across # products. Changes will affect all of them.}}"
@@ -1480,7 +1490,7 @@ msgstr "重新命名檢視失敗"
 msgid "Available"
 msgstr "可用"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:74
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:95
 msgid "Normal"
 msgstr "正常"
 
@@ -1523,7 +1533,7 @@ msgstr "地址已成功更新"
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:226
 #: src/app/routes/_authenticated/_orders/components/fulfillment-details.tsx:124
 #: src/lib/components/shared/asset/asset-gallery.tsx:747
-#: src/lib/framework/layout-engine/page-layout.tsx:705
+#: src/lib/framework/layout-engine/page-layout.tsx:717
 msgid "Created"
 msgstr "已建立"
 
@@ -1767,7 +1777,7 @@ msgstr "退款已成功完成"
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:226
 #: src/app/routes/_authenticated/_products/components/assign-facet-values-dialog.tsx:276
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:219
-#: src/app/routes/_authenticated/_profile/profile.tsx:84
+#: src/app/routes/_authenticated/_profile/profile.tsx:92
 #: src/app/routes/_authenticated/_promotions/promotions_.$id.tsx:144
 #: src/app/routes/_authenticated/_roles/roles_.$id.tsx:84
 #: src/app/routes/_authenticated/_sellers/sellers_.$id.tsx:78
@@ -1780,7 +1790,7 @@ msgstr "退款已成功完成"
 msgid "Update"
 msgstr "更新"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:76
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:97
 msgid "Heading 2"
 msgstr "標題 2"
 
@@ -1788,7 +1798,7 @@ msgstr "標題 2"
 msgid "Order placed"
 msgstr "訂單已下單"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:63
+#: src/app/routes/_authenticated/_profile/profile.tsx:71
 msgid "Successfully updated profile"
 msgstr "已成功更新個人資料"
 
@@ -1840,7 +1850,7 @@ msgstr "開始於"
 msgid "Duplicate"
 msgstr "複製"
 
-#: src/lib/components/data-table/data-table.tsx:558
+#: src/lib/components/data-table/data-table.tsx:588
 #: src/lib/components/shared/customer-group-selector.tsx:56
 msgid "No results"
 msgstr "無結果"
@@ -2712,7 +2722,7 @@ msgstr "確定要刪除此全域檢視嗎？此動作無法復原，將影響所
 msgid "Force remove option group"
 msgstr "強制移除選項群組"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:132
+#: src/app/routes/_authenticated/_profile/profile.tsx:140
 msgid "Added"
 msgstr "已新增"
 
@@ -2804,6 +2814,10 @@ msgstr "從 {0} 到 {1}"
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:111
 msgid "Failed to create customer"
 msgstr "建立客戶失敗"
+
+#: src/lib/components/shared/asset/asset-preview.tsx:138
+msgid "Focal point updated"
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:298
 msgid "Option values"
@@ -2961,7 +2975,7 @@ msgstr "退款處理成功"
 #: src/lib/components/data-input/product-multi-selector-input.tsx:281
 #: src/lib/components/data-input/product-multi-selector-input.tsx:284
 #: src/lib/components/data-input/relation-selector.tsx:404
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:418
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:439
 msgid "{0}"
 msgstr "{0}"
 
@@ -3026,7 +3040,7 @@ msgstr "確定要離開此頁面嗎？任何未儲存的變更都將遺失。"
 msgid "Toggle header column"
 msgstr "切換標題欄"
 
-#: src/app/routes/_authenticated/_promotions/promotions.tsx:87
+#: src/app/routes/_authenticated/_promotions/promotions.tsx:88
 msgid "New Promotion"
 msgstr "新增促銷"
 
@@ -3046,6 +3060,10 @@ msgstr "預設稅務類別"
 #: src/lib/components/data-input/slug-input.tsx:238
 msgid "Slug is set"
 msgstr "Slug 已設定"
+
+#: src/lib/components/shared/asset/asset-preview.tsx:141
+msgid "Failed to update focal point"
+msgstr ""
 
 #: src/app/routes/_authenticated/_zones/zones_.$id.tsx:61
 msgid "Successfully updated zone"
@@ -3110,7 +3128,7 @@ msgstr "訂單指標"
 msgid "Select display language"
 msgstr "選取顯示語言"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:120
+#: src/app/routes/_authenticated/_profile/profile.tsx:128
 msgid "Authentication methods"
 msgstr "驗證方式"
 
@@ -3227,7 +3245,7 @@ msgstr "載入更多{0}個 (剩餘{remaining}個)"
 msgid "Facet values"
 msgstr "屬性值"
 
-#: src/lib/components/data-table/data-table.tsx:228
+#: src/lib/components/data-table/data-table.tsx:237
 msgid "Failed to reorder items"
 msgstr "重新排序商品失敗"
 
@@ -3308,7 +3326,7 @@ msgstr "是"
 msgid "Slug"
 msgstr "Slug"
 
-#: src/lib/components/shared/asset/asset-focal-point-editor.tsx:97
+#: src/lib/components/shared/asset/asset-focal-point-editor.tsx:98
 msgid "Set Focal Point"
 msgstr "設定焦點"
 
@@ -3441,7 +3459,7 @@ msgstr "未執行"
 msgid "Assigned"
 msgstr "已指派"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:75
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:96
 msgid "Heading 1"
 msgstr "標題 1"
 
@@ -3563,6 +3581,7 @@ msgid "Cannot remove from active channel"
 msgstr "無法從活動頻道中移除"
 
 #: src/app/routes/_authenticated/_assets/assets_.$id.tsx:179
+#: src/lib/components/shared/asset/asset-preview.tsx:177
 msgid "Not set"
 msgstr "未設定"
 
@@ -3663,7 +3682,7 @@ msgid "Add a price in another currency"
 msgstr "新增另一種貨幣的價格"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:127
-#: src/app/routes/_authenticated/_profile/profile.tsx:106
+#: src/app/routes/_authenticated/_profile/profile.tsx:114
 msgid "Email Address or identifier"
 msgstr "電子郵件地址或識別碼"
 
@@ -3680,7 +3699,7 @@ msgstr "退款 #{0} 已轉換到 {1}"
 msgid "Customers"
 msgstr "客戶"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:78
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:99
 msgid "Heading 4"
 msgstr "標題 4"
 
@@ -4033,7 +4052,7 @@ msgstr "已出貨"
 #~ msgid "Monitored Resources"
 #~ msgstr "監控資源"
 
-#: src/lib/framework/layout-engine/page-layout.tsx:677
+#: src/lib/framework/layout-engine/page-layout.tsx:689
 msgid "Entity Information"
 msgstr "實體資訊"
 
@@ -4302,7 +4321,7 @@ msgstr "新增賣家"
 msgid "e.g., Red, Large, Cotton"
 msgstr "例如：紅色、大號、棉質"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:67
+#: src/app/routes/_authenticated/_profile/profile.tsx:75
 msgid "Failed to update profile"
 msgstr "更新個人資料失敗"
 
@@ -4726,7 +4745,7 @@ msgstr "設定"
 msgid "Settings Store"
 msgstr "設定商店"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:77
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:98
 msgid "Heading 3"
 msgstr "標題 3"
 
@@ -4968,6 +4987,11 @@ msgstr "正在履行..."
 msgid "Add option group to product"
 msgstr "將選項群組新增至商品"
 
+#. placeholder {0}: asset.name
+#: src/lib/components/shared/asset/asset-preview-dialog.tsx:37
+msgid "Preview of {0}"
+msgstr ""
+
 #: src/app/routes/_authenticated/_sellers/sellers_.$id.tsx:56
 msgid "Successfully updated seller"
 msgstr "已成功更新賣家"
@@ -5143,7 +5167,7 @@ msgid "Customer not found"
 msgstr "找不到客戶"
 
 #. placeholder {0}: entityName.toLowerCase()
-#: src/lib/components/data-input/default-relation-input.tsx:605
+#: src/lib/components/data-input/default-relation-input.tsx:603
 msgid "Select {0}s"
 msgstr "選取 {0}"
 
@@ -5158,7 +5182,7 @@ msgstr "處理退款失敗"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:115
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:176
-#: src/app/routes/_authenticated/_profile/profile.tsx:94
+#: src/app/routes/_authenticated/_profile/profile.tsx:102
 msgid "First name"
 msgstr "名字"
 
@@ -5206,8 +5230,8 @@ msgstr "新增篩選器"
 msgid "Tax category"
 msgstr "稅務類別"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:31
-#: src/app/routes/_authenticated/_profile/profile.tsx:76
+#: src/app/routes/_authenticated/_profile/profile.tsx:38
+#: src/app/routes/_authenticated/_profile/profile.tsx:84
 #: src/lib/components/layout/nav-user.tsx:108
 msgid "Profile"
 msgstr "個人資料"
@@ -5724,7 +5748,7 @@ msgstr "您沒有檢視全域語言設定的權限"
 msgid "Successfully created tax rate"
 msgstr "已成功建立稅率"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:80
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:101
 msgid "Heading 6"
 msgstr "標題 6"
 
@@ -5777,7 +5801,7 @@ msgstr "使用中的篩選條件"
 
 #: src/app/routes/_authenticated/_assets/components/asset-tag-filter.tsx:178
 #: src/lib/components/data-table/data-table-active-filters-popover.tsx:54
-#: src/lib/components/data-table/data-table.tsx:423
+#: src/lib/components/data-table/data-table.tsx:434
 msgid "Clear all"
 msgstr "全部清除"
 

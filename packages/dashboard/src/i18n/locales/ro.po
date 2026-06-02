@@ -94,7 +94,7 @@ msgstr "Folosind strategia de autentificare externă: {strategy}"
 msgid "Select a reason..."
 msgstr "Alege un motiv..."
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:79
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:100
 msgid "Heading 5"
 msgstr "Heading 5"
 
@@ -104,7 +104,7 @@ msgstr "Heading 5"
 msgid "Failed to add payment"
 msgstr "Nu s-a putut adăuga plata"
 
-#: src/lib/framework/layout-engine/page-layout.tsx:718
+#: src/lib/framework/layout-engine/page-layout.tsx:730
 msgid "Updated"
 msgstr "Actualizat"
 
@@ -160,7 +160,7 @@ msgstr "Tip"
 #. placeholder {0}: entityName.toLowerCase()
 #. placeholder {0}: group.name
 #: src/app/routes/_authenticated/_products/components/product-option-select.tsx:57
-#: src/lib/components/data-input/default-relation-input.tsx:618
+#: src/lib/components/data-input/default-relation-input.tsx:616
 msgid "Select {0}"
 msgstr "Selectează {0}"
 
@@ -296,7 +296,7 @@ msgstr "Introduceți cel puțin 2 caractere pentru căutare..."
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:121
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:182
-#: src/app/routes/_authenticated/_profile/profile.tsx:100
+#: src/app/routes/_authenticated/_profile/profile.tsx:108
 msgid "Last name"
 msgstr "Nume"
 
@@ -324,6 +324,7 @@ msgstr "Locația de stoc a fost creată cu succes"
 #: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:180
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:112
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:204
+#: src/lib/components/shared/asset/asset-preview.tsx:142
 msgid "Unknown error"
 msgstr "Eroare necunoscută"
 
@@ -662,7 +663,7 @@ msgid "Failed to set shipping method for order: {0}"
 msgstr ""
 
 #: src/app/routes/_authenticated/_option-groups/components/option-group-products-block.tsx:48
-#: src/lib/components/data-table/data-table.tsx:367
+#: src/lib/components/data-table/data-table.tsx:378
 msgid "Filter..."
 msgstr "Filtrează..."
 
@@ -865,6 +866,7 @@ msgid "Shipping address set for order"
 msgstr "Adresa de livrare setată pentru comandă"
 
 #: src/app/routes/_authenticated/_assets/assets_.$id.tsx:173
+#: src/lib/components/shared/asset/asset-preview.tsx:168
 msgid "Focal Point"
 msgstr "Punct focal"
 
@@ -915,8 +917,8 @@ msgid "Failed to update zone"
 msgstr "Nu s-a putut actualiza zona"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:133
-#: src/app/routes/_authenticated/_profile/profile.tsx:112
-#: src/app/routes/_authenticated/_profile/profile.tsx:129
+#: src/app/routes/_authenticated/_profile/profile.tsx:120
+#: src/app/routes/_authenticated/_profile/profile.tsx:137
 #: src/lib/components/login/login-form.tsx:93
 msgid "Password"
 msgstr "Parolă"
@@ -1244,6 +1246,14 @@ msgstr "{buttonText}"
 msgid "Item added to order"
 msgstr "Articol adăugat la comandă"
 
+#: src/lib/components/shared/asset/asset-preview.tsx:161
+msgid "Edit focal point"
+msgstr ""
+
+#: src/lib/components/shared/asset/asset-preview-dialog.tsx:34
+msgid "Asset"
+msgstr ""
+
 #: src/app/routes/_authenticated/_products/components/shared-option-group-warning.tsx:13
 msgid "{productCount, plural, one {This option group is used by one other product. Changes will affect it too.} other {This option group is shared across # products. Changes will affect all of them.}}"
 msgstr "{productCount, plural, one {Acest grup de opțiuni este folosit de încă un produs. Modificările îl vor afecta și pe acesta.} other {Acest grup de opțiuni este partajat între # produse. Modificările le vor afecta pe toate.}}"
@@ -1427,7 +1437,7 @@ msgstr "Nu s-a putut redenumi vizualizarea"
 msgid "Available"
 msgstr "Disponibil"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:74
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:95
 msgid "Normal"
 msgstr "Normal"
 
@@ -1470,7 +1480,7 @@ msgstr "Adresă actualizată cu succes"
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:226
 #: src/app/routes/_authenticated/_orders/components/fulfillment-details.tsx:124
 #: src/lib/components/shared/asset/asset-gallery.tsx:747
-#: src/lib/framework/layout-engine/page-layout.tsx:705
+#: src/lib/framework/layout-engine/page-layout.tsx:717
 msgid "Created"
 msgstr "Creat"
 
@@ -1706,7 +1716,7 @@ msgstr "Rambursare soluționată cu succes"
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:226
 #: src/app/routes/_authenticated/_products/components/assign-facet-values-dialog.tsx:276
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:219
-#: src/app/routes/_authenticated/_profile/profile.tsx:84
+#: src/app/routes/_authenticated/_profile/profile.tsx:92
 #: src/app/routes/_authenticated/_promotions/promotions_.$id.tsx:144
 #: src/app/routes/_authenticated/_roles/roles_.$id.tsx:84
 #: src/app/routes/_authenticated/_sellers/sellers_.$id.tsx:78
@@ -1719,7 +1729,7 @@ msgstr "Rambursare soluționată cu succes"
 msgid "Update"
 msgstr "Actualizare"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:76
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:97
 msgid "Heading 2"
 msgstr "Heading 2"
 
@@ -1727,7 +1737,7 @@ msgstr "Heading 2"
 msgid "Order placed"
 msgstr "Comandă plasată"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:63
+#: src/app/routes/_authenticated/_profile/profile.tsx:71
 msgid "Successfully updated profile"
 msgstr "Profilul a fost actualizat cu succes"
 
@@ -1773,7 +1783,7 @@ msgstr "Începe la"
 msgid "Duplicate"
 msgstr "Duplică"
 
-#: src/lib/components/data-table/data-table.tsx:558
+#: src/lib/components/data-table/data-table.tsx:588
 #: src/lib/components/shared/customer-group-selector.tsx:56
 msgid "No results"
 msgstr "Fără rezultate"
@@ -2628,7 +2638,7 @@ msgstr "Ești sigur că vrei să ștergi această vizualizare globală? Această
 msgid "Force remove option group"
 msgstr "Elimină forțat grupul de opțiuni"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:132
+#: src/app/routes/_authenticated/_profile/profile.tsx:140
 msgid "Added"
 msgstr "Adăugat"
 
@@ -2720,6 +2730,10 @@ msgstr "De la {0} la {1}"
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:111
 msgid "Failed to create customer"
 msgstr "Nu s-a putut crea clientul"
+
+#: src/lib/components/shared/asset/asset-preview.tsx:138
+msgid "Focal point updated"
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:298
 msgid "Option values"
@@ -2869,7 +2883,7 @@ msgstr "Rambursarea a fost procesată cu succes"
 #: src/lib/components/data-input/product-multi-selector-input.tsx:281
 #: src/lib/components/data-input/product-multi-selector-input.tsx:284
 #: src/lib/components/data-input/relation-selector.tsx:404
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:418
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:439
 msgid "{0}"
 msgstr "{0}"
 
@@ -2934,7 +2948,7 @@ msgstr "Ești sigur că vrei să navighezi din această pagină? Orice modifică
 msgid "Toggle header column"
 msgstr "Comută coloana antet"
 
-#: src/app/routes/_authenticated/_promotions/promotions.tsx:87
+#: src/app/routes/_authenticated/_promotions/promotions.tsx:88
 msgid "New Promotion"
 msgstr "Promoție Nouă"
 
@@ -2954,6 +2968,10 @@ msgstr "Este categoria de taxă implicită"
 #: src/lib/components/data-input/slug-input.tsx:238
 msgid "Slug is set"
 msgstr "Identificator-ul URL este setat"
+
+#: src/lib/components/shared/asset/asset-preview.tsx:141
+msgid "Failed to update focal point"
+msgstr ""
 
 #: src/app/routes/_authenticated/_zones/zones_.$id.tsx:61
 msgid "Successfully updated zone"
@@ -3018,7 +3036,7 @@ msgstr "Metrici comenzi"
 msgid "Select display language"
 msgstr "Selectează limba de afișare"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:120
+#: src/app/routes/_authenticated/_profile/profile.tsx:128
 msgid "Authentication methods"
 msgstr "Metode de autentificare"
 
@@ -3135,7 +3153,7 @@ msgstr "Încarcă încă {0} ({remaining} rămase)"
 msgid "Facet values"
 msgstr "Valori atribut"
 
-#: src/lib/components/data-table/data-table.tsx:228
+#: src/lib/components/data-table/data-table.tsx:237
 msgid "Failed to reorder items"
 msgstr "Nu s-a putut reordona elementele"
 
@@ -3216,7 +3234,7 @@ msgstr "Da"
 msgid "Slug"
 msgstr "Identificator URL"
 
-#: src/lib/components/shared/asset/asset-focal-point-editor.tsx:97
+#: src/lib/components/shared/asset/asset-focal-point-editor.tsx:98
 msgid "Set Focal Point"
 msgstr "Setează punctul focal"
 
@@ -3334,7 +3352,7 @@ msgstr "Nu rulează"
 msgid "Assigned"
 msgstr "Atribuit"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:75
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:96
 msgid "Heading 1"
 msgstr "Heading 1"
 
@@ -3452,6 +3470,7 @@ msgid "Cannot remove from active channel"
 msgstr "Nu poți elimina din canalul activ"
 
 #: src/app/routes/_authenticated/_assets/assets_.$id.tsx:179
+#: src/lib/components/shared/asset/asset-preview.tsx:177
 msgid "Not set"
 msgstr "Nu este setat"
 
@@ -3548,7 +3567,7 @@ msgid "Add a price in another currency"
 msgstr "Adaugă un preț în altă monedă"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:127
-#: src/app/routes/_authenticated/_profile/profile.tsx:106
+#: src/app/routes/_authenticated/_profile/profile.tsx:114
 msgid "Email Address or identifier"
 msgstr "Adresă de email sau identificator"
 
@@ -3565,7 +3584,7 @@ msgstr "Rambursarea #{0} a trecut la {1}"
 msgid "Customers"
 msgstr "Clienți"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:78
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:99
 msgid "Heading 4"
 msgstr "Heading 4"
 
@@ -3901,7 +3920,7 @@ msgstr "Plată soluționată"
 msgid "orderState.Shipped"
 msgstr "Expediată"
 
-#: src/lib/framework/layout-engine/page-layout.tsx:677
+#: src/lib/framework/layout-engine/page-layout.tsx:689
 msgid "Entity Information"
 msgstr "Informații entitate"
 
@@ -4158,7 +4177,7 @@ msgstr "Vânzător nou"
 msgid "e.g., Red, Large, Cotton"
 msgstr "ex., Roșu, Large, Bumbac"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:67
+#: src/app/routes/_authenticated/_profile/profile.tsx:75
 msgid "Failed to update profile"
 msgstr "Nu s-a putut actualiza profilul"
 
@@ -4570,7 +4589,7 @@ msgstr "Setări"
 msgid "Settings Store"
 msgstr "Stocare setări"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:77
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:98
 msgid "Heading 3"
 msgstr "Heading 3"
 
@@ -4788,6 +4807,11 @@ msgstr "Se livrează..."
 msgid "Add option group to product"
 msgstr "Adaugă grup de opțiuni la produs"
 
+#. placeholder {0}: asset.name
+#: src/lib/components/shared/asset/asset-preview-dialog.tsx:37
+msgid "Preview of {0}"
+msgstr ""
+
 #: src/app/routes/_authenticated/_sellers/sellers_.$id.tsx:56
 msgid "Successfully updated seller"
 msgstr "Vânzătorul a fost actualizat cu succes"
@@ -4955,7 +4979,7 @@ msgid "Customer not found"
 msgstr "Client negăsit"
 
 #. placeholder {0}: entityName.toLowerCase()
-#: src/lib/components/data-input/default-relation-input.tsx:605
+#: src/lib/components/data-input/default-relation-input.tsx:603
 msgid "Select {0}s"
 msgstr "Selectează {0}"
 
@@ -4970,7 +4994,7 @@ msgstr "Nu s-a putut procesa rambursarea"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:115
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:176
-#: src/app/routes/_authenticated/_profile/profile.tsx:94
+#: src/app/routes/_authenticated/_profile/profile.tsx:102
 msgid "First name"
 msgstr "Prenume"
 
@@ -5018,8 +5042,8 @@ msgstr "Adaugă filtru"
 msgid "Tax category"
 msgstr "Categorie de taxă"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:31
-#: src/app/routes/_authenticated/_profile/profile.tsx:76
+#: src/app/routes/_authenticated/_profile/profile.tsx:38
+#: src/app/routes/_authenticated/_profile/profile.tsx:84
 #: src/lib/components/layout/nav-user.tsx:108
 msgid "Profile"
 msgstr "Profil"
@@ -5516,7 +5540,7 @@ msgstr "Nu aveți permisiunea de a vizualiza setările globale ale limbii"
 msgid "Successfully created tax rate"
 msgstr "Cota de taxă a fost creată cu succes"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:80
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:101
 msgid "Heading 6"
 msgstr "Heading 6"
 
@@ -5569,7 +5593,7 @@ msgstr "Filtre active"
 
 #: src/app/routes/_authenticated/_assets/components/asset-tag-filter.tsx:178
 #: src/lib/components/data-table/data-table-active-filters-popover.tsx:54
-#: src/lib/components/data-table/data-table.tsx:423
+#: src/lib/components/data-table/data-table.tsx:434
 msgid "Clear all"
 msgstr "Șterge tot"
 

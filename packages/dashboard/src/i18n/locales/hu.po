@@ -94,7 +94,7 @@ msgstr "Külső hitelesítési stratégia használata: {strategy}"
 msgid "Select a reason..."
 msgstr "Válasszon indokot..."
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:79
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:100
 msgid "Heading 5"
 msgstr "5. fejléc"
 
@@ -104,7 +104,7 @@ msgstr "5. fejléc"
 msgid "Failed to add payment"
 msgstr "Fizetés hozzáadása sikertelen"
 
-#: src/lib/framework/layout-engine/page-layout.tsx:718
+#: src/lib/framework/layout-engine/page-layout.tsx:730
 msgid "Updated"
 msgstr "Frissítve"
 
@@ -164,7 +164,7 @@ msgstr "Típus"
 #. placeholder {0}: entityName.toLowerCase()
 #. placeholder {0}: group.name
 #: src/app/routes/_authenticated/_products/components/product-option-select.tsx:57
-#: src/lib/components/data-input/default-relation-input.tsx:618
+#: src/lib/components/data-input/default-relation-input.tsx:616
 msgid "Select {0}"
 msgstr "{0} kiválasztása"
 
@@ -320,7 +320,7 @@ msgstr "Írjon be legalább 2 karaktert a kereséshez..."
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:121
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:182
-#: src/app/routes/_authenticated/_profile/profile.tsx:100
+#: src/app/routes/_authenticated/_profile/profile.tsx:108
 msgid "Last name"
 msgstr "Vezetéknév"
 
@@ -348,6 +348,7 @@ msgstr "A raktárhely sikeresen létrehozva"
 #: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:180
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:112
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:204
+#: src/lib/components/shared/asset/asset-preview.tsx:142
 msgid "Unknown error"
 msgstr "Ismeretlen hiba"
 
@@ -690,7 +691,7 @@ msgid "Failed to set shipping method for order: {0}"
 msgstr ""
 
 #: src/app/routes/_authenticated/_option-groups/components/option-group-products-block.tsx:48
-#: src/lib/components/data-table/data-table.tsx:367
+#: src/lib/components/data-table/data-table.tsx:378
 msgid "Filter..."
 msgstr "Szűrés..."
 
@@ -893,6 +894,7 @@ msgid "Shipping address set for order"
 msgstr "Szállítási cím beállítva a megrendeléshez"
 
 #: src/app/routes/_authenticated/_assets/assets_.$id.tsx:173
+#: src/lib/components/shared/asset/asset-preview.tsx:168
 msgid "Focal Point"
 msgstr "Fókuszpont"
 
@@ -943,8 +945,8 @@ msgid "Failed to update zone"
 msgstr "Zóna frissítése sikertelen"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:133
-#: src/app/routes/_authenticated/_profile/profile.tsx:112
-#: src/app/routes/_authenticated/_profile/profile.tsx:129
+#: src/app/routes/_authenticated/_profile/profile.tsx:120
+#: src/app/routes/_authenticated/_profile/profile.tsx:137
 #: src/lib/components/login/login-form.tsx:93
 msgid "Password"
 msgstr "Jelszó"
@@ -1284,9 +1286,17 @@ msgstr "{buttonText}"
 msgid "Item added to order"
 msgstr "Tétel hozzáadva a megrendeléshez"
 
+#: src/lib/components/shared/asset/asset-preview.tsx:161
+msgid "Edit focal point"
+msgstr ""
+
 #: src/lib/components/shared/seller-selector.tsx:92
 #~ msgid "No sellers found"
 #~ msgstr "Nem található eladó"
+
+#: src/lib/components/shared/asset/asset-preview-dialog.tsx:34
+msgid "Asset"
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/components/shared-option-group-warning.tsx:13
 msgid "{productCount, plural, one {This option group is used by one other product. Changes will affect it too.} other {This option group is shared across # products. Changes will affect all of them.}}"
@@ -1480,7 +1490,7 @@ msgstr "Nézet átnevezése sikertelen"
 msgid "Available"
 msgstr "Elérhető"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:74
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:95
 msgid "Normal"
 msgstr "Normál"
 
@@ -1523,7 +1533,7 @@ msgstr "Cím sikeresen frissítve"
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:226
 #: src/app/routes/_authenticated/_orders/components/fulfillment-details.tsx:124
 #: src/lib/components/shared/asset/asset-gallery.tsx:747
-#: src/lib/framework/layout-engine/page-layout.tsx:705
+#: src/lib/framework/layout-engine/page-layout.tsx:717
 msgid "Created"
 msgstr "Létrehozva"
 
@@ -1767,7 +1777,7 @@ msgstr "A visszatérítés sikeresen rendezve"
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:226
 #: src/app/routes/_authenticated/_products/components/assign-facet-values-dialog.tsx:276
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:219
-#: src/app/routes/_authenticated/_profile/profile.tsx:84
+#: src/app/routes/_authenticated/_profile/profile.tsx:92
 #: src/app/routes/_authenticated/_promotions/promotions_.$id.tsx:144
 #: src/app/routes/_authenticated/_roles/roles_.$id.tsx:84
 #: src/app/routes/_authenticated/_sellers/sellers_.$id.tsx:78
@@ -1780,7 +1790,7 @@ msgstr "A visszatérítés sikeresen rendezve"
 msgid "Update"
 msgstr "Frissítés"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:76
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:97
 msgid "Heading 2"
 msgstr "2. fejléc"
 
@@ -1788,7 +1798,7 @@ msgstr "2. fejléc"
 msgid "Order placed"
 msgstr "Megrendelés leadva"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:63
+#: src/app/routes/_authenticated/_profile/profile.tsx:71
 msgid "Successfully updated profile"
 msgstr "Profil sikeresen frissítve"
 
@@ -1834,7 +1844,7 @@ msgstr "Kezdés időpontja"
 msgid "Duplicate"
 msgstr "Duplikálás"
 
-#: src/lib/components/data-table/data-table.tsx:558
+#: src/lib/components/data-table/data-table.tsx:588
 #: src/lib/components/shared/customer-group-selector.tsx:56
 msgid "No results"
 msgstr "Nincs eredmény"
@@ -2702,7 +2712,7 @@ msgstr "Biztosan törli ezt a globális nézetet? Ez a művelet nem vonható vis
 msgid "Force remove option group"
 msgstr "Opciócsoport kényszerített eltávolítása"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:132
+#: src/app/routes/_authenticated/_profile/profile.tsx:140
 msgid "Added"
 msgstr "Hozzáadva"
 
@@ -2794,6 +2804,10 @@ msgstr "{0}-tól {1}-ig"
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:111
 msgid "Failed to create customer"
 msgstr "Vásárló létrehozása sikertelen"
+
+#: src/lib/components/shared/asset/asset-preview.tsx:138
+msgid "Focal point updated"
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:298
 msgid "Option values"
@@ -2951,7 +2965,7 @@ msgstr "A visszatérítés sikeresen feldolgozva"
 #: src/lib/components/data-input/product-multi-selector-input.tsx:281
 #: src/lib/components/data-input/product-multi-selector-input.tsx:284
 #: src/lib/components/data-input/relation-selector.tsx:404
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:418
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:439
 msgid "{0}"
 msgstr "{0}"
 
@@ -3016,7 +3030,7 @@ msgstr "Biztosan elhagyja ezt az oldalt? A nem mentett módosítások elvesznek.
 msgid "Toggle header column"
 msgstr "Fejlécoszlop be-/kikapcsolása"
 
-#: src/app/routes/_authenticated/_promotions/promotions.tsx:87
+#: src/app/routes/_authenticated/_promotions/promotions.tsx:88
 msgid "New Promotion"
 msgstr "Új promóció"
 
@@ -3036,6 +3050,10 @@ msgstr "Ez az alapértelmezett adókategória"
 #: src/lib/components/data-input/slug-input.tsx:238
 msgid "Slug is set"
 msgstr "A slug be van állítva"
+
+#: src/lib/components/shared/asset/asset-preview.tsx:141
+msgid "Failed to update focal point"
+msgstr ""
 
 #: src/app/routes/_authenticated/_zones/zones_.$id.tsx:61
 msgid "Successfully updated zone"
@@ -3100,7 +3118,7 @@ msgstr "Megrendelési statisztikák"
 msgid "Select display language"
 msgstr "Válasszon megjelenítési nyelvet"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:120
+#: src/app/routes/_authenticated/_profile/profile.tsx:128
 msgid "Authentication methods"
 msgstr "Hitelesítési módszerek"
 
@@ -3217,7 +3235,7 @@ msgstr "{0} további betöltése ({remaining} maradt)"
 msgid "Facet values"
 msgstr "Tulajdonságértékek"
 
-#: src/lib/components/data-table/data-table.tsx:228
+#: src/lib/components/data-table/data-table.tsx:237
 msgid "Failed to reorder items"
 msgstr "Elemek átrendezése sikertelen"
 
@@ -3298,7 +3316,7 @@ msgstr "Igen"
 msgid "Slug"
 msgstr "Slug"
 
-#: src/lib/components/shared/asset/asset-focal-point-editor.tsx:97
+#: src/lib/components/shared/asset/asset-focal-point-editor.tsx:98
 msgid "Set Focal Point"
 msgstr "Fókuszpont beállítása"
 
@@ -3428,7 +3446,7 @@ msgstr "Nem fut"
 msgid "Assigned"
 msgstr "Hozzárendelve"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:75
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:96
 msgid "Heading 1"
 msgstr "1. fejléc"
 
@@ -3550,6 +3568,7 @@ msgid "Cannot remove from active channel"
 msgstr "Nem távolítható el az aktív csatornából"
 
 #: src/app/routes/_authenticated/_assets/assets_.$id.tsx:179
+#: src/lib/components/shared/asset/asset-preview.tsx:177
 msgid "Not set"
 msgstr "Nincs beállítva"
 
@@ -3650,7 +3669,7 @@ msgid "Add a price in another currency"
 msgstr "Ár hozzáadása másik pénznemben"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:127
-#: src/app/routes/_authenticated/_profile/profile.tsx:106
+#: src/app/routes/_authenticated/_profile/profile.tsx:114
 msgid "Email Address or identifier"
 msgstr "E-mail cím vagy azonosító"
 
@@ -3667,7 +3686,7 @@ msgstr "#{0} visszatérítés állapota {1} értékre változott"
 msgid "Customers"
 msgstr "Vásárlók"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:78
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:99
 msgid "Heading 4"
 msgstr "4. fejléc"
 
@@ -4020,7 +4039,7 @@ msgstr "Kiszállítva"
 #~ msgid "Monitored Resources"
 #~ msgstr "Figyelt erőforrások"
 
-#: src/lib/framework/layout-engine/page-layout.tsx:677
+#: src/lib/framework/layout-engine/page-layout.tsx:689
 msgid "Entity Information"
 msgstr "Entitás adatai"
 
@@ -4289,7 +4308,7 @@ msgstr "Új eladó"
 msgid "e.g., Red, Large, Cotton"
 msgstr "pl. Piros, Nagy, Pamut"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:67
+#: src/app/routes/_authenticated/_profile/profile.tsx:75
 msgid "Failed to update profile"
 msgstr "Profil frissítése sikertelen"
 
@@ -4713,7 +4732,7 @@ msgstr "Beállítások"
 msgid "Settings Store"
 msgstr "Beállítástár"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:77
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:98
 msgid "Heading 3"
 msgstr "3. fejléc"
 
@@ -4955,6 +4974,11 @@ msgstr "Teljesítés folyamatban..."
 msgid "Add option group to product"
 msgstr "Opciócsoport hozzáadása a termékhez"
 
+#. placeholder {0}: asset.name
+#: src/lib/components/shared/asset/asset-preview-dialog.tsx:37
+msgid "Preview of {0}"
+msgstr ""
+
 #: src/app/routes/_authenticated/_sellers/sellers_.$id.tsx:56
 msgid "Successfully updated seller"
 msgstr "Eladó sikeresen frissítve"
@@ -5130,7 +5154,7 @@ msgid "Customer not found"
 msgstr "Vásárló nem található"
 
 #. placeholder {0}: entityName.toLowerCase()
-#: src/lib/components/data-input/default-relation-input.tsx:605
+#: src/lib/components/data-input/default-relation-input.tsx:603
 msgid "Select {0}s"
 msgstr "{0} kiválasztása"
 
@@ -5145,7 +5169,7 @@ msgstr "Visszatérítés feldolgozása sikertelen"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:115
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:176
-#: src/app/routes/_authenticated/_profile/profile.tsx:94
+#: src/app/routes/_authenticated/_profile/profile.tsx:102
 msgid "First name"
 msgstr "Keresztnév"
 
@@ -5193,8 +5217,8 @@ msgstr "Szűrő hozzáadása"
 msgid "Tax category"
 msgstr "Adókategória"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:31
-#: src/app/routes/_authenticated/_profile/profile.tsx:76
+#: src/app/routes/_authenticated/_profile/profile.tsx:38
+#: src/app/routes/_authenticated/_profile/profile.tsx:84
 #: src/lib/components/layout/nav-user.tsx:108
 msgid "Profile"
 msgstr "Profil"
@@ -5707,7 +5731,7 @@ msgstr "Nincs jogosultsága a globális nyelvbeállítások megtekintéséhez"
 msgid "Successfully created tax rate"
 msgstr "Az adókulcs sikeresen létrehozva"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:80
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:101
 msgid "Heading 6"
 msgstr "6. fejléc"
 
@@ -5760,7 +5784,7 @@ msgstr "Aktív szűrők"
 
 #: src/app/routes/_authenticated/_assets/components/asset-tag-filter.tsx:178
 #: src/lib/components/data-table/data-table-active-filters-popover.tsx:54
-#: src/lib/components/data-table/data-table.tsx:423
+#: src/lib/components/data-table/data-table.tsx:434
 msgid "Clear all"
 msgstr "Összes törlése"
 

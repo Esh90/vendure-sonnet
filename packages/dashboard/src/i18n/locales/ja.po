@@ -94,7 +94,7 @@ msgstr "外部認証戦略を使用：{strategy}"
 msgid "Select a reason..."
 msgstr "理由を選択..."
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:79
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:100
 msgid "Heading 5"
 msgstr "見出し5"
 
@@ -104,7 +104,7 @@ msgstr "見出し5"
 msgid "Failed to add payment"
 msgstr "支払いの追加に失敗しました"
 
-#: src/lib/framework/layout-engine/page-layout.tsx:718
+#: src/lib/framework/layout-engine/page-layout.tsx:730
 msgid "Updated"
 msgstr "更新日時"
 
@@ -164,7 +164,7 @@ msgstr "タイプ"
 #. placeholder {0}: entityName.toLowerCase()
 #. placeholder {0}: group.name
 #: src/app/routes/_authenticated/_products/components/product-option-select.tsx:57
-#: src/lib/components/data-input/default-relation-input.tsx:618
+#: src/lib/components/data-input/default-relation-input.tsx:616
 msgid "Select {0}"
 msgstr "{0}を選択"
 
@@ -320,7 +320,7 @@ msgstr "検索するには少なくとも2文字を入力してください..."
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:121
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:182
-#: src/app/routes/_authenticated/_profile/profile.tsx:100
+#: src/app/routes/_authenticated/_profile/profile.tsx:108
 msgid "Last name"
 msgstr "姓"
 
@@ -348,6 +348,7 @@ msgstr "在庫ロケーションを作成しました"
 #: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:180
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:112
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:204
+#: src/lib/components/shared/asset/asset-preview.tsx:142
 msgid "Unknown error"
 msgstr "不明なエラー"
 
@@ -690,7 +691,7 @@ msgid "Failed to set shipping method for order: {0}"
 msgstr ""
 
 #: src/app/routes/_authenticated/_option-groups/components/option-group-products-block.tsx:48
-#: src/lib/components/data-table/data-table.tsx:367
+#: src/lib/components/data-table/data-table.tsx:378
 msgid "Filter..."
 msgstr "フィルター..."
 
@@ -893,6 +894,7 @@ msgid "Shipping address set for order"
 msgstr "注文の配送先住所が設定されました"
 
 #: src/app/routes/_authenticated/_assets/assets_.$id.tsx:173
+#: src/lib/components/shared/asset/asset-preview.tsx:168
 msgid "Focal Point"
 msgstr "フォーカルポイント"
 
@@ -943,8 +945,8 @@ msgid "Failed to update zone"
 msgstr "ゾーンの更新に失敗しました"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:133
-#: src/app/routes/_authenticated/_profile/profile.tsx:112
-#: src/app/routes/_authenticated/_profile/profile.tsx:129
+#: src/app/routes/_authenticated/_profile/profile.tsx:120
+#: src/app/routes/_authenticated/_profile/profile.tsx:137
 #: src/lib/components/login/login-form.tsx:93
 msgid "Password"
 msgstr "パスワード"
@@ -1284,9 +1286,17 @@ msgstr "{buttonText}"
 msgid "Item added to order"
 msgstr "注文にアイテムを追加しました"
 
+#: src/lib/components/shared/asset/asset-preview.tsx:161
+msgid "Edit focal point"
+msgstr ""
+
 #: src/lib/components/shared/seller-selector.tsx:92
 #~ msgid "No sellers found"
 #~ msgstr "販売者が見つかりません"
+
+#: src/lib/components/shared/asset/asset-preview-dialog.tsx:34
+msgid "Asset"
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/components/shared-option-group-warning.tsx:13
 msgid "{productCount, plural, one {This option group is used by one other product. Changes will affect it too.} other {This option group is shared across # products. Changes will affect all of them.}}"
@@ -1480,7 +1490,7 @@ msgstr "ビューの名前変更に失敗しました"
 msgid "Available"
 msgstr "利用可能"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:74
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:95
 msgid "Normal"
 msgstr "通常"
 
@@ -1523,7 +1533,7 @@ msgstr "住所を更新しました"
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:226
 #: src/app/routes/_authenticated/_orders/components/fulfillment-details.tsx:124
 #: src/lib/components/shared/asset/asset-gallery.tsx:747
-#: src/lib/framework/layout-engine/page-layout.tsx:705
+#: src/lib/framework/layout-engine/page-layout.tsx:717
 msgid "Created"
 msgstr "作成日時"
 
@@ -1767,7 +1777,7 @@ msgstr "返金を決済しました"
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:226
 #: src/app/routes/_authenticated/_products/components/assign-facet-values-dialog.tsx:276
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:219
-#: src/app/routes/_authenticated/_profile/profile.tsx:84
+#: src/app/routes/_authenticated/_profile/profile.tsx:92
 #: src/app/routes/_authenticated/_promotions/promotions_.$id.tsx:144
 #: src/app/routes/_authenticated/_roles/roles_.$id.tsx:84
 #: src/app/routes/_authenticated/_sellers/sellers_.$id.tsx:78
@@ -1780,7 +1790,7 @@ msgstr "返金を決済しました"
 msgid "Update"
 msgstr "更新"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:76
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:97
 msgid "Heading 2"
 msgstr "見出し2"
 
@@ -1788,7 +1798,7 @@ msgstr "見出し2"
 msgid "Order placed"
 msgstr "注文を確定しました"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:63
+#: src/app/routes/_authenticated/_profile/profile.tsx:71
 msgid "Successfully updated profile"
 msgstr "プロフィールを更新しました"
 
@@ -1840,7 +1850,7 @@ msgstr "開始日時"
 msgid "Duplicate"
 msgstr "複製"
 
-#: src/lib/components/data-table/data-table.tsx:558
+#: src/lib/components/data-table/data-table.tsx:588
 #: src/lib/components/shared/customer-group-selector.tsx:56
 msgid "No results"
 msgstr "結果なし"
@@ -2712,7 +2722,7 @@ msgstr "このグローバルビューを削除してもよろしいですか？
 msgid "Force remove option group"
 msgstr "オプショングループを強制削除"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:132
+#: src/app/routes/_authenticated/_profile/profile.tsx:140
 msgid "Added"
 msgstr "追加済み"
 
@@ -2804,6 +2814,10 @@ msgstr "{0}から{1}まで"
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:111
 msgid "Failed to create customer"
 msgstr "顧客の作成に失敗しました"
+
+#: src/lib/components/shared/asset/asset-preview.tsx:138
+msgid "Focal point updated"
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:298
 msgid "Option values"
@@ -2961,7 +2975,7 @@ msgstr "返金が正常に処理されました"
 #: src/lib/components/data-input/product-multi-selector-input.tsx:281
 #: src/lib/components/data-input/product-multi-selector-input.tsx:284
 #: src/lib/components/data-input/relation-selector.tsx:404
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:418
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:439
 msgid "{0}"
 msgstr "{0}"
 
@@ -3026,7 +3040,7 @@ msgstr "このページから移動してもよろしいですか？保存され
 msgid "Toggle header column"
 msgstr "ヘッダー列を切り替え"
 
-#: src/app/routes/_authenticated/_promotions/promotions.tsx:87
+#: src/app/routes/_authenticated/_promotions/promotions.tsx:88
 msgid "New Promotion"
 msgstr "新しいプロモーション"
 
@@ -3046,6 +3060,10 @@ msgstr "デフォルト税カテゴリ"
 #: src/lib/components/data-input/slug-input.tsx:238
 msgid "Slug is set"
 msgstr "スラッグが設定されています"
+
+#: src/lib/components/shared/asset/asset-preview.tsx:141
+msgid "Failed to update focal point"
+msgstr ""
 
 #: src/app/routes/_authenticated/_zones/zones_.$id.tsx:61
 msgid "Successfully updated zone"
@@ -3110,7 +3128,7 @@ msgstr "注文指標"
 msgid "Select display language"
 msgstr "表示言語を選択"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:120
+#: src/app/routes/_authenticated/_profile/profile.tsx:128
 msgid "Authentication methods"
 msgstr "認証方法"
 
@@ -3227,7 +3245,7 @@ msgstr "さらに{0}件読み込む (残り{remaining}件)"
 msgid "Facet values"
 msgstr "ファセット値"
 
-#: src/lib/components/data-table/data-table.tsx:228
+#: src/lib/components/data-table/data-table.tsx:237
 msgid "Failed to reorder items"
 msgstr "アイテムの並び替えに失敗しました"
 
@@ -3308,7 +3326,7 @@ msgstr "はい"
 msgid "Slug"
 msgstr "スラッグ"
 
-#: src/lib/components/shared/asset/asset-focal-point-editor.tsx:97
+#: src/lib/components/shared/asset/asset-focal-point-editor.tsx:98
 msgid "Set Focal Point"
 msgstr "フォーカルポイントを設定"
 
@@ -3441,7 +3459,7 @@ msgstr "実行されていません"
 msgid "Assigned"
 msgstr "割り当て済み"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:75
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:96
 msgid "Heading 1"
 msgstr "見出し1"
 
@@ -3563,6 +3581,7 @@ msgid "Cannot remove from active channel"
 msgstr "アクティブなチャネルからは削除できません"
 
 #: src/app/routes/_authenticated/_assets/assets_.$id.tsx:179
+#: src/lib/components/shared/asset/asset-preview.tsx:177
 msgid "Not set"
 msgstr "設定されていません"
 
@@ -3663,7 +3682,7 @@ msgid "Add a price in another currency"
 msgstr "別の通貨で価格を追加"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:127
-#: src/app/routes/_authenticated/_profile/profile.tsx:106
+#: src/app/routes/_authenticated/_profile/profile.tsx:114
 msgid "Email Address or identifier"
 msgstr "メールアドレスまたは識別子"
 
@@ -3680,7 +3699,7 @@ msgstr "返金#{0}を{1}に遷移しました"
 msgid "Customers"
 msgstr "顧客"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:78
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:99
 msgid "Heading 4"
 msgstr "見出し4"
 
@@ -4033,7 +4052,7 @@ msgstr "発送済み"
 #~ msgid "Monitored Resources"
 #~ msgstr "監視対象リソース"
 
-#: src/lib/framework/layout-engine/page-layout.tsx:677
+#: src/lib/framework/layout-engine/page-layout.tsx:689
 msgid "Entity Information"
 msgstr "エンティティ情報"
 
@@ -4302,7 +4321,7 @@ msgstr "新しい販売者"
 msgid "e.g., Red, Large, Cotton"
 msgstr "例：赤、L、コットン"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:67
+#: src/app/routes/_authenticated/_profile/profile.tsx:75
 msgid "Failed to update profile"
 msgstr "プロフィールの更新に失敗しました"
 
@@ -4726,7 +4745,7 @@ msgstr "設定"
 msgid "Settings Store"
 msgstr "設定ストア"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:77
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:98
 msgid "Heading 3"
 msgstr "見出し3"
 
@@ -4968,6 +4987,11 @@ msgstr "フルフィルメント中..."
 msgid "Add option group to product"
 msgstr "商品にオプショングループを追加"
 
+#. placeholder {0}: asset.name
+#: src/lib/components/shared/asset/asset-preview-dialog.tsx:37
+msgid "Preview of {0}"
+msgstr ""
+
 #: src/app/routes/_authenticated/_sellers/sellers_.$id.tsx:56
 msgid "Successfully updated seller"
 msgstr "販売者を更新しました"
@@ -5143,7 +5167,7 @@ msgid "Customer not found"
 msgstr "顧客が見つかりません"
 
 #. placeholder {0}: entityName.toLowerCase()
-#: src/lib/components/data-input/default-relation-input.tsx:605
+#: src/lib/components/data-input/default-relation-input.tsx:603
 msgid "Select {0}s"
 msgstr "{0}を選択"
 
@@ -5158,7 +5182,7 @@ msgstr "返金の処理に失敗しました"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:115
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:176
-#: src/app/routes/_authenticated/_profile/profile.tsx:94
+#: src/app/routes/_authenticated/_profile/profile.tsx:102
 msgid "First name"
 msgstr "名"
 
@@ -5206,8 +5230,8 @@ msgstr "フィルターを追加"
 msgid "Tax category"
 msgstr "税カテゴリ"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:31
-#: src/app/routes/_authenticated/_profile/profile.tsx:76
+#: src/app/routes/_authenticated/_profile/profile.tsx:38
+#: src/app/routes/_authenticated/_profile/profile.tsx:84
 #: src/lib/components/layout/nav-user.tsx:108
 msgid "Profile"
 msgstr "プロフィール"
@@ -5724,7 +5748,7 @@ msgstr "グローバル言語設定を表示する権限がありません"
 msgid "Successfully created tax rate"
 msgstr "税率を作成しました"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:80
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:101
 msgid "Heading 6"
 msgstr "見出し6"
 
@@ -5777,7 +5801,7 @@ msgstr "アクティブなフィルター"
 
 #: src/app/routes/_authenticated/_assets/components/asset-tag-filter.tsx:178
 #: src/lib/components/data-table/data-table-active-filters-popover.tsx:54
-#: src/lib/components/data-table/data-table.tsx:423
+#: src/lib/components/data-table/data-table.tsx:434
 msgid "Clear all"
 msgstr "すべてクリア"
 

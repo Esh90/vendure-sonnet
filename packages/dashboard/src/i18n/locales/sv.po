@@ -94,7 +94,7 @@ msgstr "Använder extern autentiseringsstrategi: {strategy}"
 msgid "Select a reason..."
 msgstr "Välj en anledning..."
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:79
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:100
 msgid "Heading 5"
 msgstr "Rubrik 5"
 
@@ -104,7 +104,7 @@ msgstr "Rubrik 5"
 msgid "Failed to add payment"
 msgstr "Misslyckades att lägga till betalning"
 
-#: src/lib/framework/layout-engine/page-layout.tsx:718
+#: src/lib/framework/layout-engine/page-layout.tsx:730
 msgid "Updated"
 msgstr "Uppdaterad"
 
@@ -164,7 +164,7 @@ msgstr "Typ"
 #. placeholder {0}: entityName.toLowerCase()
 #. placeholder {0}: group.name
 #: src/app/routes/_authenticated/_products/components/product-option-select.tsx:57
-#: src/lib/components/data-input/default-relation-input.tsx:618
+#: src/lib/components/data-input/default-relation-input.tsx:616
 msgid "Select {0}"
 msgstr "Välj {0}"
 
@@ -320,7 +320,7 @@ msgstr "Skriv minst 2 tecken för att söka..."
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:121
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:182
-#: src/app/routes/_authenticated/_profile/profile.tsx:100
+#: src/app/routes/_authenticated/_profile/profile.tsx:108
 msgid "Last name"
 msgstr "Efternamn"
 
@@ -348,6 +348,7 @@ msgstr "Lagerplats skapad"
 #: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:180
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:112
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:204
+#: src/lib/components/shared/asset/asset-preview.tsx:142
 msgid "Unknown error"
 msgstr "Okänt fel"
 
@@ -690,7 +691,7 @@ msgid "Failed to set shipping method for order: {0}"
 msgstr ""
 
 #: src/app/routes/_authenticated/_option-groups/components/option-group-products-block.tsx:48
-#: src/lib/components/data-table/data-table.tsx:367
+#: src/lib/components/data-table/data-table.tsx:378
 msgid "Filter..."
 msgstr "Filtrera..."
 
@@ -893,6 +894,7 @@ msgid "Shipping address set for order"
 msgstr "Leveransadress angiven för beställning"
 
 #: src/app/routes/_authenticated/_assets/assets_.$id.tsx:173
+#: src/lib/components/shared/asset/asset-preview.tsx:168
 msgid "Focal Point"
 msgstr "Fokuspunkt"
 
@@ -943,8 +945,8 @@ msgid "Failed to update zone"
 msgstr "Misslyckades att uppdatera zon"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:133
-#: src/app/routes/_authenticated/_profile/profile.tsx:112
-#: src/app/routes/_authenticated/_profile/profile.tsx:129
+#: src/app/routes/_authenticated/_profile/profile.tsx:120
+#: src/app/routes/_authenticated/_profile/profile.tsx:137
 #: src/lib/components/login/login-form.tsx:93
 msgid "Password"
 msgstr "Lösenord"
@@ -1284,9 +1286,17 @@ msgstr "{buttonText}"
 msgid "Item added to order"
 msgstr "Artikel tillagd i beställning"
 
+#: src/lib/components/shared/asset/asset-preview.tsx:161
+msgid "Edit focal point"
+msgstr ""
+
 #: src/lib/components/shared/seller-selector.tsx:92
 #~ msgid "No sellers found"
 #~ msgstr "Inga säljare hittades"
+
+#: src/lib/components/shared/asset/asset-preview-dialog.tsx:34
+msgid "Asset"
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/components/shared-option-group-warning.tsx:13
 msgid "{productCount, plural, one {This option group is used by one other product. Changes will affect it too.} other {This option group is shared across # products. Changes will affect all of them.}}"
@@ -1480,7 +1490,7 @@ msgstr "Misslyckades att byta namn på vy"
 msgid "Available"
 msgstr "Tillgänglig"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:74
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:95
 msgid "Normal"
 msgstr "Normal"
 
@@ -1523,7 +1533,7 @@ msgstr "Adress uppdaterad"
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:226
 #: src/app/routes/_authenticated/_orders/components/fulfillment-details.tsx:124
 #: src/lib/components/shared/asset/asset-gallery.tsx:747
-#: src/lib/framework/layout-engine/page-layout.tsx:705
+#: src/lib/framework/layout-engine/page-layout.tsx:717
 msgid "Created"
 msgstr "Skapad"
 
@@ -1767,7 +1777,7 @@ msgstr "Återbetalning genomförd"
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:226
 #: src/app/routes/_authenticated/_products/components/assign-facet-values-dialog.tsx:276
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:219
-#: src/app/routes/_authenticated/_profile/profile.tsx:84
+#: src/app/routes/_authenticated/_profile/profile.tsx:92
 #: src/app/routes/_authenticated/_promotions/promotions_.$id.tsx:144
 #: src/app/routes/_authenticated/_roles/roles_.$id.tsx:84
 #: src/app/routes/_authenticated/_sellers/sellers_.$id.tsx:78
@@ -1780,7 +1790,7 @@ msgstr "Återbetalning genomförd"
 msgid "Update"
 msgstr "Uppdatera"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:76
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:97
 msgid "Heading 2"
 msgstr "Rubrik 2"
 
@@ -1788,7 +1798,7 @@ msgstr "Rubrik 2"
 msgid "Order placed"
 msgstr "Beställning lagd"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:63
+#: src/app/routes/_authenticated/_profile/profile.tsx:71
 msgid "Successfully updated profile"
 msgstr "Profil uppdaterad"
 
@@ -1840,7 +1850,7 @@ msgstr "Börjar"
 msgid "Duplicate"
 msgstr "Duplicera"
 
-#: src/lib/components/data-table/data-table.tsx:558
+#: src/lib/components/data-table/data-table.tsx:588
 #: src/lib/components/shared/customer-group-selector.tsx:56
 msgid "No results"
 msgstr "Inga resultat"
@@ -2712,7 +2722,7 @@ msgstr "Är du säker på att du vill ta bort denna globala vy? Denna åtgärd k
 msgid "Force remove option group"
 msgstr "Tvinga borttagning av alternativgrupp"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:132
+#: src/app/routes/_authenticated/_profile/profile.tsx:140
 msgid "Added"
 msgstr "Tillagd"
 
@@ -2804,6 +2814,10 @@ msgstr "Från {0} till {1}"
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:111
 msgid "Failed to create customer"
 msgstr "Misslyckades att skapa kund"
+
+#: src/lib/components/shared/asset/asset-preview.tsx:138
+msgid "Focal point updated"
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:298
 msgid "Option values"
@@ -2961,7 +2975,7 @@ msgstr "Återbetalning behandlad framgångsrikt"
 #: src/lib/components/data-input/product-multi-selector-input.tsx:281
 #: src/lib/components/data-input/product-multi-selector-input.tsx:284
 #: src/lib/components/data-input/relation-selector.tsx:404
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:418
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:439
 msgid "{0}"
 msgstr "{0}"
 
@@ -3026,7 +3040,7 @@ msgstr "Är du säker på att du vill lämna denna sida? Alla osparade ändringa
 msgid "Toggle header column"
 msgstr "Växla rubrikkolumn"
 
-#: src/app/routes/_authenticated/_promotions/promotions.tsx:87
+#: src/app/routes/_authenticated/_promotions/promotions.tsx:88
 msgid "New Promotion"
 msgstr "Ny kampanj"
 
@@ -3046,6 +3060,10 @@ msgstr "Är standardskattekategori"
 #: src/lib/components/data-input/slug-input.tsx:238
 msgid "Slug is set"
 msgstr "Slug är angiven"
+
+#: src/lib/components/shared/asset/asset-preview.tsx:141
+msgid "Failed to update focal point"
+msgstr ""
 
 #: src/app/routes/_authenticated/_zones/zones_.$id.tsx:61
 msgid "Successfully updated zone"
@@ -3110,7 +3128,7 @@ msgstr "Beställningsmått"
 msgid "Select display language"
 msgstr "Välj visningsspråk"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:120
+#: src/app/routes/_authenticated/_profile/profile.tsx:128
 msgid "Authentication methods"
 msgstr "Autentiseringsmetoder"
 
@@ -3227,7 +3245,7 @@ msgstr "Ladda {0} fler ({remaining} kvar)"
 msgid "Facet values"
 msgstr "Facettvärden"
 
-#: src/lib/components/data-table/data-table.tsx:228
+#: src/lib/components/data-table/data-table.tsx:237
 msgid "Failed to reorder items"
 msgstr "Misslyckades med att ändra ordning på artiklar"
 
@@ -3308,7 +3326,7 @@ msgstr "Ja"
 msgid "Slug"
 msgstr "Slug"
 
-#: src/lib/components/shared/asset/asset-focal-point-editor.tsx:97
+#: src/lib/components/shared/asset/asset-focal-point-editor.tsx:98
 msgid "Set Focal Point"
 msgstr "Ange fokuspunkt"
 
@@ -3441,7 +3459,7 @@ msgstr "Körs inte"
 msgid "Assigned"
 msgstr "Tilldelad"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:75
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:96
 msgid "Heading 1"
 msgstr "Rubrik 1"
 
@@ -3563,6 +3581,7 @@ msgid "Cannot remove from active channel"
 msgstr "Kan inte ta bort från aktiv kanal"
 
 #: src/app/routes/_authenticated/_assets/assets_.$id.tsx:179
+#: src/lib/components/shared/asset/asset-preview.tsx:177
 msgid "Not set"
 msgstr "Ej angiven"
 
@@ -3663,7 +3682,7 @@ msgid "Add a price in another currency"
 msgstr "Lägg till ett pris i en annan valuta"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:127
-#: src/app/routes/_authenticated/_profile/profile.tsx:106
+#: src/app/routes/_authenticated/_profile/profile.tsx:114
 msgid "Email Address or identifier"
 msgstr "E-postadress eller identifierare"
 
@@ -3680,7 +3699,7 @@ msgstr "Återbetalning #{0} övergick till {1}"
 msgid "Customers"
 msgstr "Kunder"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:78
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:99
 msgid "Heading 4"
 msgstr "Rubrik 4"
 
@@ -4033,7 +4052,7 @@ msgstr "Skickad"
 #~ msgid "Monitored Resources"
 #~ msgstr "Övervakade resurser"
 
-#: src/lib/framework/layout-engine/page-layout.tsx:677
+#: src/lib/framework/layout-engine/page-layout.tsx:689
 msgid "Entity Information"
 msgstr "Entitetsinformation"
 
@@ -4302,7 +4321,7 @@ msgstr "Ny säljare"
 msgid "e.g., Red, Large, Cotton"
 msgstr "t.ex. Röd, Stor, Bomull"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:67
+#: src/app/routes/_authenticated/_profile/profile.tsx:75
 msgid "Failed to update profile"
 msgstr "Misslyckades att uppdatera profil"
 
@@ -4726,7 +4745,7 @@ msgstr "Inställningar"
 msgid "Settings Store"
 msgstr "Inställningslager"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:77
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:98
 msgid "Heading 3"
 msgstr "Rubrik 3"
 
@@ -4968,6 +4987,11 @@ msgstr "Levererar..."
 msgid "Add option group to product"
 msgstr "Lägg till alternativgrupp till produkt"
 
+#. placeholder {0}: asset.name
+#: src/lib/components/shared/asset/asset-preview-dialog.tsx:37
+msgid "Preview of {0}"
+msgstr ""
+
 #: src/app/routes/_authenticated/_sellers/sellers_.$id.tsx:56
 msgid "Successfully updated seller"
 msgstr "Säljare uppdaterad"
@@ -5143,7 +5167,7 @@ msgid "Customer not found"
 msgstr "Kund hittades inte"
 
 #. placeholder {0}: entityName.toLowerCase()
-#: src/lib/components/data-input/default-relation-input.tsx:605
+#: src/lib/components/data-input/default-relation-input.tsx:603
 msgid "Select {0}s"
 msgstr "Välj {0}"
 
@@ -5158,7 +5182,7 @@ msgstr "Misslyckades med att behandla återbetalning"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:115
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:176
-#: src/app/routes/_authenticated/_profile/profile.tsx:94
+#: src/app/routes/_authenticated/_profile/profile.tsx:102
 msgid "First name"
 msgstr "Förnamn"
 
@@ -5206,8 +5230,8 @@ msgstr "Lägg till filter"
 msgid "Tax category"
 msgstr "Skattekategori"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:31
-#: src/app/routes/_authenticated/_profile/profile.tsx:76
+#: src/app/routes/_authenticated/_profile/profile.tsx:38
+#: src/app/routes/_authenticated/_profile/profile.tsx:84
 #: src/lib/components/layout/nav-user.tsx:108
 msgid "Profile"
 msgstr "Profil"
@@ -5724,7 +5748,7 @@ msgstr "Du har inte behörighet att visa globala språkinställningar"
 msgid "Successfully created tax rate"
 msgstr "Skattesats skapad"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:80
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:101
 msgid "Heading 6"
 msgstr "Rubrik 6"
 
@@ -5777,7 +5801,7 @@ msgstr "Aktiva filter"
 
 #: src/app/routes/_authenticated/_assets/components/asset-tag-filter.tsx:178
 #: src/lib/components/data-table/data-table-active-filters-popover.tsx:54
-#: src/lib/components/data-table/data-table.tsx:423
+#: src/lib/components/data-table/data-table.tsx:434
 msgid "Clear all"
 msgstr "Rensa alla"
 

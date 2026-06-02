@@ -94,7 +94,7 @@ msgstr "Harici kimlik doğrulama stratejisi kullanılıyor: {strategy}"
 msgid "Select a reason..."
 msgstr "Bir neden seçin..."
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:79
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:100
 msgid "Heading 5"
 msgstr "Başlık 5"
 
@@ -104,7 +104,7 @@ msgstr "Başlık 5"
 msgid "Failed to add payment"
 msgstr "Ödeme eklenemedi"
 
-#: src/lib/framework/layout-engine/page-layout.tsx:718
+#: src/lib/framework/layout-engine/page-layout.tsx:730
 msgid "Updated"
 msgstr "Güncellendi"
 
@@ -164,7 +164,7 @@ msgstr "Tür"
 #. placeholder {0}: entityName.toLowerCase()
 #. placeholder {0}: group.name
 #: src/app/routes/_authenticated/_products/components/product-option-select.tsx:57
-#: src/lib/components/data-input/default-relation-input.tsx:618
+#: src/lib/components/data-input/default-relation-input.tsx:616
 msgid "Select {0}"
 msgstr "{0} seç"
 
@@ -320,7 +320,7 @@ msgstr "Aramak için en az 2 karakter yazın..."
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:121
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:182
-#: src/app/routes/_authenticated/_profile/profile.tsx:100
+#: src/app/routes/_authenticated/_profile/profile.tsx:108
 msgid "Last name"
 msgstr "Soyad"
 
@@ -348,6 +348,7 @@ msgstr "Stok konumu başarıyla oluşturuldu"
 #: src/app/routes/_authenticated/_products/components/generate-variants-panel.tsx:180
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:112
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:204
+#: src/lib/components/shared/asset/asset-preview.tsx:142
 msgid "Unknown error"
 msgstr "Bilinmeyen hata"
 
@@ -690,7 +691,7 @@ msgid "Failed to set shipping method for order: {0}"
 msgstr ""
 
 #: src/app/routes/_authenticated/_option-groups/components/option-group-products-block.tsx:48
-#: src/lib/components/data-table/data-table.tsx:367
+#: src/lib/components/data-table/data-table.tsx:378
 msgid "Filter..."
 msgstr "Filtrele..."
 
@@ -893,6 +894,7 @@ msgid "Shipping address set for order"
 msgstr "Sipariş için kargo adresi ayarlandı"
 
 #: src/app/routes/_authenticated/_assets/assets_.$id.tsx:173
+#: src/lib/components/shared/asset/asset-preview.tsx:168
 msgid "Focal Point"
 msgstr "Odak Noktası"
 
@@ -943,8 +945,8 @@ msgid "Failed to update zone"
 msgstr "Bölge güncellenemedi"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:133
-#: src/app/routes/_authenticated/_profile/profile.tsx:112
-#: src/app/routes/_authenticated/_profile/profile.tsx:129
+#: src/app/routes/_authenticated/_profile/profile.tsx:120
+#: src/app/routes/_authenticated/_profile/profile.tsx:137
 #: src/lib/components/login/login-form.tsx:93
 msgid "Password"
 msgstr "Şifre"
@@ -1284,9 +1286,17 @@ msgstr "{buttonText}"
 msgid "Item added to order"
 msgstr "Ürün siparişe eklendi"
 
+#: src/lib/components/shared/asset/asset-preview.tsx:161
+msgid "Edit focal point"
+msgstr ""
+
 #: src/lib/components/shared/seller-selector.tsx:92
 #~ msgid "No sellers found"
 #~ msgstr "Satıcı bulunamadı"
+
+#: src/lib/components/shared/asset/asset-preview-dialog.tsx:34
+msgid "Asset"
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/components/shared-option-group-warning.tsx:13
 msgid "{productCount, plural, one {This option group is used by one other product. Changes will affect it too.} other {This option group is shared across # products. Changes will affect all of them.}}"
@@ -1480,7 +1490,7 @@ msgstr "Görünüm yeniden adlandırılamadı"
 msgid "Available"
 msgstr "Mevcut"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:74
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:95
 msgid "Normal"
 msgstr "Normal"
 
@@ -1523,7 +1533,7 @@ msgstr "Adres başarıyla güncellendi"
 #: src/app/routes/_authenticated/_api-keys/api-keys_.$id.tsx:226
 #: src/app/routes/_authenticated/_orders/components/fulfillment-details.tsx:124
 #: src/lib/components/shared/asset/asset-gallery.tsx:747
-#: src/lib/framework/layout-engine/page-layout.tsx:705
+#: src/lib/framework/layout-engine/page-layout.tsx:717
 msgid "Created"
 msgstr "Oluşturuldu"
 
@@ -1767,7 +1777,7 @@ msgstr "İade başarıyla tamamlandı"
 #: src/app/routes/_authenticated/_product-variants/product-variants_.$id.tsx:226
 #: src/app/routes/_authenticated/_products/components/assign-facet-values-dialog.tsx:276
 #: src/app/routes/_authenticated/_products/products_.$id.tsx:219
-#: src/app/routes/_authenticated/_profile/profile.tsx:84
+#: src/app/routes/_authenticated/_profile/profile.tsx:92
 #: src/app/routes/_authenticated/_promotions/promotions_.$id.tsx:144
 #: src/app/routes/_authenticated/_roles/roles_.$id.tsx:84
 #: src/app/routes/_authenticated/_sellers/sellers_.$id.tsx:78
@@ -1780,7 +1790,7 @@ msgstr "İade başarıyla tamamlandı"
 msgid "Update"
 msgstr "Güncelle"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:76
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:97
 msgid "Heading 2"
 msgstr "Başlık 2"
 
@@ -1788,7 +1798,7 @@ msgstr "Başlık 2"
 msgid "Order placed"
 msgstr "Sipariş verildi"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:63
+#: src/app/routes/_authenticated/_profile/profile.tsx:71
 msgid "Successfully updated profile"
 msgstr "Profil başarıyla güncellendi"
 
@@ -1840,7 +1850,7 @@ msgstr "Başlangıç"
 msgid "Duplicate"
 msgstr "Çoğalt"
 
-#: src/lib/components/data-table/data-table.tsx:558
+#: src/lib/components/data-table/data-table.tsx:588
 #: src/lib/components/shared/customer-group-selector.tsx:56
 msgid "No results"
 msgstr "Sonuç yok"
@@ -2712,7 +2722,7 @@ msgstr "Bu genel görünümü silmek istediğinizden emin misiniz? Bu işlem ger
 msgid "Force remove option group"
 msgstr "Seçenek grubunu zorla kaldır"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:132
+#: src/app/routes/_authenticated/_profile/profile.tsx:140
 msgid "Added"
 msgstr "Eklendi"
 
@@ -2804,6 +2814,10 @@ msgstr "{0} ile {1} arası"
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:111
 msgid "Failed to create customer"
 msgstr "Müşteri oluşturulamadı"
+
+#: src/lib/components/shared/asset/asset-preview.tsx:138
+msgid "Focal point updated"
+msgstr ""
 
 #: src/app/routes/_authenticated/_products/products_.$id_.variants.tsx:298
 msgid "Option values"
@@ -2961,7 +2975,7 @@ msgstr "İade başarıyla işlendi"
 #: src/lib/components/data-input/product-multi-selector-input.tsx:281
 #: src/lib/components/data-input/product-multi-selector-input.tsx:284
 #: src/lib/components/data-input/relation-selector.tsx:404
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:418
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:439
 msgid "{0}"
 msgstr "{0}"
 
@@ -3026,7 +3040,7 @@ msgstr "Bu sayfadan ayrılmak istediğinizden emin misiniz? Kaydedilmemiş deği
 msgid "Toggle header column"
 msgstr "Başlık sütununu değiştir"
 
-#: src/app/routes/_authenticated/_promotions/promotions.tsx:87
+#: src/app/routes/_authenticated/_promotions/promotions.tsx:88
 msgid "New Promotion"
 msgstr "Yeni Promosyon"
 
@@ -3046,6 +3060,10 @@ msgstr "Varsayılan vergi kategorisi"
 #: src/lib/components/data-input/slug-input.tsx:238
 msgid "Slug is set"
 msgstr "Slug ayarlandı"
+
+#: src/lib/components/shared/asset/asset-preview.tsx:141
+msgid "Failed to update focal point"
+msgstr ""
 
 #: src/app/routes/_authenticated/_zones/zones_.$id.tsx:61
 msgid "Successfully updated zone"
@@ -3110,7 +3128,7 @@ msgstr "Sipariş metrikleri"
 msgid "Select display language"
 msgstr "Görüntüleme dili seçin"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:120
+#: src/app/routes/_authenticated/_profile/profile.tsx:128
 msgid "Authentication methods"
 msgstr "Kimlik doğrulama yöntemleri"
 
@@ -3227,7 +3245,7 @@ msgstr "{0} tane daha yükle ({remaining} kalan)"
 msgid "Facet values"
 msgstr "Özellik değerleri"
 
-#: src/lib/components/data-table/data-table.tsx:228
+#: src/lib/components/data-table/data-table.tsx:237
 msgid "Failed to reorder items"
 msgstr "Öğeler yeniden sıralanamadı"
 
@@ -3308,7 +3326,7 @@ msgstr "Evet"
 msgid "Slug"
 msgstr "Slug"
 
-#: src/lib/components/shared/asset/asset-focal-point-editor.tsx:97
+#: src/lib/components/shared/asset/asset-focal-point-editor.tsx:98
 msgid "Set Focal Point"
 msgstr "Odak Noktasını Ayarla"
 
@@ -3441,7 +3459,7 @@ msgstr "Çalışmıyor"
 msgid "Assigned"
 msgstr "Atanmış"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:75
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:96
 msgid "Heading 1"
 msgstr "Başlık 1"
 
@@ -3563,6 +3581,7 @@ msgid "Cannot remove from active channel"
 msgstr "Etkin kanaldan kaldırılamaz"
 
 #: src/app/routes/_authenticated/_assets/assets_.$id.tsx:179
+#: src/lib/components/shared/asset/asset-preview.tsx:177
 msgid "Not set"
 msgstr "Ayarlanmadı"
 
@@ -3663,7 +3682,7 @@ msgid "Add a price in another currency"
 msgstr "Başka bir para biriminde fiyat ekle"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:127
-#: src/app/routes/_authenticated/_profile/profile.tsx:106
+#: src/app/routes/_authenticated/_profile/profile.tsx:114
 msgid "Email Address or identifier"
 msgstr "E-posta Adresi veya tanımlayıcı"
 
@@ -3680,7 +3699,7 @@ msgstr "İade #{0}, {1} durumuna geçti"
 msgid "Customers"
 msgstr "Müşteriler"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:78
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:99
 msgid "Heading 4"
 msgstr "Başlık 4"
 
@@ -4033,7 +4052,7 @@ msgstr "Gönderildi"
 #~ msgid "Monitored Resources"
 #~ msgstr "İzlenen Kaynaklar"
 
-#: src/lib/framework/layout-engine/page-layout.tsx:677
+#: src/lib/framework/layout-engine/page-layout.tsx:689
 msgid "Entity Information"
 msgstr "Varlık Bilgisi"
 
@@ -4302,7 +4321,7 @@ msgstr "Yeni satıcı"
 msgid "e.g., Red, Large, Cotton"
 msgstr "örn. Kırmızı, Büyük, Pamuk"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:67
+#: src/app/routes/_authenticated/_profile/profile.tsx:75
 msgid "Failed to update profile"
 msgstr "Profil güncellenemedi"
 
@@ -4726,7 +4745,7 @@ msgstr "Ayarlar"
 msgid "Settings Store"
 msgstr "Ayarlar Deposu"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:77
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:98
 msgid "Heading 3"
 msgstr "Başlık 3"
 
@@ -4968,6 +4987,11 @@ msgstr "Teslim ediliyor..."
 msgid "Add option group to product"
 msgstr "Ürüne seçenek grubu ekle"
 
+#. placeholder {0}: asset.name
+#: src/lib/components/shared/asset/asset-preview-dialog.tsx:37
+msgid "Preview of {0}"
+msgstr ""
+
 #: src/app/routes/_authenticated/_sellers/sellers_.$id.tsx:56
 msgid "Successfully updated seller"
 msgstr "Satıcı başarıyla güncellendi"
@@ -5143,7 +5167,7 @@ msgid "Customer not found"
 msgstr "Müşteri bulunamadı"
 
 #. placeholder {0}: entityName.toLowerCase()
-#: src/lib/components/data-input/default-relation-input.tsx:605
+#: src/lib/components/data-input/default-relation-input.tsx:603
 msgid "Select {0}s"
 msgstr "{0} seç"
 
@@ -5158,7 +5182,7 @@ msgstr "İade işlenemedi"
 
 #: src/app/routes/_authenticated/_administrators/administrators_.$id.tsx:115
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:176
-#: src/app/routes/_authenticated/_profile/profile.tsx:94
+#: src/app/routes/_authenticated/_profile/profile.tsx:102
 msgid "First name"
 msgstr "Ad"
 
@@ -5206,8 +5230,8 @@ msgstr "Filtre ekle"
 msgid "Tax category"
 msgstr "Vergi kategorisi"
 
-#: src/app/routes/_authenticated/_profile/profile.tsx:31
-#: src/app/routes/_authenticated/_profile/profile.tsx:76
+#: src/app/routes/_authenticated/_profile/profile.tsx:38
+#: src/app/routes/_authenticated/_profile/profile.tsx:84
 #: src/lib/components/layout/nav-user.tsx:108
 msgid "Profile"
 msgstr "Profil"
@@ -5724,7 +5748,7 @@ msgstr "Genel dil ayarlarını görüntüleme izniniz yok"
 msgid "Successfully created tax rate"
 msgstr "Vergi oranı başarıyla oluşturuldu"
 
-#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:80
+#: src/lib/components/shared/rich-text-editor/responsive-toolbar.tsx:101
 msgid "Heading 6"
 msgstr "Başlık 6"
 
@@ -5777,7 +5801,7 @@ msgstr "Etkin filtreler"
 
 #: src/app/routes/_authenticated/_assets/components/asset-tag-filter.tsx:178
 #: src/lib/components/data-table/data-table-active-filters-popover.tsx:54
-#: src/lib/components/data-table/data-table.tsx:423
+#: src/lib/components/data-table/data-table.tsx:434
 msgid "Clear all"
 msgstr "Tümünü temizle"
 
