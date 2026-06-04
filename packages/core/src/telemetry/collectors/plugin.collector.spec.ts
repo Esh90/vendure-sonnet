@@ -1,9 +1,12 @@
 import { DynamicModule } from '@nestjs/common';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { ConfigService } from '../../config/config.service';
 
-import { PluginCollector } from './plugin.collector';
+import { isVendurePluginPackage, PluginCollector } from './plugin.collector';
 
 describe('PluginCollector', () => {
     let collector: PluginCollector;
@@ -249,6 +252,113 @@ describe('PluginCollector', () => {
             const result = collector.collect();
 
             expect(result.npm).toContain('nested-plugin');
+        });
+    });
+
+    describe('isVendurePluginPackage()', () => {
+        it('matches official @vendure packages from the known map', () => {
+            expect(isVendurePluginPackage('@vendure/email-plugin')).toBe(true);
+            expect(isVendurePluginPackage('@vendure/core')).toBe(true);
+        });
+
+        it('matches the public community and hub scopes', () => {
+            expect(isVendurePluginPackage('@vendure-community/stripe-plugin')).toBe(true);
+            expect(isVendurePluginPackage('@vendure-hub/some-plugin')).toBe(true);
+        });
+
+        it('matches the vendure-plugin naming convention', () => {
+            expect(isVendurePluginPackage('vendure-plugin-foo')).toBe(true);
+            expect(isVendurePluginPackage('foo-vendure-plugin')).toBe(true);
+        });
+
+        it('does not match non-plugin or unrelated packages', () => {
+            expect(isVendurePluginPackage('@vendure/common')).toBe(false);
+            expect(isVendurePluginPackage('@vendure-io/docs-generator')).toBe(false);
+            expect(isVendurePluginPackage('express')).toBe(false);
+        });
+    });
+
+    describe('getDeclaredVendurePackages()', () => {
+        let tmpDir = '';
+
+        afterEach(() => {
+            if (tmpDir) {
+                fs.rmSync(tmpDir, { recursive: true, force: true });
+                tmpDir = '';
+            }
+        });
+
+        function writePackageJson(contents: Record<string, any>): string {
+            tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'vendure-telemetry-'));
+            fs.writeFileSync(path.join(tmpDir, 'package.json'), JSON.stringify(contents));
+            return tmpDir;
+        }
+
+        it('detects vendure plugin packages from the manifest (ESM-safe)', () => {
+            const dir = writePackageJson({
+                dependencies: {
+                    '@vendure/core': '^3.0.0',
+                    '@vendure/email-plugin': '^3.0.0',
+                    '@vendure-community/stripe-plugin': '^1.0.0',
+                    'vendure-plugin-foo': '^1.0.0',
+                    express: '^4.0.0',
+                },
+            });
+
+            expect(collector.getDeclaredVendurePackages([dir]).sort()).toEqual([
+                '@vendure-community/stripe-plugin',
+                '@vendure/core',
+                '@vendure/email-plugin',
+                'vendure-plugin-foo',
+            ]);
+        });
+
+        it('also scans devDependencies and optionalDependencies', () => {
+            const dir = writePackageJson({
+                devDependencies: { 'vendure-plugin-dev': '^1.0.0' },
+                optionalDependencies: { '@vendure-hub/optional-plugin': '^1.0.0' },
+            });
+
+            expect(collector.getDeclaredVendurePackages([dir]).sort()).toEqual([
+                '@vendure-hub/optional-plugin',
+                'vendure-plugin-dev',
+            ]);
+        });
+
+        it('merges manifests across a monorepo (workspace package + repo root)', () => {
+            // The repo root holds shared tooling; the app sub-package holds the
+            // runtime plugin. Walking up from the leaf should merge both, and
+            // stop at the repo root (marked by a .git entry).
+            tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'vendure-telemetry-'));
+            fs.writeFileSync(path.join(tmpDir, '.git'), '');
+            fs.writeFileSync(
+                path.join(tmpDir, 'package.json'),
+                JSON.stringify({ devDependencies: { 'vendure-plugin-root-tool': '^1.0.0' } }),
+            );
+            const appDir = path.join(tmpDir, 'packages', 'store');
+            fs.mkdirSync(appDir, { recursive: true });
+            fs.writeFileSync(
+                path.join(appDir, 'package.json'),
+                JSON.stringify({ dependencies: { '@vendure/email-plugin': '^3.0.0' } }),
+            );
+
+            expect(collector.getDeclaredVendurePackages([appDir]).sort()).toEqual([
+                '@vendure/email-plugin',
+                'vendure-plugin-root-tool',
+            ]);
+        });
+
+        it('returns an empty array when there are no vendure dependencies', () => {
+            const dir = writePackageJson({ dependencies: { express: '^4.0.0' } });
+
+            expect(collector.getDeclaredVendurePackages([dir])).toEqual([]);
+        });
+
+        it('does not throw on a malformed package.json', () => {
+            tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'vendure-telemetry-'));
+            fs.writeFileSync(path.join(tmpDir, 'package.json'), '{ not valid json');
+
+            expect(collector.getDeclaredVendurePackages([tmpDir])).toEqual([]);
         });
     });
 });

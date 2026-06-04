@@ -1,4 +1,6 @@
 import { DynamicModule, Injectable, Type } from '@nestjs/common';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import { ConfigService } from '../../config/config.service';
 import { isDynamicModule } from '../../plugin/plugin-metadata';
@@ -36,6 +38,28 @@ const KNOWN_VENDURE_PLUGINS: Record<string, string> = {
 };
 
 /**
+ * npm package names that identify official Vendure plugins, derived from the
+ * known-plugin map above so there is a single source of truth.
+ */
+const KNOWN_VENDURE_PACKAGES = new Set(Object.values(KNOWN_VENDURE_PLUGINS));
+
+/**
+ * Determines whether an npm package name belongs to the Vendure plugin
+ * ecosystem. Matches official packages, the public community/hub scopes, and
+ * the documented `vendure-plugin` naming convention. Used to detect plugin
+ * packages from the host `package.json` in a way that works under both
+ * CommonJS and native ESM (unlike require.cache inspection).
+ */
+export function isVendurePluginPackage(name: string): boolean {
+    return (
+        KNOWN_VENDURE_PACKAGES.has(name) ||
+        name.startsWith('@vendure-community/') ||
+        name.startsWith('@vendure-hub/') ||
+        /vendure-plugin/i.test(name)
+    );
+}
+
+/**
  * Collects information about plugins used in the Vendure installation.
  * Detects npm packages by checking if the plugin originates from node_modules.
  * Custom plugin names are NOT collected for privacy.
@@ -64,6 +88,17 @@ export class PluginCollector {
                 }
             }
 
+            // Add Vendure ecosystem packages declared in the host package.json.
+            // This filesystem-based detection is ESM-safe and catches official
+            // and third-party plugin packages that require.cache inspection
+            // misses when they are loaded as native ESM modules. Note: packages
+            // are only added to the npm list; customCount is left untouched, so
+            // an ESM-loaded third-party plugin may still be counted once as
+            // custom (no worse than before this fallback existed).
+            for (const pkg of this.getDeclaredVendurePackages()) {
+                npmPlugins.add(pkg);
+            }
+
             return {
                 npm: Array.from(npmPlugins).sort((a, b) => a.localeCompare(b)),
                 customCount,
@@ -71,6 +106,92 @@ export class PluginCollector {
         } catch {
             return { npm: [], customCount: 0 };
         }
+    }
+
+    /**
+     * Reads every `package.json` found by walking up from each search directory
+     * and returns the names of declared Vendure plugin packages. Relies only on
+     * the filesystem, so it works regardless of whether plugins were loaded via
+     * CommonJS or native ESM.
+     *
+     * Monorepo-aware: it merges manifests up the tree (stopping at the repo
+     * root) and searches from both the current working directory and the
+     * application entry point. This covers workspace layouts where plugin
+     * dependencies live in a sub-package and/or the repository root, and where
+     * the process is started from a different directory than the app package.
+     * Returns an empty array on any failure.
+     */
+    getDeclaredVendurePackages(searchDirs: string[] = this.getManifestSearchDirs()): string[] {
+        const found = new Set<string>();
+        const visited = new Set<string>();
+
+        for (const startDir of searchDirs) {
+            for (const pkgPath of this.findPackageJsonPaths(startDir)) {
+                if (visited.has(pkgPath)) {
+                    continue;
+                }
+                visited.add(pkgPath);
+                try {
+                    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
+                    const depNames = [
+                        ...Object.keys(pkg.dependencies ?? {}),
+                        ...Object.keys(pkg.devDependencies ?? {}),
+                        ...Object.keys(pkg.optionalDependencies ?? {}),
+                    ];
+                    for (const name of depNames) {
+                        if (isVendurePluginPackage(name)) {
+                            found.add(name);
+                        }
+                    }
+                } catch {
+                    // Ignore unreadable/malformed manifests and continue
+                }
+            }
+        }
+
+        return Array.from(found);
+    }
+
+    /**
+     * The directories from which to search for package.json manifests. Includes
+     * the current working directory and (in a monorepo) the directory of the
+     * application entry point, which may sit in a different workspace package.
+     */
+    private getManifestSearchDirs(): string[] {
+        const dirs = [process.cwd()];
+        const mainFile = typeof require !== 'undefined' ? require.main?.filename : undefined;
+        const entryFile = mainFile ?? process.argv[1];
+        if (entryFile) {
+            dirs.push(path.dirname(entryFile));
+        }
+        return dirs;
+    }
+
+    /**
+     * Returns the paths of all `package.json` files found by walking up from
+     * `startDir`, stopping at the repository root (a directory containing a
+     * `.git` entry) or the filesystem root, whichever comes first.
+     */
+    private findPackageJsonPaths(startDir: string): string[] {
+        const paths: string[] = [];
+        let dir = startDir;
+        // Walk up a bounded number of levels to avoid infinite loops
+        for (let i = 0; i < 30; i++) {
+            const candidate = path.join(dir, 'package.json');
+            if (fs.existsSync(candidate)) {
+                paths.push(candidate);
+            }
+            // Stop at the repo root so we don't read manifests outside the project
+            if (fs.existsSync(path.join(dir, '.git'))) {
+                break;
+            }
+            const parent = path.dirname(dir);
+            if (parent === dir) {
+                break;
+            }
+            dir = parent;
+        }
+        return paths;
     }
 
     /**
