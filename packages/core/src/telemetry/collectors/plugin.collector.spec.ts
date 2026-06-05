@@ -18,6 +18,10 @@ describe('PluginCollector', () => {
             plugins: [],
         };
         collector = new PluginCollector(mockConfigService as ConfigService);
+        // Keep the collect() unit tests hermetic: don't let the manifest scan
+        // read the ambient on-disk package.json of wherever the tests run. The
+        // filesystem scan is covered separately below with temp fixtures.
+        (collector as any).getManifestSearchDirs = () => [];
     });
 
     afterEach(() => {
@@ -256,19 +260,25 @@ describe('PluginCollector', () => {
     });
 
     describe('isVendurePluginPackage()', () => {
-        it('matches official @vendure packages from the known map', () => {
+        it('matches official @vendure plugin packages and @vendure/core', () => {
             expect(isVendurePluginPackage('@vendure/email-plugin')).toBe(true);
             expect(isVendurePluginPackage('@vendure/core')).toBe(true);
+            // Future official plugins are matched by the -plugin suffix
+            expect(isVendurePluginPackage('@vendure/some-future-plugin')).toBe(true);
         });
 
-        it('matches the public community and hub scopes', () => {
+        it('matches the public community scope', () => {
             expect(isVendurePluginPackage('@vendure-community/stripe-plugin')).toBe(true);
-            expect(isVendurePluginPackage('@vendure-hub/some-plugin')).toBe(true);
         });
 
-        it('matches the vendure-plugin naming convention', () => {
-            expect(isVendurePluginPackage('vendure-plugin-foo')).toBe(true);
-            expect(isVendurePluginPackage('foo-vendure-plugin')).toBe(true);
+        it('does not match private, hub or arbitrary third-party names', () => {
+            // Privacy: scanning package.json must never transmit a private name.
+            // The @vendure-hub scope is not on the public npm registry, so it is
+            // excluded too.
+            expect(isVendurePluginPackage('@vendure-hub/some-plugin')).toBe(false);
+            expect(isVendurePluginPackage('vendure-plugin-foo')).toBe(false);
+            expect(isVendurePluginPackage('@acme/vendure-plugin-secret')).toBe(false);
+            expect(isVendurePluginPackage('foo-vendure-plugin')).toBe(false);
         });
 
         it('does not match non-plugin or unrelated packages', () => {
@@ -300,7 +310,6 @@ describe('PluginCollector', () => {
                     '@vendure/core': '^3.0.0',
                     '@vendure/email-plugin': '^3.0.0',
                     '@vendure-community/stripe-plugin': '^1.0.0',
-                    'vendure-plugin-foo': '^1.0.0',
                     express: '^4.0.0',
                 },
             });
@@ -309,31 +318,30 @@ describe('PluginCollector', () => {
                 '@vendure-community/stripe-plugin',
                 '@vendure/core',
                 '@vendure/email-plugin',
-                'vendure-plugin-foo',
             ]);
         });
 
-        it('also scans devDependencies and optionalDependencies', () => {
+        it('scans optionalDependencies but ignores devDependencies', () => {
             const dir = writePackageJson({
-                devDependencies: { 'vendure-plugin-dev': '^1.0.0' },
-                optionalDependencies: { '@vendure-hub/optional-plugin': '^1.0.0' },
+                optionalDependencies: { '@vendure-community/optional-plugin': '^1.0.0' },
+                // devDependencies must be ignored so dev-only tooling never leaks
+                devDependencies: { '@vendure-community/dev-only-plugin': '^1.0.0' },
             });
 
-            expect(collector.getDeclaredVendurePackages([dir]).sort()).toEqual([
-                '@vendure-hub/optional-plugin',
-                'vendure-plugin-dev',
+            expect(collector.getDeclaredVendurePackages([dir])).toEqual([
+                '@vendure-community/optional-plugin',
             ]);
         });
 
         it('merges manifests across a monorepo (workspace package + repo root)', () => {
-            // The repo root holds shared tooling; the app sub-package holds the
-            // runtime plugin. Walking up from the leaf should merge both, and
-            // stop at the repo root (marked by a .git entry).
+            // The repo root and the app sub-package each declare a runtime
+            // plugin. Walking up from the leaf should merge both, and stop at
+            // the repo root (marked by a .git entry).
             tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'vendure-telemetry-'));
             fs.writeFileSync(path.join(tmpDir, '.git'), '');
             fs.writeFileSync(
                 path.join(tmpDir, 'package.json'),
-                JSON.stringify({ devDependencies: { 'vendure-plugin-root-tool': '^1.0.0' } }),
+                JSON.stringify({ dependencies: { '@vendure-community/payments-plugin': '^1.0.0' } }),
             );
             const appDir = path.join(tmpDir, 'packages', 'store');
             fs.mkdirSync(appDir, { recursive: true });
@@ -343,9 +351,28 @@ describe('PluginCollector', () => {
             );
 
             expect(collector.getDeclaredVendurePackages([appDir]).sort()).toEqual([
+                '@vendure-community/payments-plugin',
                 '@vendure/email-plugin',
-                'vendure-plugin-root-tool',
             ]);
+        });
+
+        it('stops walking at a node_modules install root', () => {
+            // An ancestor manifest above the install root must not be read.
+            tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'vendure-telemetry-'));
+            fs.writeFileSync(
+                path.join(tmpDir, 'package.json'),
+                JSON.stringify({ dependencies: { '@vendure/email-plugin': '^3.0.0' } }),
+            );
+            const appDir = path.join(tmpDir, 'app');
+            fs.mkdirSync(path.join(appDir, 'node_modules'), { recursive: true });
+            fs.writeFileSync(
+                path.join(appDir, 'package.json'),
+                JSON.stringify({ dependencies: { '@vendure-community/app-plugin': '^1.0.0' } }),
+            );
+
+            // Walking up from appDir stops at appDir (it has node_modules), so
+            // the ancestor's @vendure/email-plugin is never read.
+            expect(collector.getDeclaredVendurePackages([appDir])).toEqual(['@vendure-community/app-plugin']);
         });
 
         it('returns an empty array when there are no vendure dependencies', () => {
