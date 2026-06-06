@@ -1382,9 +1382,13 @@ describe('Default search plugin', () => {
 
             it('reindex converges to identical results when run twice', async () => {
                 const byVariantId = (
-                    items: Array<{ productVariantId: string }>,
-                ): Array<{ productVariantId: string }> =>
-                    [...items].sort((a, b) => a.productVariantId.localeCompare(b.productVariantId));
+                    items: Array<{ productVariantId: string; productId: string }>,
+                ): Array<{ productVariantId: string; productId: string }> =>
+                    [...items].sort(
+                        (a, b) =>
+                            a.productVariantId.localeCompare(b.productVariantId) ||
+                            a.productId.localeCompare(b.productId),
+                    );
 
                 await adminClient.query(reindexDocument);
                 await awaitRunningJobs(adminClient);
