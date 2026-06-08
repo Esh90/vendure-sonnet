@@ -2,6 +2,8 @@
 title: "RequestContextService"
 generated: true
 ---
+## RequestContextService
+
 <GenerationInfo sourceFile="packages/core/src/service/helpers/request-context/request-context.service.ts" sourceLine="58" packageName="@vendure/core" />
 
 Creates new [RequestContext](/reference/typescript-api/request/request-context#requestcontext) instances.
@@ -18,7 +20,7 @@ class RequestContextService {
 
 ### createDefaultContext
 
-<MemberInfo kind="method" type={`(config?: <a href='/reference/typescript-api/request/request-context-service#createdefaultrequestcontextconfig'>CreateDefaultRequestContextConfig</a>) => Promise<<a href='/reference/typescript-api/request/request-context#requestcontext'>RequestContext</a>>`}  since="3.6.3"  />
+<MemberInfo kind="method" type={`(config?: <a href='/reference/typescript-api/request/request-context-service#createdefaultrequestcontextconfig'>CreateDefaultRequestContextConfig</a>) => Promise<<a href='/reference/typescript-api/request/request-context#requestcontext'>RequestContext</a>>`}  since="3.6.5"  />
 
 Creates a RequestContext based on the default Channel. This is useful when a service method
 must be called outside the normal request-response cycle and needs a context that has a valid
@@ -40,7 +42,9 @@ to all resolvers & controllers.
 
 
 </div>
-<GenerationInfo sourceFile="packages/core/src/service/helpers/request-context/request-context.service.ts" sourceLine="28" packageName="@vendure/core" since="3.6.3" />
+## CreateDefaultRequestContextConfig
+
+<GenerationInfo sourceFile="packages/core/src/service/helpers/request-context/request-context.service.ts" sourceLine="28" packageName="@vendure/core" since="3.6.5" />
 
 Optional overrides passed to `RequestContextService.createDefaultContext`. This is
 effectively an all-optional version of the [RequestContext](/reference/typescript-api/request/request-context#requestcontext) constructor parameters.
@@ -48,6 +52,8 @@ effectively an all-optional version of the [RequestContext](/reference/typescrip
 ```ts title="Signature"
 type CreateDefaultRequestContextConfig = Partial<ConstructorParameters<typeof RequestContext>[0]>
 ```
+## CreateRequestContextConfig
+
 <GenerationInfo sourceFile="packages/core/src/service/helpers/request-context/request-context.service.ts" sourceLine="40" packageName="@vendure/core" since="1.5.0" />
 
 Configuration accepted by `RequestContextService.create`. Used to construct a

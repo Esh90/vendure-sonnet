@@ -23,7 +23,7 @@ import { getUserChannelsPermissions } from '../utils/get-user-channels-permissio
  *
  * @docsCategory request
  * @docsPage RequestContextService
- * @since 3.6.3
+ * @since 3.6.5
  */
 export type CreateDefaultRequestContextConfig = Partial<ConstructorParameters<typeof RequestContext>[0]>;
 
@@ -70,7 +70,7 @@ export class RequestContextService {
      * `languageCode` derived from the default Channel's configuration.
      * @param config optional manual configuration overwriting the default values
      *
-     * @since 3.6.3
+     * @since 3.6.5
      */
     async createDefaultContext(config?: CreateDefaultRequestContextConfig): Promise<RequestContext> {
         const channel = await this.channelService.getDefaultChannel();
