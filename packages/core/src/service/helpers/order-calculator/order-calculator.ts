@@ -244,8 +244,8 @@ export class OrderCalculator {
                     if (adjustment && adjustment.amount !== 0) {
                         const amount = adjustment.amount;
                         const { orderLineDiscountDistributionStrategy } = this.configService.orderOptions;
-                        const weights = order.lines.map(l =>
-                            orderLineDiscountDistributionStrategy.getWeight(ctx, l, order),
+                        const weights = order.lines.map(line =>
+                            orderLineDiscountDistributionStrategy.getWeight(ctx, line, order),
                         );
                         const distribution = prorate(weights, amount);
                         order.lines.forEach((line, i) => {
