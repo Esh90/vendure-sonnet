@@ -1,0 +1,68 @@
+---
+title: "OrderLineDiscountDistributionStrategy"
+generated: true
+---
+<GenerationInfo sourceFile="packages/core/src/config/order/order-line-discount-distribution-strategy.ts" sourceLine="30" packageName="@vendure/core" since="3.7.0" />
+
+Determines the weight used to distribute (prorate) an order-level promotion discount across the
+[OrderLine](/reference/typescript-api/entities/order-line#orderline)s of an [Order](/reference/typescript-api/entities/order#order). The weights returned for all lines are fed into the
+`prorate()` helper, which splits the total order-level discount amount proportionally.
+
+This makes it possible to control what happens to the distribution when a line is cancelled or
+refunded. The default strategy gives a fully-cancelled line (quantity 0) a weight of 0, so its
+share of the discount is redistributed across the remaining lines. A custom strategy can instead
+weight lines by their originally-placed quantity, keeping each surviving line's share stable when
+another line is refunded.
+
+:::info
+
+This is configured via the `orderOptions.orderLineDiscountDistributionStrategy` property of
+your VendureConfig.
+
+:::
+
+```ts title="Signature"
+interface OrderLineDiscountDistributionStrategy extends InjectableStrategy {
+    getWeight(ctx: RequestContext, line: OrderLine, order: Order): number;
+}
+```
+* Extends: [`InjectableStrategy`](/reference/typescript-api/common/injectable-strategy#injectablestrategy)
+
+
+
+<div className="members-wrapper">
+
+### getWeight
+
+<MemberInfo kind="method" type={`(ctx: <a href='/reference/typescript-api/request/request-context#requestcontext'>RequestContext</a>, line: <a href='/reference/typescript-api/entities/order-line#orderline'>OrderLine</a>, order: <a href='/reference/typescript-api/entities/order#order'>Order</a>) => number`}   />
+
+Returns the (non-negative) weight for the given OrderLine. Returning 0 excludes the line from
+receiving any share of the order-level discount.
+
+
+</div>
+<GenerationInfo sourceFile="packages/core/src/config/order/default-order-line-discount-distribution-strategy.ts" sourceLine="16" packageName="@vendure/core" since="3.7.0" />
+
+The default [OrderLineDiscountDistributionStrategy](/reference/typescript-api/orders/order-line-discount-distribution-strategy#orderlinediscountdistributionstrategy). Weights each line by its current
+prorated line price (incl. tax) and assigns zero weight to fully-cancelled lines (quantity 0).
+This reproduces Vendure's historical distribution behaviour exactly.
+
+```ts title="Signature"
+class DefaultOrderLineDiscountDistributionStrategy implements OrderLineDiscountDistributionStrategy {
+    getWeight(ctx: RequestContext, line: OrderLine) => number;
+}
+```
+* Implements: [`OrderLineDiscountDistributionStrategy`](/reference/typescript-api/orders/order-line-discount-distribution-strategy#orderlinediscountdistributionstrategy)
+
+
+
+<div className="members-wrapper">
+
+### getWeight
+
+<MemberInfo kind="method" type={`(ctx: <a href='/reference/typescript-api/request/request-context#requestcontext'>RequestContext</a>, line: <a href='/reference/typescript-api/entities/order-line#orderline'>OrderLine</a>) => number`}   />
+
+
+
+
+</div>
