@@ -165,6 +165,55 @@ export const paypalPaymentHandler = new PaymentMethodHandler({
     },
 
     /**
+     * UC3 — Payment Cancellation / Void.
+     * Voids a PayPal authorization, releasing the reserved funds back to the buyer.
+     * Only applicable to payments in the 'Authorized' state (UC2 flow).
+     * Vendure's state machine prevents this from being called on 'Settled' payments.
+     */
+    cancelPayment: async (_ctx, _order, payment) => {
+        const authorizationId = payment.metadata.authorizationId as string | undefined;
+
+        if (!authorizationId) {
+            return {
+                success: false as const,
+                errorMessage:
+                    'Cannot void payment: no PayPal authorizationId found in metadata. ' +
+                    'Only authorized (not yet captured) payments can be voided.',
+            };
+        }
+
+        try {
+            const paymentsController = getPaymentsController();
+            await paymentsController.voidPayment({ authorizationId });
+
+            Logger.info(
+                `PayPal authorization voided. Auth ID: ${authorizationId}`,
+                loggerCtx,
+            );
+
+            return {
+                success: true as const,
+                metadata: {
+                    ...payment.metadata,
+                    voidedAt: new Date().toISOString(),
+                    authorizationStatus: 'VOIDED',
+                },
+            };
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : String(err);
+            Logger.error(
+                `PayPal voidPayment failed: ${message}. Auth ID: ${authorizationId}`,
+                loggerCtx,
+            );
+            return {
+                success: false as const,
+                errorMessage: message,
+                metadata: { ...payment.metadata, errorMessage: message },
+            };
+        }
+    },
+
+    /**
      * UC1: payment is already Settled from createPayment — nothing to do.
      * UC2: payment is in Authorized state; capture the held funds now.
      */
