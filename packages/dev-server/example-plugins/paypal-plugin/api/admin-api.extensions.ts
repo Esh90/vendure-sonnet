@@ -35,9 +35,72 @@ export const adminApiExtensions = gql`
         totalCycles: Int
     }
 
+    # ── UC7 — Transaction Reporting ─────────────────────────────────────────
+
+    """A monetary amount as returned by PayPal (decimal string + ISO currency code)."""
+    type PayPalMoney {
+        value: String!
+        currencyCode: String!
+    }
+
+    """A single transaction row from PayPal's Transaction Search API."""
+    type PayPalTransaction {
+        transactionId: String
+        transactionEventCode: String
+        transactionInitiationDate: String
+        transactionUpdatedDate: String
+        transactionAmount: PayPalMoney
+        feeAmount: PayPalMoney
+        transactionStatus: String
+        transactionSubject: String
+        invoiceId: String
+        customField: String
+        payerEmail: String
+        payerName: String
+    }
+
+    """Paginated result of a PayPal transaction search."""
+    type PayPalTransactionSearchResult {
+        transactions: [PayPalTransaction!]!
+        totalItems: Int!
+        totalPages: Int!
+        page: Int!
+    }
+
+    """A currency balance from the PayPal account."""
+    type PayPalBalance {
+        currency: String!
+        primary: Boolean
+        totalBalance: PayPalMoney!
+        availableBalance: PayPalMoney
+        withheldBalance: PayPalMoney
+    }
+
+    input PayPalTransactionSearchInput {
+        """Start of the search window (RFC 3339, e.g. \\"2024-01-01T00:00:00Z\\"). Max range: 31 days."""
+        startDate: String!
+        """End of the search window (RFC 3339). Max range: 31 days."""
+        endDate: String!
+        transactionId: String
+        """D=Denied, P=Pending, S=Success, V=Reversed"""
+        transactionStatus: String
+        """ISO-4217 currency code filter, e.g. \\"USD\\"."""
+        transactionCurrency: String
+        """Number of results per page (max 500, default 100)."""
+        pageSize: Int
+        """1-based page number (default 1)."""
+        page: Int
+    }
+
     extend type Query {
         """List all PayPal subscriptions stored in Vendure."""
         paypalSubscriptions: [PayPalSubscription!]!
+
+        """UC7 — Search PayPal transactions by date range and optional filters."""
+        paypalTransactions(input: PayPalTransactionSearchInput!): PayPalTransactionSearchResult!
+
+        """UC7 — Fetch current PayPal account balances."""
+        paypalBalances(asOfTime: String, currencyCode: String): [PayPalBalance!]!
     }
 
     extend type Mutation {

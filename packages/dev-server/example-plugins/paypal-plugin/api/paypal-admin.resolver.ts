@@ -1,13 +1,20 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Allow, Ctx, Permission, RequestContext } from '@vendure/core';
 import {
+    PayPalReportingService,
+    TransactionSearchInput,
+} from '../reporting/paypal-reporting.service';
+import {
     CreateBillingPlanInput,
     PayPalSubscriptionService,
 } from '../subscription/paypal-subscription.service';
 
 @Resolver()
 export class PayPalAdminResolver {
-    constructor(private readonly subscriptionService: PayPalSubscriptionService) {}
+    constructor(
+        private readonly subscriptionService: PayPalSubscriptionService,
+        private readonly reportingService: PayPalReportingService,
+    ) {}
 
     @Query()
     @Allow(Permission.ReadOrder)
@@ -52,5 +59,23 @@ export class PayPalAdminResolver {
     ): Promise<boolean> {
         await this.subscriptionService.captureSubscriptionPayment(ctx, subscriptionId);
         return true;
+    }
+
+    // ── UC7 — Transaction Reporting ─────────────────────────────────────────
+
+    @Query()
+    @Allow(Permission.ReadOrder)
+    paypalTransactions(
+        @Args() { input }: { input: TransactionSearchInput },
+    ) {
+        return this.reportingService.searchTransactions(input);
+    }
+
+    @Query()
+    @Allow(Permission.ReadOrder)
+    paypalBalances(
+        @Args() { asOfTime, currencyCode }: { asOfTime?: string; currencyCode?: string },
+    ) {
+        return this.reportingService.getBalances(asOfTime, currencyCode);
     }
 }

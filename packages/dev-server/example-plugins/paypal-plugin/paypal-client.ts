@@ -1,4 +1,4 @@
-import { Client, Environment, OrdersController, PaymentsController, SubscriptionsController } from '@paypal/paypal-server-sdk';
+import { Client, Environment, OrdersController, PaymentsController, SubscriptionsController, TransactionSearchController } from '@paypal/paypal-server-sdk';
 import { Logger } from '@vendure/core';
 
 const loggerCtx = 'PayPalClient';
@@ -7,6 +7,7 @@ let _client: Client | null = null;
 let _ordersController: OrdersController | null = null;
 let _paymentsController: PaymentsController | null = null;
 let _subscriptionsController: SubscriptionsController | null = null;
+let _transactionSearchController: TransactionSearchController | null = null;
 
 function createClient(): Client {
     const clientId = process.env.PAYPAL_CLIENT_ID;
@@ -62,4 +63,11 @@ export function getSubscriptionsController(): SubscriptionsController {
         _subscriptionsController = new SubscriptionsController(getClient());
     }
     return _subscriptionsController;
+}
+
+export function getTransactionSearchController(): TransactionSearchController {
+    if (!_transactionSearchController) {
+        _transactionSearchController = new TransactionSearchController(getClient());
+    }
+    return _transactionSearchController;
 }
