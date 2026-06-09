@@ -1,6 +1,7 @@
 import { LanguageCode, Logger, PaymentMethodHandler } from '@vendure/core';
 import { PAYPAL_HANDLER_CODE } from '../constants';
 import { getOrdersController, getPaymentsController } from '../paypal-client';
+import { toPayPalAmount } from '../utils/currency';
 
 const loggerCtx = 'PayPalPaymentHandler';
 
@@ -18,6 +19,14 @@ const loggerCtx = 'PayPalPaymentHandler';
  *   `createPayment` authorizes → state: 'Authorized'.
  *   When merchant is ready (e.g. before shipment), admin calls `settlePayment`
  *   which captures the held funds → state: 'Settled'.
+ *
+ * UC3 — Payment Cancellation / Void:
+ *   Admin calls `cancelPayment` on an Authorized payment → voids the PayPal
+ *   authorization and releases reserved funds back to the buyer.
+ *
+ * UC4 — Full Refund:
+ *   Admin calls `refundOrder` on a Settled payment. No amount body is sent to
+ *   PayPal so it refunds the entire captured amount automatically.
  */
 export const paypalPaymentHandler = new PaymentMethodHandler({
     code: PAYPAL_HANDLER_CODE,
@@ -275,6 +284,99 @@ export const paypalPaymentHandler = new PaymentMethodHandler({
                 success: false as const,
                 errorMessage: message,
                 metadata: { ...payment.metadata, errorMessage: message },
+            };
+        }
+    },
+
+    /**
+     * UC4 — Full Refund.
+     * Called by Vendure when the admin issues a refund via `refundOrder`.
+     * No amount body is sent to PayPal — it automatically refunds the entire
+     * captured amount. The optional reason is forwarded as noteToPayer.
+     */
+    createRefund: async (_ctx, input, _amount, _order, payment) => {
+        const captureId = payment.metadata.captureId as string | undefined;
+
+        if (!captureId) {
+            Logger.error(
+                `Cannot refund payment ${payment.id}: no captureId in metadata. ` +
+                    'Only settled (captured) payments can be refunded.',
+                loggerCtx,
+            );
+            return {
+                state: 'Failed' as const,
+                metadata: {
+                    errorMessage: 'No PayPal captureId found in payment metadata.',
+                },
+            };
+        }
+
+        try {
+            const paymentsController = getPaymentsController();
+            const response = await paymentsController.refundCapturedPayment({
+                captureId,
+                prefer: 'return=representation',
+                // No amount body → PayPal refunds the full captured amount (UC4)
+                body: input.reason
+                    ? { noteToPayer: input.reason.substring(0, 255) }
+                    : undefined,
+            });
+
+            const refund = response.result;
+
+            if (refund?.status === 'COMPLETED') {
+                Logger.info(
+                    `PayPal full refund completed. Capture ID: ${captureId}, Refund ID: ${refund.id}`,
+                    loggerCtx,
+                );
+                return {
+                    state: 'Settled' as const,
+                    transactionId: refund.id,
+                    metadata: {
+                        refundId: refund.id,
+                        refundStatus: refund.status,
+                        captureId,
+                    },
+                };
+            }
+
+            if (refund?.status === 'PENDING') {
+                Logger.info(
+                    `PayPal refund is pending. Capture ID: ${captureId}, Refund ID: ${refund.id}`,
+                    loggerCtx,
+                );
+                return {
+                    state: 'Pending' as const,
+                    transactionId: refund.id,
+                    metadata: {
+                        refundId: refund.id,
+                        refundStatus: refund.status,
+                        captureId,
+                    },
+                };
+            }
+
+            Logger.error(
+                `PayPal refund failed with status "${refund?.status}". Capture ID: ${captureId}`,
+                loggerCtx,
+            );
+            return {
+                state: 'Failed' as const,
+                metadata: {
+                    refundId: refund?.id,
+                    refundStatus: refund?.status,
+                    captureId,
+                },
+            };
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : String(err);
+            Logger.error(
+                `PayPal refundCapturedPayment failed: ${message}. Capture ID: ${captureId}`,
+                loggerCtx,
+            );
+            return {
+                state: 'Failed' as const,
+                metadata: { captureId, errorMessage: message },
             };
         }
     },
