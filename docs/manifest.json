@@ -1,7 +1,7 @@
 {
   "id": "core",
   "name": "Vendure Core Documentation",
-  "version": "3.6.3",
+  "version": "3.6.4",
   "vendureVersion": "v3",
   "navigation": [
     {
@@ -2050,7 +2050,13 @@
                   "title": "DefaultAssetImportStrategy",
                   "slug": "default-asset-import-strategy",
                   "file": "docs/reference/typescript-api/import-export/default-asset-import-strategy.mdx",
-                  "lastModified": "2026-04-20T16:08:16+02:00"
+                  "lastModified": "2026-06-01T12:33:30+02:00"
+                },
+                {
+                  "title": "DefaultAssetImportStrategyOptions",
+                  "slug": "default-asset-import-strategy-options",
+                  "file": "docs/reference/typescript-api/import-export/default-asset-import-strategy-options.mdx",
+                  "lastModified": "2026-06-01T12:33:30+02:00"
                 },
                 {
                   "title": "FastImporterService",
@@ -3833,7 +3839,7 @@
                   "title": "UseGeneratedForm",
                   "slug": "use-generated-form",
                   "file": "docs/reference/dashboard/detail-views/use-generated-form.mdx",
-                  "lastModified": "2026-05-08T12:27:16+02:00"
+                  "lastModified": "2026-06-05T11:02:24+02:00"
                 }
               ],
               "lastModified": "2026-01-28T14:49:21+01:00"
@@ -4135,7 +4141,7 @@
                   "title": "PaginatedListDataTable",
                   "slug": "paginated-list-data-table",
                   "file": "docs/reference/dashboard/list-views/paginated-list-data-table.mdx",
-                  "lastModified": "2026-04-20T16:08:16+02:00"
+                  "lastModified": "2026-06-01T12:33:30+02:00"
                 }
               ],
               "lastModified": "2026-01-28T14:49:21+01:00"
