@@ -98,6 +98,10 @@ export class I18nService implements OnModuleInit {
                 .map(file => path.basename(file, '.json'));
             return codes.length ? codes : fallback;
         } catch (e: any) {
+            Logger.warn(
+                `Could not read i18n messages directory, falling back to default language list: ${e.message as string}`,
+                'I18nService',
+            );
             return fallback;
         }
     }
