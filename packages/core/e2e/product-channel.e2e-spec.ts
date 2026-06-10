@@ -11,12 +11,15 @@ import { initialData } from '../../../e2e-common/e2e-initial-data';
 import { TEST_SETUP_TIMEOUT_MS, testConfig } from '../../../e2e-common/test-config';
 
 import { channelFragment, productVariantFragment } from './graphql/fragments-admin';
+import { graphql } from './graphql/graphql-admin';
 import {
+    addOptionGroupToProductDocument,
     assignProductToChannelDocument,
     assignProductVariantToChannelDocument,
     createAdministratorDocument,
     createChannelDocument,
     createProductDocument,
+    createProductOptionGroupDocument,
     createProductVariantsDocument,
     createRoleDocument,
     getChannelsDocument,
@@ -556,6 +559,165 @@ describe('ChannelAware Products and ProductVariants', () => {
         });
     });
 
+    // https://github.com/vendure-ecommerce/vendure/issues/4532
+    describe('creating a new variant for a product already assigned to another channel', () => {
+        let testProduct: ResultOf<typeof createProductDocument>['createProduct'];
+        let colorGroupId: string;
+        let redOptionId: string;
+
+        beforeAll(async () => {
+            await adminClient.asSuperAdmin();
+            adminClient.setChannelToken(E2E_DEFAULT_CHANNEL_TOKEN);
+
+            // Create a product in the default channel
+            const { createProduct } = await adminClient.query(createProductDocument, {
+                input: {
+                    translations: [
+                        {
+                            languageCode: LanguageCode.en,
+                            name: 'Channel Variant Test Product',
+                            slug: 'channel-variant-test-product',
+                            description: 'Testing variant channel inheritance',
+                        },
+                    ],
+                },
+            });
+            testProduct = createProduct;
+
+            // Create an option group with one option
+            const { createProductOptionGroup } = await adminClient.query(
+                createProductOptionGroupDocument,
+                {
+                    input: {
+                        code: 'test-color',
+                        translations: [{ languageCode: LanguageCode.en, name: 'Color' }],
+                        options: [
+                            {
+                                code: 'red',
+                                translations: [{ languageCode: LanguageCode.en, name: 'Red' }],
+                            },
+                        ],
+                    },
+                },
+            );
+            colorGroupId = createProductOptionGroup.id;
+            redOptionId = createProductOptionGroup.options[0].id;
+
+            // Attach option group to product
+            await adminClient.query(addOptionGroupToProductDocument, {
+                productId: testProduct.id,
+                optionGroupId: colorGroupId,
+            });
+
+            // Create first variant with the red option
+            const { createProductVariants } = await adminClient.query(createProductVariantsDocument, {
+                input: [
+                    {
+                        productId: testProduct.id,
+                        sku: 'CHAN-VAR-RED',
+                        price: 1000,
+                        optionIds: [redOptionId],
+                        translations: [{ languageCode: LanguageCode.en, name: 'Red Variant' }],
+                    },
+                ],
+            });
+            productVariantGuard.assertSuccess(createProductVariants[0]);
+
+            // Assign the product to the third channel
+            await adminClient.query(assignProductToChannelDocument, {
+                input: {
+                    channelId: 'T_3',
+                    productIds: [testProduct.id],
+                    priceFactor: 1,
+                },
+            });
+        });
+
+        it('new variant is automatically assigned to the same channels as the product', async () => {
+            adminClient.setChannelToken(E2E_DEFAULT_CHANNEL_TOKEN);
+
+            // Create a new option after the product was assigned to the channel
+            const { createProductOption } = await adminClient.query(createProductOptionDocument, {
+                input: {
+                    productOptionGroupId: colorGroupId,
+                    code: 'blue',
+                    translations: [{ languageCode: LanguageCode.en, name: 'Blue' }],
+                },
+            });
+
+            // Create a new variant with the new option
+            const { createProductVariants } = await adminClient.query(createProductVariantsDocument, {
+                input: [
+                    {
+                        productId: testProduct.id,
+                        sku: 'CHAN-VAR-BLUE',
+                        price: 2000,
+                        optionIds: [createProductOption.id],
+                        translations: [{ languageCode: LanguageCode.en, name: 'Blue Variant' }],
+                    },
+                ],
+            });
+            const newVariant = createProductVariants[0];
+            productVariantGuard.assertSuccess(newVariant);
+
+            // From the default channel, the new variant should be in both channels
+            expect(newVariant.channels.map(c => c.id).sort()).toEqual(['T_1', 'T_3']);
+        });
+
+        it('new variant is visible in the assigned channel', async () => {
+            adminClient.setChannelToken(THIRD_CHANNEL_TOKEN);
+
+            const { product } = await adminClient.query(getProductWithVariantsDocument, {
+                id: testProduct.id,
+            });
+            productGuard.assertSuccess(product);
+
+            // Both variants should be visible in the third channel
+            expect(product.variants).toHaveLength(2);
+            expect(product.variants.map(v => v.sku).sort()).toEqual([
+                'CHAN-VAR-BLUE',
+                'CHAN-VAR-RED',
+            ]);
+        });
+
+        it('new variant has a price in the assigned channel', async () => {
+            adminClient.setChannelToken(THIRD_CHANNEL_TOKEN);
+
+            const { product } = await adminClient.query(getProductWithVariantsDocument, {
+                id: testProduct.id,
+            });
+            productGuard.assertSuccess(product);
+
+            const blueVariant = product.variants.find(v => v.sku === 'CHAN-VAR-BLUE');
+            expect(blueVariant).toBeDefined();
+            // The price was set at 2000. Third channel has pricesIncludeTax: true,
+            // so priceWithTax should reflect the input price.
+            expect(blueVariant!.priceWithTax).toBe(2000);
+            // Third channel uses EUR
+            expect(blueVariant!.currencyCode).toBe(CurrencyCode.EUR);
+        });
+
+        it('new variant options and option groups are accessible in the assigned channel', async () => {
+            adminClient.setChannelToken(THIRD_CHANNEL_TOKEN);
+
+            const { product } = await adminClient.query(getProductWithVariantsDocument, {
+                id: testProduct.id,
+            });
+            productGuard.assertSuccess(product);
+
+            // The option group should be visible in the third channel
+            expect(product.optionGroups).toHaveLength(1);
+            expect(product.optionGroups[0].code).toBe('test-color');
+
+            // The new variant's options should have valid group references
+            const blueVariant = product.variants.find(v => v.sku === 'CHAN-VAR-BLUE');
+            expect(blueVariant).toBeDefined();
+            expect(blueVariant!.options).toHaveLength(1);
+            expect(blueVariant!.options[0].code).toBe('blue');
+            expect(blueVariant!.options[0].groupId).toBe(product.optionGroups[0].id);
+        });
+    });
+
     describe('updating Product in sub-channel', () => {
         it(
             'throws if attempting to update a Product which is not assigned to that Channel',
@@ -727,3 +889,14 @@ describe('ChannelAware Products and ProductVariants', () => {
         });
     });
 });
+
+const createProductOptionDocument = graphql(`
+    mutation CreateProductOption($input: CreateProductOptionInput!) {
+        createProductOption(input: $input) {
+            id
+            code
+            name
+            groupId
+        }
+    }
+`);

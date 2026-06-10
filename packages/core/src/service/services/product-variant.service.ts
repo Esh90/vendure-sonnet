@@ -472,6 +472,76 @@ export class ProductVariantService {
                 defaultChannel.defaultCurrencyCode,
             );
         }
+
+        // Assign the new variant to any other channels the parent product is already assigned to,
+        // so that the variant is visible in all channels the product belongs to.
+        const product = await this.connection.getRepository(ctx, Product).findOne({
+            where: { id: input.productId },
+            relations: ['channels'],
+            relationLoadStrategy: 'query',
+            loadEagerRelations: false,
+        });
+        if (product) {
+            const additionalChannelIds = product.channels
+                .map(c => c.id)
+                .filter(id => !idsAreEqual(id, ctx.channelId) && !idsAreEqual(id, defaultChannel.id));
+
+            if (additionalChannelIds.length) {
+                // Load the variant's options with their groups so we can assign them
+                // to the additional channels.
+                const optionIds = input.optionIds || [];
+                let variantOptions: ProductOption[] = [];
+                if (optionIds.length) {
+                    variantOptions = await this.connection
+                        .getRepository(ctx, ProductOption)
+                        .find({
+                            where: { id: In(optionIds) },
+                            relations: ['group'],
+                            loadEagerRelations: false,
+                        });
+                }
+                const optionGroupIds = unique(variantOptions.map(o => o.group.id));
+
+                for (const additionalChannelId of additionalChannelIds) {
+                    const channel = await this.connection.getEntityOrThrow(
+                        ctx,
+                        Channel,
+                        additionalChannelId,
+                    );
+                    await this.channelService.assignToChannels(
+                        ctx,
+                        ProductVariant,
+                        createdVariant.id,
+                        [additionalChannelId],
+                    );
+                    await this.createOrUpdateProductVariantPrice(
+                        ctx,
+                        createdVariant.id,
+                        input.price,
+                        additionalChannelId,
+                        channel.defaultCurrencyCode,
+                    );
+                    // Also assign option groups and options to the target channel
+                    for (const groupId of optionGroupIds) {
+                        await this.channelService.assignToChannels(
+                            ctx,
+                            ProductOptionGroup,
+                            groupId,
+                            [additionalChannelId],
+                        );
+                    }
+                    for (const optionId of optionIds) {
+                        await this.channelService.assignToChannels(
+                            ctx,
+                            ProductOption,
+                            optionId,
+                            [additionalChannelId],
+                        );
+                    }
+                }
+            }
+        }
+
         return createdVariant.id;
     }
 
