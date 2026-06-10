@@ -24,7 +24,7 @@ import { useSortedLanguages } from '@/vdb/hooks/use-sorted-languages.js';
 import { useUserSettings } from '@/vdb/hooks/use-user-settings.js';
 import { cn } from '@/vdb/lib/utils.js';
 import { Trans } from '@lingui/react/macro';
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate, useRouterState } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { ManageLanguagesDialog } from './manage-languages-dialog.js';
 
@@ -58,6 +58,8 @@ export function ChannelSwitcher() {
         setContentLanguage,
     } = useUserSettings();
     const [showManageLanguagesDialog, setShowManageLanguagesDialog] = useState(false);
+    const navigate = useNavigate();
+    const currentPath = useRouterState({ select: s => s.location.pathname });
     const displayChannel = activeChannel;
 
     // Get available languages from server config
@@ -82,7 +84,18 @@ export function ChannelSwitcher() {
 
     const renderChannel = (channel: (typeof channels)[number]) => (
         <div key={channel.code}>
-            <DropdownMenuItem onClick={() => setActiveChannel(channel.id)} className="gap-2 p-2">
+            <DropdownMenuItem
+                onClick={() => {
+                    if (channel.id !== displayChannel?.id) {
+                        setActiveChannel(channel.id);
+                        const segments = currentPath.split('/').filter(Boolean);
+                        if (segments.length > 1) {
+                            navigate({ to: `/${segments[0]}` as any });
+                        }
+                    }
+                }}
+                className="gap-2 p-2"
+            >
                 <div
                     className={cn(
                         'flex size-8 items-center justify-center rounded border',
