@@ -1,15 +1,20 @@
 import { Injectable, Injector } from '@angular/core';
+import { DEFAULT_CHANNEL_CODE } from '@vendure/common/lib/shared-constants';
 import { lastValueFrom } from 'rxjs';
 
 import {
+    CurrentUserFragment,
     CustomFieldConfig,
     CustomFields,
+    GetCurrentUserQuery,
     GetGlobalSettingsQuery,
     GetServerConfigQuery,
     OrderProcessState,
     PermissionDefinition,
 } from '../common/generated-types';
+import { LocalStorageService } from '../providers/local-storage/local-storage.service';
 
+import { GET_CURRENT_USER } from './definitions/auth-definitions';
 import { GET_GLOBAL_SETTINGS, GET_SERVER_CONFIG } from './definitions/settings-definitions';
 import { BaseDataService } from './providers/base-data.service';
 
@@ -29,7 +34,10 @@ export class ServerConfigService {
         return this.injector.get<BaseDataService>(BaseDataService);
     }
 
-    constructor(private injector: Injector) {}
+    constructor(
+        private injector: Injector,
+        private localStorageService: LocalStorageService,
+    ) {}
 
     /**
      * Fetches the ServerConfig. Should be run as part of the app bootstrap process by attaching
@@ -43,19 +51,53 @@ export class ServerConfigService {
      * Fetch the ServerConfig. Should be run on app init (in case user is already logged in) and on successful login.
      */
     getServerConfig() {
-        return lastValueFrom(
-            this.baseDataService.query<GetServerConfigQuery>(GET_SERVER_CONFIG).single$,
-        ).then(
-            result => {
-                this._serverConfig = result.globalSettings.serverConfig;
-                for (const entityCustomFields of this._serverConfig.entityCustomFields) {
-                    this.customFieldsMap.set(entityCustomFields.entityName, entityCustomFields.customFields);
+        return this.ensureActiveChannelToken().then(() =>
+            lastValueFrom(this.baseDataService.query<GetServerConfigQuery>(GET_SERVER_CONFIG).single$).then(
+                result => {
+                    this._serverConfig = result.globalSettings.serverConfig;
+                    for (const entityCustomFields of this._serverConfig.entityCustomFields) {
+                        this.customFieldsMap.set(
+                            entityCustomFields.entityName,
+                            entityCustomFields.customFields,
+                        );
+                    }
+                },
+                err => {
+                    // Let the error fall through to be caught by the http interceptor.
+                },
+            ),
+        );
+    }
+
+    private ensureActiveChannelToken(): Promise<void> {
+        if (this.localStorageService.get('activeChannelToken')) {
+            return Promise.resolve();
+        }
+        return lastValueFrom(this.baseDataService.query<GetCurrentUserQuery>(GET_CURRENT_USER).single$).then(
+            ({ me }) => {
+                if (me?.channels.length) {
+                    this.localStorageService.set(
+                        'activeChannelToken',
+                        this.getActiveChannel(me.channels).token,
+                    );
                 }
             },
-            err => {
-                // Let the error fall through to be caught by the http interceptor.
+            () => {
+                // Ignore unauthenticated app initialization; the main server config request handles errors.
             },
         );
+    }
+
+    private getActiveChannel(userChannels: CurrentUserFragment['channels']) {
+        const lastActiveChannelToken = this.localStorageService.get('activeChannelToken');
+        if (lastActiveChannelToken) {
+            const lastActiveChannel = userChannels.find(c => c.token === lastActiveChannelToken);
+            if (lastActiveChannel) {
+                return lastActiveChannel;
+            }
+        }
+        const defaultChannel = userChannels.find(c => c.code === DEFAULT_CHANNEL_CODE);
+        return defaultChannel || userChannels[0];
     }
 
     getAvailableLanguages() {
