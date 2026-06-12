@@ -259,7 +259,9 @@ export function PageLayout({ children, className }: Readonly<PageLayoutProps>) {
             // using `hasPermissions` over `PermissionGuard` as this would defeat the `isPageBlock` typeguard
             const willBlockRender = (
                 block: ExtensionBlockEntry,
-            ): block is ExtensionBlockEntry & { component: NonNullable<ExtensionBlockEntry['component']> } => {
+            ): block is ExtensionBlockEntry & {
+                component: NonNullable<ExtensionBlockEntry['component']>;
+            } => {
                 if (!block.component) return false;
                 if (typeof block.shouldRender === 'function' && !block.shouldRender(page)) {
                     return false;
@@ -315,7 +317,7 @@ export function PageLayout({ children, className }: Readonly<PageLayoutProps>) {
     }
 
     const fullWidthBlocks = finalChildArray.filter(
-        child => isPageBlock(child) && isOfType(child, FullWidthPageBlock),
+        child => isPageBlock(child) && (isOfType(child, FullWidthPageBlock) || child.props.column === 'full'),
     );
     const mainBlocks = finalChildArray.filter(child => isPageBlock(child) && child.props.column === 'main');
     const sideBlocks = finalChildArray.filter(child => isPageBlock(child) && child.props.column === 'side');
@@ -903,9 +905,7 @@ export function PageBlock({
     return (
         <PageBlockContext.Provider value={contextValue}>
             <LocationWrapper>
-                <Card
-                    className={cn('@container  w-full', className, 'animate-in fade-in duration-300')}
-                >
+                <Card className={cn('@container  w-full', className, 'animate-in fade-in duration-300')}>
                     {title || description ? (
                         <CardHeader>
                             {title && <CardTitle>{title}</CardTitle>}
