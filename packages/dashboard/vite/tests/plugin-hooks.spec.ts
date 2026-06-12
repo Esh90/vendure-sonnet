@@ -173,6 +173,64 @@ describe('themeVariablesPlugin', () => {
         const result = callTransform(plugin, css, '/app/styles.css');
         expect(result).toContain('@theme inline');
     });
+
+    it('injects additionalStylesheets after @import tailwindcss (single path)', () => {
+        const plugin = themeVariablesPlugin({
+            additionalStylesheets: '/abs/project/src/dashboard.css',
+        });
+        const css = `@import 'tailwindcss';\n@import 'tw-animate-css';`;
+        const result = callTransform(plugin, css, '/app/styles.css');
+        expect(result).toContain(
+            `@import 'tailwindcss';\n@import '/abs/project/src/dashboard.css';\n@import 'tw-animate-css';`,
+        );
+    });
+
+    it('injects multiple additionalStylesheets in order', () => {
+        const plugin = themeVariablesPlugin({
+            additionalStylesheets: ['/abs/project/a.css', '/abs/project/b.css'],
+        });
+        const css = `@import 'tailwindcss';`;
+        const result = callTransform(plugin, css, '/app/styles.css');
+        expect(result).toContain(
+            `@import 'tailwindcss';\n@import '/abs/project/a.css';\n@import '/abs/project/b.css';`,
+        );
+    });
+
+    it('resolves relative additionalStylesheets paths against cwd', () => {
+        const plugin = themeVariablesPlugin({
+            additionalStylesheets: 'src/dashboard.css',
+        });
+        const css = `@import 'tailwindcss';`;
+        const result = callTransform(plugin, css, '/app/styles.css');
+        const expected = path.resolve('src/dashboard.css').replace(/\\/g, '/');
+        expect(result).toContain(`@import '${expected}';`);
+    });
+
+    it('does not duplicate an additionalStylesheets import already present', () => {
+        const plugin = themeVariablesPlugin({
+            additionalStylesheets: '/abs/project/custom.css',
+        });
+        const css = `@import 'tailwindcss';\n@import '/abs/project/custom.css';`;
+        // Already there → nothing to do → transform should be a no-op.
+        const result = callTransform(plugin, css, '/app/styles.css');
+        expect(result).toBeNull();
+    });
+
+    it('does nothing when additionalStylesheets is empty', () => {
+        const plugin = themeVariablesPlugin({ additionalStylesheets: [] });
+        const css = `@import 'tailwindcss';\nbody { color: red; }`;
+        const result = callTransform(plugin, css, '/app/styles.css');
+        expect(result).toBeNull();
+    });
+
+    it('skips injection when @import tailwindcss is absent', () => {
+        const plugin = themeVariablesPlugin({
+            additionalStylesheets: '/abs/project/custom.css',
+        });
+        const css = `body { color: red; }`;
+        const result = callTransform(plugin, css, '/app/styles.css');
+        expect(result).toBeNull();
+    });
 });
 
 // ─── transformIndexHtmlPlugin ────────────────────────────────────────────────

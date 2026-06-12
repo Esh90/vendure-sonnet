@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 import { brand, darkTheme, fontFamily, lightTheme, radii, shadows } from '@vendure-io/design-tokens';
 import { Plugin } from 'vite';
 
@@ -43,7 +45,37 @@ const defaultVariables: ThemeVariables = {
 
 export type ThemeVariablesPluginOptions = {
     theme?: ThemeVariables;
+    /**
+     * @description
+     * One or more paths to additional CSS files that should be imported into
+     * the dashboard's main stylesheet. Each path is injected as an `@import`
+     * statement right after `@import 'tailwindcss';`, so the file participates
+     * in Tailwind's build pipeline — you can use `@source`, `@theme`, `@apply`,
+     * `@utility`, custom variants, etc. inside it.
+     *
+     * Paths may be absolute or relative to the current working directory;
+     * relative paths are resolved against `process.cwd()`. Backslashes are
+     * normalized to forward slashes so the resulting `@import` statement is
+     * valid on Windows.
+     *
+     * To override design tokens (e.g. brand colors), prefer the `theme`
+     * option — `additionalStylesheets` is for layering custom CSS rules.
+     *
+     * @example
+     * ```ts
+     * vendureDashboardPlugin({
+     *     additionalStylesheets: [path.resolve(__dirname, 'src/dashboard.css')],
+     * })
+     * ```
+     */
+    additionalStylesheets?: string | string[];
 };
+
+function normalizeStylesheetPaths(input: string | string[] | undefined): string[] {
+    if (!input) return [];
+    const list = Array.isArray(input) ? input : [input];
+    return list.map(p => path.resolve(p).replace(/\\/g, '/'));
+}
 
 /**
  * Generates the `@theme inline` block from design-token JS exports,
@@ -83,6 +115,7 @@ function generateThemeInlineBlock(): string {
 export function themeVariablesPlugin(options: ThemeVariablesPluginOptions): Plugin {
     const virtualModuleId = 'virtual:admin-theme';
     const resolvedVirtualModuleId = `\0${virtualModuleId}`;
+    const additionalStylesheets = normalizeStylesheetPaths(options.additionalStylesheets);
 
     return {
         name: 'vendure:admin-theme',
@@ -95,6 +128,26 @@ export function themeVariablesPlugin(options: ThemeVariablesPluginOptions): Plug
 
             let result = code;
             let modified = false;
+
+            // Inject user-supplied stylesheets as @import statements right after
+            // `@import 'tailwindcss';`. Placement among the @import statements
+            // keeps the CSS valid (imports must precede rules) and lets the file
+            // contribute @source, @theme, @apply, etc. to the dashboard build.
+            if (additionalStylesheets.length > 0) {
+                const newImports = additionalStylesheets
+                    .map(p => `@import '${p}';`)
+                    .filter(stmt => !result.includes(stmt));
+                if (newImports.length > 0) {
+                    const tailwindImportRe = /(@import\s+['"]tailwindcss['"];)/;
+                    if (tailwindImportRe.test(result)) {
+                        result = result.replace(
+                            tailwindImportRe,
+                            `$1\n${newImports.join('\n')}`,
+                        );
+                        modified = true;
+                    }
+                }
+            }
 
             // Replace @import 'virtual:admin-theme' with :root / .dark CSS custom properties
             if (

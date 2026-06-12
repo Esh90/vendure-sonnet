@@ -214,7 +214,11 @@ export function vendureDashboardPlugin(options: VitePluginVendureDashboardOption
         },
         {
             key: 'themeVariables',
-            plugin: () => themeVariablesPlugin({ theme: options.theme }),
+            plugin: () =>
+                themeVariablesPlugin({
+                    theme: options.theme,
+                    additionalStylesheets: options.additionalStylesheets,
+                }),
         },
         {
             key: 'tailwindSource',
