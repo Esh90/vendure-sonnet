@@ -85,10 +85,10 @@ import { Channel } from '../../entity/channel/channel.entity';
 import { Customer } from '../../entity/customer/customer.entity';
 import { Fulfillment } from '../../entity/fulfillment/fulfillment.entity';
 import { HistoryEntry } from '../../entity/history-entry/history-entry.entity';
-import { FulfillmentLine } from '../../entity/order-line-reference/fulfillment-line.entity';
-import { OrderLine } from '../../entity/order-line/order-line.entity';
-import { OrderModification } from '../../entity/order-modification/order-modification.entity';
 import { Order } from '../../entity/order/order.entity';
+import { OrderLine } from '../../entity/order-line/order-line.entity';
+import { FulfillmentLine } from '../../entity/order-line-reference/fulfillment-line.entity';
+import { OrderModification } from '../../entity/order-modification/order-modification.entity';
 import { Payment } from '../../entity/payment/payment.entity';
 import { ProductVariant } from '../../entity/product-variant/product-variant.entity';
 import { Promotion } from '../../entity/promotion/promotion.entity';
@@ -215,6 +215,7 @@ export class OrderService {
         ctx: RequestContext,
         orderId: ID,
         relations?: RelationPaths<Order>,
+        lock?: { mode: 'pessimistic_read' | 'pessimistic_write' },
     ): Promise<Order | undefined> {
         const qb = this.connection.getRepository(ctx, Order).createQueryBuilder('order');
         const effectiveRelations = relations ?? [
@@ -261,6 +262,7 @@ export class OrderService {
         qb.setFindOptions({
             relations: orderRelations,
             relationLoadStrategy: 'query',
+            lock: this.getLockMode(lock),
         })
             .leftJoin('order.channels', 'channel')
             .where('order.id = :orderId', { orderId })
@@ -2254,6 +2256,22 @@ export class OrderService {
             throw new UserInputError('error.order-does-not-contain-line-with-id', { id: orderLineId });
         }
         return orderLine;
+    }
+
+    /**
+     * @description
+     * Returns the lock mode if the current database driver supports it, otherwise returns undefined.
+     * This prevents errors when using drivers like SQLite which do not support pessimistic locking.
+     */
+    private getLockMode(lock?: {
+        mode: 'pessimistic_read' | 'pessimistic_write';
+    }): { mode: 'pessimistic_read' | 'pessimistic_write' } | undefined {
+        const supportedTypes = ['mysql', 'mariadb', 'postgres', 'aurora-mysql', 'aurora-postgres'];
+        const dbType = this.connection.rawConnection.options.type;
+        if (lock && supportedTypes.includes(dbType as any)) {
+            return lock;
+        }
+        return undefined;
     }
 
     /**
