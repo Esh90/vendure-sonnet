@@ -63,6 +63,7 @@ function FeaturedAsset({
 }: FeaturedAssetProps) {
     return (
         <div
+            data-testid="entity-assets-featured"
             className={`flex items-center justify-center ${compact ? 'h-40' : 'h-64'} border border-dashed rounded-md`}
         >
             {featuredAsset ? (
@@ -137,12 +138,12 @@ function SortableAsset({
             {updatePermissions && (
                 <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <DropdownMenu>
-                        <DropdownMenuTrigger render={<Button
-                                variant="secondary"
-                                size="icon"
-                                className="h-6 w-6 rounded-full"
-                            />}>
-                                <EllipsisIcon className="h-4 w-4" />
+                        <DropdownMenuTrigger
+                            render={
+                                <Button variant="secondary" size="icon" className="h-6 w-6 rounded-full" />
+                            }
+                        >
+                            <EllipsisIcon className="h-4 w-4" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => onPreview(asset)}>Preview</DropdownMenuItem>
@@ -351,6 +352,28 @@ export function EntityAssets({
                     assets={assets}
                     onOpenChange={() => setPreviewAsset(null)}
                     open={!!previewAsset}
+                    onAssetUpdated={updated => {
+                        // Keep local state in sync so a re-opened preview (or a
+                        // focal-point-cropped thumbnail rendered by VendureImage
+                        // elsewhere in this gallery) reflects the new value
+                        // immediately, without waiting for the parent detail
+                        // query to refetch.
+                        setAssets(prev =>
+                            prev.map(a =>
+                                a.id === updated.id ? { ...a, focalPoint: updated.focalPoint } : a,
+                            ),
+                        );
+                        setFeaturedAsset(prev =>
+                            prev && prev.id === updated.id
+                                ? { ...prev, focalPoint: updated.focalPoint }
+                                : prev,
+                        );
+                        setPreviewAsset(prev =>
+                            prev && prev.id === updated.id
+                                ? { ...prev, focalPoint: updated.focalPoint }
+                                : prev,
+                        );
+                    }}
                 />
             )}
         </>
