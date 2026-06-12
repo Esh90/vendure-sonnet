@@ -164,7 +164,7 @@ msgstr "Тип"
 #. placeholder {0}: entityName.toLowerCase()
 #. placeholder {0}: group.name
 #: src/app/routes/_authenticated/_products/components/product-option-select.tsx:57
-#: src/lib/components/data-input/default-relation-input.tsx:616
+#: src/lib/components/data-input/default-relation-input.tsx:676
 msgid "Select {0}"
 msgstr "Вибрати {0}"
 
@@ -359,10 +359,9 @@ msgstr "Сума повернення не може бути від'ємною"
 msgid "View details"
 msgstr "Переглянути деталі"
 
-#. placeholder {0}: entityIds.length
 #: src/lib/components/shared/assign-to-channel-dialog.tsx:95
-msgid "Select a channel to assign {0} {entityType} to"
-msgstr "Виберіть канал для призначення {0} {entityType}"
+#~ msgid "Select a channel to assign {0} {entityType} to"
+#~ msgstr "Виберіть канал для призначення {0} {entityType}"
 
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:98
 msgid "Successfully created customer"
@@ -1379,7 +1378,6 @@ msgstr "Новий спосіб оплати"
 msgid "Successfully updated promotion"
 msgstr "Акцію успішно оновлено"
 
-#: src/lib/components/shared/assign-to-channel-dialog.tsx:111
 #: src/lib/components/shared/channel-selector.tsx:47
 msgid "Select a channel"
 msgstr "Виберіть канал"
@@ -1584,7 +1582,7 @@ msgstr "Перейти на останню сторінку"
 #: src/lib/components/data-table/views-sheet.tsx:293
 #: src/lib/components/layout/manage-languages-dialog.tsx:379
 #: src/lib/components/shared/asset/asset-focal-point-editor.tsx:88
-#: src/lib/components/shared/assign-to-channel-dialog.tsx:126
+#: src/lib/components/shared/assign-to-channel-dialog.tsx:141
 #: src/lib/components/shared/confirmation-dialog.tsx:42
 #: src/lib/components/shared/customer-address-form.tsx:253
 #: src/lib/components/shared/navigation-confirmation.tsx:55
@@ -2645,6 +2643,11 @@ msgstr "Знижка"
 msgid "All types"
 msgstr "Усі типи"
 
+#. placeholder {0}: entityIds.length
+#: src/lib/components/shared/assign-to-channel-dialog.tsx:117
+msgid "Select channels to assign {0} {entityType} to"
+msgstr ""
+
 #: src/app/routes/_authenticated/_orders/components/draft-order-status.tsx:29
 msgid "Only draft orders can be completed"
 msgstr "Лише чернетки замовлень можуть бути завершені"
@@ -2666,7 +2669,7 @@ msgstr "Додати значення фасетів"
 msgid "after"
 msgstr "після"
 
-#: src/lib/components/shared/assign-to-channel-dialog.tsx:103
+#: src/lib/components/shared/assign-to-channel-dialog.tsx:125
 msgid "Channel"
 msgstr "Канал"
 
@@ -2750,7 +2753,7 @@ msgstr "Ліміт використання на клієнта"
 msgid "Billing address changed"
 msgstr "Адресу виставлення рахунку змінено"
 
-#: src/lib/components/data-input/select-with-options.tsx:101
+#: src/lib/components/data-input/select-with-options.tsx:107
 msgid "Select an option"
 msgstr "Виберіть опцію"
 
@@ -2950,6 +2953,11 @@ msgstr "Зберегти зміни"
 #: src/app/routes/_authenticated/_customers/components/customer-history/default-customer-history-components.tsx:78
 msgid "Address updated"
 msgstr "Адресу оновлено"
+
+#. placeholder {0}: selectedChannelIds.length
+#: src/lib/components/shared/assign-to-channel-dialog.tsx:92
+msgid "Successfully assigned {entityIdsLength} {entityType} to {0} channels"
+msgstr ""
 
 #: src/app/routes/_authenticated/_orders/hooks/use-refund-order.ts:299
 msgid "Refund processed successfully"
@@ -3183,13 +3191,19 @@ msgstr "Категорія"
 msgid "Moving..."
 msgstr "Переміщення..."
 
-#: src/lib/components/shared/assign-to-channel-dialog.tsx:129
+#: src/lib/components/shared/assign-to-channel-dialog.tsx:144
 msgid "Assign"
 msgstr "Призначити"
 
 #: src/app/routes/_authenticated/_sellers/sellers_.$id.tsx:56
 msgid "Successfully created seller"
 msgstr "Продавця успішно створено"
+
+#. placeholder {0}: rejected.length
+#. placeholder {1}: selectedChannelIds.length
+#: src/lib/components/shared/assign-to-channel-dialog.tsx:100
+msgid "Failed to assign {entityIdsLength} {entityType} to {0} of {1} channels"
+msgstr ""
 
 #: src/app/routes/_authenticated/_shipping-methods/shipping-methods_.$id.tsx:91
 msgid "Successfully updated shipping method"
@@ -4193,6 +4207,10 @@ msgstr "Вставити нове гіперпосилання з URL та па�
 msgid "Height"
 msgstr "Висота"
 
+#: src/lib/components/shared/assign-to-channel-dialog.tsx:114
+msgid "Assign {entityType} to channels"
+msgstr ""
+
 #: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:180
 msgid "A refund of {formattedDiff} is required. Select payment amounts and enter a note to proceed."
 msgstr "Потрібне повернення в розмірі {formattedDiff}. Виберіть суми платежів та введіть примітку для продовження."
@@ -4219,6 +4237,7 @@ msgstr "Додати канал"
 #~ msgid "Failed to update product option group"
 #~ msgstr "Не вдалося оновити групу опцій товару"
 
+#: src/lib/components/shared/assign-to-channel-dialog.tsx:133
 #: src/lib/components/shared/channel-selector.tsx:48
 msgid "Search channels..."
 msgstr "Пошук каналів..."
@@ -4255,6 +4274,10 @@ msgstr ""
 #: src/lib/components/data-table/views-sheet.tsx:120
 msgid "Failed to convert view to global"
 msgstr "Не вдалося перетворити подання на глобальне"
+
+#: src/lib/components/shared/assign-to-channel-dialog.tsx:132
+msgid "Select one or more channels"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:38
@@ -4964,8 +4987,8 @@ msgid "Using native authentication strategy"
 msgstr "Використання вбудованої стратегії аутентифікації"
 
 #: src/lib/components/shared/assign-to-channel-dialog.tsx:73
-msgid "Failed to assign {entityIdsLength} {entityType} to channel"
-msgstr "Не вдалося призначити {entityIdsLength} {entityType} каналу"
+#~ msgid "Failed to assign {entityIdsLength} {entityType} to channel"
+#~ msgstr "Не вдалося призначити {entityIdsLength} {entityType} каналу"
 
 #: src/lib/components/layout/manage-languages-dialog.tsx:351
 msgid "Default Language"
@@ -5162,7 +5185,7 @@ msgid "Customer not found"
 msgstr "Клієнта не знайдено"
 
 #. placeholder {0}: entityName.toLowerCase()
-#: src/lib/components/data-input/default-relation-input.tsx:603
+#: src/lib/components/data-input/default-relation-input.tsx:663
 msgid "Select {0}s"
 msgstr "Вибрати {0}"
 
@@ -5363,8 +5386,8 @@ msgid "Failed to create shipping method"
 msgstr "Не вдалося створити спосіб доставки"
 
 #: src/lib/components/shared/assign-to-channel-dialog.tsx:68
-msgid "Successfully assigned {entityIdsLength} {entityType} to channel"
-msgstr "{entityIdsLength} {entityType} успішно призначено каналу"
+#~ msgid "Successfully assigned {entityIdsLength} {entityType} to channel"
+#~ msgstr "{entityIdsLength} {entityType} успішно призначено каналу"
 
 #: src/lib/components/layout/manage-languages-dialog.tsx:253
 msgid "Global Languages"
@@ -5422,7 +5445,7 @@ msgstr "Значення"
 msgid "Customer updated"
 msgstr "Клієнта оновлено"
 
-#: src/lib/components/shared/assign-to-channel-dialog.tsx:146
+#: src/lib/components/shared/assign-to-channel-dialog.tsx:161
 msgid "Price conversion factor"
 msgstr "Коефіцієнт перерахунку ціни"
 
@@ -5564,8 +5587,8 @@ msgid "New Facet"
 msgstr "Новий фасет"
 
 #: src/lib/components/shared/assign-to-channel-dialog.tsx:92
-msgid "Assign {entityType} to channel"
-msgstr "Призначити {entityType} каналу"
+#~ msgid "Assign {entityType} to channel"
+#~ msgstr "Призначити {entityType} каналу"
 
 #: src/lib/components/data-table/data-table-bulk-action-item.tsx:125
 #: src/lib/components/shared/confirmation-dialog.tsx:51

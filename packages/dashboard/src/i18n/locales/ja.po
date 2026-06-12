@@ -164,7 +164,7 @@ msgstr "タイプ"
 #. placeholder {0}: entityName.toLowerCase()
 #. placeholder {0}: group.name
 #: src/app/routes/_authenticated/_products/components/product-option-select.tsx:57
-#: src/lib/components/data-input/default-relation-input.tsx:616
+#: src/lib/components/data-input/default-relation-input.tsx:676
 msgid "Select {0}"
 msgstr "{0}を選択"
 
@@ -359,10 +359,9 @@ msgstr "返金合計はマイナスにできません"
 msgid "View details"
 msgstr "詳細を表示"
 
-#. placeholder {0}: entityIds.length
 #: src/lib/components/shared/assign-to-channel-dialog.tsx:95
-msgid "Select a channel to assign {0} {entityType} to"
-msgstr "{0}{entityType}を割り当てるチャネルを選択"
+#~ msgid "Select a channel to assign {0} {entityType} to"
+#~ msgstr "{0}{entityType}を割り当てるチャネルを選択"
 
 #: src/app/routes/_authenticated/_customers/customers_.$id.tsx:98
 msgid "Successfully created customer"
@@ -1379,7 +1378,6 @@ msgstr "新しい支払い方法"
 msgid "Successfully updated promotion"
 msgstr "プロモーションを更新しました"
 
-#: src/lib/components/shared/assign-to-channel-dialog.tsx:111
 #: src/lib/components/shared/channel-selector.tsx:47
 msgid "Select a channel"
 msgstr "チャネルを選択"
@@ -1584,7 +1582,7 @@ msgstr "最後のページへ"
 #: src/lib/components/data-table/views-sheet.tsx:293
 #: src/lib/components/layout/manage-languages-dialog.tsx:379
 #: src/lib/components/shared/asset/asset-focal-point-editor.tsx:88
-#: src/lib/components/shared/assign-to-channel-dialog.tsx:126
+#: src/lib/components/shared/assign-to-channel-dialog.tsx:141
 #: src/lib/components/shared/confirmation-dialog.tsx:42
 #: src/lib/components/shared/customer-address-form.tsx:253
 #: src/lib/components/shared/navigation-confirmation.tsx:55
@@ -2645,6 +2643,11 @@ msgstr "割引"
 msgid "All types"
 msgstr "すべてのタイプ"
 
+#. placeholder {0}: entityIds.length
+#: src/lib/components/shared/assign-to-channel-dialog.tsx:117
+msgid "Select channels to assign {0} {entityType} to"
+msgstr ""
+
 #: src/app/routes/_authenticated/_orders/components/draft-order-status.tsx:29
 msgid "Only draft orders can be completed"
 msgstr "下書き注文のみ完了できます"
@@ -2666,7 +2669,7 @@ msgstr "ファセット値を追加"
 msgid "after"
 msgstr "以降"
 
-#: src/lib/components/shared/assign-to-channel-dialog.tsx:103
+#: src/lib/components/shared/assign-to-channel-dialog.tsx:125
 msgid "Channel"
 msgstr "チャネル"
 
@@ -2750,7 +2753,7 @@ msgstr "顧客ごとの使用制限"
 msgid "Billing address changed"
 msgstr "請求先住所を変更しました"
 
-#: src/lib/components/data-input/select-with-options.tsx:101
+#: src/lib/components/data-input/select-with-options.tsx:107
 msgid "Select an option"
 msgstr "オプションを選択"
 
@@ -2950,6 +2953,11 @@ msgstr "変更を保存"
 #: src/app/routes/_authenticated/_customers/components/customer-history/default-customer-history-components.tsx:78
 msgid "Address updated"
 msgstr "住所を更新しました"
+
+#. placeholder {0}: selectedChannelIds.length
+#: src/lib/components/shared/assign-to-channel-dialog.tsx:92
+msgid "Successfully assigned {entityIdsLength} {entityType} to {0} channels"
+msgstr ""
 
 #: src/app/routes/_authenticated/_orders/hooks/use-refund-order.ts:299
 msgid "Refund processed successfully"
@@ -3183,13 +3191,19 @@ msgstr "カテゴリ"
 msgid "Moving..."
 msgstr "移動中..."
 
-#: src/lib/components/shared/assign-to-channel-dialog.tsx:129
+#: src/lib/components/shared/assign-to-channel-dialog.tsx:144
 msgid "Assign"
 msgstr "割り当て"
 
 #: src/app/routes/_authenticated/_sellers/sellers_.$id.tsx:56
 msgid "Successfully created seller"
 msgstr "販売者を作成しました"
+
+#. placeholder {0}: rejected.length
+#. placeholder {1}: selectedChannelIds.length
+#: src/lib/components/shared/assign-to-channel-dialog.tsx:100
+msgid "Failed to assign {entityIdsLength} {entityType} to {0} of {1} channels"
+msgstr ""
 
 #: src/app/routes/_authenticated/_shipping-methods/shipping-methods_.$id.tsx:91
 msgid "Successfully updated shipping method"
@@ -4193,6 +4207,10 @@ msgstr "URL とターゲットオプションを指定して新しいハイパ�
 msgid "Height"
 msgstr "高さ"
 
+#: src/lib/components/shared/assign-to-channel-dialog.tsx:114
+msgid "Assign {entityType} to channels"
+msgstr ""
+
 #: src/app/routes/_authenticated/_orders/components/order-modification-preview-dialog.tsx:180
 msgid "A refund of {formattedDiff} is required. Select payment amounts and enter a note to proceed."
 msgstr "{formattedDiff} の返金が必要です。支払い金額を選択し、メモを入力して続行してください。"
@@ -4219,6 +4237,7 @@ msgstr "チャネルを追加"
 #~ msgid "Failed to update product option group"
 #~ msgstr "商品オプショングループの更新に失敗しました"
 
+#: src/lib/components/shared/assign-to-channel-dialog.tsx:133
 #: src/lib/components/shared/channel-selector.tsx:48
 msgid "Search channels..."
 msgstr "チャネルを検索..."
@@ -4255,6 +4274,10 @@ msgstr ""
 #: src/lib/components/data-table/views-sheet.tsx:120
 msgid "Failed to convert view to global"
 msgstr "ビューのグローバル化に失敗しました"
+
+#: src/lib/components/shared/assign-to-channel-dialog.tsx:132
+msgid "Select one or more channels"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/lib/framework/defaults.ts:38
@@ -4964,8 +4987,8 @@ msgid "Using native authentication strategy"
 msgstr "ネイティブ認証戦略を使用"
 
 #: src/lib/components/shared/assign-to-channel-dialog.tsx:73
-msgid "Failed to assign {entityIdsLength} {entityType} to channel"
-msgstr "{entityIdsLength}件の{entityType}をチャネルに割り当てられませんでした"
+#~ msgid "Failed to assign {entityIdsLength} {entityType} to channel"
+#~ msgstr "{entityIdsLength}件の{entityType}をチャネルに割り当てられませんでした"
 
 #: src/lib/components/layout/manage-languages-dialog.tsx:351
 msgid "Default Language"
@@ -5162,7 +5185,7 @@ msgid "Customer not found"
 msgstr "顧客が見つかりません"
 
 #. placeholder {0}: entityName.toLowerCase()
-#: src/lib/components/data-input/default-relation-input.tsx:603
+#: src/lib/components/data-input/default-relation-input.tsx:663
 msgid "Select {0}s"
 msgstr "{0}を選択"
 
@@ -5363,8 +5386,8 @@ msgid "Failed to create shipping method"
 msgstr "配送方法の作成に失敗しました"
 
 #: src/lib/components/shared/assign-to-channel-dialog.tsx:68
-msgid "Successfully assigned {entityIdsLength} {entityType} to channel"
-msgstr "{entityIdsLength}個の{entityType}をチャネルに割り当てました"
+#~ msgid "Successfully assigned {entityIdsLength} {entityType} to channel"
+#~ msgstr "{entityIdsLength}個の{entityType}をチャネルに割り当てました"
 
 #: src/lib/components/layout/manage-languages-dialog.tsx:253
 msgid "Global Languages"
@@ -5422,7 +5445,7 @@ msgstr "値"
 msgid "Customer updated"
 msgstr "顧客を更新しました"
 
-#: src/lib/components/shared/assign-to-channel-dialog.tsx:146
+#: src/lib/components/shared/assign-to-channel-dialog.tsx:161
 msgid "Price conversion factor"
 msgstr "価格換算係数"
 
@@ -5564,8 +5587,8 @@ msgid "New Facet"
 msgstr "新しいファセット"
 
 #: src/lib/components/shared/assign-to-channel-dialog.tsx:92
-msgid "Assign {entityType} to channel"
-msgstr "チャネルに{entityType}を割り当て"
+#~ msgid "Assign {entityType} to channel"
+#~ msgstr "チャネルに{entityType}を割り当て"
 
 #: src/lib/components/data-table/data-table-bulk-action-item.tsx:125
 #: src/lib/components/shared/confirmation-dialog.tsx:51
