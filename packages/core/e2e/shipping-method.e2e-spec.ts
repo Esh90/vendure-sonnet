@@ -13,15 +13,28 @@ import { initialData } from '../../../e2e-common/e2e-initial-data';
 import { TEST_SETUP_TIMEOUT_MS, testConfig } from '../../../e2e-common/test-config';
 import { manualFulfillmentHandler } from '../src/config/fulfillment/manual-fulfillment-handler';
 
+import { testSuccessfulPaymentMethod } from './fixtures/test-payment-methods';
 import { shippingMethodFragment } from './graphql/fragments-admin';
 import { graphql, ResultOf } from './graphql/graphql-admin';
 import {
+    assignProductVariantToChannelDocument,
+    createChannelDocument,
     createShippingMethodDocument,
     deleteShippingMethodDocument,
+    getOrderDocument,
     getShippingMethodListDocument,
     updateShippingMethodDocument,
 } from './graphql/shared-definitions';
-import { getActiveShippingMethodsDocument } from './graphql/shop-definitions';
+import {
+    addItemToOrderDocument,
+    addPaymentDocument,
+    getActiveOrderDocument,
+    getActiveShippingMethodsDocument,
+    setCustomerDocument,
+    setShippingAddressDocument,
+    setShippingMethodDocument,
+    transitionToStateDocument,
+} from './graphql/shop-definitions';
 
 const TEST_METADATA = {
     foo: 'bar',
@@ -52,6 +65,9 @@ const activeShippingMethodsGuard: ErrorResultGuard<
 describe('ShippingMethod resolver', () => {
     const { server, adminClient, shopClient } = createTestEnvironment({
         ...testConfig(),
+        paymentOptions: {
+            paymentMethodHandlers: [testSuccessfulPaymentMethod],
+        },
         shippingOptions: {
             shippingEligibilityCheckers: [defaultShippingEligibilityChecker],
             shippingCalculators: [defaultShippingCalculator, calculatorWithMetadata],
@@ -60,7 +76,15 @@ describe('ShippingMethod resolver', () => {
 
     beforeAll(async () => {
         await server.init({
-            initialData,
+            initialData: {
+                ...initialData,
+                paymentMethods: [
+                    {
+                        name: testSuccessfulPaymentMethod.code,
+                        handler: { code: testSuccessfulPaymentMethod.code, arguments: [] },
+                    },
+                ],
+            },
             productsCsvPath: path.join(__dirname, 'fixtures/e2e-products-full.csv'),
             customerCount: 1,
         });
@@ -482,6 +506,183 @@ describe('ShippingMethod resolver', () => {
         expect(activeShippingMethods[0].name).toBe('Active Method');
         expect(activeShippingMethods[0].description).toBe('This is an active shipping method');
     });
+
+    // https://github.com/vendure-ecommerce/vendure/issues/4492
+    describe('shipping line removal on channel unassign', () => {
+        let channelId: string;
+        let shippingMethodId: string;
+
+        beforeAll(async () => {
+            // Create a new channel
+            const { createChannel } = await adminClient.query(createChannelDocument, {
+                input: {
+                    code: 'shipping-test-channel',
+                    token: 'shipping-test-channel-token',
+                    defaultLanguageCode: LanguageCode.en,
+                    currencyCode: 'USD',
+                    pricesIncludeTax: false,
+                    defaultShippingZoneId: 'T_1',
+                    defaultTaxZoneId: 'T_1',
+                },
+            });
+            channelId = createChannel.id;
+
+            // Create a shipping method and assign it to the new channel
+            const { createShippingMethod } = await adminClient.query(createShippingMethodDocument, {
+                input: {
+                    code: 'channel-test-method',
+                    fulfillmentHandler: manualFulfillmentHandler.code,
+                    checker: {
+                        code: defaultShippingEligibilityChecker.code,
+                        arguments: [{ name: 'orderMinimum', value: '0' }],
+                    },
+                    calculator: {
+                        code: defaultShippingCalculator.code,
+                        arguments: [
+                            { name: 'rate', value: '500' },
+                            { name: 'includesTax', value: 'auto' },
+                            { name: 'taxRate', value: '0' },
+                        ],
+                    },
+                    translations: [
+                        { languageCode: LanguageCode.en, name: 'Channel Test Method', description: '' },
+                    ],
+                },
+            });
+            shippingMethodId = createShippingMethod.id;
+
+            await adminClient.query(assignShippingMethodsToChannelDocument, {
+                input: {
+                    channelId,
+                    shippingMethodIds: [shippingMethodId],
+                },
+            });
+
+            // Assign product variant to the new channel
+            await adminClient.query(assignProductVariantToChannelDocument, {
+                input: {
+                    channelId,
+                    productVariantIds: ['T_1'],
+                },
+            });
+        });
+
+        it('recalculates active orders when shipping method is unassigned from channel', async () => {
+            shopClient.setChannelToken('shipping-test-channel-token');
+            try {
+                // Create an active order in the new channel with the shipping method
+                await shopClient.asAnonymousUser();
+                await shopClient.query(addItemToOrderDocument, {
+                    productVariantId: 'T_1',
+                    quantity: 1,
+                });
+                await shopClient.query(setShippingMethodDocument, { id: [shippingMethodId] });
+
+                // Verify shipping line is present and totals include shipping
+                const { activeOrder: orderBefore } = await shopClient.query(getActiveOrderDocument);
+                expect(orderBefore.shippingLines).toHaveLength(1);
+                expect(orderBefore.shippingLines[0].shippingMethod.id).toBe(shippingMethodId);
+                expect(orderBefore.shipping).toBe(500);
+                expect(orderBefore.total).toBe(Number(orderBefore.subTotal) + 500);
+
+                // Remove the shipping method from the channel
+                await adminClient.query(removeShippingMethodsFromChannelDocument, {
+                    input: {
+                        channelId,
+                        shippingMethodIds: [shippingMethodId],
+                    },
+                });
+
+                // Verify the shipping line has been removed and totals recalculated
+                const { activeOrder: orderAfter } = await shopClient.query(getActiveOrderDocument);
+                expect(orderAfter.shippingLines).toHaveLength(0);
+                expect(orderAfter.shipping).toBe(0);
+                expect(orderAfter.shippingWithTax).toBe(0);
+                expect(orderAfter.total).toBe(orderAfter.subTotal);
+                expect(orderAfter.totalWithTax).toBe(orderAfter.subTotalWithTax);
+            } finally {
+                shopClient.setChannelToken('e2e-default-channel');
+            }
+        });
+
+        it('historical orders still resolve shipping method after unassignment', async () => {
+            try {
+                // Re-assign the shipping method to the channel so we can create a completed order
+                await adminClient.query(assignShippingMethodsToChannelDocument, {
+                    input: {
+                        channelId,
+                        shippingMethodIds: [shippingMethodId],
+                    },
+                });
+
+                // Create a payment method in the test channel
+                adminClient.setChannelToken('shipping-test-channel-token');
+                await adminClient.query(createPaymentMethodForShippingTestDocument, {
+                    input: {
+                        code: testSuccessfulPaymentMethod.code,
+                        translations: [
+                            { languageCode: LanguageCode.en, name: 'Test Payment Method', description: '' },
+                        ],
+                        enabled: true,
+                        handler: {
+                            code: testSuccessfulPaymentMethod.code,
+                            arguments: [],
+                        },
+                    },
+                });
+                adminClient.setChannelToken('e2e-default-channel');
+
+                // Create and complete an order
+                shopClient.setChannelToken('shipping-test-channel-token');
+                await shopClient.asAnonymousUser();
+                await shopClient.query(addItemToOrderDocument, {
+                    productVariantId: 'T_1',
+                    quantity: 1,
+                });
+                await shopClient.query(setShippingMethodDocument, { id: [shippingMethodId] });
+                await shopClient.query(setCustomerDocument, {
+                    input: {
+                        firstName: 'Test',
+                        lastName: 'Customer',
+                        emailAddress: 'shipping-test@test.com',
+                    },
+                });
+                await shopClient.query(setShippingAddressDocument, {
+                    input: {
+                        streetLine1: '1 Test Street',
+                        countryCode: 'GB',
+                    },
+                });
+                await shopClient.query(transitionToStateDocument, { state: 'ArrangingPayment' });
+                const { addPaymentToOrder: completedOrder } = await shopClient.query(addPaymentDocument, {
+                    input: {
+                        method: testSuccessfulPaymentMethod.code,
+                        metadata: {},
+                    },
+                });
+
+                // Remove the shipping method from the channel again
+                await adminClient.query(removeShippingMethodsFromChannelDocument, {
+                    input: {
+                        channelId,
+                        shippingMethodIds: [shippingMethodId],
+                    },
+                });
+
+                // Verify the historical order still resolves the shipping method
+                adminClient.setChannelToken('shipping-test-channel-token');
+                const { order } = await adminClient.query(getOrderDocument, {
+                    id: completedOrder.id,
+                });
+                expect(order.shippingLines).toHaveLength(1);
+                expect(order.shippingLines[0].shippingMethod.id).toBe(shippingMethodId);
+                expect(order.shippingLines[0].shippingMethod.name).toBe('Channel Test Method');
+            } finally {
+                shopClient.setChannelToken('e2e-default-channel');
+                adminClient.setChannelToken('e2e-default-channel');
+            }
+        });
+    });
 });
 
 const getShippingMethodDocument = graphql(
@@ -549,6 +750,34 @@ export const testEligibleShippingMethodsDocument = graphql(`
             price
             priceWithTax
             metadata
+        }
+    }
+`);
+
+const assignShippingMethodsToChannelDocument = graphql(`
+    mutation AssignShippingMethodsToChannel($input: AssignShippingMethodsToChannelInput!) {
+        assignShippingMethodsToChannel(input: $input) {
+            id
+            name
+        }
+    }
+`);
+
+const createPaymentMethodForShippingTestDocument = graphql(`
+    mutation CreatePaymentMethodForShippingTest($input: CreatePaymentMethodInput!) {
+        createPaymentMethod(input: $input) {
+            id
+            code
+            name
+        }
+    }
+`);
+
+const removeShippingMethodsFromChannelDocument = graphql(`
+    mutation RemoveShippingMethodsFromChannel($input: RemoveShippingMethodsFromChannelInput!) {
+        removeShippingMethodsFromChannel(input: $input) {
+            id
+            name
         }
     }
 `);
