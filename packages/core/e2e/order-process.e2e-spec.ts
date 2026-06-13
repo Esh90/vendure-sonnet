@@ -548,7 +548,7 @@ describe('Order process', () => {
             const failedTransitionEntry = history.items.find(
                 entry =>
                     entry.type === HistoryEntryType.ORDER_STATE_TRANSITION &&
-                    (entry.data as any)?.to === 'ValidatingCustomer',
+                    entry.data?.to === 'ValidatingCustomer',
             );
             expect(failedTransitionEntry).toBeUndefined();
         });
