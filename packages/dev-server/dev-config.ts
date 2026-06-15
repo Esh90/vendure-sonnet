@@ -27,6 +27,7 @@ import { DataSourceOptions } from 'typeorm';
 import { NavModifierPlugin } from './test-plugins/nav-modifier-plugin/nav-modifier-plugin';
 // import { FieldTestPlugin } from './test-plugins/field-test/field-test-plugin';
 import { ReviewsPlugin } from './test-plugins/reviews/reviews-plugin';
+import { PayPalPlugin } from './example-plugins/paypal-plugin';
 
 const IS_INSTRUMENTED = process.env.IS_INSTRUMENTED === 'true';
 
@@ -121,6 +122,13 @@ export const devConfig: VendureConfig = {
         // }),
         ReadonlySettingsTestPlugin,
         ReviewsPlugin,
+        PayPalPlugin.init({
+            environment: (process.env.PAYPAL_ENVIRONMENT as 'sandbox' | 'production') ?? 'sandbox',
+            clientId: process.env.PAYPAL_CLIENT_ID,
+            clientSecret: process.env.PAYPAL_CLIENT_SECRET,
+            returnUrl: process.env.PAYPAL_RETURN_URL,
+            cancelUrl: process.env.PAYPAL_CANCEL_URL,
+        }),
         // FieldTestPlugin,
         NavModifierPlugin,
         GraphiqlPlugin.init(),
