@@ -347,18 +347,20 @@ export class PayPalClient {
      * Full refund  (UC4): pass no amount/currencyCode — PayPal refunds the exact
      *   captured amount. Omitting the amount avoids rounding mismatches.
      *
-     * Partial refund (UC5): pass the amount and currencyCode — PayPal refunds only
-     *   that portion. Multiple partial refunds may be issued against the same
-     *   capture up to its original value.
+     * Partial refund (UC5): pass amount, currencyCode, and a caller-generated
+     *   idempotencyKey. The caller must generate a new key per refund invocation
+     *   (not per amount) so that multiple same-amount partial refunds are treated
+     *   as distinct operations by PayPal.
      *
      * Idempotency key:
-     *   Full    → `refund-full-<captureId>`   (one full refund per capture)
-     *   Partial → `refund-partial-<captureId>-<amount>` (one attempt per amount)
+     *   Full    → `refund-full-<captureId>` (stable; one full refund per capture)
+     *   Partial → caller-supplied            (unique per invocation)
      */
     async refundCapture(
         captureId: string,
         amount?: number,
         currencyCode?: string,
+        idempotencyKey?: string,
     ): Promise<RefundCaptureResult> {
         const token = await this.getAccessToken();
         const isPartial = amount !== undefined && currencyCode !== undefined;
@@ -371,9 +373,9 @@ export class PayPalClient {
             };
         }
 
-        const idempotencyKey = isPartial
-            ? `refund-partial-${captureId}-${amount}`
-            : `refund-full-${captureId}`;
+        const resolvedKey = idempotencyKey ?? (isPartial
+            ? `refund-partial-${captureId}-${Date.now()}`
+            : `refund-full-${captureId}`);
 
         const response = await fetch(
             `${this.baseUrl}/v2/payments/captures/${encodeURIComponent(captureId)}/refund`,
@@ -383,7 +385,7 @@ export class PayPalClient {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
-                    'PayPal-Request-Id': idempotencyKey,
+                    'PayPal-Request-Id': resolvedKey,
                 },
                 body: JSON.stringify(body),
             },

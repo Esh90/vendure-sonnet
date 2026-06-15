@@ -317,15 +317,26 @@ export const paypalPaymentMethodHandler = new PaymentMethodHandler({
 
     /**
      * Use Case 4 – Full Refund
-     * Use Case 5 – Partial Refund  (same function; amount drives the distinction)
+     * Use Case 5 – Partial Refund
      *
-     * Vendure passes the amount it wants refunded. When that equals the full payment
-     * amount we omit amount from the PayPal call so PayPal refunds the exact capture
-     * value without risk of rounding mismatch. For anything less we send the amount
-     * explicitly — PayPal validates it against the remaining refundable balance.
+     * Both cases are handled here; the amount parameter determines which path runs:
      *
-     * The captureId stored in payment.metadata is the PayPal capture ID produced by
-     * either createPayment (CAPTURE intent) or settlePayment (AUTHORIZE intent).
+     *   amount >= payment.amount  →  Full refund (UC4)
+     *     PayPal call omits amount so PayPal refunds the exact capture value.
+     *     Idempotency key is stable: `refund-full-<captureId>`.
+     *
+     *   amount < payment.amount   →  Partial refund (UC5)
+     *     PayPal call includes amount; PayPal validates it against the remaining
+     *     refundable balance (returns REFUND_AMOUNT_EXCEEDED if over-refunded).
+     *     Multiple partial refunds are allowed against the same capture up to the
+     *     original captured value.
+     *     Idempotency key is unique per invocation (`refund-partial-<captureId>-<paymentId>-<ts>`)
+     *     so that two partial refunds of the same amount are treated as distinct
+     *     operations. Note: a retry after a network failure will create a second
+     *     refund — merchants should confirm the refund state before retrying.
+     *
+     * The captureId in payment.metadata comes from createPayment (CAPTURE intent)
+     * or from settlePayment's returned metadata (AUTHORIZE intent).
      */
     createRefund: async (
         _ctx,
@@ -345,9 +356,14 @@ export const paypalPaymentMethodHandler = new PaymentMethodHandler({
             return { state: 'Failed' };
         }
 
-        // Full refund: amount matches the settled payment — omit amount so PayPal
-        // refunds exactly what was captured without any rounding risk.
         const isFullRefund = amount >= payment.amount;
+
+        // For partial refunds, generate a unique key per invocation so repeated
+        // calls for the same amount create distinct PayPal refunds rather than
+        // being collapsed into the same one by PayPal's idempotency layer.
+        const partialKey = isFullRefund
+            ? undefined
+            : `refund-partial-${captureId}-${payment.id}-${Date.now()}`;
 
         try {
             const client = getPayPalClient();
@@ -355,6 +371,7 @@ export const paypalPaymentMethodHandler = new PaymentMethodHandler({
                 captureId,
                 isFullRefund ? undefined : amount,
                 isFullRefund ? undefined : order.currencyCode,
+                partialKey,
             );
 
             if (status === 'COMPLETED') {
