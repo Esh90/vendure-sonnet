@@ -177,3 +177,72 @@ export interface PatchOperation {
     path: string;
     value?: unknown;
 }
+
+// ─── Transaction Reporting ─────────────────────────────────────────────────────
+
+export interface PayPalMoneyValue {
+    currency_code: string;
+    value: string;
+}
+
+export interface PayPalTransactionInfo {
+    transaction_id: string;
+    paypal_reference_id?: string;
+    paypal_reference_id_type?: string;
+    transaction_event_code: string;
+    transaction_initiation_date: string;
+    transaction_updated_date: string;
+    transaction_amount: PayPalMoneyValue;
+    fee_amount?: PayPalMoneyValue;
+    transaction_status: string;
+    transaction_subject?: string;
+    transaction_note?: string;
+    ending_balance?: PayPalMoneyValue;
+}
+
+export interface PayPalTransactionPayerInfo {
+    account_id?: string;
+    email_address?: string;
+    payer_name?: { given_name?: string; surname?: string };
+    country_code?: string;
+}
+
+export interface PayPalTransactionItem {
+    transaction_info: PayPalTransactionInfo;
+    payer_info?: PayPalTransactionPayerInfo;
+    cart_info?: {
+        item_details?: Array<{
+            item_name?: string;
+            item_quantity?: string;
+            item_unit_price?: PayPalMoneyValue;
+            item_amount?: PayPalMoneyValue;
+        }>;
+    };
+}
+
+export interface PayPalTransactionSearchResponse {
+    transaction_details: PayPalTransactionItem[];
+    account_number: string;
+    start_date: string;
+    end_date: string;
+    last_refreshed_datetime?: string;
+    page: number;
+    total_items: number;
+    total_pages: number;
+    links: PayPalOrderLink[];
+}
+
+export interface PayPalBalanceCurrency {
+    currency: string;
+    primary: boolean;
+    total_balance: PayPalMoneyValue;
+    available_balance?: PayPalMoneyValue;
+    withheld_balance?: PayPalMoneyValue;
+}
+
+export interface PayPalBalanceResponse {
+    balances: PayPalBalanceCurrency[];
+    account_id: string;
+    as_of_time: string;
+    last_refresh_time: string;
+}

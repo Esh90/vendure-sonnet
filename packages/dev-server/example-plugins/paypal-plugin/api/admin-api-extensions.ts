@@ -27,6 +27,62 @@ export const adminApiExtensions = gql`
         failedPaymentsCount: Int!
     }
 
+    # ── Reporting types ───────────────────────────────────────────────────────
+
+    type PaypalMoneyValue {
+        currencyCode: String!
+        value: String!
+    }
+
+    type PaypalTransactionInfo {
+        transactionId: String!
+        transactionEventCode: String!
+        transactionInitiationDate: String!
+        transactionUpdatedDate: String!
+        transactionAmount: PaypalMoneyValue!
+        feeAmount: PaypalMoneyValue
+        transactionStatus: String!
+        transactionSubject: String
+        endingBalance: PaypalMoneyValue
+    }
+
+    type PaypalTransactionPayerInfo {
+        emailAddress: String
+        payerName: String
+        countryCode: String
+    }
+
+    type PaypalTransaction {
+        transactionInfo: PaypalTransactionInfo!
+        payerInfo: PaypalTransactionPayerInfo
+    }
+
+    type PaypalTransactionSearchResult {
+        transactions: [PaypalTransaction!]!
+        totalItems: Int!
+        totalPages: Int!
+        page: Int!
+        startDate: String!
+        endDate: String!
+        "Transactions appear in reports with up to a 3-hour delay after execution."
+        lastRefreshedDatetime: String
+    }
+
+    type PaypalBalance {
+        currency: String!
+        primary: Boolean!
+        totalBalance: PaypalMoneyValue!
+        availableBalance: PaypalMoneyValue
+        withheldBalance: PaypalMoneyValue
+    }
+
+    type PaypalBalanceResult {
+        balances: [PaypalBalance!]!
+        "ISO 8601 timestamp of when this balance snapshot was taken."
+        asOfTime: String!
+        lastRefreshTime: String!
+    }
+
     extend type Query {
         "Returns all PayPal billing plans stored in the local database."
         paypalBillingPlans: [PaypalBillingPlanResult!]!
@@ -39,6 +95,28 @@ export const adminApiExtensions = gql`
 
         "Returns a single PayPal subscription by its local entity ID."
         paypalSubscription(id: ID!): PaypalSubscriptionAdminResult
+
+        """
+        Searches PayPal transactions within the given date range.
+        Dates must be ISO 8601 strings with a timezone offset
+        (e.g. "2024-01-01T00:00:00-0700").
+        The range must not exceed 31 days (PayPal API constraint).
+        Transactions appear with up to a 3-hour delay after execution.
+        """
+        paypalTransactions(
+            startDate: String!
+            endDate: String!
+            "Page number (1-based). Defaults to 1."
+            page: Int
+            "Results per page, max 500. Defaults to 100."
+            pageSize: Int
+        ): PaypalTransactionSearchResult!
+
+        """
+        Returns the current PayPal account balances.
+        Optionally pass asOfTime (ISO 8601) to query a historical snapshot.
+        """
+        paypalBalance(asOfTime: String): PaypalBalanceResult!
     }
 
     extend type Mutation {

@@ -4,6 +4,7 @@ import type {
     PatchOperation,
     PayPalApiError,
     PayPalAuthorizeOrderResponse,
+    PayPalBalanceResponse,
     PayPalBillingPlanApiResponse,
     PayPalCaptureAuthorizationResponse,
     PayPalCaptureOrderResponse,
@@ -14,6 +15,7 @@ import type {
     PayPalSubscriptionApiResponse,
     PayPalSubscriptionIntervalUnit,
     PayPalTokenResponse,
+    PayPalTransactionSearchResponse,
 } from '../types';
 
 export interface CreateOrderResult {
@@ -64,6 +66,22 @@ export interface GetSubscriptionResult {
     subscriberEmail?: string;
     nextBillingTime?: string;
     failedPaymentsCount: number;
+}
+
+export interface ListTransactionsResult {
+    transactions: PayPalTransactionSearchResponse['transaction_details'];
+    totalItems: number;
+    totalPages: number;
+    page: number;
+    startDate: string;
+    endDate: string;
+    lastRefreshedDatetime?: string;
+}
+
+export interface GetBalanceResult {
+    balances: PayPalBalanceResponse['balances'];
+    asOfTime: string;
+    lastRefreshTime: string;
 }
 
 /**
@@ -765,6 +783,127 @@ export class PayPalClient {
             const err = await this.parseError(response);
             throw new Error(`PayPal cancelSubscription failed (HTTP ${response.status}): ${err}`);
         }
+    }
+
+    // ─── Reporting v1 ────────────────────────────────────────────────────────
+
+    /**
+     * Searches PayPal transactions for the given date range.
+     *
+     * Constraints (enforced here before the API call):
+     *   - Date range must not exceed 31 days (PayPal hard limit).
+     *   - Dates must be ISO 8601 strings with a timezone offset, e.g. "2024-01-01T00:00:00-0700".
+     *
+     * Note: PayPal reports transactions with up to a 3-hour delay; this endpoint
+     * is intended for reconciliation/accounting, not real-time confirmation.
+     */
+    async listTransactions(
+        startDate: string,
+        endDate: string,
+        page = 1,
+        pageSize = 100,
+    ): Promise<ListTransactionsResult> {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const diffDays = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
+
+        if (diffDays > 31) {
+            throw new Error(
+                `PayPal transaction search supports a maximum 31-day window. ` +
+                    `Requested range is ${Math.ceil(diffDays)} days. ` +
+                    `Split the request into multiple 31-day queries.`,
+            );
+        }
+
+        if (diffDays < 0) {
+            throw new Error('startDate must be before endDate.');
+        }
+
+        const token = await this.getAccessToken();
+        const clampedPageSize = Math.min(Math.max(1, pageSize), 500);
+
+        const params = new URLSearchParams({
+            start_date: startDate,
+            end_date: endDate,
+            fields: 'all',
+            page_size: String(clampedPageSize),
+            page: String(page),
+        });
+
+        const response = await fetch(
+            `${this.baseUrl}/v1/reporting/transactions?${params.toString()}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+            },
+        );
+
+        if (!response.ok) {
+            const err = await this.parseError(response);
+            throw new Error(`PayPal listTransactions failed (HTTP ${response.status}): ${err}`);
+        }
+
+        const data = (await response.json()) as PayPalTransactionSearchResponse;
+
+        Logger.verbose(
+            `PayPal transactions fetched: ${data.total_items} total, page ${data.page}/${data.total_pages}`,
+            loggerCtx,
+        );
+
+        return {
+            transactions: data.transaction_details ?? [],
+            totalItems: data.total_items ?? 0,
+            totalPages: data.total_pages ?? 1,
+            page: data.page ?? 1,
+            startDate: data.start_date,
+            endDate: data.end_date,
+            lastRefreshedDatetime: data.last_refreshed_datetime,
+        };
+    }
+
+    /**
+     * Returns the current PayPal account balances.
+     * Optionally pass `asOfTime` (ISO 8601) to query a historical balance snapshot.
+     */
+    async getBalance(asOfTime?: string): Promise<GetBalanceResult> {
+        const token = await this.getAccessToken();
+
+        const params = new URLSearchParams();
+        if (asOfTime) {
+            params.set('as_of_time', asOfTime);
+        }
+
+        const qs = params.toString();
+        const url = `${this.baseUrl}/v1/reporting/balances${qs ? `?${qs}` : ''}`;
+
+        const response = await fetch(url, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            const err = await this.parseError(response);
+            throw new Error(`PayPal getBalance failed (HTTP ${response.status}): ${err}`);
+        }
+
+        const data = (await response.json()) as PayPalBalanceResponse;
+
+        Logger.verbose(
+            `PayPal balance fetched as of ${data.as_of_time}: ${data.balances.length} currencies`,
+            loggerCtx,
+        );
+
+        return {
+            balances: data.balances ?? [],
+            asOfTime: data.as_of_time,
+            lastRefreshTime: data.last_refresh_time,
+        };
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────────────

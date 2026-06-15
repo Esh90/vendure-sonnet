@@ -1,5 +1,6 @@
 import { PluginCommonModule, VendurePlugin } from '@vendure/core';
 import { PayPalAdminResolver } from './api/paypal-admin-resolver';
+import { PayPalReportingResolver } from './api/paypal-reporting-resolver';
 import { PayPalShopResolver } from './api/paypal-shop-resolver';
 import { PayPalShopSubscriptionResolver } from './api/paypal-shop-subscription-resolver';
 import { adminApiExtensions } from './api/admin-api-extensions';
@@ -25,7 +26,7 @@ import type { PayPalPluginOptions } from './types';
     },
     adminApiExtensions: {
         schema: adminApiExtensions,
-        resolvers: [PayPalAdminResolver],
+        resolvers: [PayPalAdminResolver, PayPalReportingResolver],
     },
     compatibility: '>=3.0.0',
 })
