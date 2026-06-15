@@ -1,20 +1,31 @@
 import { PluginCommonModule, VendurePlugin } from '@vendure/core';
+import { PayPalAdminResolver } from './api/paypal-admin-resolver';
 import { PayPalShopResolver } from './api/paypal-shop-resolver';
+import { PayPalShopSubscriptionResolver } from './api/paypal-shop-subscription-resolver';
+import { adminApiExtensions } from './api/admin-api-extensions';
 import { shopApiExtensions } from './api/shop-api-extensions';
 import { paypalPaymentMethodHandler } from './config/paypal-payment-handler';
+import { PayPalBillingPlan } from './subscription/entities/paypal-billing-plan.entity';
+import { PayPalSubscription } from './subscription/entities/paypal-subscription.entity';
+import { PayPalSubscriptionService } from './subscription/service/paypal-subscription.service';
 import { initPayPalClient } from './service/paypal-client';
 import type { PayPalPluginOptions } from './types';
 
 @VendurePlugin({
     imports: [PluginCommonModule],
+    entities: [PayPalBillingPlan, PayPalSubscription],
     configuration: config => {
         config.paymentOptions.paymentMethodHandlers.push(paypalPaymentMethodHandler);
         return config;
     },
-    providers: [PayPalShopResolver],
+    providers: [PayPalSubscriptionService],
     shopApiExtensions: {
         schema: shopApiExtensions,
-        resolvers: [PayPalShopResolver],
+        resolvers: [PayPalShopResolver, PayPalShopSubscriptionResolver],
+    },
+    adminApiExtensions: {
+        schema: adminApiExtensions,
+        resolvers: [PayPalAdminResolver],
     },
     compatibility: '>=3.0.0',
 })

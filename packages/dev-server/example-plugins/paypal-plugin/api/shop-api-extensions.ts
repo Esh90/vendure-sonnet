@@ -44,5 +44,49 @@ export const shopApiExtensions = gql`
             "URL PayPal redirects the buyer to if they cancel. Defaults to returnUrl."
             cancelUrl: String
         ): PaypalOrderResult!
+
+        """
+        Creates a PayPal Subscription under the given billing plan.
+
+        Flow:
+          1. Admin creates a billing plan via createPaypalBillingPlan.
+          2. Storefront calls createPaypalSubscription — gets back an approvalUrl.
+          3. Redirect the customer to approvalUrl; PayPal activates the subscription.
+          4. After return, call syncPaypalSubscription to refresh the local status.
+        """
+        createPaypalSubscription(
+            "ID of the local PayPalBillingPlan entity."
+            planId: ID!
+            "URL PayPal redirects the buyer to after subscription approval."
+            returnUrl: String
+            "URL PayPal redirects if the buyer cancels. Defaults to returnUrl."
+            cancelUrl: String
+            "ISO 8601 start time. Defaults to immediate."
+            startTime: String
+            "Pre-fill the subscriber's email on the PayPal approval page."
+            subscriberEmail: String
+        ): PaypalSubscriptionResult!
+
+        """
+        Syncs the subscription status from PayPal into the local database.
+        Call this when the customer returns from the PayPal approval URL.
+        """
+        syncPaypalSubscription(id: ID!): PaypalSubscriptionResult!
+
+        """
+        Cancels an ACTIVE or SUSPENDED PayPal subscription.
+        """
+        cancelPaypalSubscription(id: ID!, reason: String!): PaypalSubscriptionResult!
+    }
+
+    type PaypalSubscriptionResult {
+        id: ID!
+        paypalSubscriptionId: String!
+        paypalPlanId: String!
+        status: String!
+        approvalUrl: String
+        subscriberEmail: String
+        nextBillingTime: String
+        failedPaymentsCount: Int!
     }
 `;

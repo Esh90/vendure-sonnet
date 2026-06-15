@@ -1,13 +1,18 @@
 import { Logger } from '@vendure/core';
 import { loggerCtx, ZERO_DECIMAL_CURRENCIES } from '../constants';
 import type {
+    PatchOperation,
     PayPalApiError,
     PayPalAuthorizeOrderResponse,
+    PayPalBillingPlanApiResponse,
     PayPalCaptureAuthorizationResponse,
     PayPalCaptureOrderResponse,
     PayPalCreateOrderResponse,
     PayPalPluginOptions,
+    PayPalProductApiResponse,
     PayPalRefundResponse,
+    PayPalSubscriptionApiResponse,
+    PayPalSubscriptionIntervalUnit,
     PayPalTokenResponse,
 } from '../types';
 
@@ -35,6 +40,30 @@ export interface CaptureAuthorizationResult {
 export interface RefundCaptureResult {
     refundId: string;
     status: string;
+}
+
+export interface CreateProductResult {
+    productId: string;
+}
+
+export interface CreateBillingPlanResult {
+    planId: string;
+    status: string;
+}
+
+export interface CreateSubscriptionResult {
+    subscriptionId: string;
+    status: string;
+    approvalUrl: string;
+}
+
+export interface GetSubscriptionResult {
+    subscriptionId: string;
+    planId: string;
+    status: string;
+    subscriberEmail?: string;
+    nextBillingTime?: string;
+    failedPaymentsCount: number;
 }
 
 /**
@@ -405,6 +434,337 @@ export class PayPalClient {
         );
 
         return { refundId: data.id, status: data.status };
+    }
+
+    // ─── Subscriptions v1 ────────────────────────────────────────────────────
+
+    /**
+     * Creates a PayPal Catalog Product (required before creating a billing plan).
+     * Products are reusable across billing plans.
+     */
+    async createProduct(name: string, description?: string): Promise<CreateProductResult> {
+        const token = await this.getAccessToken();
+
+        const body: Record<string, unknown> = {
+            name,
+            type: 'SERVICE',
+            ...(description ? { description } : {}),
+        };
+
+        const response = await fetch(`${this.baseUrl}/v1/catalogs/products`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'PayPal-Request-Id': `product-${name.toLowerCase().replace(/\s+/g, '-').slice(0, 50)}`,
+            },
+            body: JSON.stringify(body),
+        });
+
+        if (!response.ok) {
+            const err = await this.parseError(response);
+            throw new Error(`PayPal createProduct failed (HTTP ${response.status}): ${err}`);
+        }
+
+        const data = (await response.json()) as PayPalProductApiResponse;
+        Logger.info(`PayPal product created: ${data.id}`, loggerCtx);
+        return { productId: data.id };
+    }
+
+    /**
+     * Creates a PayPal Billing Plan linked to the given product.
+     * The plan is created in ACTIVE status by default.
+     */
+    async createBillingPlan(params: {
+        productId: string;
+        name: string;
+        description?: string;
+        amount: number;
+        currencyCode: string;
+        intervalUnit: PayPalSubscriptionIntervalUnit;
+        intervalCount?: number;
+        paymentFailureThreshold?: number;
+    }): Promise<CreateBillingPlanResult> {
+        const token = await this.getAccessToken();
+        const {
+            productId,
+            name,
+            description,
+            amount,
+            currencyCode,
+            intervalUnit,
+            intervalCount = 1,
+            paymentFailureThreshold = 3,
+        } = params;
+
+        const body: Record<string, unknown> = {
+            product_id: productId,
+            name,
+            ...(description ? { description } : {}),
+            status: 'ACTIVE',
+            billing_cycles: [
+                {
+                    frequency: { interval_unit: intervalUnit, interval_count: intervalCount },
+                    tenure_type: 'REGULAR',
+                    sequence: 1,
+                    total_cycles: 0, // 0 = infinite
+                    pricing_scheme: {
+                        fixed_price: {
+                            currency_code: currencyCode.toUpperCase(),
+                            value: this.toPayPalAmount(amount, currencyCode),
+                        },
+                    },
+                },
+            ],
+            payment_preferences: {
+                auto_bill_outstanding: true,
+                payment_failure_threshold: paymentFailureThreshold,
+            },
+        };
+
+        const response = await fetch(`${this.baseUrl}/v1/billing/plans`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'PayPal-Request-Id': `plan-${productId}-${intervalUnit}-${intervalCount}`,
+            },
+            body: JSON.stringify(body),
+        });
+
+        if (!response.ok) {
+            const err = await this.parseError(response);
+            throw new Error(`PayPal createBillingPlan failed (HTTP ${response.status}): ${err}`);
+        }
+
+        const data = (await response.json()) as PayPalBillingPlanApiResponse;
+        Logger.info(`PayPal billing plan created: ${data.id}, status: ${data.status}`, loggerCtx);
+        return { planId: data.id, status: data.status };
+    }
+
+    /**
+     * Activates an INACTIVE billing plan.
+     * PayPal returns 204 No Content on success.
+     */
+    async activateBillingPlan(planId: string): Promise<void> {
+        const token = await this.getAccessToken();
+
+        const response = await fetch(
+            `${this.baseUrl}/v1/billing/plans/${encodeURIComponent(planId)}/activate`,
+            {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: '{}',
+            },
+        );
+
+        if (response.status === 204) {
+            Logger.info(`PayPal billing plan ${planId} activated`, loggerCtx);
+            return;
+        }
+
+        if (!response.ok) {
+            const err = await this.parseError(response);
+            throw new Error(`PayPal activateBillingPlan failed (HTTP ${response.status}): ${err}`);
+        }
+    }
+
+    /** Fetches the current state of a billing plan from PayPal. */
+    async getBillingPlan(planId: string): Promise<PayPalBillingPlanApiResponse> {
+        const token = await this.getAccessToken();
+
+        const response = await fetch(
+            `${this.baseUrl}/v1/billing/plans/${encodeURIComponent(planId)}`,
+            {
+                headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+            },
+        );
+
+        if (!response.ok) {
+            const err = await this.parseError(response);
+            throw new Error(`PayPal getBillingPlan failed (HTTP ${response.status}): ${err}`);
+        }
+
+        return (await response.json()) as PayPalBillingPlanApiResponse;
+    }
+
+    /**
+     * Updates a billing plan using JSON Patch semantics.
+     * Common use: change `payment_preferences/payment_failure_threshold`.
+     * PayPal returns 204 No Content on success.
+     */
+    async updateBillingPlan(planId: string, patches: PatchOperation[]): Promise<void> {
+        const token = await this.getAccessToken();
+
+        const response = await fetch(
+            `${this.baseUrl}/v1/billing/plans/${encodeURIComponent(planId)}`,
+            {
+                method: 'PATCH',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(patches),
+            },
+        );
+
+        if (response.status === 204) {
+            Logger.info(`PayPal billing plan ${planId} updated`, loggerCtx);
+            return;
+        }
+
+        if (!response.ok) {
+            const err = await this.parseError(response);
+            throw new Error(`PayPal updateBillingPlan failed (HTTP ${response.status}): ${err}`);
+        }
+    }
+
+    /**
+     * Creates a PayPal Subscription for the given plan.
+     * Returns the subscription ID and the buyer-approval URL.
+     * The subscriber must visit the approval URL once to activate the subscription.
+     */
+    async createSubscription(params: {
+        planId: string;
+        returnUrl: string;
+        cancelUrl: string;
+        subscriberEmail?: string;
+        startTime?: string;
+    }): Promise<CreateSubscriptionResult> {
+        const token = await this.getAccessToken();
+        const { planId, returnUrl, cancelUrl, subscriberEmail, startTime } = params;
+
+        const body: Record<string, unknown> = {
+            plan_id: planId,
+            application_context: {
+                return_url: returnUrl,
+                cancel_url: cancelUrl,
+                user_action: 'SUBSCRIBE_NOW',
+                shipping_preference: 'NO_SHIPPING',
+            },
+        };
+
+        if (startTime) {
+            body.start_time = startTime;
+        }
+
+        if (subscriberEmail) {
+            body.subscriber = { email_address: subscriberEmail };
+        }
+
+        const response = await fetch(`${this.baseUrl}/v1/billing/subscriptions`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'PayPal-Request-Id': `sub-${planId}-${Date.now()}`,
+            },
+            body: JSON.stringify(body),
+        });
+
+        if (!response.ok) {
+            const err = await this.parseError(response);
+            throw new Error(`PayPal createSubscription failed (HTTP ${response.status}): ${err}`);
+        }
+
+        const data = (await response.json()) as PayPalSubscriptionApiResponse;
+        const approvalUrl = data.links.find(l => l.rel === 'approve')?.href ?? '';
+
+        Logger.info(
+            `PayPal subscription created: ${data.id}, status: ${data.status}`,
+            loggerCtx,
+        );
+        return { subscriptionId: data.id, status: data.status, approvalUrl };
+    }
+
+    /** Fetches the current subscription state from PayPal and maps it to a flat result. */
+    async getSubscription(subscriptionId: string): Promise<GetSubscriptionResult> {
+        const token = await this.getAccessToken();
+
+        const response = await fetch(
+            `${this.baseUrl}/v1/billing/subscriptions/${encodeURIComponent(subscriptionId)}`,
+            {
+                headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+            },
+        );
+
+        if (!response.ok) {
+            const err = await this.parseError(response);
+            throw new Error(`PayPal getSubscription failed (HTTP ${response.status}): ${err}`);
+        }
+
+        const data = (await response.json()) as PayPalSubscriptionApiResponse;
+        return {
+            subscriptionId: data.id,
+            planId: data.plan_id,
+            status: data.status,
+            subscriberEmail: data.subscriber?.email_address,
+            nextBillingTime: data.billing_info?.next_billing_time,
+            failedPaymentsCount: data.billing_info?.failed_payments_count ?? 0,
+        };
+    }
+
+    /**
+     * Activates a SUSPENDED subscription.
+     * PayPal returns 204 No Content on success.
+     */
+    async activateSubscription(subscriptionId: string, reason: string): Promise<void> {
+        const token = await this.getAccessToken();
+
+        const response = await fetch(
+            `${this.baseUrl}/v1/billing/subscriptions/${encodeURIComponent(subscriptionId)}/activate`,
+            {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ reason }),
+            },
+        );
+
+        if (response.status === 204) {
+            Logger.info(`PayPal subscription ${subscriptionId} activated`, loggerCtx);
+            return;
+        }
+
+        if (!response.ok) {
+            const err = await this.parseError(response);
+            throw new Error(`PayPal activateSubscription failed (HTTP ${response.status}): ${err}`);
+        }
+    }
+
+    /**
+     * Cancels a ACTIVE or SUSPENDED subscription.
+     * PayPal returns 204 No Content on success.
+     */
+    async cancelSubscription(subscriptionId: string, reason: string): Promise<void> {
+        const token = await this.getAccessToken();
+
+        const response = await fetch(
+            `${this.baseUrl}/v1/billing/subscriptions/${encodeURIComponent(subscriptionId)}/cancel`,
+            {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ reason }),
+            },
+        );
+
+        if (response.status === 204) {
+            Logger.info(`PayPal subscription ${subscriptionId} cancelled`, loggerCtx);
+            return;
+        }
+
+        if (!response.ok) {
+            const err = await this.parseError(response);
+            throw new Error(`PayPal cancelSubscription failed (HTTP ${response.status}): ${err}`);
+        }
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────────────
