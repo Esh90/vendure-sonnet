@@ -5,6 +5,7 @@ import { getPayPalClient } from '../service/paypal-client';
 
 interface CreatePaypalOrderArgs {
     vendureOrderId: string;
+    intent?: 'CAPTURE' | 'AUTHORIZE';
     returnUrl?: string;
     cancelUrl?: string;
 }
@@ -23,7 +24,7 @@ export class PayPalShopResolver {
         @Ctx() ctx: RequestContext,
         @Args() args: CreatePaypalOrderArgs,
     ): Promise<CreatePaypalOrderResult> {
-        const { vendureOrderId, returnUrl, cancelUrl } = args;
+        const { vendureOrderId, intent = 'CAPTURE', returnUrl, cancelUrl } = args;
 
         const order = await this.orderService.findOne(ctx, vendureOrderId);
         if (!order) {
@@ -32,11 +33,11 @@ export class PayPalShopResolver {
 
         Logger.info(
             `Creating PayPal order for Vendure order ${order.code} ` +
-                `(${order.totalWithTax} ${order.currencyCode})`,
+                `(${order.totalWithTax} ${order.currencyCode}, intent: ${intent})`,
             loggerCtx,
         );
 
         const client = getPayPalClient();
-        return client.createOrder(order.totalWithTax, order.currencyCode, returnUrl, cancelUrl);
+        return client.createOrder(order.totalWithTax, order.currencyCode, returnUrl, cancelUrl, intent);
     }
 }

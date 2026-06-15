@@ -70,3 +70,32 @@ export interface PayPalApiError {
     details?: PayPalErrorDetails[];
     debug_id?: string;
 }
+
+export interface PayPalAuthorizationDetails {
+    id: string;
+    status: string;
+    expiration_time?: string;
+    amount: {
+        currency_code: string;
+        value: string;
+    };
+}
+
+export interface PayPalAuthorizeOrderResponse {
+    id: string;
+    status: string;
+    purchase_units: Array<{
+        payments: {
+            authorizations: PayPalAuthorizationDetails[];
+        };
+    }>;
+}
+
+export interface PayPalCaptureAuthorizationResponse {
+    id: string;
+    status: string;
+    amount: {
+        currency_code: string;
+        value: string;
+    };
+}

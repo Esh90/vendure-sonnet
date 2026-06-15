@@ -2,6 +2,8 @@ import { Logger } from '@vendure/core';
 import { loggerCtx, ZERO_DECIMAL_CURRENCIES } from '../constants';
 import type {
     PayPalApiError,
+    PayPalAuthorizeOrderResponse,
+    PayPalCaptureAuthorizationResponse,
     PayPalCaptureOrderResponse,
     PayPalCreateOrderResponse,
     PayPalPluginOptions,
@@ -14,6 +16,17 @@ export interface CreateOrderResult {
 }
 
 export interface CaptureOrderResult {
+    captureId: string;
+    status: string;
+}
+
+export interface AuthorizeOrderResult {
+    authorizationId: string;
+    status: string;
+    expirationTime?: string;
+}
+
+export interface CaptureAuthorizationResult {
     captureId: string;
     status: string;
 }
@@ -87,6 +100,7 @@ export class PayPalClient {
         currencyCode: string,
         returnUrl?: string,
         cancelUrl?: string,
+        intent: 'CAPTURE' | 'AUTHORIZE' = 'CAPTURE',
     ): Promise<CreateOrderResult> {
         // Per-call URLs take precedence; fall back to plugin-level defaults.
         const effectiveReturnUrl = returnUrl || this.defaultReturnUrl;
@@ -104,7 +118,7 @@ export class PayPalClient {
         const value = this.toPayPalAmount(amount, currencyCode);
 
         const body: Record<string, unknown> = {
-            intent: 'CAPTURE',
+            intent,
             purchase_units: [
                 {
                     amount: {
@@ -195,6 +209,93 @@ export class PayPalClient {
         );
 
         return { captureId: captureDetails.id, status: captureDetails.status };
+    }
+
+    /**
+     * Authorizes a buyer-approved PayPal order (AUTHORIZE intent).
+     * Reserves funds without moving money. Returns the authorization ID
+     * which must be stored in payment.metadata for later capture.
+     */
+    async authorizeOrder(paypalOrderId: string): Promise<AuthorizeOrderResult> {
+        const token = await this.getAccessToken();
+
+        const response = await fetch(
+            `${this.baseUrl}/v2/checkout/orders/${encodeURIComponent(paypalOrderId)}/authorize`,
+            {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'PayPal-Request-Id': `authorize-${paypalOrderId}`,
+                },
+                body: '{}',
+            },
+        );
+
+        if (!response.ok) {
+            const err = await this.parseError(response);
+            throw new Error(`PayPal authorizeOrder failed (HTTP ${response.status}): ${err}`);
+        }
+
+        const data = (await response.json()) as PayPalAuthorizeOrderResponse;
+        const authDetails = data.purchase_units[0]?.payments?.authorizations?.[0];
+
+        if (!authDetails) {
+            throw new Error(
+                `PayPal authorizeOrder response for order ${paypalOrderId} is missing authorization details`,
+            );
+        }
+
+        Logger.info(
+            `PayPal order ${paypalOrderId} authorized. Auth ID: ${authDetails.id}, ` +
+                `status: ${authDetails.status}, expires: ${authDetails.expiration_time ?? 'N/A'}`,
+            loggerCtx,
+        );
+
+        return {
+            authorizationId: authDetails.id,
+            status: authDetails.status,
+            expirationTime: authDetails.expiration_time,
+        };
+    }
+
+    /**
+     * Captures a previously authorized PayPal payment.
+     * Called by settlePayment when the merchant is ready to charge the buyer
+     * (e.g., just before shipment). Authorization IDs are valid for 29 days;
+     * the capture window is 3 days after re-authorization.
+     */
+    async captureAuthorization(authorizationId: string): Promise<CaptureAuthorizationResult> {
+        const token = await this.getAccessToken();
+
+        const response = await fetch(
+            `${this.baseUrl}/v2/payments/authorizations/${encodeURIComponent(authorizationId)}/capture`,
+            {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'PayPal-Request-Id': `capture-auth-${authorizationId}`,
+                },
+                body: JSON.stringify({ final_capture: true }),
+            },
+        );
+
+        if (!response.ok) {
+            const err = await this.parseError(response);
+            throw new Error(`PayPal captureAuthorization failed (HTTP ${response.status}): ${err}`);
+        }
+
+        const data = (await response.json()) as PayPalCaptureAuthorizationResponse;
+
+        Logger.info(
+            `PayPal authorization ${authorizationId} captured. Capture ID: ${data.id}, status: ${data.status}`,
+            loggerCtx,
+        );
+
+        return { captureId: data.id, status: data.status };
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────────────
