@@ -1,4 +1,6 @@
 import {
+    CancelPaymentErrorResult,
+    CancelPaymentResult,
     CreatePaymentErrorResult,
     CreatePaymentResult,
     LanguageCode,
@@ -245,6 +247,67 @@ export const paypalPaymentMethodHandler = new PaymentMethodHandler({
             const message = err instanceof Error ? err.message : String(err);
             Logger.error(
                 `PayPal settlePayment error (authorizationId=${authorizationId}): ${message}`,
+                loggerCtx,
+            );
+            return { success: false, errorMessage: message };
+        }
+    },
+
+    /**
+     * Use Case 3 – Payment Cancellation / Void.
+     *
+     * Voids an AUTHORIZE-intent payment that is in the Authorized state, releasing
+     * the reserved funds back to the buyer without any charge.
+     *
+     * Constraints (enforced by PayPal):
+     *   - The authorization must not have been captured (partially or fully).
+     *   - The authorization must not have already been voided.
+     *   - PayPal authorizations expire after 29 days; voiding an expired auth returns an error.
+     *
+     * For CAPTURE-intent payments (already Settled) this function will not normally be
+     * reached (Vendure prevents cancelling a Settled payment), but returns an explanatory
+     * error just in case.
+     */
+    cancelPayment: async (
+        _ctx,
+        _order,
+        payment,
+        args,
+    ): Promise<CancelPaymentResult | CancelPaymentErrorResult> => {
+        const intent = (args.paymentIntent as string) || 'CAPTURE';
+
+        if (intent !== 'AUTHORIZE') {
+            return {
+                success: false,
+                errorMessage:
+                    'Cannot void a CAPTURE-intent payment — the funds have already been taken. ' +
+                    'Issue a refund instead.',
+            };
+        }
+
+        const authorizationId = payment.metadata?.authorizationId as string | undefined;
+
+        if (!authorizationId || typeof authorizationId !== 'string') {
+            return {
+                success: false,
+                errorMessage:
+                    'Cannot cancel: authorizationId is missing from payment metadata. ' +
+                    'Ensure createPayment completed successfully with AUTHORIZE intent.',
+            };
+        }
+
+        try {
+            const client = getPayPalClient();
+            await client.voidAuthorization(authorizationId);
+
+            return {
+                success: true,
+                metadata: { authorizationId, voidedAt: new Date().toISOString() },
+            };
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : String(err);
+            Logger.error(
+                `PayPal cancelPayment error (authorizationId=${authorizationId}): ${message}`,
                 loggerCtx,
             );
             return { success: false, errorMessage: message };

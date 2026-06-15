@@ -298,6 +298,43 @@ export class PayPalClient {
         return { captureId: data.id, status: data.status };
     }
 
+    /**
+     * Voids (cancels) a PayPal authorization, releasing the reserved funds back
+     * to the buyer. Only valid for authorizations that have not been captured or
+     * already voided. PayPal returns 204 No Content on success.
+     *
+     * Throws with a descriptive message on failure, including the PayPal error code
+     * so callers can distinguish "already voided" from "already captured".
+     */
+    async voidAuthorization(authorizationId: string): Promise<void> {
+        const token = await this.getAccessToken();
+
+        const response = await fetch(
+            `${this.baseUrl}/v2/payments/authorizations/${encodeURIComponent(authorizationId)}/void`,
+            {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'PayPal-Request-Id': `void-${authorizationId}`,
+                },
+                body: '{}',
+            },
+        );
+
+        // 204 = success, no body
+        if (response.status === 204) {
+            Logger.info(`PayPal authorization ${authorizationId} voided successfully`, loggerCtx);
+            return;
+        }
+
+        if (!response.ok) {
+            const err = await this.parseError(response);
+            throw new Error(`PayPal voidAuthorization failed (HTTP ${response.status}): ${err}`);
+        }
+    }
+
     // ─── Helpers ──────────────────────────────────────────────────────────────
 
     /**
