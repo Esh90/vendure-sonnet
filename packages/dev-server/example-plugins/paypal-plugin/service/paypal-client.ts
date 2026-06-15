@@ -15,6 +15,8 @@ import type {
     PayPalSubscriptionApiResponse,
     PayPalSubscriptionIntervalUnit,
     PayPalTokenResponse,
+    PayPalTrackerInput,
+    PayPalTrackingBatchResponse,
     PayPalTransactionSearchResponse,
 } from '../types';
 
@@ -783,6 +785,65 @@ export class PayPalClient {
             const err = await this.parseError(response);
             throw new Error(`PayPal cancelSubscription failed (HTTP ${response.status}): ${err}`);
         }
+    }
+
+    // ─── Shipment Tracking v1 ────────────────────────────────────────────────
+
+    /**
+     * Pushes shipment tracking information to PayPal.
+     * PayPal surfaces this data to the buyer in their PayPal account activity.
+     *
+     * Uses the batch endpoint so multiple lines from the same fulfillment can be
+     * submitted in one call. Partial errors from PayPal are logged as warnings
+     * but do not throw — a failed tracking push must never block a shipment.
+     *
+     * transactionId must be the PayPal **capture** ID (not the order ID).
+     */
+    async addTrackingInfo(trackers: PayPalTrackerInput[]): Promise<void> {
+        const token = await this.getAccessToken();
+
+        const body = {
+            trackers: trackers.map(t => ({
+                transaction_id: t.transactionId,
+                tracking_number: t.trackingNumber,
+                status: t.status,
+                carrier: t.carrier,
+                ...(t.carrierNameOther ? { carrier_name_other: t.carrierNameOther } : {}),
+            })),
+        };
+
+        const response = await fetch(`${this.baseUrl}/v1/shipping/trackers-batch`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+            body: JSON.stringify(body),
+        });
+
+        if (!response.ok) {
+            const err = await this.parseError(response);
+            throw new Error(`PayPal addTrackingInfo failed (HTTP ${response.status}): ${err}`);
+        }
+
+        const data = (await response.json()) as PayPalTrackingBatchResponse;
+
+        if (data.errors?.length) {
+            const summary = data.errors
+                .map(e => `${e.name}: ${e.message}`)
+                .join('; ');
+            Logger.warn(
+                `PayPal tracking batch completed with errors: ${summary}`,
+                loggerCtx,
+            );
+        }
+
+        const submitted = data.tracker_identifiers?.length ?? 0;
+        Logger.info(
+            `PayPal tracking info submitted: ${submitted}/${trackers.length} tracker(s) accepted`,
+            loggerCtx,
+        );
     }
 
     // ─── Reporting v1 ────────────────────────────────────────────────────────

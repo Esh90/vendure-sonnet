@@ -246,3 +246,33 @@ export interface PayPalBalanceResponse {
     as_of_time: string;
     last_refresh_time: string;
 }
+
+// ─── Shipment Tracking ────────────────────────────────────────────────────────
+
+export type PayPalTrackerStatus = 'SHIPPED' | 'ON_THE_WAY' | 'DELIVERED' | 'CANCELLED';
+
+export interface PayPalTrackerInput {
+    /** PayPal capture ID — the transaction_id for the tracking record. */
+    transactionId: string;
+    trackingNumber: string;
+    status: PayPalTrackerStatus;
+    /** PayPal carrier code (e.g. "FEDEX", "UPS", "OTHER"). */
+    carrier: string;
+    /** Required when carrier is "OTHER". */
+    carrierNameOther?: string;
+}
+
+export interface PayPalTrackingBatchError {
+    name: string;
+    message: string;
+    details?: Array<{ field: string; issue: string }>;
+}
+
+export interface PayPalTrackingBatchResponse {
+    tracker_identifiers?: Array<{
+        transaction_id: string;
+        tracking_number: string;
+        links: PayPalOrderLink[];
+    }>;
+    errors?: PayPalTrackingBatchError[];
+}

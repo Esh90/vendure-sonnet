@@ -1,4 +1,4 @@
-export const PAYPAL_PAYMENT_HANDLER_CODE = 'paypal-payment';
+export const PAYPAL_PAYMENT_HANDLER_CODE = 'paypal';
 
 export const loggerCtx = 'PayPalPlugin';
 

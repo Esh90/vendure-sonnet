@@ -1,6 +1,7 @@
 import { PluginCommonModule, VendurePlugin } from '@vendure/core';
 import { PayPalAdminResolver } from './api/paypal-admin-resolver';
 import { PayPalReportingResolver } from './api/paypal-reporting-resolver';
+import { PayPalTrackingSubscriber } from './fulfillment/paypal-tracking-subscriber';
 import { PayPalShopResolver } from './api/paypal-shop-resolver';
 import { PayPalShopSubscriptionResolver } from './api/paypal-shop-subscription-resolver';
 import { adminApiExtensions } from './api/admin-api-extensions';
@@ -19,7 +20,7 @@ import type { PayPalPluginOptions } from './types';
         config.paymentOptions.paymentMethodHandlers.push(paypalPaymentMethodHandler);
         return config;
     },
-    providers: [PayPalSubscriptionService],
+    providers: [PayPalSubscriptionService, PayPalTrackingSubscriber],
     shopApiExtensions: {
         schema: shopApiExtensions,
         resolvers: [PayPalShopResolver, PayPalShopSubscriptionResolver],
