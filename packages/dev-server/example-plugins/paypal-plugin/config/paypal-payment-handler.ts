@@ -3,6 +3,7 @@ import {
     CancelPaymentResult,
     CreatePaymentErrorResult,
     CreatePaymentResult,
+    CreateRefundResult,
     LanguageCode,
     Logger,
     PaymentMethodHandler,
@@ -311,6 +312,85 @@ export const paypalPaymentMethodHandler = new PaymentMethodHandler({
                 loggerCtx,
             );
             return { success: false, errorMessage: message };
+        }
+    },
+
+    /**
+     * Use Case 4 – Full Refund
+     * Use Case 5 – Partial Refund  (same function; amount drives the distinction)
+     *
+     * Vendure passes the amount it wants refunded. When that equals the full payment
+     * amount we omit amount from the PayPal call so PayPal refunds the exact capture
+     * value without risk of rounding mismatch. For anything less we send the amount
+     * explicitly — PayPal validates it against the remaining refundable balance.
+     *
+     * The captureId stored in payment.metadata is the PayPal capture ID produced by
+     * either createPayment (CAPTURE intent) or settlePayment (AUTHORIZE intent).
+     */
+    createRefund: async (
+        _ctx,
+        _input,
+        amount,
+        order,
+        payment,
+    ): Promise<CreateRefundResult> => {
+        const captureId = payment.metadata?.captureId as string | undefined;
+
+        if (!captureId || typeof captureId !== 'string') {
+            Logger.error(
+                `PayPal createRefund: captureId missing from payment ${payment.id} metadata. ` +
+                    'The payment may not have been settled via the PayPal handler.',
+                loggerCtx,
+            );
+            return { state: 'Failed' };
+        }
+
+        // Full refund: amount matches the settled payment — omit amount so PayPal
+        // refunds exactly what was captured without any rounding risk.
+        const isFullRefund = amount >= payment.amount;
+
+        try {
+            const client = getPayPalClient();
+            const { refundId, status } = await client.refundCapture(
+                captureId,
+                isFullRefund ? undefined : amount,
+                isFullRefund ? undefined : order.currencyCode,
+            );
+
+            if (status === 'COMPLETED') {
+                return {
+                    state: 'Settled',
+                    transactionId: refundId,
+                    metadata: {
+                        refundId,
+                        refundStatus: status,
+                        refundType: isFullRefund ? 'FULL' : 'PARTIAL',
+                        refundedAmount: amount,
+                    },
+                };
+            }
+
+            if (status === 'PENDING') {
+                Logger.warn(
+                    `PayPal refund ${refundId} for capture ${captureId} is PENDING`,
+                    loggerCtx,
+                );
+                return {
+                    state: 'Pending',
+                    transactionId: refundId,
+                    metadata: { refundId, refundStatus: status },
+                };
+            }
+
+            Logger.error(
+                `PayPal refund for capture ${captureId} returned unexpected status: ${status}`,
+                loggerCtx,
+            );
+            return { state: 'Failed', metadata: { refundId, refundStatus: status } };
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : String(err);
+            Logger.error(`PayPal createRefund error (captureId=${captureId}): ${message}`, loggerCtx);
+            return { state: 'Failed', metadata: { captureId, error: message } };
         }
     },
 });

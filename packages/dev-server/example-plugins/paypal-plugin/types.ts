@@ -99,3 +99,12 @@ export interface PayPalCaptureAuthorizationResponse {
         value: string;
     };
 }
+
+export interface PayPalRefundResponse {
+    id: string;
+    status: string;
+    amount?: {
+        currency_code: string;
+        value: string;
+    };
+}

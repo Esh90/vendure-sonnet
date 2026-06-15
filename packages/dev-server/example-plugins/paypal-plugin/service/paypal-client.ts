@@ -7,6 +7,7 @@ import type {
     PayPalCaptureOrderResponse,
     PayPalCreateOrderResponse,
     PayPalPluginOptions,
+    PayPalRefundResponse,
     PayPalTokenResponse,
 } from '../types';
 
@@ -28,6 +29,11 @@ export interface AuthorizeOrderResult {
 
 export interface CaptureAuthorizationResult {
     captureId: string;
+    status: string;
+}
+
+export interface RefundCaptureResult {
+    refundId: string;
     status: string;
 }
 
@@ -333,6 +339,70 @@ export class PayPalClient {
             const err = await this.parseError(response);
             throw new Error(`PayPal voidAuthorization failed (HTTP ${response.status}): ${err}`);
         }
+    }
+
+    /**
+     * Refunds a captured PayPal payment.
+     *
+     * Full refund  (UC4): pass no amount/currencyCode — PayPal refunds the exact
+     *   captured amount. Omitting the amount avoids rounding mismatches.
+     *
+     * Partial refund (UC5): pass the amount and currencyCode — PayPal refunds only
+     *   that portion. Multiple partial refunds may be issued against the same
+     *   capture up to its original value.
+     *
+     * Idempotency key:
+     *   Full    → `refund-full-<captureId>`   (one full refund per capture)
+     *   Partial → `refund-partial-<captureId>-<amount>` (one attempt per amount)
+     */
+    async refundCapture(
+        captureId: string,
+        amount?: number,
+        currencyCode?: string,
+    ): Promise<RefundCaptureResult> {
+        const token = await this.getAccessToken();
+        const isPartial = amount !== undefined && currencyCode !== undefined;
+
+        const body: Record<string, unknown> = {};
+        if (isPartial) {
+            body.amount = {
+                currency_code: (currencyCode as string).toUpperCase(),
+                value: this.toPayPalAmount(amount as number, currencyCode as string),
+            };
+        }
+
+        const idempotencyKey = isPartial
+            ? `refund-partial-${captureId}-${amount}`
+            : `refund-full-${captureId}`;
+
+        const response = await fetch(
+            `${this.baseUrl}/v2/payments/captures/${encodeURIComponent(captureId)}/refund`,
+            {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'PayPal-Request-Id': idempotencyKey,
+                },
+                body: JSON.stringify(body),
+            },
+        );
+
+        if (!response.ok) {
+            const err = await this.parseError(response);
+            throw new Error(`PayPal refundCapture failed (HTTP ${response.status}): ${err}`);
+        }
+
+        const data = (await response.json()) as PayPalRefundResponse;
+
+        Logger.info(
+            `PayPal capture ${captureId} refunded${isPartial ? ` (partial: ${amount})` : ' (full)'}. ` +
+                `Refund ID: ${data.id}, status: ${data.status}`,
+            loggerCtx,
+        );
+
+        return { refundId: data.id, status: data.status };
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────────────
